@@ -1565,6 +1565,24 @@ body.work-mode .dsb-wmlib{display:inline-flex}
 .dsb-work.active{background:linear-gradient(180deg,var(--purple),#6000aa) !important;color:#fff !important;box-shadow:0 0 20px rgba(200,0,255,.7) !important}
 .dsb-work:hover{color:var(--purple) !important;border-color:var(--purple) !important;box-shadow:0 0 14px rgba(200,0,255,.5)}
 
+/* LANGUAGE toggle button */
+.lang-btn{
+  padding:6px 12px;background:linear-gradient(180deg,#2a2a2e 0%,#151518 100%);
+  border:1px solid var(--screen-glow);color:var(--screen-glow);
+  font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:2px;font-weight:700;
+  border-radius:4px;cursor:pointer;transition:all .15s ease;
+}
+.lang-btn:hover{background:var(--screen-glow);color:#0a0a0a;box-shadow:0 0 14px rgba(46,224,255,.55)}
+
+/* RTL fix: Hebrew language direction */
+body.lang-he{direction:rtl}
+body.lang-he .header-right,body.lang-he .dsb-monitor,body.lang-he .library-actions,
+body.lang-he .track-row .actions{direction:rtl}
+body.lang-he .master-bpm,body.lang-he .screen-right,body.lang-he .time-value,
+body.lang-he .screen-bpm,body.lang-he .track-row .t-bpm,body.lang-he .track-row .t-key,
+body.lang-he input.url-input,body.lang-he input.search-input,body.lang-he .yt-input,
+body.lang-he input[type=text],body.lang-he input[type=password]{direction:ltr;text-align:start}
+
 /* STUDIO MASTERING panel */
 .studio-panel{display:flex;flex-direction:column;gap:14px}
 .studio-sub-label{font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:3px;color:var(--orange);font-weight:700;margin-bottom:6px}
@@ -1616,22 +1634,23 @@ body.work-mode .dsb-wmlib{display:inline-flex}
 <div class="header-right">
 <div class="power-led"></div><span>BPM</span>
 <span class="master-bpm" id="masterBpm">---.--</span>
-<button class="rec-btn" id="recBtn">REC</button>
+<button class="rec-btn" id="recBtn" data-t="rec">REC</button>
+<button class="lang-btn" id="langBtn" title="Language / שפה">🌐 EN</button>
 </div>
 </div>
 
 <div class="main-tabs">
-<button class="tab-btn active" data-tab="deck">◉ DECKS</button>
-<button class="tab-btn" data-tab="sampler">▣ SAMPLER</button>
-<button class="tab-btn" data-tab="youtube">🔎 MUSIC</button>
-<button class="tab-btn" data-tab="playlists">≡ PLAYLISTS</button>
-<button class="tab-btn" data-tab="sessions">💾 SESSIONS</button>
-<button class="tab-btn" data-tab="ai">🤖 AI DJ</button>
-<button class="tab-btn" data-tab="analytics">📊 ANALYTICS</button>
-<button class="tab-btn" data-tab="midi">🎹 MIDI</button>
-<button class="tab-btn" data-tab="studio">🎚 STUDIO</button>
-<button class="tab-btn" data-tab="settings">⚙ SETTINGS</button>
-<button class="tab-btn" data-tab="help">? HELP</button>
+<button class="tab-btn active" data-tab="deck" data-t="tab_decks">◉ DECKS</button>
+<button class="tab-btn" data-tab="sampler" data-t="tab_sampler">▣ SAMPLER</button>
+<button class="tab-btn" data-tab="youtube" data-t="tab_music">🔎 MUSIC</button>
+<button class="tab-btn" data-tab="playlists" data-t="tab_playlists">≡ PLAYLISTS</button>
+<button class="tab-btn" data-tab="sessions" data-t="tab_sessions">💾 SESSIONS</button>
+<button class="tab-btn" data-tab="ai" data-t="tab_ai">🤖 AI DJ</button>
+<button class="tab-btn" data-tab="analytics" data-t="tab_analytics">📊 ANALYTICS</button>
+<button class="tab-btn" data-tab="midi" data-t="tab_midi">🎹 MIDI</button>
+<button class="tab-btn" data-tab="studio" data-t="tab_studio">🎚 STUDIO</button>
+<button class="tab-btn" data-tab="settings" data-t="tab_settings">⚙ SETTINGS</button>
+<button class="tab-btn" data-tab="help" data-t="tab_help">? HELP</button>
 </div>
 
 <div class="tab-content active" id="tab-deck">
@@ -1690,14 +1709,14 @@ body.work-mode .dsb-wmlib{display:inline-flex}
 </div>
 
 <div class="deck-switch-bar">
-  <span class="dsb-label">DECK FOCUS</span>
+  <span class="dsb-label" data-t="deck_focus">DECK FOCUS</span>
   <button class="dsb-btn active" data-pair="AB">1 · 2</button>
   <button class="dsb-btn" data-pair="CD">3 · 4</button>
   <button class="dsb-btn dsb-split" data-pair="AC">1 · 3</button>
   <button class="dsb-btn dsb-split" data-pair="BD">2 · 4</button>
-  <button class="dsb-btn dsb-all" data-pair="ALL">ALL 4</button>
-  <button class="dsb-btn dsb-work" id="workModeBtn" title="Stage-ready performance view">🎆 WORK MODE</button>
-  <button class="dsb-btn dsb-wmlib" id="wmLibBtn" title="Show / hide the track library in work mode">📚 LIBRARY</button>
+  <button class="dsb-btn dsb-all" data-pair="ALL" data-t="all_4">ALL 4</button>
+  <button class="dsb-btn dsb-work" id="workModeBtn" title="Stage-ready performance view" data-t="work_mode">🎆 WORK MODE</button>
+  <button class="dsb-btn dsb-wmlib" id="wmLibBtn" title="Show / hide the track library in work mode" data-t="library_btn">📚 LIBRARY</button>
   <span class="dsb-monitor" id="dsbMonitor"></span>
 </div>
 
@@ -4578,6 +4597,125 @@ document.addEventListener('DOMContentLoaded',()=>{
   },200);
 });
 window.applyDeckPair=applyDeckPair;
+
+/* ========================================================
+   I18N — Hebrew ⇄ English language toggle
+   ======================================================== */
+const I18N={
+  en:{},
+  he:{
+    rec:'הקלט',
+    tab_decks:'◉ דקים',tab_sampler:'▣ סמפלר',tab_music:'🔎 מוזיקה',tab_playlists:'≡ רשימות',
+    tab_sessions:'💾 הפעלות',tab_ai:'🤖 DJ חכם',tab_analytics:'📊 נתונים',tab_midi:'🎹 MIDI',
+    tab_studio:'🎚 אולפן',tab_settings:'⚙ הגדרות',tab_help:'? עזרה',
+    deck_focus:'מיקוד דק',all_4:'4 הכל',work_mode:'🎆 מצב הופעה',library_btn:'📚 ספרייה',
+    'TRACK LIBRARY':'ספריית שירים','+ FILES':'+ קבצים','+ URL':'+ קישור','+ YOUTUBE':'+ יוטיוב',
+    '+ NEW PLAYLIST':'+ רשימה חדשה','EXPORT':'ייצוא','IMPORT':'ייבוא',
+    'MY PLAYLISTS':'הרשימות שלי','LOAD TO DECK A':'טען לדק A',
+    'YOUTUBE DIRECT PLAYER':'▶ נגן יוטיוב ישיר','🔎 MUSIC SEARCH':'🔎 חיפוש מוזיקה','SEARCH':'חפש',
+    'MY SESSIONS':'ההפעלות שלי','+ SAVE CURRENT':'+ שמור נוכחי',
+    '⚡ ANALYZE LIBRARY':'⚡ ניתוח ספרייה','Mix Style':'סגנון מיקס','Transition Length (beats)':'אורך מעבר',
+    'BPM Tolerance':'טווח BPM','Track Order':'סדר שירים',
+    'SMOOTH':'חלק','ENERGY':'אנרגיה','HARMONIC':'הרמוני','CUT':'חיתוך','ECHO OUT':'הד יציאה','PICK NEXT':'בחר הבא',
+    '⚡ AUTO MIX':'⚡ מיקס אוטומטי','CROSSFADER':'קרוספיידר','MASTER':'מאסטר',
+    'CLEAR ALL DATA':'מחק הכל','SAVE CREDENTIALS':'שמור אישורים','MUSIC SERVICES':'🎵 שירותי מוזיקה',
+    '🎵 MUSIC SERVICES':'🎵 שירותי מוזיקה','⌨ KEYBOARD SHORTCUTS':'⌨ קיצורי מקלדת',
+    'PERFORMANCE':'ביצועים','UI SETTINGS':'הגדרות ממשק','AUDIO SETTINGS':'הגדרות אודיו','DATA':'נתונים',
+    '🎚 STUDIO MASTERING — PRO SOUND CALIBRATION':'🎚 אולפן מאסטרינג — כיול סאונד מקצועי',
+    'A/B BYPASS':'A/B עקיפה','● ACTIVE':'● פעיל','● BYPASSED':'● עקוף',
+    'ROOM / VENUE PRESETS':'פריסטים לחדר/אולם','7-BAND PARAMETRIC EQ':'EQ פרמטרי 7 פסים',
+    'REAL-TIME SPECTRUM':'ספקטרום חי','🎛 COMPRESSOR':'🎛 מדחס','🎧 STEREO & IMAGE':'🎧 סטריאו ודימוי',
+    '✨ HARMONIC EXCITER':'✨ מגרה הרמוני','🛡 MASTER LIMITER':'🛡 לימיטר מאסטר',
+    'FLAT':'ישר','CLUB':'מועדון','STUDIO':'אולפן','OUTDOOR':'חוץ','HEADPHONES':'אוזניות','CAR':'רכב',
+    'WARM':'חמים','BRIGHT':'בהיר','BASS+':'באס+','VOCAL':'שירה',
+    '▶ START AUTO-MIX':'▶ התחל מיקס אוטומטי','⏹ STOP AUTO-MIX':'⏹ עצור מיקס',
+    'PLAY':'נגן','PAUSE':'השהה','CUE':'CUE','SYNC':'סנכרון','KEYLOCK':'נעל מפתח','QUANTIZE':'קוונטיזציה',
+    'SLIP':'SLIP','REVERSE':'הפוך','LOOP IN':'התחל לופ','LOOP OUT':'סיים לופ','RELOOP':'לופ מחדש',
+    'BEAT FX':'אפקט ביט','SCENE FX':'אפקט סצנה','ON / OFF':'הפעל / כבה','TAP':'הקש',
+    'No playlists yet. Click NEW PLAYLIST.':'אין עדיין רשימות. לחץ "רשימה חדשה".',
+    'Load a track first':'טען שיר קודם','No video':'אין וידאו',
+    'SETTINGS':'הגדרות','HELP':'עזרה',
+    '⚙ SETTINGS':'⚙ הגדרות','? HELP':'? עזרה',
+  }
+};
+const I18N_KEY='djmaxai_lang_v1';
+let currentLang=localStorage.getItem(I18N_KEY)||'en';
+function t(key){return (I18N[currentLang]&&I18N[currentLang][key])||(I18N.en[key])||key;}
+
+function applyLanguage(lang){
+  currentLang=lang;
+  try{localStorage.setItem(I18N_KEY,lang);}catch(e){}
+  document.body.classList.toggle('lang-he',lang==='he');
+  // Keep dir="rtl" for Hebrew, "ltr" for English (layout reflows)
+  document.documentElement.lang=lang;
+  document.documentElement.dir=lang==='he'?'rtl':'ltr';
+  // data-t: keyed lookups
+  document.querySelectorAll('[data-t]').forEach(el=>{
+    const k=el.dataset.t;
+    if(!el.dataset.tOriginal)el.dataset.tOriginal=el.textContent.trim();
+    el.textContent=lang==='en'?el.dataset.tOriginal:(I18N.he[k]||el.dataset.tOriginal);
+  });
+  // Text-based selectors: translate specific element classes when they contain a mapped string
+  const textTargets=[
+    '.library-title','.settings-section h3','.ai-dj-title','.mix-history h4','.sampler-title',
+    '.playlist-card h4','.session-name','.shortcut-item span:first-child',
+    '.upload-btn','.url-btn','.yt-btn','.playlist-btn','.tool-btn','.big-btn .lbl',
+    '.big-btn','.loop-btn','.util-btn','.studio-preset-btn','.automix-btn','.ai-dj-btn',
+    '.beat-fx-label','.scene-fx-label','.crossfader-label','.mixer-brand','.deck-label',
+    '.setting-label','.ai-config-item label','.compact-deck-header','.compact-vol-label',
+    '.scene-btn','.fx-onoff','.tap-btn','.search-src-btn','.dsb-btn',
+    '.lang-btn','.studio-sub-label','.studio-block-title','.studio-level-label',
+    '.stat-card h5','.stat-card .stat-sub','.mix-entry'
+  ];
+  textTargets.forEach(sel=>{
+    document.querySelectorAll(sel).forEach(el=>{
+      if(el.children.length>1)return;
+      const orig=el.dataset.tOriginal||el.textContent.trim();
+      if(!el.dataset.tOriginal)el.dataset.tOriginal=orig;
+      if(lang==='en'){el.textContent=el.dataset.tOriginal;return;}
+      const map=I18N.he;
+      const key=el.dataset.tOriginal;
+      if(map[key]){el.textContent=map[key];return;}
+      // Try case-insensitive
+      const keyUpper=Object.keys(map).find(k=>k.toLowerCase()===key.toLowerCase());
+      if(keyUpper){el.textContent=map[keyUpper];return;}
+    });
+  });
+  // Placeholder translations
+  const placeholders={
+    'Search any artist, song, remix...':'חפש אמן / שיר / רמיקס...',
+    'Paste YouTube URL or video ID...':'הדבק קישור או מזהה וידאו...',
+    'Paste YouTube URL...':'הדבק קישור יוטיוב...',
+    'Optional — for Spotify search + 30s previews':'אופציונלי — לחיפוש Spotify',
+    'Optional':'אופציונלי',
+    'Optional — enables YouTube search':'אופציונלי — לחיפוש יוטיוב'
+  };
+  document.querySelectorAll('input[placeholder]').forEach(inp=>{
+    if(!inp.dataset.phOrig)inp.dataset.phOrig=inp.placeholder;
+    inp.placeholder=lang==='en'?inp.dataset.phOrig:(placeholders[inp.dataset.phOrig]||inp.dataset.phOrig);
+  });
+  // Button label
+  const lb=document.getElementById('langBtn');
+  if(lb)lb.textContent=lang==='en'?'🌐 EN':'🌐 עב';
+  // Re-render dynamic panels to pick up language
+  try{renderLibrary&&renderLibrary();}catch(e){}
+  try{renderPlaylists&&renderPlaylists();}catch(e){}
+  try{renderSessions&&renderSessions();}catch(e){}
+  try{renderSampler&&renderSampler();}catch(e){}
+  try{updateDsbMonitor&&updateDsbMonitor();}catch(e){}
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  setTimeout(()=>{
+    const lb=document.getElementById('langBtn');
+    if(lb){
+      lb.addEventListener('click',()=>{
+        applyLanguage(currentLang==='en'?'he':'en');
+      });
+    }
+    applyLanguage(currentLang);
+  },500);
+});
 
 /* ========================================================
    STUDIO MASTERING — pro audio chain inserted before the limiter
