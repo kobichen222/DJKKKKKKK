@@ -3672,6 +3672,207 @@ function setupJogWheel(deckId){
 }
 document.addEventListener('DOMContentLoaded',()=>{setTimeout(()=>{['A','B'].forEach(setupJogWheel);},100);});
 
+/* ========================================================
+   PRO MIX ENGINE — world-class DJ automation
+   Camelot harmony, beat-phase sync, gain-matching, multi-stage
+   transitions (bass-swap, echo-out, filter-sweep, hard cut).
+   ======================================================== */
+const CAMELOT_MAP = {
+  'C':'8B','Am':'8A','G':'9B','Em':'9A','D':'10B','Bm':'10A',
+  'A':'11B','F#m':'11A','Gbm':'11A','E':'12B','C#m':'12A','Dbm':'12A',
+  'B':'1B','G#m':'1A','Abm':'1A','F#':'2B','Gb':'2B','D#m':'2A','Ebm':'2A',
+  'C#':'3B','Db':'3B','A#m':'3A','Bbm':'3A','G#':'4B','Ab':'4B','Fm':'4A',
+  'D#':'5B','Eb':'5B','Cm':'5A','A#':'6B','Bb':'6B','Gm':'6A','F':'7B','Dm':'7A'
+};
+function camelotPos(key){
+  if(!key||key==='--')return null;
+  const c=CAMELOT_MAP[key];if(!c)return null;
+  return {n:parseInt(c),side:c.slice(-1)};
+}
+function harmonicScore(k1,k2){
+  const a=camelotPos(k1),b=camelotPos(k2);
+  if(!a||!b)return 0.5;
+  if(a.n===b.n&&a.side===b.side)return 1.0;
+  if(a.n===b.n)return 0.85;
+  const dn=Math.min(Math.abs(a.n-b.n),12-Math.abs(a.n-b.n));
+  if(dn===1&&a.side===b.side)return 0.9;
+  if(dn===2&&a.side===b.side)return 0.6;
+  if(dn===7&&a.side===b.side)return 0.55;
+  return 0.3;
+}
+function bpmScore(b1,b2,tolPct){
+  const diff=Math.abs(b1-b2)/b1;
+  if(diff<=tolPct)return 1.0-diff/tolPct*0.3;
+  if(diff<=tolPct*2)return 0.5-((diff-tolPct)/tolPct)*0.3;
+  return 0.05;
+}
+function energyScore(e1,e2,direction){
+  if(e1==null||e2==null)return 0.6;
+  const d=e2-e1;
+  if(direction==='build'){return d>=0?Math.min(1,1-d/10*0.3):0.3;}
+  if(direction==='cool')return d<=0?Math.min(1,1+d/10*0.3):0.3;
+  return 1-Math.abs(d)/10;
+}
+
+const _recentlyPlayed=[];
+function smartPickNextTrack(){
+  const cands=library.filter(t=>t.source!=='yt'&&t.buffer);
+  if(!cands.length)return null;
+  const cur=decks.A.playing?decks.A:decks.B.playing?decks.B:null;
+  const order=document.getElementById('aiOrder')?.value||'energy-flow';
+  const tolPct=(parseFloat(document.getElementById('aiBpmTol')?.value||6))/100;
+  if(!cur||!cur.track){
+    const fresh=cands.filter(t=>!_recentlyPlayed.includes(t.id));
+    return (fresh.length?fresh:cands)[Math.floor(Math.random()*(fresh.length||cands.length))];
+  }
+  const ct=cur.track;
+  let dir='match';
+  if(order==='energy-flow')dir='build';
+  if(order==='harmonic'||order==='bpm-progressive')dir='match';
+  let best=null,bestScore=-1;
+  cands.forEach(t=>{
+    if(t.id===ct.id)return;
+    if(_recentlyPlayed.includes(t.id))return;
+    let s=0;
+    s+=bpmScore(ct.bpm,t.bpm,tolPct)*0.45;
+    s+=harmonicScore(ct.key,t.key)*0.35;
+    s+=energyScore(ct.energy,t.energy,dir)*0.20;
+    if(s>bestScore){bestScore=s;best=t;}
+  });
+  return best||cands[Math.floor(Math.random()*cands.length)];
+}
+
+function autoGainMatch(deckId){
+  const d=decks[deckId];
+  if(!d.track||!d.trimGain)return;
+  const target=settings.targetEnergy||5;
+  const e=d.track.energy||5;
+  const trim=Math.pow(10,((target-e)*1.5)/20);
+  d.trimGain.gain.setTargetAtTime(Math.max(0.4,Math.min(1.6,trim)),audioCtx.currentTime,0.05);
+}
+
+function nextDownbeatTime(deckId,bars){
+  const d=decks[deckId];if(!d.track)return audioCtx?audioCtx.currentTime+1:0;
+  const bpm=d.track.bpm*(1+d.tempo/100);
+  const beatDur=60/bpm,phraseDur=beatDur*4*bars;
+  const cur=getCurrentTime(deckId);
+  const beatsFromCue=(cur-(d.cuePoint||0))/beatDur;
+  const phraseBeats=4*bars;
+  const beatsToNext=phraseBeats-((beatsFromCue%phraseBeats)+phraseBeats)%phraseBeats;
+  return audioCtx.currentTime+beatsToNext*beatDur;
+}
+
+function syncDeckPhase(toId,fromId){
+  const dt=decks[toId],df=decks[fromId];
+  if(!dt.track||!df.track)return;
+  const newRate=(df.track.bpm*(1+df.tempo/100))/dt.track.bpm;
+  dt.tempo=(newRate-1)*100;
+  dt.playbackRate=newRate;
+  if(dt.source)try{dt.source.playbackRate.setTargetAtTime(newRate,audioCtx.currentTime,0.05);}catch(e){}
+  const fromBeat=60/(df.track.bpm*(1+df.tempo/100));
+  const fromCur=getCurrentTime(fromId)-(df.cuePoint||0);
+  const phaseInBar=((fromCur/fromBeat)%4+4)%4;
+  const toBeat=60/(dt.track.bpm*newRate);
+  const targetOffset=(dt.cuePoint||0)+phaseInBar*toBeat;
+  dt.offset=Math.max(0,targetOffset);
+}
+
+function eqSwap(outId,inId,durSec,filterStyle){
+  if(!audioCtx)return;
+  const t0=audioCtx.currentTime,t1=t0+durSec;
+  const dOut=decks[outId],dIn=decks[inId];
+  if(dOut.eqLow){dOut.eqLow.gain.cancelScheduledValues(t0);dOut.eqLow.gain.setValueAtTime(dOut.eqLow.gain.value,t0);dOut.eqLow.gain.linearRampToValueAtTime(-80,t1);}
+  if(dIn.eqLow){dIn.eqLow.gain.cancelScheduledValues(t0);dIn.eqLow.gain.setValueAtTime(-80,t0);dIn.eqLow.gain.linearRampToValueAtTime(0,t0+durSec*0.6);}
+  if(filterStyle==='hp-sweep'&&dOut.colorFilter){
+    dOut.colorFilter.type='highpass';dOut.colorFilter.frequency.cancelScheduledValues(t0);
+    dOut.colorFilter.frequency.setValueAtTime(20,t0);
+    dOut.colorFilter.frequency.exponentialRampToValueAtTime(8000,t1);
+  }
+  if(filterStyle==='echo-out'&&window.sceneFxWet){
+    sceneFxWet.gain.cancelScheduledValues(t0);
+    sceneFxWet.gain.setValueAtTime(sceneFxWet.gain.value,t0);
+    sceneFxWet.gain.linearRampToValueAtTime(0.7,t0+durSec*0.5);
+    sceneFxWet.gain.linearRampToValueAtTime(0,t1+1);
+  }
+}
+
+function fadeCrossfaderCurve(target,durMs,curve){
+  const start=mixerState.crossfader,t0=performance.now();
+  curve=curve||'cosine';
+  function ease(t){
+    if(curve==='cosine')return (1-Math.cos(Math.PI*t))/2;
+    if(curve==='cut')return t<0.5?0:1;
+    if(curve==='exp')return Math.pow(t,2);
+    return t;
+  }
+  function step(){
+    const el=performance.now()-t0,raw=Math.min(1,el/durMs);
+    const t=ease(raw);
+    mixerState.crossfader=start+(target-start)*t;
+    const h=document.getElementById('xfaderHandle');
+    if(h)h.style.left=`${mixerState.crossfader*100}%`;
+    applyCrossfader();
+    if(raw<1)requestAnimationFrame(step);
+  }
+  step();
+}
+
+async function proTransition(from,to,style,bars){
+  if(!audioCtx)return;
+  const next=smartPickNextTrack();
+  if(!next){aiLog&&aiLog('No suitable next track');stopAIDJ&&stopAIDJ();return;}
+  aiLog&&aiLog(`▶ ${style.toUpperCase()} | ${next.title} (${next.bpm} BPM, ${next.key||'--'}, E${next.energy||'?'})`);
+  await loadTrackToDeck(to,next);
+  autoGainMatch(to);
+  await new Promise(r=>setTimeout(r,300));
+  syncDeckPhase(to,from);
+  const dropAt=nextDownbeatTime(from,Math.min(bars,8));
+  const wait=Math.max(0,(dropAt-audioCtx.currentTime)*1000);
+  setTimeout(()=>{
+    const dIn=decks[to];if(dIn.eqLow)dIn.eqLow.gain.setValueAtTime(0,audioCtx.currentTime);
+    playDeck(to);
+    const beatDur=60/(decks[from].track.bpm*(1+decks[from].tempo/100));
+    const durSec=beatDur*bars;
+    const xfTarget=from==='A'?1:0;
+    if(style==='cut'){
+      fadeCrossfaderCurve(xfTarget,beatDur*4*1000,'cut');
+      setTimeout(()=>{pauseDeck(from);_recentlyPlayed.push(decks[from].track?.id);if(_recentlyPlayed.length>8)_recentlyPlayed.shift();aiDJ.transitionTimer=setTimeout(scheduleAITransition,2000);},beatDur*4*1000+200);
+      return;
+    }
+    if(style==='energy'){
+      eqSwap(from,to,durSec*0.6,'hp-sweep');
+      fadeCrossfaderCurve(xfTarget,durSec*1000,'exp');
+    }else if(style==='harmonic'||style==='smooth'){
+      eqSwap(from,to,durSec*0.8,null);
+      fadeCrossfaderCurve(xfTarget,durSec*1000,'cosine');
+    }else{
+      eqSwap(from,to,durSec*0.7,'echo-out');
+      fadeCrossfaderCurve(xfTarget,durSec*1000,'cosine');
+    }
+    setTimeout(()=>{
+      pauseDeck(from);
+      const t=decks[from].track;if(t){_recentlyPlayed.push(t.id);if(_recentlyPlayed.length>8)_recentlyPlayed.shift();}
+      if(decks[from].colorFilter){decks[from].colorFilter.type='allpass';decks[from].colorFilter.frequency.value=1000;}
+      if(decks[from].eqLow)decks[from].eqLow.gain.setValueAtTime(0,audioCtx.currentTime);
+      if(window.sceneFxWet)sceneFxWet.gain.setValueAtTime(0,audioCtx.currentTime);
+      aiLog&&aiLog(`✓ Now on Deck ${to}`);
+      aiDJ.transitionTimer=setTimeout(scheduleAITransition,1500);
+    },durSec*1000+400);
+  },wait);
+}
+
+if(typeof window!=='undefined'){
+  window.pickNextTrack=smartPickNextTrack;
+  const _origPerformAITransition=window.performAITransition;
+  window.performAITransition=function(from){
+    if(!aiDJ.active)return;
+    const to=from==='A'?'B':'A';
+    const style=document.getElementById('aiStyle')?.value||'smooth';
+    const bars=parseInt(document.getElementById('aiTransLen')?.value||16)/4;
+    proTransition(from,to,style,Math.max(2,bars));
+  };
+}
+
 document.addEventListener('DOMContentLoaded',init);
 </script>
 </body>
