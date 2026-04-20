@@ -1,6 +1,7 @@
 {
-  "buildCommand": "cp public/pioneer-dj-pro-max-v2.html public/index.html",
-  "outputDirectory": "public",
   "framework": null,
-  "installCommand": "echo skip"
+  "buildCommand": null,
+  "installCommand": null,
+  "outputDirectory": "public",
+  "cleanUrls": true
 }
