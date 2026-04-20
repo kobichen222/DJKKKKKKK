@@ -1851,8 +1851,25 @@ function togglePlay(deckId){
 }
 function cueDeck(deckId){
   const d=decks[deckId];if(!d.track)return;
-  if(d.playing)seekDeck(deckId,d.cuePoint);
-  else{d.cuePoint=getCurrentTime(deckId);toast(`Cue: ${fmtTime(d.cuePoint)}`);}
+  if(d.playing){
+    seekDeck(deckId,d.cuePoint);
+    pauseDeck(deckId);
+  }else{
+    const cur=getCurrentTime(deckId);
+    if(Math.abs(cur-d.cuePoint)>0.05){d.cuePoint=cur;toast(`Cue set: ${fmtTime(d.cuePoint)}`);}
+    else{seekDeck(deckId,d.cuePoint);}
+  }
+}
+function cuePressDown(deckId){
+  const d=decks[deckId];if(!d.track||d.playing)return;
+  const cur=getCurrentTime(deckId);
+  if(Math.abs(cur-d.cuePoint)<=0.05){d._cuePreview=true;playDeck(deckId);}
+}
+function cuePressUp(deckId){
+  const d=decks[deckId];if(!d._cuePreview)return;
+  d._cuePreview=false;
+  pauseDeck(deckId);
+  seekDeck(deckId,d.cuePoint);
 }
 function getCurrentTime(deckId){
   const d=decks[deckId];
@@ -2520,10 +2537,17 @@ function applyCrossfader(){
 /* EVENTS */
 function attachEvents(){
   document.querySelectorAll('.big-btn').forEach(btn=>{
-    btn.addEventListener('click',()=>{
-      const d=btn.dataset.deck,a=btn.dataset.action;
-      if(a==='play')togglePlay(d);else if(a==='cue')cueDeck(d);
-    });
+    const d=btn.dataset.deck,a=btn.dataset.action;
+    if(a==='cue'){
+      btn.addEventListener('mousedown',(e)=>{e.preventDefault();cuePressDown(d);});
+      btn.addEventListener('mouseup',()=>cuePressUp(d));
+      btn.addEventListener('mouseleave',()=>cuePressUp(d));
+      btn.addEventListener('touchstart',(e)=>{e.preventDefault();cuePressDown(d);},{passive:false});
+      btn.addEventListener('touchend',(e)=>{e.preventDefault();cuePressUp(d);});
+      btn.addEventListener('click',()=>cueDeck(d));
+    }else{
+      btn.addEventListener('click',()=>{if(a==='play')togglePlay(d);});
+    }
   });
   document.querySelectorAll('.loop-btn').forEach(btn=>{
     btn.addEventListener('click',()=>{
