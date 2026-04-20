@@ -1337,7 +1337,9 @@ body{align-items:center;justify-content:flex-start}
 .channels{align-items:end}
 .channel{gap:6px;align-items:center}
 .channel .channel-body{align-items:end}
-.fader-wrap,.vu-meter{display:block}
+.fader-wrap{display:block}
+.vu-meter{display:flex;flex-direction:column-reverse}
+.vu-led{flex:1 1 auto;min-height:4px}
 
 /* Crossfader section — centered, even margins */
 .crossfader-section{display:flex;flex-direction:column;gap:6px;padding:8px}
