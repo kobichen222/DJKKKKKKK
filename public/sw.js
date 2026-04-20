@@ -5,8 +5,8 @@
    - CDN assets (Google Fonts, jsDelivr) → cache-first once seen
    - Everything cached stays reachable offline forever */
 
-const CACHE = 'djmaxai-shell-v18';
-const CDN_CACHE = 'djmaxai-cdn-v18';
+const CACHE = 'djmaxai-shell-v19';
+const CDN_CACHE = 'djmaxai-cdn-v19';
 const SHELL = [
   './','./index.html','./pioneer-dj-pro-max-v2.html',
   './analyzer.worker.js','./manifest.json','./icon.svg','./auth.sql'
