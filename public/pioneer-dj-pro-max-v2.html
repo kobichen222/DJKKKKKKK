@@ -1057,6 +1057,53 @@ button:focus-visible{outline:2px solid var(--orange-glow);outline-offset:2px}
   border-radius:3px;cursor:pointer;transition:all .15s ease;
 }
 .automix-sync:hover{background:var(--orange);color:#000;box-shadow:0 0 12px rgba(255,138,26,.6)}
+
+/* DECK SWITCH BAR — 4-deck focus toggle */
+.deck-switch-bar{
+  width:100%;max-width:1700px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;
+  padding:8px 12px;background:linear-gradient(180deg,#1c1c20 0%,#111114 100%);
+  border:1px solid rgba(255,255,255,.06);border-radius:8px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 4px 14px rgba(0,0,0,.5);
+}
+.dsb-label{
+  font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:3px;
+  color:var(--orange);font-weight:800;margin-right:6px;
+}
+.dsb-btn{
+  padding:7px 14px;background:linear-gradient(180deg,#2a2a2e 0%,#151518 100%);
+  border:1px solid #333;color:var(--text-dim);font-family:'Orbitron',sans-serif;
+  font-size:11px;letter-spacing:2.5px;font-weight:800;border-radius:4px;cursor:pointer;
+  transition:all .15s ease;
+}
+.dsb-btn:hover{border-color:var(--orange);color:var(--orange);transform:translateY(-1px)}
+.dsb-btn.active{
+  background:linear-gradient(180deg,var(--orange) 0%,#c85a00 100%);
+  color:#0a0a0a;border-color:var(--orange-glow);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 0 18px rgba(255,138,26,.55);
+}
+.dsb-split{font-size:10px;letter-spacing:1.5px}
+.dsb-all{letter-spacing:1.5px}
+.dsb-monitor{
+  margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;
+  font-family:'Share Tech Mono',monospace;font-size:10px;
+}
+.dsb-chip{
+  display:inline-flex;align-items:center;gap:6px;padding:4px 10px;
+  background:#0a0a0b;border:1px solid #2a2a2e;border-radius:3px;letter-spacing:1.5px;
+}
+.dsb-chip .dsb-dot{width:6px;height:6px;border-radius:50%;background:#444}
+.dsb-chip.playing .dsb-dot{background:var(--play-green);box-shadow:0 0 6px var(--play-green);animation:blink 1.2s infinite}
+.dsb-chip .dsb-id{color:var(--orange);font-weight:700}
+.dsb-chip .dsb-bpm{color:var(--screen-glow)}
+.dsb-chip.focus{border-color:var(--orange)}
+
+/* When ALL 4 decks visible, adjust console grid */
+.console.show-all{grid-template-columns:1fr 1fr 420px 1fr 1fr}
+@media(max-width:1400px){.console.show-all{grid-template-columns:1fr 1fr;} .console.show-all .mixer{grid-column:1/-1}}
+
+/* Compact monitor in mixer — list style */
+.compact-decks{min-height:0}
+.compact-decks:empty{display:none}
 </style>
 </head>
 <body>
@@ -1137,10 +1184,22 @@ button:focus-visible{outline:2px solid var(--orange-glow);outline-offset:2px}
 <div class="knob-wrap"><div class="knob small" data-knob="sceneDepth"><div class="knob-indicator"></div></div><span class="knob-label">DEPTH</span></div>
 </div>
 
-<div class="console">
+<div class="deck-switch-bar">
+  <span class="dsb-label">DECK FOCUS</span>
+  <button class="dsb-btn active" data-pair="AB">1 · 2</button>
+  <button class="dsb-btn" data-pair="CD">3 · 4</button>
+  <button class="dsb-btn dsb-split" data-pair="AC">1 · 3</button>
+  <button class="dsb-btn dsb-split" data-pair="BD">2 · 4</button>
+  <button class="dsb-btn dsb-all" data-pair="ALL">ALL 4</button>
+  <span class="dsb-monitor" id="dsbMonitor"></span>
+</div>
+
+<div class="console" id="console">
 <div class="cdj" data-deck="A" id="deckA-container"></div>
+<div class="cdj" data-deck="C" id="deckC-container" style="display:none"></div>
 <div class="mixer" id="mixer-container"></div>
 <div class="cdj" data-deck="B" id="deckB-container"></div>
+<div class="cdj" data-deck="D" id="deckD-container" style="display:none"></div>
 </div>
 
 <div class="library">
@@ -1581,38 +1640,7 @@ function buildMixerHTML(){
     <button class="mic-btn" id="micOnBtn">ON</button>
   </div>
 
-  <div class="compact-decks">
-    ${['C','D'].map((cd,i)=>`
-    <div class="compact-deck" data-deck="${cd}">
-      <div class="compact-deck-header">
-        <span class="cd-num">DECK ${cd}</span>
-        <span style="color:var(--text-dim);">CH ${i+3} · CDJ-M</span>
-      </div>
-      <div class="compact-deck-title" id="cdTitle-${cd}">— EMPTY —</div>
-      <div class="compact-deck-bpm" id="cdBpm-${cd}">---</div>
-      <div class="compact-transport">
-        <button class="compact-btn cue" data-compact="cue" data-deck="${cd}">CUE</button>
-        <button class="compact-btn play" data-compact="play" data-deck="${cd}">▶ PLAY</button>
-      </div>
-      <div class="compact-tempo">
-        <button data-compact="tempo-minus" data-deck="${cd}">−</button>
-        <button data-compact="tempo-reset" data-deck="${cd}">0</button>
-        <button data-compact="tempo-plus" data-deck="${cd}">+</button>
-      </div>
-      <div class="compact-vol">
-        <span class="compact-vol-label">VOL</span>
-        <input type="range" min="0" max="100" value="80" data-compact-vol="${cd}" />
-      </div>
-      <div class="compact-vol">
-        <span class="compact-vol-label">XF</span>
-        <div class="xfader-assign" data-deck="${cd}" style="flex:1;">
-          <button class="assign-btn" data-assign="A">A</button>
-          <button class="assign-btn active" data-assign="THRU">∥</button>
-          <button class="assign-btn" data-assign="B">B</button>
-        </div>
-      </div>
-    </div>`).join('')}
-  </div>
+  <div class="compact-decks" id="mixerCompactDecks"></div>
 
   <div class="isolator-panel">
     <div class="knob-wrap"><div class="knob small" data-knob="isoLow"><div class="knob-indicator"></div></div><span class="knob-label">ISO LOW</span></div>
@@ -1944,21 +1972,17 @@ async function loadTrackToDeck(deckId,track){
     }
   }
   d.buffer=track.buffer||generateBuffer(track);
-  // Update display - compact decks have different IDs
-  if(deckId==='C'||deckId==='D'){
-    const tEl=document.getElementById(`cdTitle-${deckId}`);
-    const bEl=document.getElementById(`cdBpm-${deckId}`);
-    if(tEl)tEl.textContent=track.title.toUpperCase();
-    if(bEl)bEl.textContent=track.bpm.toFixed(1)+' BPM';
-  }else{
-    document.getElementById(`title-${deckId}`).textContent=track.title.toUpperCase();
-    document.getElementById(`artist-${deckId}`).textContent=track.artist.toUpperCase();
-    document.getElementById(`bpm-${deckId}`).textContent=track.bpm.toFixed(2);
-    document.getElementById(`key-${deckId}`).textContent=track.key;
-    document.getElementById(`centerBpm-${deckId}`).textContent=track.bpm.toFixed(1);
-    document.querySelectorAll(`.hot-cues[data-deck="${deckId}"] .cue-btn`).forEach(b=>b.classList.remove('active'));
-    drawWaveform(deckId,track);drawPhraseMarkers(deckId,track);
-  }
+  const setText=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  setText(`title-${deckId}`,track.title.toUpperCase());
+  setText(`artist-${deckId}`,track.artist.toUpperCase());
+  setText(`bpm-${deckId}`,track.bpm.toFixed(2));
+  setText(`key-${deckId}`,track.key);
+  setText(`centerBpm-${deckId}`,track.bpm.toFixed(1));
+  setText(`cdTitle-${deckId}`,track.title.toUpperCase());
+  setText(`cdBpm-${deckId}`,track.bpm.toFixed(1)+' BPM');
+  document.querySelectorAll(`.hot-cues[data-deck="${deckId}"] .cue-btn`).forEach(b=>b.classList.remove('active'));
+  try{drawWaveform(deckId,track);drawPhraseMarkers(deckId,track);}catch(e){}
+  updateDsbMonitor&&updateDsbMonitor();
   updateMasterBpm();logMix(`Loaded "${track.title}" → Deck ${deckId}`);
   stats.tracksPlayed++;updateStats();
 }
@@ -3474,6 +3498,8 @@ function init(){
   applyTheme(settings.theme);
   document.getElementById('deckA-container').innerHTML=buildDeckHTML('A');
   document.getElementById('deckB-container').innerHTML=buildDeckHTML('B');
+  document.getElementById('deckC-container').innerHTML=buildDeckHTML('C');
+  document.getElementById('deckD-container').innerHTML=buildDeckHTML('D');
   document.getElementById('mixer-container').innerHTML=buildMixerHTML();
   setupVU('vu-A',20);setupVU('vu-B',20);setupVU('vu-C',20);setupVU('vu-D',20);
   setupVU('masterVuL',6);setupVU('masterVuR',6);
@@ -3786,7 +3812,85 @@ function setupJogWheel(deckId){
     d.cuePoint=d.offset;toast(`Deck ${deckId}: CUE set at ${fmtTime(d.offset)}`,'success');
   });
 }
-document.addEventListener('DOMContentLoaded',()=>{setTimeout(()=>{['A','B'].forEach(setupJogWheel);},100);});
+document.addEventListener('DOMContentLoaded',()=>{setTimeout(()=>{['A','B','C','D'].forEach(setupJogWheel);},100);});
+
+/* ========================================================
+   Deck focus toggle — show any pair (AB/CD/AC/BD) or ALL 4
+   ======================================================== */
+const DSB_PAIRS={AB:['A','B'],CD:['C','D'],AC:['A','C'],BD:['B','D'],ALL:['A','B','C','D']};
+let dsbPair='AB';
+function applyDeckPair(pair){
+  dsbPair=pair;
+  const visible=new Set(DSB_PAIRS[pair]||DSB_PAIRS.AB);
+  ['A','B','C','D'].forEach(d=>{
+    const c=document.getElementById('deck'+d+'-container');
+    if(c)c.style.display=visible.has(d)?'':'none';
+  });
+  document.querySelectorAll('.dsb-btn').forEach(b=>b.classList.toggle('active',b.dataset.pair===pair));
+  const console=document.getElementById('console');
+  if(console)console.classList.toggle('show-all',pair==='ALL');
+  renderMixerCompactDecks();
+  updateDsbMonitor();
+}
+function renderMixerCompactDecks(){
+  const container=document.getElementById('mixerCompactDecks');
+  if(!container)return;
+  const visible=new Set(DSB_PAIRS[dsbPair]||[]);
+  const monitor=['A','B','C','D'].filter(d=>!visible.has(d));
+  if(!monitor.length){container.innerHTML='';return;}
+  container.innerHTML=monitor.map((cd,i)=>`
+    <div class="compact-deck" data-deck="${cd}">
+      <div class="compact-deck-header">
+        <span class="cd-num">DECK ${cd}</span>
+        <span style="color:var(--text-dim);">MONITOR</span>
+      </div>
+      <div class="compact-deck-title" id="cdTitle-${cd}">${decks[cd]?.track?.title?.toUpperCase()||'— EMPTY —'}</div>
+      <div class="compact-deck-bpm" id="cdBpm-${cd}">${decks[cd]?.track?decks[cd].track.bpm.toFixed(1)+' BPM':'---'}</div>
+      <div class="compact-transport">
+        <button class="compact-btn cue ${decks[cd]?.cuePoint?'':''}" data-compact="cue" data-deck="${cd}">CUE</button>
+        <button class="compact-btn play ${decks[cd]?.playing?'active':''}" data-compact="play" data-deck="${cd}">${decks[cd]?.playing?'❚❚ PAUSE':'▶ PLAY'}</button>
+      </div>
+      <div class="compact-tempo">
+        <button data-compact="tempo-minus" data-deck="${cd}">−</button>
+        <button data-compact="tempo-reset" data-deck="${cd}">0</button>
+        <button data-compact="tempo-plus" data-deck="${cd}">+</button>
+      </div>
+      <div class="compact-vol">
+        <span class="compact-vol-label">VOL</span>
+        <input type="range" min="0" max="100" value="${Math.round((decks[cd]?.volume||0.8)*100)}" data-compact-vol="${cd}" />
+      </div>
+      <div class="compact-vol">
+        <span class="compact-vol-label">FOCUS</span>
+        <button class="dsb-btn" style="flex:1;padding:4px;" onclick="applyDeckPair('${cd==='A'||cd==='B'?'AB':'CD'}')">FOCUS ${cd}</button>
+      </div>
+    </div>`).join('');
+  container.querySelectorAll('[data-compact="play"]').forEach(b=>b.addEventListener('click',()=>togglePlay(b.dataset.deck)));
+  container.querySelectorAll('[data-compact="cue"]').forEach(b=>b.addEventListener('click',()=>cueDeck(b.dataset.deck)));
+  container.querySelectorAll('[data-compact="tempo-minus"]').forEach(b=>b.addEventListener('click',()=>{const d=b.dataset.deck;setTempo(d,(decks[d].tempo||0)-0.1);}));
+  container.querySelectorAll('[data-compact="tempo-plus"]').forEach(b=>b.addEventListener('click',()=>{const d=b.dataset.deck;setTempo(d,(decks[d].tempo||0)+0.1);}));
+  container.querySelectorAll('[data-compact="tempo-reset"]').forEach(b=>b.addEventListener('click',()=>setTempo(b.dataset.deck,0)));
+  container.querySelectorAll('[data-compact-vol]').forEach(r=>r.addEventListener('input',e=>{
+    const d=r.dataset.compactVol,v=parseInt(e.target.value)/100;decks[d].volume=v;
+    if(decks[d].volumeGain&&decks[d].playing)decks[d].volumeGain.gain.setTargetAtTime(v,audioCtx.currentTime,0.02);
+  }));
+}
+function updateDsbMonitor(){
+  const m=document.getElementById('dsbMonitor');if(!m)return;
+  const focused=new Set(DSB_PAIRS[dsbPair]||[]);
+  m.innerHTML=['A','B','C','D'].map(d=>{
+    const dk=decks[d]||{};const playing=dk.playing?'playing':'';const focus=focused.has(d)?'focus':'';
+    const bpm=dk.track?(dk.track.bpm*(1+(dk.tempo||0)/100)).toFixed(1):'---';
+    return `<span class="dsb-chip ${playing} ${focus}"><span class="dsb-dot"></span><span class="dsb-id">${d}</span><span class="dsb-bpm">${bpm}</span></span>`;
+  }).join('');
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  setTimeout(()=>{
+    document.querySelectorAll('.dsb-btn[data-pair]').forEach(b=>b.addEventListener('click',()=>applyDeckPair(b.dataset.pair)));
+    applyDeckPair('AB');
+    setInterval(updateDsbMonitor,500);
+  },200);
+});
+window.applyDeckPair=applyDeckPair;
 
 /* ========================================================
    PRO MIX ENGINE — world-class DJ automation
