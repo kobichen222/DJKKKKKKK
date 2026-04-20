@@ -3,7 +3,7 @@
 export default function DJPage() {
   return (
     <iframe
-      src="/pioneer-dj-pro-max-v2.html"
+      src="./pioneer-dj-pro-max-v2.html"
       style={{
         width: "100vw",
         height: "100vh",
