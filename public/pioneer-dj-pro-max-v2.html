@@ -2486,9 +2486,12 @@ body.theme-light .deck-header .deck-lib-btn{background:linear-gradient(180deg,#f
 body.theme-light .deck-header .deck-upload-btn{background:linear-gradient(180deg,#fff,#e4e4e8);color:var(--orange-glow);border-color:rgba(255,138,26,.5)}
 body.theme-light .deck-header .deck-upload-btn:hover{background:var(--orange);color:#fff}
 
-/* CUE big-btn centering fix */
-.big-btn{justify-content:center !important;text-align:center !important}
+/* CUE big-btn centering fix — compensate for letter-spacing trailing */
+.big-btn{justify-content:center !important;align-items:center !important;text-align:center !important;padding-left:13px !important;padding-right:10px !important}
 .big-btn .icon,.big-btn .lbl{display:block;text-align:center;width:100%;line-height:1}
+.big-btn .icon{letter-spacing:0 !important;text-indent:0}
+.big-btn .lbl{text-indent:3px}
+.big-btn.cue .lbl,.big-btn.play .lbl{margin-left:0;padding-left:0}
 body.theme-light .deck-header .deck-lib-btn:hover{background:#00a656;color:#fff}
 
 /* Quick library picker modal */
