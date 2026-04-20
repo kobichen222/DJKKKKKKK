@@ -3855,6 +3855,8 @@ function ensureAudio(){
   masterLimiter.ratio.value=20;masterLimiter.attack.value=0.001;masterLimiter.release.value=0.05;
   recordDestination=audioCtx.createMediaStreamDestination();
   masterAnalyserL=audioCtx.createAnalyser();masterAnalyserR=audioCtx.createAnalyser();
+  masterAnalyserL.fftSize=1024;masterAnalyserR.fftSize=1024;
+  masterAnalyserL.smoothingTimeConstant=0.25;masterAnalyserR.smoothingTimeConstant=0.25;
   const splitter=audioCtx.createChannelSplitter(2);
   sceneFxOut.connect(splitter);
   splitter.connect(masterAnalyserL,0);splitter.connect(masterAnalyserR,1);
@@ -5586,31 +5588,49 @@ function animateVU(){
   (function paintMaster(){
     const now=performance.now();
     const haveAudio=!!masterAnalyserL&&!!masterAnalyserR;
+    const anyPlaying=['A','B','C','D'].some(k=>decks[k]&&decks[k].playing);
     let maxLevel=0;
     [['masterHVuL',masterAnalyserL,18,'clipLedL','lblL',0],['masterHVuR',masterAnalyserR,18,'clipLedR','lblR',1]].forEach(([id,an,segs,clipId,lblId,chan])=>{
       const vu=document.getElementById(id);if(!vu)return;
       const leds=vu.querySelectorAll('.vu-led');if(!leds.length)return;
-      let level=0;
+      let level=0,bassEnergy=0;
       if(an){
         try{
-          const arr=new Uint8Array(an.frequencyBinCount);
-          an.getByteTimeDomainData(arr);
+          const tArr=new Uint8Array(an.fftSize);
+          an.getByteTimeDomainData(tArr);
           let peak=0,rms=0;
-          for(let i=0;i<arr.length;i++){const v=Math.abs(arr[i]-128);if(v>peak)peak=v;rms+=v*v;}
-          rms=Math.sqrt(rms/arr.length);
-          const combined=peak*0.6+rms*2.2;
-          level=Math.min(segs,(combined/128)*(segs*1.7));
+          for(let i=0;i<tArr.length;i++){const v=Math.abs(tArr[i]-128);if(v>peak)peak=v;rms+=v*v;}
+          rms=Math.sqrt(rms/tArr.length);
+          const combined=peak*0.55+rms*2.4;
+          level=Math.min(segs,(combined/128)*(segs*1.9));
+          // Beat detection via low-band FFT energy (20-150Hz kick range)
+          const fArr=new Uint8Array(an.frequencyBinCount);
+          an.getByteFrequencyData(fArr);
+          const sr=(audioCtx&&audioCtx.sampleRate)||48000;
+          const binHz=sr/an.fftSize;
+          const lowEnd=Math.min(an.frequencyBinCount-1,Math.floor(150/binHz));
+          let lowSum=0,lowCount=0;
+          for(let i=1;i<=lowEnd;i++){lowSum+=fArr[i];lowCount++;}
+          bassEnergy=lowCount?lowSum/lowCount:0;
         }catch(e){level=0;}
       }
-      // Idle breathing — subtle sine wave so the meter visibly pulses even
-      // before audio starts.  Stops as soon as real level > 1.
-      if(level<0.5){
+      // Beat punch — detect sudden rise in bass energy -> brief spike
+      vu._bassAvg=vu._bassAvg!=null?vu._bassAvg*0.92+bassEnergy*0.08:bassEnergy;
+      const bassDelta=bassEnergy-vu._bassAvg;
+      if(bassDelta>18&&bassEnergy>70){vu._punchUntil=now+140;vu._punchAmt=Math.min(6,bassDelta/8);}
+      if((vu._punchUntil||0)>now){
+        const punchLeft=(vu._punchUntil-now)/140;
+        level+=(vu._punchAmt||3)*punchLeft;
+      }
+      // Idle breathing — only when nothing playing
+      if(!anyPlaying&&level<0.5){
         const phase=(now/480)+chan*0.6;
         level=1.6+Math.sin(phase)*1.0;
       }
+      level=Math.min(segs,level);
       vu._hold=vu._hold||0;
       vu._peak=vu._peak||0;
-      if(level>vu._hold)vu._hold=level;else vu._hold=Math.max(level,vu._hold-0.65);
+      if(level>vu._hold)vu._hold=level;else vu._hold=Math.max(level,vu._hold-0.85);
       if(vu._hold>vu._peak){vu._peak=vu._hold;vu._peakTime=now;}
       else if(now-(vu._peakTime||0)>500)vu._peak=Math.max(vu._hold,vu._peak-0.12);
       const peakIdx=Math.max(0,Math.floor(vu._peak)-1);
