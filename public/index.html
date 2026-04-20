@@ -1465,50 +1465,102 @@ body{align-items:center;justify-content:flex-start}
 .search-card .sc-source.youtube{background:rgba(255,46,46,.12);color:#ff6a6a;border:1px solid rgba(255,46,46,.3)}
 @media(max-width:820px){.search-results{grid-template-columns:1fr}}
 
-/* WORK MODE — performance view: only decks + mixer with neon halo */
+/* WORK MODE — stage-ready performance view with library drawer */
 body.work-mode .header-bar,
 body.work-mode .main-tabs,
-body.work-mode .rgb-ambient,
 body.work-mode canvas#spectrumCanvas,
 body.work-mode .beat-fx-panel,
 body.work-mode .scene-fx-panel,
-body.work-mode .library,
 body.work-mode .tab-content:not(#tab-deck),
-body.work-mode #tab-deck > *:not(.console){display:none !important;}
+body.work-mode #tab-deck > *:not(.console):not(.library){display:none !important;}
+body.work-mode .library{display:block !important}
 body.work-mode .tab-content#tab-deck{display:flex !important;flex-direction:column;align-items:center;gap:12px}
-body.work-mode .deck-switch-bar{position:sticky;top:6px;z-index:50;backdrop-filter:blur(12px);background:rgba(17,17,20,.85)}
+body.work-mode .rgb-ambient{display:block;height:3px;opacity:.85;max-width:1700px;margin:0 auto}
+body.work-mode .library{display:block;opacity:1}
+body.work-mode .library.wm-collapsed{max-height:0;padding-top:0;padding-bottom:0;overflow:hidden;margin:0;border-width:0;opacity:0}
+body.work-mode .deck-switch-bar{
+  position:sticky;top:6px;z-index:50;
+  backdrop-filter:blur(14px) saturate(1.2);
+  background:linear-gradient(180deg,rgba(20,20,24,.88) 0%,rgba(14,14,18,.75) 100%);
+  border-color:rgba(255,138,26,.25);
+  box-shadow:0 10px 32px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.05);
+}
 body.work-mode{
-  background:
-    radial-gradient(ellipse at 15% 10%,rgba(255,138,26,.12) 0%,transparent 45%),
-    radial-gradient(ellipse at 85% 90%,rgba(46,224,255,.12) 0%,transparent 45%),
-    radial-gradient(ellipse at center,#0d0d10 0%,#050506 70%);
   padding:6px;
+  background:
+    radial-gradient(ellipse at 20% 5%,rgba(255,138,26,.08) 0%,transparent 50%),
+    radial-gradient(ellipse at 80% 95%,rgba(46,224,255,.08) 0%,transparent 50%),
+    radial-gradient(ellipse at center,#0b0b0e 0%,#040405 80%);
 }
 body.work-mode .console{
-  padding:10px;border-radius:18px;
-  background:rgba(20,20,24,.4);
+  padding:14px;border-radius:20px;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.02) 0%,transparent 15%,transparent 85%,rgba(0,0,0,.2) 100%),
+    rgba(14,14,18,.65);
+  backdrop-filter:blur(6px);
+  border:1px solid rgba(255,138,26,.22);
   box-shadow:
-    0 0 0 1px rgba(255,138,26,.2),
-    0 0 40px rgba(255,138,26,.18),
-    0 0 80px rgba(46,224,255,.12),
-    inset 0 0 30px rgba(0,0,0,.4);
+    inset 0 1px 0 rgba(255,255,255,.08),
+    0 0 1px rgba(255,138,26,.35),
+    0 0 40px rgba(255,138,26,.1),
+    0 0 100px rgba(46,224,255,.06),
+    0 24px 80px rgba(0,0,0,.7);
   position:relative;
+  isolation:isolate;
 }
-body.work-mode .console::before,body.work-mode .console::after{
-  content:'';position:absolute;inset:-2px;border-radius:20px;pointer-events:none;z-index:-1;
-  background:conic-gradient(from var(--neon-angle,0deg),
-    #ff7a1a,#ff3c78,#c800ff,#00e5ff,#00ff7a,#ffd400,#ff7a1a);
-  filter:blur(14px);opacity:.55;
-  animation:neonSpin 6s linear infinite;
+body.work-mode .console::before{
+  content:'';position:absolute;inset:-1px;border-radius:21px;pointer-events:none;z-index:-1;
+  padding:1px;
+  background:linear-gradient(135deg,
+    rgba(255,138,26,.55) 0%,
+    rgba(255,60,120,.35) 25%,
+    rgba(200,0,255,.35) 50%,
+    rgba(46,224,255,.45) 75%,
+    rgba(255,138,26,.55) 100%);
+  background-size:300% 300%;
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+  mask-composite:exclude;
+  animation:neonFlow 12s ease-in-out infinite;
 }
-body.work-mode .console::after{filter:blur(28px);opacity:.35;animation-duration:9s;animation-direction:reverse;}
-@keyframes neonSpin{0%{--neon-angle:0deg;transform:rotate(0deg)}100%{--neon-angle:360deg;transform:rotate(360deg)}}
+body.work-mode .console::after{
+  content:'';position:absolute;inset:-6px;border-radius:26px;pointer-events:none;z-index:-2;
+  background:linear-gradient(135deg,
+    rgba(255,138,26,.18),rgba(200,0,255,.14),rgba(46,224,255,.18),rgba(255,138,26,.18));
+  background-size:300% 300%;
+  filter:blur(26px);opacity:.7;
+  animation:neonFlow 12s ease-in-out infinite,neonPulse 4.5s ease-in-out infinite;
+}
+@keyframes neonFlow{
+  0%,100%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+}
+@keyframes neonPulse{
+  0%,100%{opacity:.45;transform:scale(1)}
+  50%{opacity:.85;transform:scale(1.01)}
+}
 body.work-mode .cdj,body.work-mode .mixer{
+  background:linear-gradient(180deg,rgba(42,42,46,.9) 0%,rgba(23,23,26,.95) 100%);
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.1),
-    0 0 30px rgba(0,0,0,.7),
-    0 0 0 1px rgba(255,138,26,.15);
+    0 0 0 1px rgba(255,138,26,.1),
+    0 10px 30px rgba(0,0,0,.7);
 }
+body.work-mode .library{
+  max-width:1700px;margin:0 auto;
+  background:linear-gradient(180deg,rgba(30,30,34,.85) 0%,rgba(17,17,20,.9) 100%);
+  backdrop-filter:blur(12px);
+  border:1px solid rgba(255,138,26,.18);
+  transition:max-height .4s ease,opacity .3s ease,padding .3s ease;
+}
+body.work-mode .library-title::after{
+  content:' — LIVE';color:var(--play-green);font-size:9px;margin-left:8px;letter-spacing:2px;
+}
+/* WM library toggle button styled like other dsb buttons */
+.dsb-wmlib{color:var(--play-green) !important;border-color:rgba(28,255,143,.4) !important;display:none}
+body.work-mode .dsb-wmlib{display:inline-flex}
+.dsb-wmlib.active{background:linear-gradient(180deg,var(--play-green),#0aa05a) !important;color:#000 !important;box-shadow:0 0 18px rgba(28,255,143,.6) !important}
 .dsb-work{color:var(--purple) !important;border-color:rgba(200,0,255,.4) !important}
 .dsb-work.active{background:linear-gradient(180deg,var(--purple),#6000aa) !important;color:#fff !important;box-shadow:0 0 20px rgba(200,0,255,.7) !important}
 .dsb-work:hover{color:var(--purple) !important;border-color:var(--purple) !important;box-shadow:0 0 14px rgba(200,0,255,.5)}
@@ -1608,7 +1660,8 @@ body.work-mode .cdj,body.work-mode .mixer{
   <button class="dsb-btn dsb-split" data-pair="AC">1 · 3</button>
   <button class="dsb-btn dsb-split" data-pair="BD">2 · 4</button>
   <button class="dsb-btn dsb-all" data-pair="ALL">ALL 4</button>
-  <button class="dsb-btn dsb-work" id="workModeBtn" title="Hide everything except decks + mixer, add neon border">🎆 WORK MODE</button>
+  <button class="dsb-btn dsb-work" id="workModeBtn" title="Stage-ready performance view">🎆 WORK MODE</button>
+  <button class="dsb-btn dsb-wmlib" id="wmLibBtn" title="Show / hide the track library in work mode">📚 LIBRARY</button>
   <span class="dsb-monitor" id="dsbMonitor"></span>
 </div>
 
@@ -4863,9 +4916,19 @@ document.addEventListener('DOMContentLoaded',()=>{
             document.querySelector('.tab-btn[data-tab="deck"]')?.classList.add('active');
             document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
             document.getElementById('tab-deck')?.classList.add('active');
+            document.querySelector('.library')?.classList.remove('wm-collapsed');
           }
           document.body.classList.toggle('work-mode',on);
           btn.classList.toggle('active',on);
+          const libBtn=document.getElementById('wmLibBtn');if(libBtn)libBtn.classList.toggle('active',on);
+        });
+      }
+      const libBtn=document.getElementById('wmLibBtn');
+      if(libBtn){
+        libBtn.addEventListener('click',()=>{
+          const lib=document.querySelector('.library');if(!lib)return;
+          lib.classList.toggle('wm-collapsed');
+          libBtn.classList.toggle('active',!lib.classList.contains('wm-collapsed'));
         });
       }
     },300);
