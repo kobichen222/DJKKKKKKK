@@ -3596,7 +3596,19 @@ async function enrichTrackAsync(track,buf){
    ======================================================== */
 if('serviceWorker' in navigator){
   window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('./sw.js').catch(err=>console.warn('SW register failed',err));
+    navigator.serviceWorker.register('./sw.js').then(reg=>{
+      if(reg.waiting)reg.waiting.postMessage('SKIP_WAITING');
+      reg.addEventListener('updatefound',()=>{
+        const sw=reg.installing;if(!sw)return;
+        sw.addEventListener('statechange',()=>{
+          if(sw.state==='installed'&&navigator.serviceWorker.controller){
+            sw.postMessage&&sw.postMessage('SKIP_WAITING');
+            window.location.reload();
+          }
+        });
+      });
+      setInterval(()=>reg.update().catch(()=>{}),60000);
+    }).catch(err=>console.warn('SW register failed',err));
   });
 }
 

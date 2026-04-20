@@ -2,7 +2,7 @@
    Caches the shell + library assets so the app boots offline after first visit.
    Strategy: cache-first for same-origin static assets, network-first for everything else. */
 
-const CACHE = 'djpro-shell-v2';
+const CACHE = 'djpro-shell-v5';
 const SHELL = [
   './',
   './index.html',
@@ -15,6 +15,10 @@ self.addEventListener('install', (event) => {
     caches.open(CACHE).then(c => c.addAll(SHELL).catch(() => null))
   );
   self.skipWaiting();
+});
+
+self.addEventListener('message', (event) => {
+  if (event.data === 'SKIP_WAITING') self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
@@ -32,21 +36,22 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(req.url);
   if (url.origin !== location.origin) return;
 
+  if (req.destination === 'document' || req.mode === 'navigate' || req.url.endsWith('.html')) {
+    event.respondWith(
+      fetch(req).then(fresh => {
+        if (fresh && fresh.ok) caches.open(CACHE).then(c => c.put(req, fresh.clone()));
+        return fresh;
+      }).catch(() => caches.match(req).then(c => c || caches.match('./index.html')))
+    );
+    return;
+  }
   event.respondWith(
     caches.match(req).then(cached => {
-      if (cached) {
-        fetch(req).then(fresh => {
-          if (fresh && fresh.ok) caches.open(CACHE).then(c => c.put(req, fresh.clone()));
-        }).catch(() => null);
-        return cached;
-      }
-      return fetch(req).then(fresh => {
-        if (fresh && fresh.ok && (req.destination === 'script' || req.destination === 'style' || req.destination === 'document' || req.destination === 'image' || req.destination === 'font')) {
-          const copy = fresh.clone();
-          caches.open(CACHE).then(c => c.put(req, copy));
-        }
+      const network = fetch(req).then(fresh => {
+        if (fresh && fresh.ok) caches.open(CACHE).then(c => c.put(req, fresh.clone()));
         return fresh;
-      }).catch(() => caches.match('./index.html'));
+      }).catch(() => cached);
+      return cached || network;
     })
   );
 });
