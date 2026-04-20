@@ -1098,7 +1098,7 @@ button:focus-visible{outline:2px solid var(--orange-glow);outline-offset:2px}
 .dsb-chip.focus{border-color:var(--orange)}
 
 /* When ALL 4 decks visible, adjust console grid */
-.console.show-all{grid-template-columns:1fr 1fr 420px 1fr 1fr}
+.console.show-all{grid-template-columns:1fr 1fr 400px 1fr 1fr}
 @media(max-width:1400px){.console.show-all{grid-template-columns:1fr 1fr;} .console.show-all .mixer{grid-column:1/-1}}
 
 /* Compact monitor in mixer — list style */
@@ -1297,6 +1297,145 @@ button:focus-visible{outline:2px solid var(--orange-glow);outline-offset:2px}
   .main-tabs{padding:2px}
   .tab-btn{padding:5px 6px;font-size:9px;min-width:auto}
 }
+
+/* ============================================================
+   PIXEL PERFECT LAYER — alignment, box-sizing, consistent rhythm
+   ============================================================ */
+
+/* Centering base — body already flex column + align-items:center */
+body{align-items:center;justify-content:flex-start}
+
+/* Ensure all top-level containers line up at the same max-width + inset */
+.header-bar,.main-tabs,.rgb-ambient,.deck-switch-bar,.console,.library,
+.beat-fx-panel,.scene-fx-panel,.sampler-panel,.youtube-panel,
+.playlists-panel,.ai-dj-panel,.analytics-panel,.midi-panel,.settings-panel,
+.tab-content > *{
+  width:100%;max-width:1700px;box-sizing:border-box;
+}
+
+/* Console grid: equal-height columns so decks and mixer line up */
+.console{align-items:stretch}
+.console > .cdj,.console > .mixer{min-width:0;align-self:stretch}
+
+/* All decks identical padding and internal rhythm */
+.cdj{padding:14px;display:flex;flex-direction:column;gap:8px}
+.cdj > *{min-width:0}
+.deck-header{margin:0 0 2px}
+.screen{margin-bottom:0}
+.loop-section,.beat-jump,.deck-utils{margin:0}
+.tempo-section,.hot-cues,.transport,.pad-mode-row{margin:0}
+
+/* Mixer internals — even vertical rhythm */
+.mixer{padding:12px;gap:8px}
+.mixer > *{min-width:0}
+.master-section,.color-fx-row,.color-fx-grid,.headphone-section,
+.mic-section,.crossfader-section,.isolator-panel,.automix-panel{
+  margin:0;border-radius:8px;
+}
+
+/* Channels: equal width, bottom-aligned faders/VU */
+.channels{align-items:end}
+.channel{gap:6px;align-items:center}
+.channel .channel-body{align-items:end}
+.fader-wrap,.vu-meter{display:block}
+
+/* Crossfader section — centered, even margins */
+.crossfader-section{display:flex;flex-direction:column;gap:6px;padding:8px}
+.crossfader-ab{padding:0 2px}
+.crossfader-track{margin:0}
+.crossfader-label{text-align:center;margin:0}
+.curve-switch{display:flex;justify-content:center;gap:4px;margin:0}
+
+/* Auto-mix panel — consistent grid cell heights */
+.automix-grid{grid-auto-rows:1fr}
+.automix-btn{min-height:36px;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1}
+
+/* DSB monitor row — consistent chip height + baseline */
+.deck-switch-bar{align-items:center;min-height:44px}
+.dsb-btn{min-height:30px;display:inline-flex;align-items:center;justify-content:center;line-height:1}
+.dsb-chip{min-height:22px;display:inline-flex;align-items:center;line-height:1}
+
+/* Library — add a header row that matches the track-row grid */
+.track-list{gap:2px}
+.track-list::before{
+  content:'# TITLE ARTIST BPM KEY RATING ACTIONS';
+  display:none;
+}
+.track-list-header{
+  display:grid;grid-template-columns:30px 1fr 1fr 55px 50px 80px 150px;gap:10px;
+  padding:6px 10px 6px 16px;color:var(--orange);font-family:'Orbitron',sans-serif;
+  font-size:9px;letter-spacing:2px;font-weight:700;
+  border-bottom:1px solid rgba(255,138,26,.2);margin-bottom:4px;
+}
+.track-list-header span{text-align:left}
+.track-list-header .th-bpm,.track-list-header .th-key,.track-list-header .th-rating{text-align:center}
+.track-list-header .th-actions{text-align:right}
+@media(max-width:1100px){
+  .track-list-header{grid-template-columns:24px 1.5fr 1fr 45px 40px 70px 120px;padding-left:12px}
+}
+@media(max-width:820px){
+  .track-list-header{grid-template-columns:20px 1fr 70px 70px;padding-left:8px}
+  .track-list-header .th-artist,.track-list-header .th-rating,.track-list-header .th-actions{display:none}
+}
+@media(max-width:520px){
+  .track-list-header{grid-template-columns:18px 1fr 55px}
+  .track-list-header .th-key{display:none}
+}
+
+/* Header bar — baseline alignment + no-overflow */
+.header-bar{align-items:center;min-height:36px;padding:4px 10px}
+.header-right{align-items:center;flex-wrap:wrap;min-height:32px}
+
+/* RGB ambient — never exceed its container */
+.rgb-ambient{box-sizing:border-box}
+
+/* Toast/modal — sit above everything and never jitter */
+.toast{z-index:9998}
+.modal-overlay{z-index:9999}
+
+/* Beat FX / Scene FX — vertical centering and equal gaps */
+.beat-fx-panel,.scene-fx-panel{align-items:center;min-height:54px}
+.beat-fx-panel > *,.scene-fx-panel > *{align-self:center}
+
+/* Stats / AI DJ config — equal row heights */
+.stats-grid,.ai-dj-controls,.ai-dj-config{grid-auto-rows:1fr}
+.stat-card,.ai-config-item{display:flex;flex-direction:column;justify-content:center}
+
+/* Sampler — square pads always */
+.sample-pad{aspect-ratio:1/1}
+
+/* Jog wheel — always a perfect circle, centered */
+.jog-wheel{display:block;margin:0 auto}
+.jog-wrapper{justify-content:center;align-items:center}
+
+/* Knobs: exact circle */
+.knob{aspect-ratio:1/1}
+
+/* Playlists / sessions — equal row heights in grid */
+.playlist-grid{grid-auto-rows:1fr}
+.playlist-card,.session-card{height:100%}
+
+/* Tab switches — active indicator lines up with pill */
+.main-tabs{align-items:center;min-height:40px}
+.tab-btn{min-height:28px;display:inline-flex;align-items:center;justify-content:center;line-height:1}
+
+/* Mic section — evenly spaced */
+.mic-section{align-items:center;min-height:56px}
+
+/* Make sure everything uses border-box (sanity net) */
+*,*::before,*::after{box-sizing:border-box}
+
+/* Consistent scrollbar gutter so headers don't shift when lists grow */
+.track-list{scrollbar-gutter:stable}
+
+/* Sub-pixel crisp borders on retina */
+@media(min-resolution:2dppx){
+  .cdj,.mixer,.library,.beat-fx-panel,.scene-fx-panel,
+  .sampler-panel,.playlists-panel,.ai-dj-panel,.analytics-panel,
+  .midi-panel,.settings-panel,.youtube-panel,.deck-switch-bar{
+    border-width:.5px;
+  }
+}
 </style>
 </head>
 <body>
@@ -1428,6 +1567,7 @@ button:focus-visible{outline:2px solid var(--orange-glow);outline-offset:2px}
 <button class="yt-load" id="ytLoad">ADD</button>
 <span class="url-status" id="ytStatus">READY</span>
 </div>
+<div class="track-list-header"><span>#</span><span>TITLE</span><span class="th-artist">ARTIST</span><span class="th-bpm">BPM</span><span class="th-key">KEY</span><span class="th-rating">RATING</span><span class="th-actions">ACTIONS</span></div>
 <div class="track-list" id="trackList"></div>
 </div>
 </div>
