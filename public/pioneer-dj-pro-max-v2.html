@@ -1628,7 +1628,8 @@ body.work-mode .header-bar,
 body.work-mode .main-tabs,
 body.work-mode canvas#spectrumCanvas,
 body.work-mode .tab-content:not(#tab-deck),
-body.work-mode #tab-deck > *:not(.console):not(.library):not(.beat-fx-panel):not(.scene-fx-panel):not(.deck-switch-bar){display:none !important;}
+body.work-mode #tab-deck > *:not(.console):not(.library):not(.beat-fx-panel):not(.scene-fx-panel):not(.deck-switch-bar):not(.quick-lib-overlay):not(.auth-modal):not(.wm-exit-btn):not(#toastBox){display:none !important;}
+body.work-mode .quick-lib-overlay.open{display:flex !important;z-index:100000;}
 body.work-mode .deck-switch-bar{position:fixed;top:8px;right:8px;left:auto;width:auto;max-width:none;z-index:60;background:rgba(10,10,14,.92);backdrop-filter:blur(10px);border:1px solid rgba(255,138,26,.35);box-shadow:0 10px 30px rgba(0,0,0,.7);padding:6px 10px;border-radius:10px;gap:6px;flex-wrap:wrap}
 body.work-mode .deck-switch-bar .dsb-label{color:var(--orange) !important;font-size:10px}
 body.work-mode .beat-fx-panel,body.work-mode .scene-fx-panel{
