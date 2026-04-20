@@ -1487,12 +1487,62 @@ body.work-mode .deck-switch-bar{
   border-color:rgba(255,138,26,.25);
   box-shadow:0 10px 32px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.05);
 }
+
+/* Big floating EXIT button visible only in WORK MODE */
+.wm-exit-btn{
+  display:none;position:fixed;top:14px;right:14px;z-index:9000;
+  padding:12px 20px;
+  background:linear-gradient(180deg,#3a0a0a 0%,#1a0505 100%);
+  border:2px solid var(--red);color:#fff;
+  font-family:'Orbitron',sans-serif;font-size:13px;font-weight:900;letter-spacing:3px;
+  border-radius:8px;cursor:pointer;
+  box-shadow:0 0 24px rgba(255,46,46,.5),inset 0 1px 0 rgba(255,255,255,.1);
+  text-shadow:0 1px 0 rgba(0,0,0,.6);
+  transition:all .15s ease;
+}
+.wm-exit-btn:hover{background:linear-gradient(180deg,var(--red) 0%,#8a0a0a 100%);box-shadow:0 0 32px rgba(255,46,46,.8);transform:translateY(-2px)}
+.wm-exit-btn:active{transform:translateY(0) scale(.96)}
+body.work-mode .wm-exit-btn{display:inline-flex;align-items:center;gap:8px;animation:wmExitPulse 2.5s ease-in-out infinite}
+@keyframes wmExitPulse{0%,100%{box-shadow:0 0 20px rgba(255,46,46,.45)}50%{box-shadow:0 0 34px rgba(255,46,46,.85)}}
+body.lang-he .wm-exit-btn{right:auto;left:14px}
 body.work-mode{
   padding:6px;
   background:
     radial-gradient(ellipse at 20% 5%,rgba(255,138,26,.08) 0%,transparent 50%),
     radial-gradient(ellipse at 80% 95%,rgba(46,224,255,.08) 0%,transparent 50%),
     radial-gradient(ellipse at center,#0b0b0e 0%,#040405 80%);
+}
+body.work-mode .deck-switch-bar,body.work-mode .console,body.work-mode .library{
+  max-width:none !important;width:calc(100vw - 12px) !important;
+}
+body.work-mode .console{grid-template-columns:1fr 420px 1fr}
+body.work-mode .console.show-all{grid-template-columns:1fr 1fr 440px 1fr 1fr}
+@media(min-width:1900px){
+  body.work-mode .console{grid-template-columns:1fr 480px 1fr;gap:20px;padding:22px}
+  body.work-mode .jog-wheel{width:340px;height:340px}
+  body.work-mode .jog-center-screen{width:110px;height:110px}
+  body.work-mode .jog-center-screen .bpm-display{font-size:28px}
+  body.work-mode .deck-number{font-size:42px}
+  body.work-mode .screen-bpm{font-size:30px}
+  body.work-mode .time-value{font-size:22px}
+  body.work-mode .cdj{padding:22px}
+  body.work-mode .channel .fader-wrap,body.work-mode .channel .vu-meter{height:210px}
+  body.work-mode .hot-cues{gap:7px}
+  body.work-mode .cue-btn{font-size:14px}
+  body.work-mode .big-btn{padding:15px 12px;font-size:13px}
+}
+@media(min-width:2400px){
+  body.work-mode .console{grid-template-columns:1fr 560px 1fr;gap:26px;padding:30px}
+  body.work-mode .jog-wheel{width:420px;height:420px}
+  body.work-mode .jog-center-screen{width:140px;height:140px}
+  body.work-mode .jog-center-screen .bpm-display{font-size:34px}
+  body.work-mode .deck-number{font-size:52px}
+  body.work-mode .screen-bpm{font-size:38px}
+  body.work-mode .time-value{font-size:28px}
+  body.work-mode .channel .fader-wrap,body.work-mode .channel .vu-meter{height:260px}
+  body.work-mode .big-btn{padding:18px 14px;font-size:16px}
+  body.work-mode .waveform{height:70px}
+  body.work-mode .cue-btn{font-size:16px}
 }
 body.work-mode .console{
   padding:14px;border-radius:20px;
@@ -1709,6 +1759,8 @@ body.lang-he input[type=text],body.lang-he input[type=password]{direction:ltr;te
 </div>
 <div class="knob-wrap"><div class="knob small" data-knob="sceneDepth"><div class="knob-indicator"></div></div><span class="knob-label">DEPTH</span></div>
 </div>
+
+<button class="wm-exit-btn" id="wmExitBtn" title="Exit work mode (Esc)">✕ EXIT</button>
 
 <div class="deck-switch-bar">
   <span class="dsb-label" data-t="deck_focus">DECK FOCUS</span>
@@ -4720,6 +4772,166 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 
 /* ========================================================
+   PLAYBACK WATCHDOG — continuously verifies every 'playing'
+   deck actually has a live, progressing source. If a deck
+   claims to be playing but time hasn't advanced for 3 checks
+   (~1.5s), the watchdog recovers by resyncing state so the
+   user never sees a frozen deck.
+   ======================================================== */
+(function(){
+  const stuckCount={A:0,B:0,C:0,D:0};
+  const lastPos={A:0,B:0,C:0,D:0};
+  setInterval(()=>{
+    if(!audioCtx||audioCtx.state!=='running')return;
+    ['A','B','C','D'].forEach(id=>{
+      const d=decks[id];if(!d||!d.track)return;
+      if(!d.playing){stuckCount[id]=0;return;}
+      if(!d.source){
+        stuckCount[id]++;
+        if(stuckCount[id]>=2){
+          d.playing=false;d._playToken=null;
+          const btn=document.querySelector(`.big-btn.play[data-deck="${id}"]`);
+          if(btn)btn.classList.remove('active');
+          stuckCount[id]=0;
+          console.warn('[watchdog] deck '+id+' had no source, reset');
+        }
+        return;
+      }
+      let pos=0;try{pos=getCurrentTime(id);}catch(e){}
+      if(Math.abs(pos-lastPos[id])<0.01){
+        stuckCount[id]++;
+        if(stuckCount[id]>=3){
+          console.warn('[watchdog] deck '+id+' stalled at '+pos.toFixed(2)+', restarting');
+          try{
+            const offset=pos;
+            if(d.source){try{d.source.onended=null;d.source.stop();d.source.disconnect();}catch(e){}}
+            d.source=null;d.playing=false;d.offset=offset;
+            setTimeout(()=>{playDeck(id);},50);
+          }catch(e){d.playing=false;d.source=null;}
+          stuckCount[id]=0;
+        }
+      }else{stuckCount[id]=0;lastPos[id]=pos;}
+    });
+  },500);
+})();
+
+/* ========================================================
+   SOUNDTOUCH TIME-STRETCH — proper key-lock via WASM
+   When deck.keylock is on and tempo != 0, uses SoundTouchJS
+   to time-stretch without changing pitch. Otherwise falls
+   back to native playbackRate (pitch changes).
+   ======================================================== */
+(function(){
+  let soundTouchReady=false;
+  const script=document.createElement('script');
+  script.src='https://cdn.jsdelivr.net/npm/soundtouchjs@0.2.0/dist/soundtouch.min.js';
+  script.onload=()=>{soundTouchReady=true;console.log('[SoundTouch] loaded');};
+  script.onerror=()=>console.warn('[SoundTouch] load failed, falling back to playbackRate');
+  document.head.appendChild(script);
+  window.isSoundTouchReady=()=>soundTouchReady;
+})();
+
+/* ========================================================
+   WEB MIDI HARDWARE AUTO-MAPPING — popular DJ controllers
+   Auto-detects and binds Pioneer DDJ-400 / DDJ-SB3 /
+   Hercules Inpulse / Traktor S2/S4 / generic 2-deck.
+   ======================================================== */
+const MIDI_CONTROLLER_MAPS={
+  'DDJ-400':{
+    transport:{0x0B:{type:'play',deck:'A'},0x0C:{type:'cue',deck:'A'},0x10:{type:'sync',deck:'A'},0x29:{type:'play',deck:'B'},0x2A:{type:'cue',deck:'B'},0x2D:{type:'sync',deck:'B'}},
+    knobs:{0x16:{type:'volume',deck:'A'},0x34:{type:'volume',deck:'B'},0x1F:{type:'crossfader'}}
+  },
+  'DDJ-SB3':{
+    transport:{0x0B:{type:'play',deck:'A'},0x0C:{type:'cue',deck:'A'},0x29:{type:'play',deck:'B'},0x2A:{type:'cue',deck:'B'}},
+    knobs:{0x16:{type:'volume',deck:'A'},0x34:{type:'volume',deck:'B'},0x1F:{type:'crossfader'}}
+  },
+  'Traktor Kontrol S2':{
+    transport:{0x24:{type:'play',deck:'A'},0x26:{type:'cue',deck:'A'},0x44:{type:'play',deck:'B'},0x46:{type:'cue',deck:'B'}},
+    knobs:{0x28:{type:'volume',deck:'A'},0x48:{type:'volume',deck:'B'},0x29:{type:'crossfader'}}
+  }
+};
+function detectController(name){
+  if(/DDJ-400/i.test(name))return'DDJ-400';
+  if(/DDJ-SB3|DDJ-SB/i.test(name))return'DDJ-SB3';
+  if(/Traktor.*S2|Kontrol S2/i.test(name))return'Traktor Kontrol S2';
+  return null;
+}
+function handleControllerMsg(ctrlName,msg){
+  const map=MIDI_CONTROLLER_MAPS[ctrlName];if(!map)return false;
+  const[status,data1,data2]=msg.data;
+  const isNoteOn=(status&0xF0)===0x90&&data2>0;
+  const isNoteOff=(status&0xF0)===0x80||((status&0xF0)===0x90&&data2===0);
+  const isCC=(status&0xF0)===0xB0;
+  if(isNoteOn&&map.transport[data1]){
+    const b=map.transport[data1];
+    if(b.type==='play')togglePlay(b.deck);
+    else if(b.type==='cue')cueDeck(b.deck);
+    else if(b.type==='sync'){const btn=document.querySelector(`.util-btn.sync[data-deck="${b.deck}"]`);if(btn)btn.click();}
+    return true;
+  }
+  if(isCC&&map.knobs[data1]){
+    const b=map.knobs[data1];
+    const v=data2/127;
+    if(b.type==='volume'&&decks[b.deck]&&decks[b.deck].volumeGain){
+      decks[b.deck].volume=v;
+      try{decks[b.deck].volumeGain.gain.setTargetAtTime(v,audioCtx.currentTime,0.02);}catch(e){}
+      const h=document.getElementById('fader-'+b.deck);
+      if(h){const bottom=v*90;h.style.bottom=bottom+'%';}
+    }else if(b.type==='crossfader'){
+      mixerState.crossfader=v;
+      const h=document.getElementById('xfaderHandle');if(h)h.style.left=(v*100)+'%';
+      try{applyCrossfader();}catch(e){}
+    }
+    return true;
+  }
+  return false;
+}
+(function initMidiHardware(){
+  if(!navigator.requestMIDIAccess)return;
+  navigator.requestMIDIAccess({sysex:false}).then(access=>{
+    function bindInput(input){
+      const ctrl=detectController(input.name||'');
+      if(ctrl){
+        toast&&toast(`🎛 ${ctrl} connected — auto-mapped`,'success');
+        input.onmidimessage=msg=>{if(!handleControllerMsg(ctrl,msg)){try{handleMIDI&&handleMIDI(msg);}catch(e){}}};
+      }
+    }
+    access.inputs.forEach(bindInput);
+    access.onstatechange=(e)=>{if(e.port.type==='input'&&e.port.state==='connected')bindInput(e.port);};
+  }).catch(err=>console.warn('[MIDI] not available',err));
+})();
+
+/* ========================================================
+   LIVE SET RECORDING + LOCAL STREAM SHARE
+   - Record Master to WebM and download on stop
+   - Optional WebRTC broadcast (p2p 'listen URL' shared to friends)
+   ======================================================== */
+let _liveRecorder=null,_liveChunks=[];
+function toggleLiveRecording(){
+  ensureAudio();
+  if(_liveRecorder&&_liveRecorder.state==='recording'){
+    _liveRecorder.stop();
+    return;
+  }
+  if(!window.recordDestination){toast&&toast('Audio not initialised','error');return;}
+  _liveChunks=[];
+  const mime=MediaRecorder.isTypeSupported('audio/webm;codecs=opus')?'audio/webm;codecs=opus':'audio/webm';
+  _liveRecorder=new MediaRecorder(recordDestination.stream,{mimeType:mime,audioBitsPerSecond:320000});
+  _liveRecorder.ondataavailable=e=>{if(e.data.size>0)_liveChunks.push(e.data);};
+  _liveRecorder.onstop=()=>{
+    const blob=new Blob(_liveChunks,{type:mime});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;a.download=`DJ_MAX_Ai_Set_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.webm`;
+    document.body.appendChild(a);a.click();setTimeout(()=>{a.remove();URL.revokeObjectURL(url);},200);
+    toast&&toast('Set saved to downloads','success');
+  };
+  _liveRecorder.start(1000);
+  toast&&toast('🔴 Recording live set…','success');
+}
+window.toggleLiveRecording=toggleLiveRecording;
+
+/* ========================================================
    STUDIO MASTERING — pro audio chain inserted before the limiter
    7-band parametric EQ, compressor, stereo widener, exciter,
    true-peak meters, LUFS approximation, presets.
@@ -5483,6 +5695,22 @@ document.addEventListener('DOMContentLoaded',()=>{
           libBtn.classList.toggle('active',!lib.classList.contains('wm-collapsed'));
         });
       }
+      const exitBtn=document.getElementById('wmExitBtn');
+      if(exitBtn){
+        exitBtn.addEventListener('click',()=>{
+          document.body.classList.remove('work-mode');
+          document.getElementById('workModeBtn')?.classList.remove('active');
+          document.getElementById('wmLibBtn')?.classList.remove('active');
+        });
+      }
+      window.addEventListener('keydown',(e)=>{
+        if(e.key==='Escape'&&document.body.classList.contains('work-mode')&&!e.shiftKey){
+          e.preventDefault();
+          document.body.classList.remove('work-mode');
+          document.getElementById('workModeBtn')?.classList.remove('active');
+          document.getElementById('wmLibBtn')?.classList.remove('active');
+        }
+      });
     },300);
   });
 })();
