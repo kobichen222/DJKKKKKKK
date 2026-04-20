@@ -1940,6 +1940,42 @@ body.work-mode .deck-switch-bar{
 body.work-mode .wm-exit-btn{display:inline-flex;align-items:center;gap:8px;animation:wmExitPulse 2.5s ease-in-out infinite}
 @keyframes wmExitPulse{0%,100%{box-shadow:0 0 20px rgba(255,46,46,.45)}50%{box-shadow:0 0 34px rgba(255,46,46,.85)}}
 body.lang-he .wm-exit-btn{right:auto;left:14px}
+
+/* WORK MODE top exit bar — always visible, impossible to miss */
+.wm-topbar{display:none}
+body.work-mode .wm-topbar{
+  display:flex;justify-content:center;align-items:center;
+  width:100%;max-width:1700px;margin:0 auto 4px;
+  position:sticky;top:0;z-index:48;
+}
+body.work-mode.show-all + .wm-topbar,body.work-mode .wm-topbar{max-width:none}
+.wm-exit-bar{
+  padding:10px 28px;
+  background:linear-gradient(90deg,rgba(40,6,6,.9) 0%,rgba(80,12,12,.95) 50%,rgba(40,6,6,.9) 100%);
+  border:1px solid var(--red);
+  color:#fff;
+  font-family:'Orbitron',sans-serif;font-size:12px;font-weight:900;letter-spacing:4px;
+  border-radius:0 0 12px 12px;
+  cursor:pointer;transition:all .2s ease;
+  box-shadow:0 6px 20px rgba(255,46,46,.4),inset 0 1px 0 rgba(255,255,255,.15);
+  backdrop-filter:blur(10px);
+  text-shadow:0 1px 2px rgba(0,0,0,.7),0 0 10px rgba(255,46,46,.5);
+  animation:wmBarPulse 3s ease-in-out infinite;
+}
+.wm-exit-bar:hover{
+  padding:12px 40px;
+  background:linear-gradient(90deg,var(--red) 0%,#ff5050 50%,var(--red) 100%);
+  box-shadow:0 10px 30px rgba(255,46,46,.8),inset 0 1px 0 rgba(255,255,255,.25);
+  transform:translateY(1px);
+  letter-spacing:5px;
+}
+.wm-exit-bar:active{transform:translateY(2px) scale(.985)}
+.wm-esc-hint{font-size:10px;opacity:.75;margin-left:6px;letter-spacing:2px}
+@keyframes wmBarPulse{
+  0%,100%{box-shadow:0 6px 18px rgba(255,46,46,.35),inset 0 1px 0 rgba(255,255,255,.15)}
+  50%{box-shadow:0 10px 30px rgba(255,46,46,.75),inset 0 1px 0 rgba(255,255,255,.2)}
+}
+body.lang-he .wm-esc-hint{margin-left:0;margin-right:6px}
 body.work-mode{
   padding:6px;
   background:
@@ -2229,6 +2265,9 @@ body.lang-he input[type=text],body.lang-he input[type=password]{direction:ltr;te
 </div>
 
 <button class="wm-exit-btn" id="wmExitBtn" title="Exit work mode (Esc)">✕ EXIT</button>
+<div class="wm-topbar" id="wmTopbar">
+  <button class="wm-exit-bar" id="wmExitBarBtn">← EXIT WORK MODE  <span class="wm-esc-hint">(ESC)</span></button>
+</div>
 
 <div class="deck-switch-bar">
   <span class="dsb-label" data-t="deck_focus">DECK FOCUS</span>
@@ -6173,6 +6212,8 @@ document.addEventListener('DOMContentLoaded',()=>{
       };
       if(exitBtn)exitBtn.addEventListener('click',exitWM);
       if(exitInline)exitInline.addEventListener('click',exitWM);
+      const exitBar=document.getElementById('wmExitBarBtn');
+      if(exitBar)exitBar.addEventListener('click',exitWM);
       window.addEventListener('keydown',(e)=>{
         if(e.key==='Escape'&&document.body.classList.contains('work-mode')&&!e.shiftKey){
           e.preventDefault();
