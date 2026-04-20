@@ -2584,12 +2584,9 @@ body.theme-light .deck-header .deck-lib-btn{background:linear-gradient(180deg,#f
 body.theme-light .deck-header .deck-upload-btn{background:linear-gradient(180deg,#fff,#e4e4e8);color:var(--orange-glow);border-color:rgba(255,138,26,.5)}
 body.theme-light .deck-header .deck-upload-btn:hover{background:var(--orange);color:#fff}
 
-/* CUE big-btn centering fix — compensate for letter-spacing trailing */
-.big-btn{justify-content:center !important;align-items:center !important;text-align:center !important;padding-left:13px !important;padding-right:10px !important}
-.big-btn .icon,.big-btn .lbl{display:block;text-align:center;width:100%;line-height:1}
-.big-btn .icon{letter-spacing:0 !important;text-indent:0}
-.big-btn .lbl{text-indent:3px}
-.big-btn.cue .lbl,.big-btn.play .lbl{margin-left:0;padding-left:0}
+/* CUE/PLAY big-btn centering */
+.big-btn{justify-content:center !important;align-items:center !important;text-align:center !important;padding:12px 8px !important}
+.big-btn .icon,.big-btn .lbl{display:block;text-align:center;width:100%;line-height:1;text-indent:0;margin:0;padding:0}
 body.theme-light .deck-header .deck-lib-btn:hover{background:#00a656;color:#fff}
 
 /* Enhanced deck LIBRARY button — premium animated, always visible */
@@ -4287,8 +4284,8 @@ function playDeck(deckId){
     d.volumeGain.gain.linearRampToValueAtTime(target,now+0.008);
   }
   if(deckId==='A'||deckId==='B'){
-    document.getElementById(`jog-${deckId}`).classList.add('playing');
-    document.getElementById(`platter-${deckId}`).classList.add('spinning');
+    document.getElementById(`jog-${deckId}`)?.classList.add('playing');
+    document.getElementById(`platter-${deckId}`)?.classList.add('spinning');
     const btn=document.querySelector(`.big-btn.play[data-deck="${deckId}"]`);
     if(btn)btn.classList.add('active');
     const icon=document.getElementById(`playIcon-${deckId}`);
@@ -4303,8 +4300,8 @@ function playDeck(deckId){
     if(d.playing){
       d.playing=false;
       if(deckId==='A'||deckId==='B'){
-        document.getElementById(`jog-${deckId}`).classList.remove('playing');
-        document.getElementById(`platter-${deckId}`).classList.remove('spinning');
+        document.getElementById(`jog-${deckId}`)?.classList.remove('playing');
+        document.getElementById(`platter-${deckId}`)?.classList.remove('spinning');
         const btn=document.querySelector(`.big-btn.play[data-deck="${deckId}"]`);
         if(btn)btn.classList.remove('active');
         const icon=document.getElementById(`playIcon-${deckId}`);if(icon)icon.textContent='▶';
@@ -4334,8 +4331,8 @@ function pauseDeck(deckId){
   }
   d.source=null;d.playing=false;
   if(deckId==='A'||deckId==='B'){
-    document.getElementById(`jog-${deckId}`).classList.remove('playing');
-    document.getElementById(`platter-${deckId}`).classList.remove('spinning');
+    document.getElementById(`jog-${deckId}`)?.classList.remove('playing');
+    document.getElementById(`platter-${deckId}`)?.classList.remove('spinning');
     const btn=document.querySelector(`.big-btn.play[data-deck="${deckId}"]`);
     if(btn)btn.classList.remove('active');
     const icon=document.getElementById(`playIcon-${deckId}`);if(icon)icon.textContent='▶';
@@ -4949,10 +4946,10 @@ function startAIDJ(){
   if(aiDJ.active){stopAIDJ();return;}
   if(!library.filter(t=>t.source!=='yt').length){toast('Load tracks first','error');return;}
   aiDJ.active=true;
-  document.getElementById('aiStatus').classList.add('active');
-  document.getElementById('aiStatusText').textContent='ACTIVE — AUTO-MIXING';
-  document.getElementById('aiStartBtn').classList.add('active');
-  document.getElementById('aiStartBtn').textContent='⏹ STOP AUTO-MIX';
+  document.getElementById('aiStatus')?.classList.add('active');
+  if(document.getElementById('aiStatusText'))document.getElementById('aiStatusText').textContent='ACTIVE — AUTO-MIXING';
+  document.getElementById('aiStartBtn')?.classList.add('active');
+  if(document.getElementById('aiStartBtn'))document.getElementById('aiStartBtn').textContent='⏹ STOP AUTO-MIX';
   aiLog('AI Auto-Mix started');
   if(!decks.A.playing&&!decks.B.playing){
     const t=pickNextTrack();
@@ -4963,10 +4960,10 @@ function startAIDJ(){
 
 function stopAIDJ(){
   aiDJ.active=false;
-  document.getElementById('aiStatus').classList.remove('active');
-  document.getElementById('aiStatusText').textContent='INACTIVE';
-  document.getElementById('aiStartBtn').classList.remove('active');
-  document.getElementById('aiStartBtn').textContent='▶ START AUTO-MIX';
+  document.getElementById('aiStatus')?.classList.remove('active');
+  if(document.getElementById('aiStatusText'))document.getElementById('aiStatusText').textContent='INACTIVE';
+  document.getElementById('aiStartBtn')?.classList.remove('active');
+  if(document.getElementById('aiStartBtn'))document.getElementById('aiStartBtn').textContent='▶ START AUTO-MIX';
   if(aiDJ.transitionTimer){clearTimeout(aiDJ.transitionTimer);aiDJ.transitionTimer=null;}
   aiLog('AI stopped');
 }
@@ -5527,10 +5524,10 @@ function setupBeatFxUI(){
       if(mixerState.fx.on)applyBeatFx();
     });
   });
-  document.getElementById('fxOnOff').addEventListener('click',()=>{
+  document.getElementById('fxOnOff')?.addEventListener('click',()=>{
     ensureAudio();
     mixerState.fx.on=!mixerState.fx.on;
-    document.getElementById('fxOnOff').classList.toggle('active',mixerState.fx.on);
+    document.getElementById('fxOnOff')?.classList.toggle('active',mixerState.fx.on);
     if(mixerState.fx.on){stats.fxCount++;document.getElementById('statFxCount').textContent=stats.fxCount;}
     applyBeatFx();
     toast(`Beat FX ${mixerState.fx.on?'ON':'OFF'} — ${mixerState.fx.type}`);
@@ -5862,7 +5859,7 @@ function setupKeyboard(){
       case '.':{mixerState.crossfader=Math.min(1,mixerState.crossfader+0.1);document.getElementById('xfaderHandle').style.left=`${mixerState.crossfader*100}%`;applyCrossfader();break;}
       case '/':{mixerState.crossfader=0.5;document.getElementById('xfaderHandle').style.left='50%';applyCrossfader();break;}
       case ' ':e.preventDefault();togglePlay('A');togglePlay('B');break;
-      case 'f':document.getElementById('fxOnOff').click();break;
+      case 'f':document.getElementById('fxOnOff')?.click();break;
       case 't':document.getElementById('tapBtn').click();break;
     }
     const padKeys=['z','x','c','v','b','n','m',','];
@@ -5883,7 +5880,7 @@ function setupTabs(){
       document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
       btn.classList.add('active');
-      document.getElementById(`tab-${btn.dataset.tab}`).classList.add('active');
+      document.getElementById(`tab-${btn.dataset.tab}`)?.classList.add('active');
     });
   });
 }
@@ -6099,12 +6096,12 @@ function init(){
     }
     e.target.value='';
   });
-  document.getElementById('urlBtnToggle').addEventListener('click',()=>document.getElementById('urlInputWrap').classList.toggle('open'));
-  document.getElementById('urlLoad').addEventListener('click',()=>{const u=document.getElementById('urlInput').value.trim();if(u)loadFromURL(u);});
-  document.getElementById('urlInput').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('urlLoad').click();});
-  document.getElementById('ytBtnToggle').addEventListener('click',()=>document.getElementById('ytInputWrap').classList.toggle('open'));
-  document.getElementById('ytLoad').addEventListener('click',()=>{const u=document.getElementById('ytInput').value.trim();if(u)addYouTubeTrack(u);});
-  document.getElementById('ytInput').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('ytLoad').click();});
+  document.getElementById('urlBtnToggle')?.addEventListener('click',()=>document.getElementById('urlInputWrap')?.classList.toggle('open'));
+  document.getElementById('urlLoad')?.addEventListener('click',()=>{const u=document.getElementById('urlInput')?.value.trim();if(u)loadFromURL(u);});
+  document.getElementById('urlInput')?.addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('urlLoad')?.click();});
+  document.getElementById('ytBtnToggle')?.addEventListener('click',()=>document.getElementById('ytInputWrap')?.classList.toggle('open'));
+  document.getElementById('ytLoad')?.addEventListener('click',()=>{const u=document.getElementById('ytInput')?.value.trim();if(u)addYouTubeTrack(u);});
+  document.getElementById('ytInput')?.addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('ytLoad')?.click();});
   document.getElementById('searchInput').addEventListener('input',renderLibrary);
   document.getElementById('sortSelect').addEventListener('change',renderLibrary);
   document.getElementById('filterSource').addEventListener('change',renderLibrary);
