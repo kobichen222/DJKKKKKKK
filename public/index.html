@@ -2425,6 +2425,28 @@ body.theme-light .editor-block-title{color:#1a1a1c}
 body.theme-light .editor-timeline{background:#f4f4f8;border-color:rgba(0,0,0,.08)}
 
 /* ============================================================
+   MASTER METERS — horizontal LED strips in mixer header
+   ============================================================ */
+.master-meters{
+  display:flex;flex-direction:column;gap:4px;
+  padding:8px 10px;background:#0a0a0b;border:1px solid rgba(255,255,255,.05);
+  border-radius:6px;box-shadow:inset 0 2px 4px rgba(0,0,0,.5);
+}
+.master-meter-row{display:grid;grid-template-columns:14px 1fr;gap:8px;align-items:center}
+.mm-label{font-family:'Orbitron',sans-serif;font-size:9px;color:var(--orange);font-weight:800;letter-spacing:1px;text-align:center}
+.vu-meter.vu-h{
+  width:100%;height:10px;min-width:0;
+  background:#020408;border:1px solid rgba(0,0,0,.6);
+  border-radius:2px;padding:1px;
+  box-shadow:inset 0 0 4px rgba(0,0,0,.9);
+  display:flex;flex-direction:row;gap:1px;
+}
+.vu-meter.vu-h .vu-led{flex:1 1 auto;min-width:3px;border-radius:1px;min-height:0;height:100%}
+/* Master header VU stays small but readable */
+.master-vu .vu-meter.vu-h{width:90px;height:10px;padding:1px}
+body.theme-light .master-meters{background:#fff;border-color:rgba(0,0,0,.08);box-shadow:inset 0 2px 4px rgba(0,0,0,.06)}
+
+/* ============================================================
    PRO SAMPLER UI — banks, edit panel, step sequencer
    ============================================================ */
 .bank-switcher{display:inline-flex;gap:3px;padding:3px;background:#050506;border:1px solid #2a2a2e;border-radius:4px}
@@ -3527,7 +3549,11 @@ function buildDeckHTML(d){
 }
 
 function buildMixerHTML(){
-  return `<div class="mixer-header"><div class="mixer-brand"><span class="model">DJM-</span>V10 PRO MAX</div><div class="master-vu"><div class="vu-meter" id="masterVuL"></div><div class="vu-meter" id="masterVuR"></div></div></div>
+  return `<div class="mixer-header"><div class="mixer-brand"><span class="model">DJM-</span>V10 PRO MAX</div><div class="master-vu"><div class="vu-meter vu-h" id="masterVuL"></div><div class="vu-meter vu-h" id="masterVuR"></div></div></div>
+  <div class="master-meters">
+    <div class="master-meter-row"><span class="mm-label">L</span><div class="vu-meter vu-h" id="masterHVuL"></div></div>
+    <div class="master-meter-row"><span class="mm-label">R</span><div class="vu-meter vu-h" id="masterHVuR"></div></div>
+  </div>
   <div class="master-section">
     <div class="master-knob-wrap"><div class="knob" data-knob="master"><div class="knob-indicator"></div></div><span class="knob-label">MASTER</span></div>
     <div class="master-knob-wrap"><div class="knob" data-knob="booth"><div class="knob-indicator"></div></div><span class="knob-label">BOOTH</span></div>
@@ -5368,14 +5394,18 @@ function animateVU(){
     leds.forEach((l,i)=>{l.classList.remove('on','green','yellow','red');if(i<level){l.classList.add('on');l.classList.add(l.dataset.color);}});
   });
   if(masterAnalyserL){
-    [['masterVuL',masterAnalyserL],['masterVuR',masterAnalyserR]].forEach(([id,an])=>{
+    [['masterVuL',masterAnalyserL,10],['masterVuR',masterAnalyserR,10],['masterHVuL',masterAnalyserL,24],['masterHVuR',masterAnalyserR,24]].forEach(([id,an,segs])=>{
       const vu=document.getElementById(id);if(!vu)return;
       const leds=vu.querySelectorAll('.vu-led');
       const arr=new Uint8Array(an.frequencyBinCount);
       an.getByteTimeDomainData(arr);
-      let peak=0;for(let i=0;i<arr.length;i++)peak=Math.max(peak,Math.abs(arr[i]-128));
-      const level=Math.min(6,(peak/128)*8);
-      leds.forEach((l,i)=>{l.classList.remove('on','green','yellow','red');if(i<level){l.classList.add('on');l.classList.add(l.dataset.color);}});
+      let peak=0,rms=0;for(let i=0;i<arr.length;i++){const v=Math.abs(arr[i]-128);if(v>peak)peak=v;rms+=v*v;}
+      rms=Math.sqrt(rms/arr.length);
+      const combined=peak*0.6+rms*1.8;
+      const level=Math.min(segs,(combined/128)*(segs*1.4));
+      if(!vu._hold)vu._hold=0;
+      if(level>vu._hold)vu._hold=level;else vu._hold=Math.max(level,vu._hold-0.8);
+      leds.forEach((l,i)=>{l.classList.remove('on','green','yellow','red');if(i<vu._hold){l.classList.add('on');l.classList.add(l.dataset.color);}});
     });
   }
 }
@@ -5775,7 +5805,8 @@ function init(){
   document.getElementById('deckD-container').innerHTML=buildDeckHTML('D');
   document.getElementById('mixer-container').innerHTML=buildMixerHTML();
   setupVU('vu-A',20);setupVU('vu-B',20);setupVU('vu-C',20);setupVU('vu-D',20);
-  setupVU('masterVuL',6);setupVU('masterVuR',6);
+  setupVU('masterVuL',10);setupVU('masterVuR',10);
+  setupVU('masterHVuL',24);setupVU('masterHVuR',24);
   attachKnobs();attachEvents();setupBeatFxUI();setupSceneFx();setupKeyboard();setupTabs();setupSettings();
   setupWaveformInteraction();setupAdvancedFeatures();renderSessions();
   renderSampler();renderPlaylists();
