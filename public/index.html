@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Pioneer DJ Pro MAX — WORLD CLASS v2</title>
+<title>DJ MAX Ai — Ultimate AI DJ Console</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Share+Tech+Mono&family=Barlow+Condensed:wght@400;500;600;700&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
@@ -1447,7 +1447,7 @@ body{align-items:center;justify-content:flex-start}
 .search-card .sc-title{color:#fff;font-family:'Orbitron',sans-serif;font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .search-card .sc-artist{color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:1px}
 .search-card .sc-meta{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--screen-glow);letter-spacing:1.5px}
-.search-card .sc-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-top:auto}
+.search-card .sc-actions{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:3px;margin-top:auto}
 .search-card .sc-actions button{
   padding:6px 4px;background:linear-gradient(180deg,#2a2a2e 0%,#151518 100%);
   border:1px solid #333;color:var(--text-dim);font-family:'Orbitron',sans-serif;
@@ -1457,11 +1457,52 @@ body{align-items:center;justify-content:flex-start}
 .search-card .sc-actions button:hover{border-color:var(--orange);color:var(--orange)}
 .search-card .sc-actions button.to-a:hover{border-color:var(--screen-glow);color:var(--screen-glow)}
 .search-card .sc-actions button.to-b:hover{border-color:var(--pink);color:var(--pink)}
+.search-card .sc-actions button.to-c:hover{border-color:var(--yellow);color:var(--yellow)}
+.search-card .sc-actions button.to-d:hover{border-color:var(--purple);color:var(--purple)}
 .search-card .sc-source{display:inline-block;padding:2px 6px;border-radius:2px;font-size:8px;letter-spacing:1.5px;margin-left:auto}
 .search-card .sc-source.itunes{background:rgba(255,138,26,.12);color:var(--orange-glow);border:1px solid rgba(255,138,26,.3)}
 .search-card .sc-source.spotify{background:rgba(28,255,143,.12);color:var(--play-green);border:1px solid rgba(28,255,143,.3)}
 .search-card .sc-source.youtube{background:rgba(255,46,46,.12);color:#ff6a6a;border:1px solid rgba(255,46,46,.3)}
 @media(max-width:820px){.search-results{grid-template-columns:1fr}}
+
+/* WORK MODE — performance view: only decks + mixer with neon halo */
+body.work-mode > *:not(.deck-switch-bar):not(.console):not(.toast):not(.modal-overlay){display:none !important;}
+body.work-mode .deck-switch-bar{position:sticky;top:6px;z-index:50;backdrop-filter:blur(12px);background:rgba(17,17,20,.85)}
+body.work-mode{
+  background:
+    radial-gradient(ellipse at 15% 10%,rgba(255,138,26,.12) 0%,transparent 45%),
+    radial-gradient(ellipse at 85% 90%,rgba(46,224,255,.12) 0%,transparent 45%),
+    radial-gradient(ellipse at center,#0d0d10 0%,#050506 70%);
+  padding:6px;
+}
+body.work-mode .console{
+  padding:10px;border-radius:18px;
+  background:rgba(20,20,24,.4);
+  box-shadow:
+    0 0 0 1px rgba(255,138,26,.2),
+    0 0 40px rgba(255,138,26,.18),
+    0 0 80px rgba(46,224,255,.12),
+    inset 0 0 30px rgba(0,0,0,.4);
+  position:relative;
+}
+body.work-mode .console::before,body.work-mode .console::after{
+  content:'';position:absolute;inset:-2px;border-radius:20px;pointer-events:none;z-index:-1;
+  background:conic-gradient(from var(--neon-angle,0deg),
+    #ff7a1a,#ff3c78,#c800ff,#00e5ff,#00ff7a,#ffd400,#ff7a1a);
+  filter:blur(14px);opacity:.55;
+  animation:neonSpin 6s linear infinite;
+}
+body.work-mode .console::after{filter:blur(28px);opacity:.35;animation-duration:9s;animation-direction:reverse;}
+@keyframes neonSpin{0%{--neon-angle:0deg;transform:rotate(0deg)}100%{--neon-angle:360deg;transform:rotate(360deg)}}
+body.work-mode .cdj,body.work-mode .mixer{
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.1),
+    0 0 30px rgba(0,0,0,.7),
+    0 0 0 1px rgba(255,138,26,.15);
+}
+.dsb-work{color:var(--purple) !important;border-color:rgba(200,0,255,.4) !important}
+.dsb-work.active{background:linear-gradient(180deg,var(--purple),#6000aa) !important;color:#fff !important;box-shadow:0 0 20px rgba(200,0,255,.7) !important}
+.dsb-work:hover{color:var(--purple) !important;border-color:var(--purple) !important;box-shadow:0 0 14px rgba(200,0,255,.5)}
 
 /* Sub-pixel crisp borders on retina */
 @media(min-resolution:2dppx){
@@ -1475,7 +1516,7 @@ body{align-items:center;justify-content:flex-start}
 </head>
 <body>
 <div class="header-bar">
-<div class="brand"><span class="max">MAX</span>Pioneer<span>DJ</span> Pro — Ultimate Console</div>
+<div class="brand"><span class="max">Ai</span>DJ <span>MAX</span> — Ultimate AI DJ Console</div>
 <div class="header-right">
 <div class="power-led"></div><span>BPM</span>
 <span class="master-bpm" id="masterBpm">---.--</span>
@@ -1558,6 +1599,7 @@ body{align-items:center;justify-content:flex-start}
   <button class="dsb-btn dsb-split" data-pair="AC">1 · 3</button>
   <button class="dsb-btn dsb-split" data-pair="BD">2 · 4</button>
   <button class="dsb-btn dsb-all" data-pair="ALL">ALL 4</button>
+  <button class="dsb-btn dsb-work" id="workModeBtn" title="Hide everything except decks + mixer, add neon border">🎆 WORK MODE</button>
   <span class="dsb-monitor" id="dsbMonitor"></span>
 </div>
 
@@ -1860,7 +1902,7 @@ No MIDI devices. Press CONNECT.
 </div>
 <div class="settings-section"><h3>ℹ ABOUT</h3>
 <div style="font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text-dim);line-height:1.8;">
-<p><strong style="color:var(--orange);">Pioneer DJ Pro MAX</strong> v1.0 — Ultimate browser DJ console</p>
+<p><strong style="color:var(--orange);">DJ MAX Ai</strong> v1.0 — Ultimate AI-powered browser DJ console</p>
 <p>Built with Web Audio API. Inspired by Pioneer CDJ-3000 + DJM-V10.</p>
 <p>All audio processing local. No data leaves your device.</p>
 <p style="margin-top:10px;">Created by <strong style="color:var(--screen-glow);">Kobi Chen / Media Deal</strong></p>
@@ -1883,7 +1925,7 @@ No MIDI devices. Press CONNECT.
 <script src="https://www.youtube.com/iframe_api"></script>
 <script>
 /* PIONEER DJ PRO MAX — Ultimate DJ Console */
-const STORAGE_KEY = 'pioneerDJProMAX_v1';
+const STORAGE_KEY = 'djMaxAi_v1';
 
 let audioCtx=null, masterGain=null, masterLimiter=null, recordDestination=null;
 let mediaRecorder=null, recordedChunks=[];
@@ -2444,7 +2486,7 @@ function drawWaveform(deckId,track){
 }
 
 function setupWaveformInteraction(){
-  ['A','B'].forEach(deckId=>{
+  ['A','B','C','D'].forEach(deckId=>{
     const wave=document.querySelector(`.waveform:has(#wave-${deckId})`)||document.getElementById(`wave-${deckId}`).parentElement;
     if(!wave)return;
     let wDown=false;
@@ -3143,7 +3185,7 @@ function applyKnob(id,val){
   else if(id==='micVol'){mixerState.micVol=0.5+val*0.5;if(micGain&&mixerState.micOn)micGain.gain.value=mixerState.micVol;}
   else if(id==='micHi'){if(micEqHi)micEqHi.gain.value=val*12;}
   else if(id==='micLow'){if(micEqLow)micEqLow.gain.value=val*12;}
-  else if(id==='fxLevel'){mixerState.fx.level=0.5+val*0.5;}
+  else if(id==='fxLevel'){mixerState.fx.level=(val+1)/2;if(mixerState.fx.on&&typeof applyBeatFx==='function')applyBeatFx();}
   else if(id==='isoLow'){mixerState.isolator.low=val;if(window.isoLow){const v=val<=-0.95?-80:val<0?val*30:val*12;isoLow.gain.value=v;}}
   else if(id==='isoMid'){mixerState.isolator.mid=val;if(window.isoMid){const v=val<-0.9?-40:val<0?val*30:val*12;isoMid.gain.value=v;}}
   else if(id==='isoHi'){mixerState.isolator.hi=val;if(window.isoHi){const v=val<-0.9?-40:val<0?val*30:val*12;isoHi.gain.value=v;}}
@@ -3328,9 +3370,10 @@ function attachEvents(){
   document.querySelectorAll('.pad-mode-btn').forEach(btn=>{
     btn.addEventListener('click',()=>setPadMode(btn.dataset.deck,btn.dataset.padMode));
   });
-  ['A','B'].forEach(d=>{
+  ['A','B','C','D'].forEach(d=>{
     // Tempo buttons replace the slider
     const deckEl=document.getElementById(`deck${d}-container`);
+    if(!deckEl)return;
     deckEl.querySelectorAll(`[data-tempo-action][data-deck="${d}"]`).forEach(btn=>{
       const act=btn.dataset.tempoAction;
       if(act==='minus')btn.addEventListener('click',()=>adjustTempo(d,-1,false));
@@ -3439,8 +3482,65 @@ function attachEvents(){
 }
 
 /* BEAT FX UI */
+function applyBeatFx(){
+  if(!audioCtx||!window.sceneFxWet)return;
+  const f=mixerState.fx;const t0=audioCtx.currentTime;
+  if(!f.on){
+    sceneFxWet.gain.cancelScheduledValues(t0);
+    sceneFxWet.gain.setTargetAtTime(0,t0,0.08);
+    return;
+  }
+  const bpm=parseFloat(document.getElementById('masterBpm').textContent)||128;
+  const beatSec=60/bpm;
+  const time=Math.max(0.005,beatSec*(f.beat||1));
+  const level=Math.max(0,Math.min(1,f.level!=null?f.level:0.6));
+  const ramp=0.05;
+  sceneFxDelay.delayTime.cancelScheduledValues(t0);
+  sceneFxFeedback.gain.cancelScheduledValues(t0);
+  sceneFxWet.gain.cancelScheduledValues(t0);
+  sceneFxDry.gain.cancelScheduledValues(t0);
+  if(sceneFxFilter.frequency)sceneFxFilter.frequency.cancelScheduledValues(t0);
+  if(f.type==='delay'){
+    sceneFxDelay.delayTime.setTargetAtTime(time,t0,ramp);
+    sceneFxFeedback.gain.setTargetAtTime(0.35,t0,ramp);
+    sceneFxFilter.type='allpass';
+  }else if(f.type==='echo'){
+    sceneFxDelay.delayTime.setTargetAtTime(time,t0,ramp);
+    sceneFxFeedback.gain.setTargetAtTime(0.75,t0,ramp);
+    sceneFxFilter.type='lowpass';sceneFxFilter.frequency.value=3500;
+  }else if(f.type==='pingpong'){
+    sceneFxDelay.delayTime.setTargetAtTime(time,t0,ramp);
+    sceneFxFeedback.gain.setTargetAtTime(0.6,t0,ramp);
+    sceneFxFilter.type='allpass';
+  }else if(f.type==='reverb'){
+    sceneFxDelay.delayTime.setTargetAtTime(0.05,t0,ramp);
+    sceneFxFeedback.gain.setTargetAtTime(0.9,t0,ramp);
+    sceneFxFilter.type='lowpass';sceneFxFilter.frequency.value=4500;
+  }else if(f.type==='filter'){
+    sceneFxDelay.delayTime.setTargetAtTime(0,t0,ramp);
+    sceneFxFeedback.gain.setTargetAtTime(0,t0,ramp);
+    sceneFxFilter.type='bandpass';
+    sceneFxFilter.frequency.setTargetAtTime(200+level*6000,t0,ramp);
+    if(sceneFxFilter.Q)sceneFxFilter.Q.value=4;
+  }else if(f.type==='flanger'){
+    sceneFxDelay.delayTime.setTargetAtTime(0.004,t0,ramp);
+    sceneFxFeedback.gain.setTargetAtTime(0.75,t0,ramp);
+    sceneFxFilter.type='allpass';
+  }else if(f.type==='phaser'){
+    sceneFxDelay.delayTime.setTargetAtTime(0.008,t0,ramp);
+    sceneFxFeedback.gain.setTargetAtTime(0.6,t0,ramp);
+    sceneFxFilter.type='allpass';
+  }else if(f.type==='roll'){
+    sceneFxDelay.delayTime.setTargetAtTime(time*0.5,t0,ramp);
+    sceneFxFeedback.gain.setTargetAtTime(0.88,t0,ramp);
+    sceneFxFilter.type='allpass';
+  }
+  sceneFxDry.gain.setTargetAtTime(1,t0,ramp);
+  sceneFxWet.gain.setTargetAtTime(level,t0,ramp);
+}
+
 function setupBeatFxUI(){
-  document.getElementById('fxType').addEventListener('change',e=>{mixerState.fx.type=e.target.value;});
+  document.getElementById('fxType').addEventListener('change',e=>{mixerState.fx.type=e.target.value;if(mixerState.fx.on)applyBeatFx();});
   document.getElementById('fxChannel').addEventListener('change',e=>{mixerState.fx.channel=e.target.value;});
   document.querySelectorAll('#beatButtons .beat-btn').forEach(btn=>{
     btn.addEventListener('click',()=>{
@@ -3448,12 +3548,15 @@ function setupBeatFxUI(){
       btn.classList.add('active');
       mixerState.fx.beat=parseFloat(btn.dataset.beat);
       document.getElementById('beatDisplay').textContent=btn.textContent;
+      if(mixerState.fx.on)applyBeatFx();
     });
   });
   document.getElementById('fxOnOff').addEventListener('click',()=>{
+    ensureAudio();
     mixerState.fx.on=!mixerState.fx.on;
     document.getElementById('fxOnOff').classList.toggle('active',mixerState.fx.on);
     if(mixerState.fx.on){stats.fxCount++;document.getElementById('statFxCount').textContent=stats.fxCount;}
+    applyBeatFx();
     toast(`Beat FX ${mixerState.fx.on?'ON':'OFF'} — ${mixerState.fx.type}`);
   });
   let tapTimes=[];
@@ -3488,11 +3591,19 @@ function animateVU(){
     const leds=vu.querySelectorAll('.vu-led');
     let level=0;
     if(dk.playing&&dk.analyser){
-      const arr=new Uint8Array(dk.analyser.frequencyBinCount);
-      dk.analyser.getByteTimeDomainData(arr);
-      let peak=0;for(let i=0;i<arr.length;i++)peak=Math.max(peak,Math.abs(arr[i]-128));
-      level=Math.min(20,(peak/128)*25);
-    }
+      const fftN=dk.analyser.frequencyBinCount;
+      const tArr=new Uint8Array(fftN);
+      dk.analyser.getByteTimeDomainData(tArr);
+      let peak=0,rms=0;
+      for(let i=0;i<tArr.length;i++){const v=Math.abs(tArr[i]-128);if(v>peak)peak=v;rms+=v*v;}
+      rms=Math.sqrt(rms/tArr.length);
+      const combined=peak*0.7+rms*1.6;
+      level=Math.min(20,(combined/128)*32);
+      if(dk.playing&&level<1.5)level=1.5;
+      if(dk._vuHold==null)dk._vuHold=0;
+      if(level>dk._vuHold)dk._vuHold=level;else dk._vuHold=Math.max(level,dk._vuHold-0.6);
+      level=dk._vuHold;
+    }else if(dk._vuHold){dk._vuHold=0;}
     leds.forEach((l,i)=>{l.classList.remove('on','green','yellow','red');if(i<level){l.classList.add('on');l.classList.add(l.dataset.color);}});
   });
   if(masterAnalyserL){
@@ -3604,7 +3715,7 @@ function setupSettings(){
       t.classList.toggle('on');
       settings[key]=t.classList.contains('on');
       if(s==='Rgb')document.getElementById('rgbStrip').style.display=settings.rgbAmbient?'':'none';
-      if(s==='Phrase'){['A','B'].forEach(d=>{const tr=decks[d].track;if(tr)drawPhraseMarkers(d,tr);});}
+      if(s==='Phrase'){['A','B','C','D'].forEach(d=>{const tr=decks[d].track;if(tr)drawPhraseMarkers(d,tr);});}
       saveToDB();
     });
   });
@@ -3979,7 +4090,7 @@ function init(){
 
   setInterval(updateStats,1000);
   requestAnimationFrame(tick);
-  toast('Pioneer DJ Pro MAX loaded','success');
+  toast('DJ MAX Ai loaded','success');
 }
 
 /* ========================================================
@@ -4375,7 +4486,7 @@ function renderSearchResults(items){
     return `<div class="search-card" data-sid="${it.id}">
       <div class="sc-top">${art}<div class="sc-info"><div class="sc-title">${escapeHtml(it.title)}</div><div class="sc-artist">${escapeHtml(it.artist||'')}</div>${meta?`<div class="sc-meta">${escapeHtml(meta)}</div>`:''}</div><span class="sc-source ${it.source}">${it.source.toUpperCase()}</span></div>
       <div class="sc-actions">
-        ${canPreview?`<button class="to-lib" data-add="${it.id}">+ LIBRARY</button><button class="to-a" data-to="A" data-add="${it.id}">→ A</button><button class="to-b" data-to="B" data-add="${it.id}">→ B</button>`:canYt?`<button class="to-lib" data-add-yt="${it.id}">+ LIBRARY</button><button class="to-a" data-to-yt="A" data-add-yt="${it.id}">→ A (YT)</button><button class="to-b" data-to-yt="B" data-add-yt="${it.id}">→ B (YT)</button>`:`<button disabled>No preview</button>`}
+        ${canPreview?`<button class="to-lib" data-add="${it.id}">+ LIB</button><button class="to-a" data-to="A" data-add="${it.id}">→ A</button><button class="to-b" data-to="B" data-add="${it.id}">→ B</button><button class="to-c" data-to="C" data-add="${it.id}">→ C</button><button class="to-d" data-to="D" data-add="${it.id}">→ D</button>`:canYt?`<button class="to-lib" data-add-yt="${it.id}">+ LIB</button><button class="to-a" data-to-yt="A" data-add-yt="${it.id}">→ A</button><button class="to-b" data-to-yt="B" data-add-yt="${it.id}">→ B</button><button class="to-c" data-to-yt="C" data-add-yt="${it.id}">→ C</button><button class="to-d" data-to-yt="D" data-add-yt="${it.id}">→ D</button>`:`<button disabled>No preview</button>`}
       </div>
     </div>`;
   }).join('');
@@ -4604,21 +4715,124 @@ document.addEventListener('DOMContentLoaded',()=>{
     }
   });
 
-  /* 9) Guard pauseDeck against being called when no source exists
-        (prevents the ghost-pause that left the UI in half-state). */
-  const _origPauseDeck=window.pauseDeck;
-  if(_origPauseDeck){
-    window.pauseDeck=function(id){
-      const d=decks&&decks[id];if(!d)return;
-      if(!d.playing&&!d.source){
-        const btnFull=document.querySelector(`.big-btn.play[data-deck="${id}"]`);
-        if(btnFull)btnFull.classList.remove('active');
-        return;
-      }
-      try{return _origPauseDeck.call(this,id);}
-      catch(e){d.playing=false;d.source=null;clearTransientState(e.message);}
+  /* 9) BULLETPROOF TRANSPORT — total replacement of playDeck / pauseDeck /
+        seekDeck that uses source tokens so callbacks from stale sources
+        can never trigger a pause on a live one. Fixes the "track stops
+        mid-way" and "lost control of deck" bugs. */
+  function _updatePlayUI(id,playing){
+    const btnFull=document.querySelector(`.big-btn.play[data-deck="${id}"]`);
+    if(btnFull)btnFull.classList.toggle('active',playing);
+    const icon=document.getElementById(`playIcon-${id}`);if(icon)icon.textContent=playing?'❚❚':'▶';
+    const lbl=document.getElementById(`playLabel-${id}`);if(lbl)lbl.textContent=playing?'PAUSE':'PLAY';
+    const jog=document.getElementById(`jog-${id}`);if(jog)jog.classList.toggle('playing',playing);
+    const platter=document.getElementById(`platter-${id}`);if(platter)platter.classList.toggle('spinning',playing);
+    const cBtn=document.querySelector(`.compact-btn.play[data-deck="${id}"]`);
+    if(cBtn){cBtn.classList.toggle('active',playing);cBtn.textContent=playing?'❚❚ PAUSE':'▶ PLAY';}
+  }
+  function _killDeckSource(d){
+    if(!d||!d.source)return;
+    const s=d.source;d.source=null;
+    try{s.onended=null;}catch(e){}
+    try{s.stop();}catch(e){}
+    try{s.disconnect();}catch(e){}
+  }
+  window.playDeck=function(id){
+    const d=decks[id];if(!d||!d.buffer||d.playing)return;
+    ensureAudio();if(!audioCtx)return;
+    _killDeckSource(d);
+    const src=audioCtx.createBufferSource();
+    src.buffer=d.buffer;
+    src.playbackRate.value=d.playbackRate||1;
+    if(d.loop&&d.loop.active&&d.loop.start!=null&&d.loop.end!=null&&d.loop.end>d.loop.start){
+      src.loop=true;src.loopStart=d.loop.start;src.loopEnd=d.loop.end;
+    }
+    try{src.connect(d.trimGain);}catch(e){console.warn('connect fail',e);return;}
+    const token=Symbol('src');
+    src._dmxToken=token;d._playToken=token;
+    src.onended=()=>{
+      if(d._playToken!==token)return;
+      d.playing=false;d.source=null;d.offset=0;d._playToken=null;
+      _updatePlayUI(id,false);
+    };
+    const startOffset=Math.max(0,Math.min((d.offset||0),d.buffer.duration-0.02));
+    try{src.start(0,startOffset);}catch(e){console.warn('start fail',e);return;}
+    d.source=src;d.startTime=audioCtx.currentTime;d.playing=true;d._manualStop=false;
+    if(d.volumeGain){
+      const target=d.volume!=null?d.volume:0.8;
+      const now=audioCtx.currentTime;
+      d.volumeGain.gain.cancelScheduledValues(now);
+      d.volumeGain.gain.setValueAtTime(0,now);
+      d.volumeGain.gain.linearRampToValueAtTime(target,now+0.008);
+    }
+    _updatePlayUI(id,true);
+  };
+  window.pauseDeck=function(id){
+    const d=decks[id];if(!d)return;
+    if(!d.playing&&!d.source){_updatePlayUI(id,false);return;}
+    d._manualStop=true;
+    try{d.offset=getCurrentTime(id);}catch(e){}
+    d.playing=false;
+    const src=d.source;d.source=null;d._playToken=null;
+    if(src){try{src.onended=null;}catch(e){}}
+    if(d.volumeGain&&audioCtx){
+      const now=audioCtx.currentTime;
+      const cur=d.volumeGain.gain.value;
+      d.volumeGain.gain.cancelScheduledValues(now);
+      d.volumeGain.gain.setValueAtTime(cur,now);
+      d.volumeGain.gain.linearRampToValueAtTime(0,now+0.008);
+      setTimeout(()=>{
+        try{src&&src.stop();src&&src.disconnect();}catch(e){}
+        if(audioCtx){d.volumeGain.gain.cancelScheduledValues(audioCtx.currentTime);d.volumeGain.gain.setValueAtTime(d.volume!=null?d.volume:0.8,audioCtx.currentTime);}
+      },18);
+    }else if(src){try{src.stop();src.disconnect();}catch(e){}}
+    _updatePlayUI(id,false);
+  };
+  window.seekDeck=function(id,sec){
+    const d=decks[id];if(!d||!d.buffer)return;
+    const clamped=Math.max(0,Math.min(d.buffer.duration-0.02,sec));
+    if(!d.playing){d.offset=clamped;return;}
+    const wasManual=d._manualStop;
+    d._manualStop=true;
+    _killDeckSource(d);
+    d.offset=clamped;d.playing=false;d._playToken=null;
+    d._manualStop=wasManual;
+    playDeck(id);
+  };
+  window.stopDeck=function(id){const d=decks[id];if(!d)return;pauseDeck(id);d.offset=0;};
+
+  /* 10) Tick override: update elapsed/remain/waveform for ALL four
+         decks (was A/B only), and use native source loop instead of
+         calling seekDeck every frame. */
+  const _origTick=window.tick;
+  if(_origTick){
+    window.tick=function(){
+      ['A','B','C','D'].forEach(d=>{
+        const dk=decks[d];if(!dk.track)return;
+        const t=dk.playing?getCurrentTime(d):(dk.offset||0);
+        const dur=dk.track.duration||0;
+        const el=document.getElementById(`elapsed-${d}`);if(el)el.textContent=fmtTime(t);
+        const rm=document.getElementById(`remain-${d}`);if(rm)rm.textContent='-'+fmtTime(Math.max(0,dur-t));
+        const c=document.getElementById(`wave-${d}`);
+        if(c&&dur){const pct=t/dur;const zoom=dk.waveZoom||1;c.style.transform=`translateX(${(0.5-pct)*100*zoom}%) scaleX(${zoom})`;c.style.transformOrigin=`${pct*100}% 50%`;}
+      });
+      try{animateVU&&animateVU();}catch(e){}
+      try{drawSpectrum&&drawSpectrum();}catch(e){}
+      requestAnimationFrame(window.tick);
     };
   }
+
+  /* 11) WORK MODE toggle */
+  document.addEventListener('DOMContentLoaded',()=>{
+    setTimeout(()=>{
+      const btn=document.getElementById('workModeBtn');
+      if(btn){
+        btn.addEventListener('click',()=>{
+          document.body.classList.toggle('work-mode');
+          btn.classList.toggle('active',document.body.classList.contains('work-mode'));
+        });
+      }
+    },300);
+  });
 })();
 
 /* ========================================================
