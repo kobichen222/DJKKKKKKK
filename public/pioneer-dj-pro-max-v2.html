@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -1908,9 +1908,7 @@ body.theme-light .toggle-switch.on{background:var(--orange)}
 body.theme-light .waveform{background:#05101c;border:1px solid rgba(0,0,0,.25);box-shadow:inset 0 2px 6px rgba(0,0,0,.3)}
 body.theme-light .playhead{background:#fff;box-shadow:0 0 8px rgba(255,255,255,.9),0 0 2px rgba(0,0,0,.7)}
 
-/* Language + WORK MODE buttons keep their look */
-body.theme-light .lang-btn{color:var(--screen-glow);border-color:var(--screen-glow)}
-body.theme-light .lang-btn:hover{background:var(--screen-glow);color:#fff}
+/* WORK MODE button keeps its look */
 body.theme-light .dsb-work{color:var(--purple) !important;border-color:rgba(140,0,200,.4) !important}
 body.theme-light .wm-exit-btn{background:linear-gradient(180deg,#ff8080 0%,var(--red) 100%);color:#fff;border:2px solid var(--red)}
 
@@ -2491,6 +2489,77 @@ body.theme-light .deck-header .deck-upload-btn:hover{background:var(--orange);co
 .big-btn .icon,.big-btn .lbl{display:block;text-align:center;width:100%;line-height:1}
 body.theme-light .deck-header .deck-lib-btn:hover{background:#00a656;color:#fff}
 
+/* Enhanced deck LIBRARY button — premium animated, always visible */
+.deck-header .deck-lib-btn{
+  margin-left:4px;padding:7px 14px;font-family:'Orbitron',sans-serif;font-size:11px;
+  letter-spacing:2.5px;font-weight:900;
+  background:linear-gradient(180deg,#1a3325 0%,#0a1a12 60%,#050a08 100%);
+  border:1px solid rgba(28,255,143,.6);color:var(--play-green);
+  border-radius:5px;cursor:pointer;transition:all .18s ease;
+  box-shadow:0 0 0 1px rgba(28,255,143,.15) inset,0 2px 6px rgba(0,0,0,.5),0 0 10px rgba(28,255,143,.25);
+  text-shadow:0 0 8px rgba(28,255,143,.6);
+  display:inline-flex;align-items:center;gap:5px;
+  position:relative;overflow:hidden;
+}
+.deck-header .deck-lib-btn::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(120deg,transparent 30%,rgba(28,255,143,.35) 50%,transparent 70%);
+  transform:translateX(-120%);transition:transform .6s ease;
+}
+.deck-header .deck-lib-btn:hover{
+  background:linear-gradient(180deg,var(--play-green) 0%,#0aa05a 100%);
+  color:#001a0c;border-color:#baffd9;
+  box-shadow:0 0 20px rgba(28,255,143,.8),inset 0 1px 0 rgba(255,255,255,.3);
+  transform:translateY(-1px);
+  text-shadow:0 1px 0 rgba(255,255,255,.35);
+}
+.deck-header .deck-lib-btn:hover::before{transform:translateX(120%)}
+.deck-header .deck-lib-btn:active{transform:translateY(0) scale(.97)}
+
+/* MIC STRIP — sits alongside BEAT FX / DECK FOCUS under the console */
+.mic-strip{
+  width:100%;max-width:1700px;
+  background:linear-gradient(180deg,#2a2a18 0%,#1a1a0c 100%);
+  border-radius:10px;padding:8px 14px;
+  border:1px solid rgba(255,212,0,.35);
+  box-shadow:0 8px 22px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,212,0,.1);
+  display:grid;grid-template-columns:auto auto 1fr auto;gap:14px;
+  align-items:center;
+}
+.mic-strip-hint{
+  font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1.5px;
+  color:rgba(255,212,0,.55);text-align:right;
+}
+.mic-strip-label{
+  font-family:'Orbitron',sans-serif;font-size:12px;letter-spacing:3px;font-weight:900;
+  color:var(--yellow);text-shadow:0 0 8px rgba(255,212,0,.55);
+  padding-right:8px;border-right:2px solid rgba(255,212,0,.25);
+}
+.mic-strip-btn{
+  padding:8px 16px;font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:2.5px;font-weight:900;
+  background:linear-gradient(180deg,#3a3a22 0%,#1a1a0c 100%);
+  border:1px solid rgba(255,212,0,.5);color:var(--yellow);
+  border-radius:4px;cursor:pointer;transition:all .15s ease;
+  text-shadow:0 0 6px rgba(255,212,0,.4);
+}
+.mic-strip-btn:hover{background:linear-gradient(180deg,var(--yellow) 0%,#c8a400 100%);color:#000;box-shadow:0 0 16px rgba(255,212,0,.65)}
+.mic-strip-btn.active{background:linear-gradient(180deg,var(--yellow) 0%,#c8a400 100%);color:#000;box-shadow:0 0 18px rgba(255,212,0,.85);animation:micPulse 1.4s ease-in-out infinite}
+@keyframes micPulse{0%,100%{box-shadow:0 0 14px rgba(255,212,0,.6)}50%{box-shadow:0 0 26px rgba(255,212,0,1)}}
+.mic-strip-vu{
+  width:120px;height:10px;background:#050505;border:1px solid rgba(255,212,0,.25);border-radius:3px;overflow:hidden;
+  box-shadow:inset 0 0 6px rgba(0,0,0,.9);
+}
+.mic-strip-vu > span{
+  display:block;height:100%;width:0%;
+  background:linear-gradient(90deg,#0aa05a 0%,var(--yellow) 60%,var(--red) 100%);
+  transition:width .08s linear;
+}
+@media (max-width:900px){
+  .mic-strip{grid-template-columns:auto auto 1fr;gap:8px;padding:6px 10px}
+  .mic-strip-hint{display:none}
+  .mic-strip-vu{width:100%}
+}
+
 /* Quick library picker modal */
 .quick-lib-overlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);align-items:flex-start;justify-content:center;padding-top:6vh;animation:fadeIn .18s}
 .quick-lib-overlay.open{display:flex}
@@ -2594,8 +2663,6 @@ body.work-mode .deck-switch-bar{
 .wm-exit-btn:active{transform:translateY(0) scale(.96)}
 body.work-mode .wm-exit-btn{display:inline-flex;align-items:center;gap:8px;animation:wmExitPulse 2.5s ease-in-out infinite}
 @keyframes wmExitPulse{0%,100%{box-shadow:0 0 20px rgba(255,46,46,.45)}50%{box-shadow:0 0 34px rgba(255,46,46,.85)}}
-body.lang-he .wm-exit-btn{right:auto;left:14px}
-
 /* WORK MODE top exit bar — always visible, impossible to miss */
 .wm-topbar{display:none}
 body.work-mode .wm-topbar{
@@ -2630,7 +2697,6 @@ body.work-mode.show-all + .wm-topbar,body.work-mode .wm-topbar{max-width:none}
   0%,100%{box-shadow:0 6px 18px rgba(255,46,46,.35),inset 0 1px 0 rgba(255,255,255,.15)}
   50%{box-shadow:0 10px 30px rgba(255,46,46,.75),inset 0 1px 0 rgba(255,255,255,.2)}
 }
-body.lang-he .wm-esc-hint{margin-left:0;margin-right:6px}
 body.work-mode{
   padding:6px;
   background:
@@ -2776,24 +2842,6 @@ body.work-mode .dsb-wmexit{display:inline-flex;background:linear-gradient(180deg
 .dsb-work.active{background:linear-gradient(180deg,var(--purple),#6000aa) !important;color:#fff !important;box-shadow:0 0 20px rgba(200,0,255,.7) !important}
 .dsb-work:hover{color:var(--purple) !important;border-color:var(--purple) !important;box-shadow:0 0 14px rgba(200,0,255,.5)}
 
-/* LANGUAGE toggle button */
-.lang-btn{
-  padding:6px 12px;background:linear-gradient(180deg,#2a2a2e 0%,#151518 100%);
-  border:1px solid var(--screen-glow);color:var(--screen-glow);
-  font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:2px;font-weight:700;
-  border-radius:4px;cursor:pointer;transition:all .15s ease;
-}
-.lang-btn:hover{background:var(--screen-glow);color:#0a0a0a;box-shadow:0 0 14px rgba(46,224,255,.55)}
-
-/* RTL fix: Hebrew language direction */
-body.lang-he{direction:rtl}
-body.lang-he .header-right,body.lang-he .dsb-monitor,body.lang-he .library-actions,
-body.lang-he .track-row .actions{direction:rtl}
-body.lang-he .master-bpm,body.lang-he .screen-right,body.lang-he .time-value,
-body.lang-he .screen-bpm,body.lang-he .track-row .t-bpm,body.lang-he .track-row .t-key,
-body.lang-he input.url-input,body.lang-he input.search-input,body.lang-he .yt-input,
-body.lang-he input[type=text],body.lang-he input[type=password]{direction:ltr;text-align:start}
-
 /* STUDIO MASTERING panel */
 .studio-panel{display:flex;flex-direction:column;gap:14px}
 .studio-sub-label{font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:3px;color:var(--orange);font-weight:700;margin-bottom:6px}
@@ -2845,8 +2893,7 @@ body.lang-he input[type=text],body.lang-he input[type=password]{direction:ltr;te
 <div class="header-right">
 <div class="power-led"></div><span>BPM</span>
 <span class="master-bpm" id="masterBpm">---.--</span>
-<button class="rec-btn" id="recBtn" data-t="rec">REC</button>
-<button class="lang-btn" id="langBtn" title="Language / שפה">🌐 EN</button>
+<button class="rec-btn" id="recBtn">REC</button>
 <button class="auth-btn" id="authBtn" title="Sign in / Sign up">👤 SIGN IN</button>
 <span class="auth-chip" id="authChip" style="display:none"><span id="authName"></span> <button class="auth-logout" id="authLogoutBtn" title="Log out">⎋</button></span>
 </div>
@@ -2869,60 +2916,6 @@ body.lang-he input[type=text],body.lang-he input[type=password]{direction:ltr;te
 </div>
 
 <div class="tab-content active" id="tab-deck">
-<div class="beat-fx-panel">
-<div class="beat-fx-label">BEAT FX</div>
-<select class="fx-selector" id="fxType">
-<option value="delay">DELAY</option><option value="echo">ECHO</option>
-<option value="pingpong">PING PONG</option><option value="reverb">REVERB</option>
-<option value="filter">FILTER</option><option value="flanger">FLANGER</option>
-<option value="phaser">PHASER</option><option value="roll">ROLL</option>
-</select>
-<select class="fx-selector" id="fxChannel">
-<option value="master">MASTER</option><option value="A">CH 1</option>
-<option value="B">CH 2</option><option value="C">CH 3</option>
-<option value="D">CH 4</option><option value="mic">MIC</option>
-</select>
-<div class="beat-buttons" id="beatButtons">
-<button class="beat-btn" data-beat="0.0625">1/16</button>
-<button class="beat-btn" data-beat="0.125">1/8</button>
-<button class="beat-btn" data-beat="0.25">1/4</button>
-<button class="beat-btn" data-beat="0.5">1/2</button>
-<button class="beat-btn active" data-beat="1">1</button>
-<button class="beat-btn" data-beat="2">2</button>
-<button class="beat-btn" data-beat="4">4</button>
-<button class="beat-btn" data-beat="8">8</button>
-<button class="beat-btn" data-beat="16">16</button>
-</div>
-<div class="beat-display" id="beatDisplay">1</div>
-<div class="knob-wrap"><div class="knob small" data-knob="fxLevel"><div class="knob-indicator"></div></div><span class="knob-label">LEVEL</span></div>
-<button class="tap-btn" id="tapBtn">TAP</button>
-<button class="fx-onoff" id="fxOnOff">ON / OFF</button>
-</div>
-<canvas class="spectrum-canvas" id="spectrumCanvas" width="1700" height="40"></canvas>
-<div class="rgb-ambient" id="rgbStrip"></div>
-
-<div class="scene-fx-panel">
-<div class="scene-fx-label">SCENE FX</div>
-<div class="scene-fx-buttons" id="sceneFxButtons">
-<button class="scene-btn" data-scene="dubspiral">DUB SPIRAL</button>
-<button class="scene-btn" data-scene="sweep">SWEEP</button>
-<button class="scene-btn" data-scene="helix">HELIX</button>
-<button class="scene-btn" data-scene="mod">MOD</button>
-<button class="scene-btn" data-scene="shimmer">SHIMMER</button>
-<button class="scene-btn" data-scene="plaza">PLAZA</button>
-</div>
-<div class="x-pad-wrap">
-<div class="x-pad" id="xPad">
-<div class="x-pad-dot" id="xPadDot"></div>
-<div class="x-pad-labels">
-<span class="top">HIGH</span><span class="bottom">LOW</span>
-<span class="left">DRY</span><span class="right">WET</span>
-</div>
-</div>
-</div>
-<div class="knob-wrap"><div class="knob small" data-knob="sceneDepth"><div class="knob-indicator"></div></div><span class="knob-label">DEPTH</span></div>
-</div>
-
 <button class="wm-exit-btn" id="wmExitBtn" title="Exit work mode (Esc)">✕ EXIT</button>
 
 <div class="quick-lib-overlay" id="quickLibOverlay">
@@ -2976,25 +2969,87 @@ body.lang-he input[type=text],body.lang-he input[type=password]{direction:ltr;te
   <button class="wm-exit-bar" id="wmExitBarBtn">← EXIT WORK MODE  <span class="wm-esc-hint">(ESC)</span></button>
 </div>
 
-<div class="deck-switch-bar">
-  <span class="dsb-label" data-t="deck_focus">DECK FOCUS</span>
-  <button class="dsb-btn" data-pair="AB">1 · 2</button>
-  <button class="dsb-btn" data-pair="CD">3 · 4</button>
-  <button class="dsb-btn dsb-split" data-pair="AC">1 · 3</button>
-  <button class="dsb-btn dsb-split" data-pair="BD">2 · 4</button>
-  <button class="dsb-btn dsb-all active" data-pair="ALL" data-t="all_4">ALL 4</button>
-  <button class="dsb-btn dsb-work" id="workModeBtn" title="Stage-ready performance view" data-t="work_mode">🎆 WORK MODE</button>
-  <button class="dsb-btn dsb-wmlib" id="wmLibBtn" title="Show / hide the track library in work mode" data-t="library_btn">📚 LIBRARY</button>
-  <button class="dsb-btn dsb-wmexit" id="wmExitInlineBtn" title="Exit work mode (Esc)">✕ EXIT WORK</button>
-  <span class="dsb-monitor" id="dsbMonitor"></span>
-</div>
-
 <div class="console" id="console">
 <div class="cdj" data-deck="A" id="deckA-container"></div>
 <div class="cdj" data-deck="C" id="deckC-container" style="display:none"></div>
 <div class="mixer" id="mixer-container"></div>
 <div class="cdj" data-deck="B" id="deckB-container"></div>
 <div class="cdj" data-deck="D" id="deckD-container" style="display:none"></div>
+</div>
+
+<div class="deck-switch-bar">
+  <span class="dsb-label">DECK FOCUS</span>
+  <button class="dsb-btn" data-pair="AB">1 · 2</button>
+  <button class="dsb-btn" data-pair="CD">3 · 4</button>
+  <button class="dsb-btn dsb-split" data-pair="AC">1 · 3</button>
+  <button class="dsb-btn dsb-split" data-pair="BD">2 · 4</button>
+  <button class="dsb-btn dsb-all active" data-pair="ALL">ALL 4</button>
+  <button class="dsb-btn dsb-work" id="workModeBtn" title="Stage-ready performance view">🎆 WORK MODE</button>
+  <button class="dsb-btn dsb-wmlib" id="wmLibBtn" title="Show / hide the track library in work mode">📚 LIBRARY</button>
+  <button class="dsb-btn dsb-wmexit" id="wmExitInlineBtn" title="Exit work mode (Esc)">✕ EXIT WORK</button>
+  <span class="dsb-monitor" id="dsbMonitor"></span>
+</div>
+
+<div class="beat-fx-panel">
+<div class="beat-fx-label">BEAT FX</div>
+<select class="fx-selector" id="fxType">
+<option value="delay">DELAY</option><option value="echo">ECHO</option>
+<option value="pingpong">PING PONG</option><option value="reverb">REVERB</option>
+<option value="filter">FILTER</option><option value="flanger">FLANGER</option>
+<option value="phaser">PHASER</option><option value="roll">ROLL</option>
+</select>
+<select class="fx-selector" id="fxChannel">
+<option value="master">MASTER</option><option value="A">CH 1</option>
+<option value="B">CH 2</option><option value="C">CH 3</option>
+<option value="D">CH 4</option><option value="mic">MIC</option>
+</select>
+<div class="beat-buttons" id="beatButtons">
+<button class="beat-btn" data-beat="0.0625">1/16</button>
+<button class="beat-btn" data-beat="0.125">1/8</button>
+<button class="beat-btn" data-beat="0.25">1/4</button>
+<button class="beat-btn" data-beat="0.5">1/2</button>
+<button class="beat-btn active" data-beat="1">1</button>
+<button class="beat-btn" data-beat="2">2</button>
+<button class="beat-btn" data-beat="4">4</button>
+<button class="beat-btn" data-beat="8">8</button>
+<button class="beat-btn" data-beat="16">16</button>
+</div>
+<div class="beat-display" id="beatDisplay">1</div>
+<div class="knob-wrap"><div class="knob small" data-knob="fxLevel"><div class="knob-indicator"></div></div><span class="knob-label">LEVEL</span></div>
+<button class="tap-btn" id="tapBtn">TAP</button>
+<button class="fx-onoff" id="fxOnOff">ON / OFF</button>
+</div>
+
+<div class="mic-strip" id="micStrip">
+  <div class="mic-strip-label">🎤 MIC</div>
+  <button class="mic-strip-btn" id="micStripOnBtn" title="Toggle microphone">ON</button>
+  <div class="mic-strip-vu" id="micStripVu" title="Live mic level"><span></span></div>
+  <div class="mic-strip-hint">Gain / HI / LOW on mixer panel</div>
+</div>
+
+<canvas class="spectrum-canvas" id="spectrumCanvas" width="1700" height="40"></canvas>
+<div class="rgb-ambient" id="rgbStrip"></div>
+
+<div class="scene-fx-panel">
+<div class="scene-fx-label">SCENE FX</div>
+<div class="scene-fx-buttons" id="sceneFxButtons">
+<button class="scene-btn" data-scene="dubspiral">DUB SPIRAL</button>
+<button class="scene-btn" data-scene="sweep">SWEEP</button>
+<button class="scene-btn" data-scene="helix">HELIX</button>
+<button class="scene-btn" data-scene="mod">MOD</button>
+<button class="scene-btn" data-scene="shimmer">SHIMMER</button>
+<button class="scene-btn" data-scene="plaza">PLAZA</button>
+</div>
+<div class="x-pad-wrap">
+<div class="x-pad" id="xPad">
+<div class="x-pad-dot" id="xPadDot"></div>
+<div class="x-pad-labels">
+<span class="top">HIGH</span><span class="bottom">LOW</span>
+<span class="left">DRY</span><span class="right">WET</span>
+</div>
+</div>
+</div>
+<div class="knob-wrap"><div class="knob small" data-knob="sceneDepth"><div class="knob-indicator"></div></div><span class="knob-label">DEPTH</span></div>
 </div>
 
 <div class="library">
@@ -3809,12 +3864,31 @@ function setupDeck(id){
   d.channelGain.connect(masterGain);
 }
 
-let micStream,micSource,micGain,micEqHi,micEqLow;
+let micStream,micSource,micGain,micEqHi,micEqLow,micAnalyser,micVuRaf;
 function setupMic(){
   micGain=audioCtx.createGain();micGain.gain.value=0;
   micEqHi=audioCtx.createBiquadFilter();micEqHi.type='highshelf';micEqHi.frequency.value=4000;
   micEqLow=audioCtx.createBiquadFilter();micEqLow.type='lowshelf';micEqLow.frequency.value=250;
+  micAnalyser=audioCtx.createAnalyser();micAnalyser.fftSize=512;
   micEqLow.connect(micEqHi);micEqHi.connect(micGain);micGain.connect(masterGain);
+  micEqHi.connect(micAnalyser);
+}
+function setMicUi(on){
+  ['micOnBtn','micStripOnBtn'].forEach(id=>{
+    const b=document.getElementById(id);if(b)b.classList.toggle('active',on);
+  });
+  const strip=document.getElementById('micStrip');
+  if(strip)strip.classList.toggle('mic-live',on);
+}
+function paintMicVu(){
+  const bar=document.querySelector('#micStripVu > span');
+  if(!bar||!micAnalyser){micVuRaf=null;return;}
+  const buf=new Uint8Array(micAnalyser.fftSize);
+  micAnalyser.getByteTimeDomainData(buf);
+  let peak=0;for(let i=0;i<buf.length;i++){const v=Math.abs(buf[i]-128);if(v>peak)peak=v;}
+  const pct=mixerState.micOn?Math.min(100,(peak/128)*180):0;
+  bar.style.width=pct.toFixed(1)+'%';
+  micVuRaf=requestAnimationFrame(paintMicVu);
 }
 
 async function toggleMic(){
@@ -3823,14 +3897,17 @@ async function toggleMic(){
     mixerState.micOn=false;
     if(micSource){micSource.disconnect();micSource=null;}
     if(micStream){micStream.getTracks().forEach(t=>t.stop());micStream=null;}
-    document.getElementById('micOnBtn').classList.remove('active');return;
+    setMicUi(false);
+    const bar=document.querySelector('#micStripVu > span');if(bar)bar.style.width='0%';
+    return;
   }
   try{
     micStream=await navigator.mediaDevices.getUserMedia({audio:true});
     micSource=audioCtx.createMediaStreamSource(micStream);
     micSource.connect(micEqLow);
     mixerState.micOn=true;
-    document.getElementById('micOnBtn').classList.add('active');
+    setMicUi(true);
+    if(!micVuRaf)paintMicVu();
     toast('Mic connected','success');
   }catch(e){toast('Mic denied','error');}
 }
@@ -5322,6 +5399,8 @@ function attachEvents(){
     });
   });
   document.getElementById('micOnBtn').addEventListener('click',toggleMic);
+  const micStripBtn=document.getElementById('micStripOnBtn');
+  if(micStripBtn)micStripBtn.addEventListener('click',toggleMic);
   document.querySelectorAll('.cdj').forEach(deck=>{
     deck.addEventListener('dragover',e=>{e.preventDefault();deck.classList.add('drop-target');});
     deck.addEventListener('dragleave',()=>deck.classList.remove('drop-target'));
@@ -6315,124 +6394,12 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 window.applyDeckPair=applyDeckPair;
 
-/* ========================================================
-   I18N — Hebrew ⇄ English language toggle
-   ======================================================== */
-const I18N={
-  en:{},
-  he:{
-    rec:'הקלט',
-    tab_decks:'◉ דקים',tab_sampler:'▣ סמפלר',tab_music:'🔎 מוזיקה',tab_playlists:'≡ רשימות',
-    tab_sessions:'💾 הפעלות',tab_ai:'🤖 DJ חכם',tab_analytics:'📊 נתונים',tab_midi:'🎹 MIDI',
-    tab_studio:'🎚 אולפן',tab_settings:'⚙ הגדרות',tab_help:'? עזרה',
-    deck_focus:'מיקוד דק',all_4:'4 הכל',work_mode:'🎆 מצב הופעה',library_btn:'📚 ספרייה',
-    'TRACK LIBRARY':'ספריית שירים','+ FILES':'+ קבצים','+ URL':'+ קישור','+ YOUTUBE':'+ יוטיוב',
-    '+ NEW PLAYLIST':'+ רשימה חדשה','EXPORT':'ייצוא','IMPORT':'ייבוא',
-    'MY PLAYLISTS':'הרשימות שלי','LOAD TO DECK A':'טען לדק A',
-    'YOUTUBE DIRECT PLAYER':'▶ נגן יוטיוב ישיר','🔎 MUSIC SEARCH':'🔎 חיפוש מוזיקה','SEARCH':'חפש',
-    'MY SESSIONS':'ההפעלות שלי','+ SAVE CURRENT':'+ שמור נוכחי',
-    '⚡ ANALYZE LIBRARY':'⚡ ניתוח ספרייה','Mix Style':'סגנון מיקס','Transition Length (beats)':'אורך מעבר',
-    'BPM Tolerance':'טווח BPM','Track Order':'סדר שירים',
-    'SMOOTH':'חלק','ENERGY':'אנרגיה','HARMONIC':'הרמוני','CUT':'חיתוך','ECHO OUT':'הד יציאה','PICK NEXT':'בחר הבא',
-    '⚡ AUTO MIX':'⚡ מיקס אוטומטי','CROSSFADER':'קרוספיידר','MASTER':'מאסטר',
-    'CLEAR ALL DATA':'מחק הכל','SAVE CREDENTIALS':'שמור אישורים','MUSIC SERVICES':'🎵 שירותי מוזיקה',
-    '🎵 MUSIC SERVICES':'🎵 שירותי מוזיקה','⌨ KEYBOARD SHORTCUTS':'⌨ קיצורי מקלדת',
-    'PERFORMANCE':'ביצועים','UI SETTINGS':'הגדרות ממשק','AUDIO SETTINGS':'הגדרות אודיו','DATA':'נתונים',
-    '🎚 STUDIO MASTERING — PRO SOUND CALIBRATION':'🎚 אולפן מאסטרינג — כיול סאונד מקצועי',
-    'A/B BYPASS':'A/B עקיפה','● ACTIVE':'● פעיל','● BYPASSED':'● עקוף',
-    'ROOM / VENUE PRESETS':'פריסטים לחדר/אולם','7-BAND PARAMETRIC EQ':'EQ פרמטרי 7 פסים',
-    'REAL-TIME SPECTRUM':'ספקטרום חי','🎛 COMPRESSOR':'🎛 מדחס','🎧 STEREO & IMAGE':'🎧 סטריאו ודימוי',
-    '✨ HARMONIC EXCITER':'✨ מגרה הרמוני','🛡 MASTER LIMITER':'🛡 לימיטר מאסטר',
-    'FLAT':'ישר','CLUB':'מועדון','STUDIO':'אולפן','OUTDOOR':'חוץ','HEADPHONES':'אוזניות','CAR':'רכב',
-    'WARM':'חמים','BRIGHT':'בהיר','BASS+':'באס+','VOCAL':'שירה',
-    '▶ START AUTO-MIX':'▶ התחל מיקס אוטומטי','⏹ STOP AUTO-MIX':'⏹ עצור מיקס',
-    'PLAY':'נגן','PAUSE':'השהה','CUE':'CUE','SYNC':'סנכרון','KEYLOCK':'נעל מפתח','QUANTIZE':'קוונטיזציה',
-    'SLIP':'SLIP','REVERSE':'הפוך','LOOP IN':'התחל לופ','LOOP OUT':'סיים לופ','RELOOP':'לופ מחדש',
-    'BEAT FX':'אפקט ביט','SCENE FX':'אפקט סצנה','ON / OFF':'הפעל / כבה','TAP':'הקש',
-    'No playlists yet. Click NEW PLAYLIST.':'אין עדיין רשימות. לחץ "רשימה חדשה".',
-    'Load a track first':'טען שיר קודם','No video':'אין וידאו',
-    'SETTINGS':'הגדרות','HELP':'עזרה',
-    '⚙ SETTINGS':'⚙ הגדרות','? HELP':'? עזרה',
-  }
-};
-const I18N_KEY='djmaxai_lang_v1';
-let currentLang=localStorage.getItem(I18N_KEY)||'en';
-function t(key){return (I18N[currentLang]&&I18N[currentLang][key])||(I18N.en[key])||key;}
-
-function applyLanguage(lang){
-  currentLang=lang;
-  try{localStorage.setItem(I18N_KEY,lang);}catch(e){}
-  document.body.classList.toggle('lang-he',lang==='he');
-  // Keep dir="rtl" for Hebrew, "ltr" for English (layout reflows)
-  document.documentElement.lang=lang;
-  document.documentElement.dir=lang==='he'?'rtl':'ltr';
-  // data-t: keyed lookups
-  document.querySelectorAll('[data-t]').forEach(el=>{
-    const k=el.dataset.t;
-    if(!el.dataset.tOriginal)el.dataset.tOriginal=el.textContent.trim();
-    el.textContent=lang==='en'?el.dataset.tOriginal:(I18N.he[k]||el.dataset.tOriginal);
-  });
-  // Text-based selectors: translate specific element classes when they contain a mapped string
-  const textTargets=[
-    '.library-title','.settings-section h3','.ai-dj-title','.mix-history h4','.sampler-title',
-    '.playlist-card h4','.session-name','.shortcut-item span:first-child',
-    '.upload-btn','.url-btn','.yt-btn','.playlist-btn','.tool-btn','.big-btn .lbl',
-    '.big-btn','.loop-btn','.util-btn','.studio-preset-btn','.automix-btn','.ai-dj-btn',
-    '.beat-fx-label','.scene-fx-label','.crossfader-label','.mixer-brand','.deck-label',
-    '.setting-label','.ai-config-item label','.compact-deck-header','.compact-vol-label',
-    '.scene-btn','.fx-onoff','.tap-btn','.search-src-btn','.dsb-btn',
-    '.lang-btn','.studio-sub-label','.studio-block-title','.studio-level-label',
-    '.stat-card h5','.stat-card .stat-sub','.mix-entry'
-  ];
-  textTargets.forEach(sel=>{
-    document.querySelectorAll(sel).forEach(el=>{
-      if(el.children.length>1)return;
-      const orig=el.dataset.tOriginal||el.textContent.trim();
-      if(!el.dataset.tOriginal)el.dataset.tOriginal=orig;
-      if(lang==='en'){el.textContent=el.dataset.tOriginal;return;}
-      const map=I18N.he;
-      const key=el.dataset.tOriginal;
-      if(map[key]){el.textContent=map[key];return;}
-      // Try case-insensitive
-      const keyUpper=Object.keys(map).find(k=>k.toLowerCase()===key.toLowerCase());
-      if(keyUpper){el.textContent=map[keyUpper];return;}
-    });
-  });
-  // Placeholder translations
-  const placeholders={
-    'Search any artist, song, remix...':'חפש אמן / שיר / רמיקס...',
-    'Paste YouTube URL or video ID...':'הדבק קישור או מזהה וידאו...',
-    'Paste YouTube URL...':'הדבק קישור יוטיוב...',
-    'Optional — for Spotify search + 30s previews':'אופציונלי — לחיפוש Spotify',
-    'Optional':'אופציונלי',
-    'Optional — enables YouTube search':'אופציונלי — לחיפוש יוטיוב'
-  };
-  document.querySelectorAll('input[placeholder]').forEach(inp=>{
-    if(!inp.dataset.phOrig)inp.dataset.phOrig=inp.placeholder;
-    inp.placeholder=lang==='en'?inp.dataset.phOrig:(placeholders[inp.dataset.phOrig]||inp.dataset.phOrig);
-  });
-  // Button label
-  const lb=document.getElementById('langBtn');
-  if(lb)lb.textContent=lang==='en'?'🌐 EN':'🌐 עב';
-  // Re-render dynamic panels to pick up language
-  try{renderLibrary&&renderLibrary();}catch(e){}
-  try{renderPlaylists&&renderPlaylists();}catch(e){}
-  try{renderSessions&&renderSessions();}catch(e){}
-  try{renderSampler&&renderSampler();}catch(e){}
-  try{updateDsbMonitor&&updateDsbMonitor();}catch(e){}
-}
-
-document.addEventListener('DOMContentLoaded',()=>{
-  setTimeout(()=>{
-    const lb=document.getElementById('langBtn');
-    if(lb){
-      lb.addEventListener('click',()=>{
-        applyLanguage(currentLang==='en'?'he':'en');
-      });
-    }
-    applyLanguage(currentLang);
-  },500);
-});
+/* I18N removed — app is English-only */
+const currentLang='en';
+function t(key){return key;}
+try{localStorage.removeItem('djmaxai_lang_v1');}catch(e){}
+document.documentElement.lang='en';
+document.documentElement.dir='ltr';
 
 /* ========================================================
    PLAYBACK WATCHDOG — continuously verifies every 'playing'
