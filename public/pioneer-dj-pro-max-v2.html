@@ -2449,13 +2449,38 @@ body.theme-light .master-meters{background:#fff;border-color:rgba(0,0,0,.08);box
 .deck-header{display:flex;align-items:center;gap:10px}
 .deck-header .deck-label{flex:0 0 auto}
 .deck-header .deck-lib-btn{
-  margin-left:auto;padding:6px 12px;font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:2px;font-weight:800;
+  margin-left:4px;padding:6px 12px;font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:2px;font-weight:800;
   background:linear-gradient(180deg,#2a2a2e 0%,#151518 100%);
   border:1px solid rgba(28,255,143,.4);color:var(--play-green);
   border-radius:4px;cursor:pointer;transition:all .15s ease;
 }
 .deck-header .deck-lib-btn:hover{background:var(--play-green);color:#0a0a0a;box-shadow:0 0 14px rgba(28,255,143,.55)}
 body.theme-light .deck-header .deck-lib-btn{background:linear-gradient(180deg,#fff,#e4e4e8);color:#00a656;border-color:rgba(0,166,86,.4)}
+.deck-header .deck-upload-btn{
+  margin-left:auto;padding:6px 10px;font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:2px;font-weight:800;
+  background:linear-gradient(180deg,#2a2a2e 0%,#151518 100%);
+  border:1px solid rgba(255,138,26,.45);color:var(--orange);
+  border-radius:4px;cursor:pointer;transition:all .15s ease;
+  display:inline-flex;align-items:center;gap:4px;
+}
+.deck-header .deck-upload-btn:hover{
+  background:linear-gradient(180deg,#ffb366 0%,var(--orange) 60%,#c85a00 100%);color:#0a0a0a;
+  box-shadow:0 0 14px rgba(255,138,26,.55),inset 0 1px 0 rgba(255,255,255,.3);
+  border-color:var(--orange-glow);
+  text-shadow:0 1px 0 rgba(255,255,255,.25);
+}
+.deck-header .deck-upload-btn.loading{
+  background:linear-gradient(90deg,#ffb366,var(--orange),#ffb366);background-size:200% 100%;
+  color:#0a0a0a;border-color:var(--orange-glow);
+  animation:deckUploadPulse 1.2s linear infinite;
+}
+@keyframes deckUploadPulse{0%{background-position:0 0}100%{background-position:200% 0}}
+body.theme-light .deck-header .deck-upload-btn{background:linear-gradient(180deg,#fff,#e4e4e8);color:var(--orange-glow);border-color:rgba(255,138,26,.5)}
+body.theme-light .deck-header .deck-upload-btn:hover{background:var(--orange);color:#fff}
+
+/* CUE big-btn centering fix */
+.big-btn{justify-content:center !important;text-align:center !important}
+.big-btn .icon,.big-btn .lbl{display:block;text-align:center;width:100%;line-height:1}
 body.theme-light .deck-header .deck-lib-btn:hover{background:#00a656;color:#fff}
 
 /* Quick library picker modal */
