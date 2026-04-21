@@ -2617,28 +2617,62 @@ body.theme-light .editor-timeline{background:#f4f4f8;border-color:rgba(0,0,0,.08
   box-shadow:inset 0 2px 6px rgba(0,0,0,.8),0 6px 18px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.04) inset;
   overflow:hidden;
 }
-/* Analog needle VU — looks like a vintage amplifier meter */
-.master-vu-analog{
-  position:relative;margin-bottom:6px;padding:10px 12px 8px;
-  background:linear-gradient(180deg,#1a1a1e 0%,#0a0a0b 100%);
+/* Modern studio VU — twin vertical gradient bars, like Pro Tools / DJM */
+.master-vu-modern{
+  position:relative;margin-bottom:6px;padding:10px 12px;
+  background:linear-gradient(180deg,#14141a 0%,#05050a 100%);
   border:1px solid rgba(255,138,26,.22);border-radius:10px;
-  box-shadow:inset 0 2px 6px rgba(0,0,0,.85),0 6px 18px rgba(0,0,0,.6),inset 0 0 30px rgba(255,138,26,.04);
+  box-shadow:inset 0 2px 8px rgba(0,0,0,.9),0 6px 18px rgba(0,0,0,.6),inset 0 0 30px rgba(255,138,26,.03);
+  display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:stretch;min-height:170px;
+}
+.master-vu-modern .mvm-scale{
+  display:flex;flex-direction:column;justify-content:space-between;
+  font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;
+  color:rgba(46,224,255,.7);text-align:right;padding:6px 0 18px;
+}
+.master-vu-modern .mvm-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:2px 4px 0}
+.master-vu-modern .mvm-col{display:flex;flex-direction:column;align-items:center;gap:4px}
+.master-vu-modern .mvm-chlabel{
+  font-family:'Orbitron',sans-serif;font-size:11px;font-weight:800;letter-spacing:2px;
+  color:var(--orange);text-shadow:0 0 8px rgba(255,122,0,.5);
+}
+.master-vu-modern .mvm-clip{
+  width:14px;height:5px;border-radius:2px;
+  background:#1a0606;border:1px solid rgba(255,46,46,.3);
+  box-shadow:inset 0 0 2px rgba(0,0,0,.8);transition:all .08s linear;
+}
+.master-vu-modern .mvm-clip.hot{
+  background:linear-gradient(180deg,#ff5050,#c02020);
+  box-shadow:0 0 12px rgba(255,46,46,1),inset 0 1px 0 rgba(255,255,255,.4);
+  animation:clipFlash .25s linear;
+}
+.master-vu-modern .mvm-bar{
+  flex:1;width:16px;position:relative;
+  background:linear-gradient(180deg,#040406 0%,#0a0a0c 100%);
+  border:1px solid rgba(255,255,255,.06);border-radius:3px;
+  box-shadow:inset 0 0 10px rgba(0,0,0,.95),inset 0 1px 0 rgba(0,0,0,.5);
   overflow:hidden;
 }
-.master-vu-svg{width:100%;height:auto;display:block;filter:drop-shadow(0 2px 6px rgba(0,0,0,.7))}
-.master-vu-analog #vuNeedleL line,.master-vu-analog #vuNeedleR line{
-  transform-origin:120px 130px;
-  filter:drop-shadow(0 0 2px rgba(216,0,10,.6));
-  transition:none;
+.master-vu-modern .mvm-bar::before{
+  content:'';position:absolute;top:0;bottom:0;left:50%;width:1px;
+  background:repeating-linear-gradient(180deg,rgba(255,255,255,.12) 0 1px,transparent 1px 8px);
+  transform:translateX(-50%);opacity:.3;
 }
-.master-vu-analog .master-vu-clip{
-  position:absolute;top:8px;left:calc(50% - 40px);
-  width:14px;height:6px;border-radius:2px;
-  background:#1a0a0a;border:1px solid rgba(255,46,46,.35);
-  box-shadow:inset 0 0 3px rgba(0,0,0,.8);transition:all .08s linear;z-index:2;
+.master-vu-modern .mvm-bar-fill{
+  position:absolute;left:1px;right:1px;bottom:1px;height:0%;
+  background:linear-gradient(0deg,#0d8a4a 0%,#1cff8f 25%,#1cff8f 55%,#ffd400 75%,#ff7a00 88%,#ff2e2e 100%);
+  box-shadow:0 0 6px rgba(255,138,26,.6),inset 0 0 4px rgba(255,255,255,.25);
+  border-radius:2px;transition:height .04s linear;
 }
-.master-vu-analog .master-vu-clip-r{left:calc(50% + 26px)}
-.master-vu-analog .master-vu-clip.hot{background:linear-gradient(180deg,#ff4040,#c41010);box-shadow:0 0 14px rgba(255,46,46,.95),inset 0 1px 0 rgba(255,255,255,.4);animation:clipFlash .3s linear}
+.master-vu-modern .mvm-bar-fill-r{
+  background:linear-gradient(0deg,#0088b4 0%,#2ee0ff 25%,#2ee0ff 55%,#ffd400 75%,#ff7a00 88%,#ff2e2e 100%);
+  box-shadow:0 0 6px rgba(46,224,255,.55),inset 0 0 4px rgba(255,255,255,.25);
+}
+.master-vu-modern .mvm-bar-peak{
+  position:absolute;left:0;right:0;height:2px;background:#fff;
+  box-shadow:0 0 6px rgba(255,255,255,.85);border-radius:1px;
+  bottom:0;opacity:0;transition:bottom .12s linear,opacity .15s;pointer-events:none;
+}
 .master-vu-halo{
   position:absolute;inset:-6px;pointer-events:none;
   background:radial-gradient(ellipse at center,rgba(28,255,143,.0) 0%,transparent 70%);
@@ -3905,95 +3939,23 @@ function buildMixerToolbarHTML(){
 
 function buildMixerHTML(){
   return `<div class="mixer-header"><div class="mixer-brand"><span class="model">DJM-</span>V10 PRO MAX</div></div>
-  <div class="master-vu-analog" id="masterVuBox">
+  <div class="master-vu-modern" id="masterVuBox">
     <div class="master-vu-halo" id="masterVuHalo"></div>
-    <svg class="master-vu-svg" viewBox="0 0 260 150" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-      <defs>
-        <radialGradient id="vuFace" cx="50%" cy="100%" r="95%">
-          <stop offset="0%" stop-color="#14161c"/>
-          <stop offset="60%" stop-color="#0b0d12"/>
-          <stop offset="100%" stop-color="#040507"/>
-        </radialGradient>
-        <linearGradient id="vuBezel" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#3a3a40"/>
-          <stop offset="50%" stop-color="#1a1a1c"/>
-          <stop offset="100%" stop-color="#0a0a0b"/>
-        </linearGradient>
-        <linearGradient id="needleL" x1="0" y1="1" x2="0" y2="0">
-          <stop offset="0%" stop-color="#ff5a00"/>
-          <stop offset="50%" stop-color="#ff8a1a"/>
-          <stop offset="100%" stop-color="#ffc66a"/>
-        </linearGradient>
-        <linearGradient id="needleR" x1="0" y1="1" x2="0" y2="0">
-          <stop offset="0%" stop-color="#0088b4"/>
-          <stop offset="50%" stop-color="#2ee0ff"/>
-          <stop offset="100%" stop-color="#a8f4ff"/>
-        </linearGradient>
-        <radialGradient id="hubL" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="#ffb366"/>
-          <stop offset="50%" stop-color="#8a3a00"/>
-          <stop offset="100%" stop-color="#1a0a00"/>
-        </radialGradient>
-        <filter id="glowN" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="1.4" result="b"/>
-          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-        </filter>
-      </defs>
-      <!-- bezel frame -->
-      <rect x="2" y="2" width="256" height="146" rx="10" fill="url(#vuBezel)" stroke="#0a0a0b" stroke-width="1"/>
-      <rect x="6" y="6" width="248" height="138" rx="7" fill="url(#vuFace)" stroke="rgba(255,138,26,.18)" stroke-width="1"/>
-      <!-- subtle grid/sheen -->
-      <ellipse cx="130" cy="30" rx="140" ry="32" fill="rgba(46,224,255,.035)"/>
-      <!-- arc segments: green / yellow / red -->
-      <path d="M36,135 A94,94 0 0 1 156,56" stroke="#1cff8f" stroke-width="3" fill="none" opacity=".92"/>
-      <path d="M156,56 A94,94 0 0 1 200,78" stroke="#ffd400" stroke-width="3" fill="none" opacity=".92"/>
-      <path d="M200,78 A94,94 0 0 1 224,135" stroke="#ff2e2e" stroke-width="3" fill="none" opacity=".95"/>
-      <!-- inner arc faint guide -->
-      <path d="M40,135 A90,90 0 0 1 220,135" stroke="rgba(255,255,255,.08)" stroke-width="1" fill="none"/>
-      <!-- tick marks -->
-      <g stroke="rgba(255,255,255,.35)" stroke-linecap="round">
-        <line x1="36" y1="135" x2="42" y2="129" stroke-width="1.4"/>
-        <line x1="56" y1="112" x2="62" y2="108" stroke-width="1.2"/>
-        <line x1="84" y1="88" x2="90" y2="86" stroke-width="1.2"/>
-        <line x1="118" y1="70" x2="122" y2="76" stroke-width="1.2"/>
-        <line x1="156" y1="56" x2="158" y2="62" stroke-width="1.6" stroke="#ffd400"/>
-        <line x1="190" y1="66" x2="188" y2="72" stroke-width="1.2"/>
-        <line x1="218" y1="94" x2="214" y2="96" stroke-width="1.2"/>
-        <line x1="224" y1="135" x2="218" y2="129" stroke-width="1.4" stroke="#ff2e2e"/>
-      </g>
-      <!-- dB labels -->
-      <g font-family="Share Tech Mono,monospace" font-size="7.5" fill="rgba(46,224,255,.85)" text-anchor="middle" letter-spacing="1">
-        <text x="38" y="122">-24</text>
-        <text x="60" y="100">-12</text>
-        <text x="90" y="78">-6</text>
-        <text x="130" y="62">0</text>
-        <text x="178" y="68">+3</text>
-        <text x="214" y="86">+6</text>
-      </g>
-      <!-- brand -->
-      <text x="130" y="100" text-anchor="middle" font-family="Orbitron,sans-serif" font-size="7.5" font-weight="800" fill="rgba(255,255,255,.55)" letter-spacing="3.5">MASTER</text>
-      <text x="130" y="112" text-anchor="middle" font-family="Share Tech Mono,monospace" font-size="6.5" fill="rgba(255,138,26,.7)" letter-spacing="2">dB VU</text>
-      <!-- channel labels -->
-      <g font-family="Orbitron,sans-serif" font-size="10" font-weight="900" letter-spacing="1">
-        <text x="46" y="142" text-anchor="middle" fill="#ff8a1a">L</text>
-        <text x="214" y="142" text-anchor="middle" fill="#2ee0ff">R</text>
-      </g>
-      <!-- needles -->
-      <g id="vuNeedleL" transform="rotate(-60 130 135)" filter="url(#glowN)">
-        <line x1="130" y1="135" x2="130" y2="44" stroke="url(#needleL)" stroke-width="2.4" stroke-linecap="round"/>
-        <polygon points="130,40 127,50 133,50" fill="#ffc66a"/>
-      </g>
-      <g id="vuNeedleR" transform="rotate(-60 130 135)" filter="url(#glowN)">
-        <line x1="130" y1="135" x2="130" y2="48" stroke="url(#needleR)" stroke-width="1.8" stroke-linecap="round" opacity=".95"/>
-      </g>
-      <!-- hub -->
-      <circle cx="130" cy="135" r="8" fill="url(#hubL)" stroke="#0a0a0b" stroke-width="1.2"/>
-      <circle cx="130" cy="135" r="3" fill="#1a1a1c" stroke="#ff8a1a" stroke-width=".6"/>
-      <!-- inset top highlight -->
-      <path d="M14,14 Q130,6 246,14" stroke="rgba(255,255,255,.06)" stroke-width="1" fill="none"/>
-    </svg>
-    <div class="master-vu-clip" id="clipLedL" title="Clip L"></div>
-    <div class="master-vu-clip master-vu-clip-r" id="clipLedR" title="Clip R"></div>
+    <div class="mvm-scale">
+      <span>+6</span><span>0</span><span>-6</span><span>-12</span><span>-24</span><span>-48</span>
+    </div>
+    <div class="mvm-cols">
+      <div class="mvm-col">
+        <div class="mvm-chlabel" id="mvmLabelL">L</div>
+        <div class="mvm-clip" id="clipLedL"></div>
+        <div class="mvm-bar"><div class="mvm-bar-fill" id="mvmFillL"></div><div class="mvm-bar-peak" id="mvmPeakL"></div></div>
+      </div>
+      <div class="mvm-col">
+        <div class="mvm-chlabel" id="mvmLabelR" style="color:var(--screen-glow);text-shadow:0 0 8px rgba(46,224,255,.5)">R</div>
+        <div class="mvm-clip" id="clipLedR"></div>
+        <div class="mvm-bar"><div class="mvm-bar-fill mvm-bar-fill-r" id="mvmFillR"></div><div class="mvm-bar-peak" id="mvmPeakR"></div></div>
+      </div>
+    </div>
   </div>
   <div class="master-section">
     <div class="master-knob-wrap"><div class="knob" data-knob="master"><div class="knob-indicator"></div></div><span class="knob-label">MASTER</span></div>
@@ -5805,7 +5767,7 @@ function animateVU(){
     }else if(dk._vuHold){dk._vuHold=0;}
     leds.forEach((l,i)=>{l.classList.remove('on','green','yellow','red');if(i<level){l.classList.add('on');l.classList.add(l.dataset.color);}});
   });
-  // MASTER analog needle VU (L=red, R=orange) — driven by beat + level
+  // MASTER modern VU — twin vertical gradient bars with peak hold + beat punch
   (function paintMaster(){
     const now=performance.now();
     const haveAudio=!!masterAnalyserL&&!!masterAnalyserR;
@@ -5814,9 +5776,10 @@ function animateVU(){
     let maxLevel=0;
     ['L','R'].forEach((suffix,chan)=>{
       const an=chan===0?masterAnalyserL:masterAnalyserR;
-      const needle=document.getElementById('vuNeedle'+suffix);
+      const fill=document.getElementById('mvmFill'+suffix);
+      const peakEl=document.getElementById('mvmPeak'+suffix);
       const clip=document.getElementById('clipLed'+suffix);
-      if(!needle)return;
+      if(!fill)return;
       let level=0,bassEnergy=0;
       if(an){
         try{
@@ -5836,40 +5799,45 @@ function animateVU(){
           bassEnergy=lowCount?lowSum/lowCount:0;
         }catch(e){level=0;}
       }
-      // Beat punch on kick detection
-      needle._bassAvg=needle._bassAvg!=null?needle._bassAvg*0.92+bassEnergy*0.08:bassEnergy;
-      const bassDelta=bassEnergy-needle._bassAvg;
-      if(bassDelta>18&&bassEnergy>70){needle._punchUntil=now+140;needle._punchAmt=Math.min(6,bassDelta/8);}
-      if((needle._punchUntil||0)>now){
-        const punchLeft=(needle._punchUntil-now)/140;
-        level+=(needle._punchAmt||3)*punchLeft;
+      // Beat punch on kick
+      fill._bassAvg=fill._bassAvg!=null?fill._bassAvg*0.92+bassEnergy*0.08:bassEnergy;
+      const bassDelta=bassEnergy-fill._bassAvg;
+      if(bassDelta>18&&bassEnergy>70){fill._punchUntil=now+140;fill._punchAmt=Math.min(6,bassDelta/8);}
+      if((fill._punchUntil||0)>now){
+        const punchLeft=(fill._punchUntil-now)/140;
+        level+=(fill._punchAmt||3)*punchLeft;
       }
-      // Idle breathing when no deck is playing
-      if(!anyPlaying&&level<0.5){
-        const phase=(now/520)+chan*0.4;
-        level=2.0+Math.sin(phase)*1.4;
+      // Idle breathing
+      if(!anyPlaying&&level<0.4){
+        const phase=(now/520)+chan*0.5;
+        level=1.8+Math.sin(phase)*1.2;
       }
       level=Math.max(0,Math.min(SEGS,level));
-      // Mechanical needle damping — feels like a real meter
-      needle._hold=needle._hold||0;
-      const target=level;
-      const attack=target>needle._hold?0.35:0.12;
-      needle._hold+=(target-needle._hold)*attack;
-      maxLevel=Math.max(maxLevel,needle._hold);
-      // Map 0-SEGS level to -60deg..+60deg rotation
-      const rot=-60+(needle._hold/SEGS)*120;
-      needle.setAttribute('transform',`rotate(${rot.toFixed(2)} 120 130)`);
-      // Clip LED when needle pins
+      fill._hold=fill._hold||0;
+      const attack=level>fill._hold?0.45:0.14;
+      fill._hold+=(level-fill._hold)*attack;
+      // Peak hold
+      fill._peak=fill._peak||0;
+      if(fill._hold>fill._peak){fill._peak=fill._hold;fill._peakTime=now;}
+      else if(now-(fill._peakTime||0)>700)fill._peak=Math.max(fill._hold,fill._peak-0.15);
+      maxLevel=Math.max(maxLevel,fill._hold);
+      const pct=(fill._hold/SEGS)*100;
+      const peakPct=(fill._peak/SEGS)*100;
+      fill.style.height=pct.toFixed(1)+'%';
+      if(peakEl){
+        peakEl.style.bottom=peakPct.toFixed(1)+'%';
+        peakEl.style.opacity=fill._peak>0.5?'1':'0';
+      }
       if(clip){
-        const nowClip=haveAudio&&needle._hold>=SEGS-0.4;
-        if(nowClip)needle._clipUntil=now+240;
-        clip.classList.toggle('hot',(needle._clipUntil||0)>now);
+        const nowClip=haveAudio&&fill._hold>=SEGS-0.4;
+        if(nowClip)fill._clipUntil=now+240;
+        clip.classList.toggle('hot',(fill._clipUntil||0)>now);
       }
     });
     const halo=document.getElementById('masterVuHalo');
     if(halo){
       const n=Math.min(1,maxLevel/SEGS);
-      const color=haveAudio&&n>0.75?`rgba(255,60,60,${.25+n*.55})`:haveAudio&&n>0.5?`rgba(255,212,0,${.2+n*.45})`:`rgba(255,138,26,${.1+n*.4})`;
+      const color=haveAudio&&n>0.75?`rgba(255,60,60,${.22+n*.5})`:haveAudio&&n>0.5?`rgba(255,212,0,${.18+n*.4})`:`rgba(255,138,26,${.08+n*.35})`;
       halo.style.background=`radial-gradient(ellipse at center,${color} 0%,transparent 70%)`;
     }
   })();
