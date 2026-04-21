@@ -52,6 +52,8 @@ body{padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:
 .rgb-ambient{width:100%;max-width:1700px;height:5px;background:linear-gradient(90deg,var(--orange),var(--pink),var(--purple),var(--screen-glow),var(--play-green),var(--yellow),var(--orange));background-size:200% 100%;border-radius:3px;animation:ambient 8s linear infinite;filter:blur(3px);opacity:.6}
 @keyframes ambient{from{background-position:0% 0%}to{background-position:200% 0%}}
 .console{display:grid;grid-template-columns:1fr 400px 1fr;gap:12px;max-width:1700px;width:100%}
+@media(min-width:1920px){.console{grid-template-columns:1fr 460px 1fr;gap:16px;max-width:1850px}}
+@media(min-width:2560px){.console{grid-template-columns:1fr 540px 1fr;gap:22px;max-width:2200px}}
 @media(max-width:1200px){.console{grid-template-columns:1fr 340px 1fr;gap:10px}}
 @media(max-width:960px){.console{grid-template-columns:1fr 300px 1fr;gap:8px}}
 /* console 820px collapse handled in responsive layer below */
@@ -1262,6 +1264,26 @@ body.work-mode .console::before,body.work-mode .console::after{
    RESPONSIVE LAYER — full screen-size coverage
    ============================================================ */
 
+/* Ultra-wide / 4K — breathing room, bigger elements */
+@media(min-width:1920px){
+  .console.show-all{grid-template-columns:1fr 1fr 400px 1fr 1fr;gap:14px;max-width:1850px}
+  .console.show-all .cdj .jog-wheel{width:220px;height:220px}
+  .console.show-all .cdj .jog-center-screen{width:72px;height:72px}
+  .console.show-all .cdj .jog-center-screen .bpm-display{font-size:18px}
+  .console.show-all .cdj .track-title{font-size:13px}
+  .console.show-all .cdj .screen-bpm{font-size:16px}
+  .console.show-all .cdj .deck-number{font-size:26px}
+  .console.show-all .cdj .big-btn{padding:11px 6px !important;font-size:11px}
+  .console.show-all .cdj .cue-btn{font-size:11px;padding:5px 3px}
+  .console.show-all .cdj .tempo-btn{padding:9px 3px;font-size:13px}
+}
+@media(min-width:2560px){
+  .console.show-all{grid-template-columns:1fr 1fr 480px 1fr 1fr;gap:20px;max-width:2200px}
+  .console.show-all .cdj .jog-wheel{width:260px;height:260px}
+  .console.show-all .cdj .jog-center-screen{width:86px;height:86px}
+  .console.show-all .cdj .jog-center-screen .bpm-display{font-size:22px}
+}
+
 /* Large desktop — 5-col ALL 4 fits, keep it */
 @media(max-width:1700px){
   .console.show-all{grid-template-columns:1fr 1fr 320px 1fr 1fr;gap:8px}
@@ -1458,6 +1480,11 @@ body.work-mode .console::before,body.work-mode .console::after{
   .sampler-grid{grid-template-columns:repeat(2,1fr)}
   .channels{grid-template-columns:1fr 1fr}
   .automix-grid{grid-template-columns:1fr}
+  .mic-section{grid-template-columns:1fr 1fr;gap:3px;padding:3px}
+  .mic-btn{padding:5px 4px;font-size:7px}
+  .master-section,.isolator-panel{grid-template-columns:1fr 1fr;gap:3px}
+  .beat-fx-panel{grid-template-columns:1fr;gap:4px}
+  .beat-buttons{flex-wrap:wrap;justify-content:center}
 }
 
 /* Hover-capable devices get nicer affordances; touch devices skip transform hovers */
