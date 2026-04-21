@@ -2617,13 +2617,13 @@ body.theme-light .editor-timeline{background:#f4f4f8;border-color:rgba(0,0,0,.08
   box-shadow:inset 0 2px 6px rgba(0,0,0,.8),0 6px 18px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.04) inset;
   overflow:hidden;
 }
-/* Master VU — twin LED-segment bars, DJM / Pro-Tools quality */
+/* Master VU — twin LED-segment bars (real .vu-led children, same system as channels) */
 .master-vu-modern{
-  position:relative;margin-bottom:8px;padding:12px 14px;
+  position:relative;margin-bottom:8px;padding:18px 14px 12px;
   background:linear-gradient(180deg,#141418 0%,#060609 100%);
   border:1px solid rgba(255,138,26,.22);border-radius:10px;
   box-shadow:inset 0 2px 8px rgba(0,0,0,.9),0 6px 22px rgba(0,0,0,.65),inset 0 0 30px rgba(255,138,26,.03);
-  display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:stretch;min-height:188px;
+  display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:stretch;min-height:200px;
 }
 .master-vu-modern::before{
   content:'MASTER';position:absolute;top:4px;left:50%;transform:translateX(-50%);
@@ -2633,17 +2633,18 @@ body.theme-light .editor-timeline{background:#f4f4f8;border-color:rgba(0,0,0,.08
 .master-vu-modern .mvm-scale{
   display:flex;flex-direction:column;justify-content:space-between;
   font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:.5px;
-  color:rgba(46,224,255,.6);text-align:right;padding:18px 0 22px;min-width:22px;
+  color:rgba(46,224,255,.65);text-align:right;padding:4px 0 20px;min-width:22px;
 }
 .master-vu-modern .mvm-scale span{line-height:1}
-.master-vu-modern .mvm-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:4px 4px 2px}
+.master-vu-modern .mvm-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 4px}
 .master-vu-modern .mvm-col{display:flex;flex-direction:column;align-items:center;gap:5px;position:relative}
 .master-vu-modern .mvm-chlabel{
   font-family:'Orbitron',sans-serif;font-size:11px;font-weight:900;letter-spacing:2px;
   color:var(--orange);text-shadow:0 0 8px rgba(255,122,0,.55);line-height:1;
 }
+.master-vu-modern .mvm-chlabel-r{color:var(--screen-glow);text-shadow:0 0 8px rgba(46,224,255,.5)}
 .master-vu-modern .mvm-clip{
-  width:16px;height:5px;border-radius:2px;
+  width:18px;height:5px;border-radius:2px;
   background:#150505;border:1px solid rgba(255,46,46,.28);
   box-shadow:inset 0 0 2px rgba(0,0,0,.8);transition:all .08s linear;
 }
@@ -2652,55 +2653,15 @@ body.theme-light .editor-timeline{background:#f4f4f8;border-color:rgba(0,0,0,.08
   box-shadow:0 0 14px rgba(255,46,46,1),inset 0 1px 0 rgba(255,255,255,.5);
   animation:clipFlash .25s linear;
 }
-.master-vu-modern .mvm-bar{
-  flex:1;width:20px;position:relative;
-  background:
-    linear-gradient(180deg,rgba(255,46,46,.04) 0%,rgba(255,212,0,.03) 14%,rgba(28,255,143,.02) 40%,transparent 100%),
-    linear-gradient(180deg,#030305 0%,#080810 100%);
-  border:1px solid rgba(255,255,255,.08);border-radius:3px;
-  box-shadow:inset 0 0 14px rgba(0,0,0,.95),inset 0 1px 0 rgba(0,0,0,.6),0 1px 0 rgba(255,255,255,.03);
-  overflow:hidden;
+/* Vertical meter same system as per-channel — segmented LEDs inside */
+.master-vu-modern .vu-meter.vu-master{
+  flex:1;width:22px;min-height:140px;
+  background:#030305;border:1px solid rgba(255,255,255,.07);border-radius:3px;
+  padding:2px;box-shadow:inset 0 0 10px rgba(0,0,0,.95),inset 0 1px 0 rgba(0,0,0,.6);
+  display:flex;flex-direction:column-reverse;gap:2px;
 }
-/* Faint horizontal scale lines inside the bar matching the dB labels */
-.master-vu-modern .mvm-bar::before{
-  content:'';position:absolute;inset:0;pointer-events:none;
-  background:
-    linear-gradient(180deg,transparent calc(0%),rgba(255,46,46,.25) calc(0% + 1px),transparent calc(0% + 2px)),
-    linear-gradient(180deg,transparent calc(30%),rgba(255,255,255,.08) calc(30% + 1px),transparent calc(30% + 2px)),
-    linear-gradient(180deg,transparent calc(45%),rgba(255,255,255,.06) calc(45% + 1px),transparent calc(45% + 2px)),
-    linear-gradient(180deg,transparent calc(60%),rgba(255,255,255,.05) calc(60% + 1px),transparent calc(60% + 2px)),
-    linear-gradient(180deg,transparent calc(75%),rgba(255,255,255,.04) calc(75% + 1px),transparent calc(75% + 2px));
-}
-/* LED-segment overlay creates the classic segmented-meter look */
-.master-vu-modern .mvm-bar::after{
-  content:'';position:absolute;inset:0;pointer-events:none;z-index:2;
-  background:repeating-linear-gradient(180deg,transparent 0,transparent 5px,rgba(0,0,0,.55) 5px,rgba(0,0,0,.55) 6px);
-}
-.master-vu-modern .mvm-bar-fill{
-  position:absolute;left:1px;right:1px;bottom:1px;height:0%;
-  background:linear-gradient(0deg,
-    #0a7a48 0%,#14c070 10%,#1cff8f 28%,#1cff8f 52%,
-    #ffd400 72%,#ff9a1a 86%,#ff4040 100%);
-  box-shadow:
-    0 0 8px rgba(28,255,143,.45),
-    0 -2px 14px rgba(255,138,26,.3),
-    inset 0 0 6px rgba(255,255,255,.22);
-  border-radius:2px;transition:height .04s linear;
-}
-.master-vu-modern .mvm-bar-fill-r{
-  background:linear-gradient(0deg,
-    #005a7a 0%,#0088b4 10%,#2ee0ff 28%,#2ee0ff 52%,
-    #ffd400 72%,#ff9a1a 86%,#ff4040 100%);
-  box-shadow:
-    0 0 8px rgba(46,224,255,.45),
-    0 -2px 14px rgba(255,138,26,.3),
-    inset 0 0 6px rgba(255,255,255,.22);
-}
-.master-vu-modern .mvm-bar-peak{
-  position:absolute;left:0;right:0;height:2px;background:#fff;
-  box-shadow:0 0 8px rgba(255,255,255,.95),0 0 2px #fff;border-radius:1px;
-  bottom:0;opacity:0;transition:bottom .12s linear,opacity .2s;pointer-events:none;z-index:3;
-}
+/* Override default .vu-led color tint for the R channel (cyan greens) */
+.master-vu-modern .vu-master-r .vu-led.on.green{background:linear-gradient(90deg,#0088b4,#2ee0ff);box-shadow:0 0 6px rgba(46,224,255,.9),inset 0 1px 0 rgba(255,255,255,.35)}
 .master-vu-halo{
   position:absolute;inset:-6px;pointer-events:none;
   background:radial-gradient(ellipse at center,rgba(28,255,143,.0) 0%,transparent 70%);
@@ -2917,8 +2878,7 @@ body.work-mode .deck-switch-bar{
 }
 .wm-exit-btn:hover{background:linear-gradient(180deg,var(--red) 0%,#8a0a0a 100%);box-shadow:0 0 32px rgba(255,46,46,.8);transform:translateY(-2px)}
 .wm-exit-btn:active{transform:translateY(0) scale(.96)}
-body.work-mode .wm-exit-btn{display:inline-flex;align-items:center;gap:4px}
-body.work-mode .wm-exit-btn:hover{opacity:1;padding:6px 12px}
+.wm-exit-btn,body.work-mode .wm-exit-btn{display:none !important}
 /* WORK MODE top exit strip — removed (blocked the decks). Small floating
    .wm-exit-btn at top-right is the single exit UI. */
 .wm-topbar,.wm-exit-bar{display:none !important}
@@ -3784,24 +3744,56 @@ No MIDI devices. Press CONNECT.
 <div class="tab-content" id="tab-help">
 <div class="settings-panel">
 <div class="settings-section"><h3>⌨ KEYBOARD SHORTCUTS</h3>
+
+<h4 style="color:var(--orange);font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:2px;margin:10px 0 6px">DECKS</h4>
 <div class="shortcut-grid">
 <div class="shortcut-item"><span>Deck A Play/Pause</span><kbd>W</kbd></div>
 <div class="shortcut-item"><span>Deck A Cue</span><kbd>Q</kbd></div>
 <div class="shortcut-item"><span>Deck B Play/Pause</span><kbd>P</kbd></div>
 <div class="shortcut-item"><span>Deck B Cue</span><kbd>O</kbd></div>
-<div class="shortcut-item"><span>Hot Cues A</span><kbd>1-8</kbd></div>
-<div class="shortcut-item"><span>Hot Cues B</span><kbd>Shift+1-8</kbd></div>
-<div class="shortcut-item"><span>Beat Jump A</span><kbd>A/S</kbd></div>
-<div class="shortcut-item"><span>Beat Jump B</span><kbd>K/L</kbd></div>
-<div class="shortcut-item"><span>Crossfader ←</span><kbd>,</kbd></div>
-<div class="shortcut-item"><span>Crossfader →</span><kbd>.</kbd></div>
-<div class="shortcut-item"><span>Both Play</span><kbd>Space</kbd></div>
+<div class="shortcut-item"><span>Both Play Together</span><kbd>Space</kbd></div>
+<div class="shortcut-item"><span>Hot Cues — Deck A</span><kbd>1 – 8</kbd></div>
+<div class="shortcut-item"><span>Hot Cues — Deck B</span><kbd>Shift+1 – 8</kbd></div>
+<div class="shortcut-item"><span>Beat Jump — Deck A</span><kbd>A / S</kbd></div>
+<div class="shortcut-item"><span>Beat Jump — Deck B</span><kbd>K / L</kbd></div>
+<div class="shortcut-item"><span>Tempo Nudge — Deck A</span><kbd>↑ / ↓</kbd></div>
+<div class="shortcut-item"><span>Tempo Nudge — Deck B</span><kbd>→ / ←</kbd></div>
+</div>
+
+<h4 style="color:var(--orange);font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:2px;margin:16px 0 6px">MIXER</h4>
+<div class="shortcut-grid">
+<div class="shortcut-item"><span>Crossfader ← / →</span><kbd>, / .</kbd></div>
+<div class="shortcut-item"><span>Crossfader Center</span><kbd>/</kbd></div>
+<div class="shortcut-item"><span>Master Vol − / +</span><kbd>Alt+− / Alt+=</kbd></div>
+<div class="shortcut-item"><span>Headphone Vol − / +</span><kbd>Alt+[ / Alt+]</kbd></div>
+<div class="shortcut-item"><span>Booth Vol − / +</span><kbd>Alt+; / Alt+'</kbd></div>
+<div class="shortcut-item"><span>MIC On/Off</span><kbd>Alt+M</kbd></div>
+<div class="shortcut-item"><span>Reset Isolator</span><kbd>Alt+R</kbd></div>
+<div class="shortcut-item"><span>HP Cue Deck A</span><kbd>G</kbd></div>
+<div class="shortcut-item"><span>HP Cue Deck B</span><kbd>H</kbd></div>
 <div class="shortcut-item"><span>Beat FX On/Off</span><kbd>F</kbd></div>
 <div class="shortcut-item"><span>Tap Tempo</span><kbd>T</kbd></div>
-<div class="shortcut-item"><span>AI Auto-Mix</span><kbd>Ctrl+A</kbd></div>
-<div class="shortcut-item"><span>Record</span><kbd>Ctrl+R</kbd></div>
-<div class="shortcut-item"><span>Sampler Pads</span><kbd>Z-M</kbd></div>
 </div>
+
+<h4 style="color:var(--purple);font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:2px;margin:16px 0 6px">AUTO MIX</h4>
+<div class="shortcut-grid">
+<div class="shortcut-item"><span>SMOOTH</span><kbd>Alt+1</kbd></div>
+<div class="shortcut-item"><span>ENERGY</span><kbd>Alt+2</kbd></div>
+<div class="shortcut-item"><span>HARMONIC</span><kbd>Alt+3</kbd></div>
+<div class="shortcut-item"><span>CUT</span><kbd>Alt+4</kbd></div>
+<div class="shortcut-item"><span>ECHO OUT</span><kbd>Alt+5</kbd></div>
+<div class="shortcut-item"><span>PICK NEXT</span><kbd>Alt+6</kbd></div>
+<div class="shortcut-item"><span>SYNC →</span><kbd>Alt+S</kbd></div>
+<div class="shortcut-item"><span>Toggle AI DJ</span><kbd>Ctrl+A</kbd></div>
+</div>
+
+<h4 style="color:var(--screen-glow);font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:2px;margin:16px 0 6px">SAMPLER / GLOBAL</h4>
+<div class="shortcut-grid">
+<div class="shortcut-item"><span>Sampler Pads 9 – 16</span><kbd>Z X C V B N M ,</kbd></div>
+<div class="shortcut-item"><span>Switch Tab 1 – 9</span><kbd>Ctrl+1 – 9</kbd></div>
+<div class="shortcut-item"><span>Record</span><kbd>Ctrl+R</kbd></div>
+</div>
+
 </div>
 <div class="settings-section"><h3>ℹ ABOUT</h3>
 <div style="font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text-dim);line-height:1.8;">
@@ -3976,12 +3968,12 @@ function buildMixerHTML(){
       <div class="mvm-col">
         <div class="mvm-chlabel" id="mvmLabelL">L</div>
         <div class="mvm-clip" id="clipLedL"></div>
-        <div class="mvm-bar"><div class="mvm-bar-fill" id="mvmFillL"></div><div class="mvm-bar-peak" id="mvmPeakL"></div></div>
+        <div class="vu-meter vu-master" id="masterHVuL"></div>
       </div>
       <div class="mvm-col">
-        <div class="mvm-chlabel" id="mvmLabelR" style="color:var(--screen-glow);text-shadow:0 0 8px rgba(46,224,255,.5)">R</div>
+        <div class="mvm-chlabel mvm-chlabel-r" id="mvmLabelR">R</div>
         <div class="mvm-clip" id="clipLedR"></div>
-        <div class="mvm-bar"><div class="mvm-bar-fill mvm-bar-fill-r" id="mvmFillR"></div><div class="mvm-bar-peak" id="mvmPeakR"></div></div>
+        <div class="vu-meter vu-master vu-master-r" id="masterHVuR"></div>
       </div>
     </div>
   </div>
@@ -5343,13 +5335,32 @@ function attachKnobs(){
   document.querySelectorAll('.knob').forEach(knob=>{
     if(knob.dataset.attached)return;
     knob.dataset.attached='1';
-    let startY=0,startRot=0,rot=0,drag=false;
+    knob._rot=knob._rot||0;
+    let startY=0,startRot=0,drag=false;
     const ind=knob.querySelector('.knob-indicator');
-    knob.addEventListener('pointerdown',e=>{knob.setPointerCapture(e.pointerId);startY=e.clientY;startRot=rot;drag=true;knob.style.cursor='grabbing';});
-    knob.addEventListener('pointermove',e=>{if(!drag)return;const dy=startY-e.clientY;rot=Math.max(-135,Math.min(135,startRot+dy));if(ind)ind.style.transform=`rotate(${rot}deg)`;applyKnob(knob.dataset.knob,rot/135);});
+    knob.addEventListener('pointerdown',e=>{knob.setPointerCapture(e.pointerId);startY=e.clientY;startRot=knob._rot;drag=true;knob.style.cursor='grabbing';});
+    knob.addEventListener('pointermove',e=>{if(!drag)return;const dy=startY-e.clientY;knob._rot=Math.max(-135,Math.min(135,startRot+dy));if(ind)ind.style.transform=`rotate(${knob._rot}deg)`;applyKnob(knob.dataset.knob,knob._rot/135);});
     knob.addEventListener('pointerup',e=>{knob.releasePointerCapture(e.pointerId);drag=false;knob.style.cursor='grab';});
-    knob.addEventListener('dblclick',()=>{rot=0;if(ind)ind.style.transform='rotate(0deg)';applyKnob(knob.dataset.knob,0);});
+    knob.addEventListener('dblclick',()=>{knob._rot=0;if(ind)ind.style.transform='rotate(0deg)';applyKnob(knob.dataset.knob,0);});
   });
+}
+
+/* Programmatic knob nudge — used by keyboard shortcuts */
+function adjustKnob(id,delta){
+  const knob=document.querySelector(`.knob[data-knob="${id}"]`);
+  if(!knob)return;
+  knob._rot=Math.max(-135,Math.min(135,(knob._rot||0)+delta));
+  const ind=knob.querySelector('.knob-indicator');
+  if(ind)ind.style.transform=`rotate(${knob._rot}deg)`;
+  applyKnob(id,knob._rot/135);
+}
+function resetKnob(id){
+  const knob=document.querySelector(`.knob[data-knob="${id}"]`);
+  if(!knob)return;
+  knob._rot=0;
+  const ind=knob.querySelector('.knob-indicator');
+  if(ind)ind.style.transform='rotate(0deg)';
+  applyKnob(id,0);
 }
 
 function applyKnob(id,val){
@@ -5795,20 +5806,19 @@ function animateVU(){
     }else if(dk._vuHold){dk._vuHold=0;}
     leds.forEach((l,i)=>{l.classList.remove('on','green','yellow','red');if(i<level){l.classList.add('on');l.classList.add(l.dataset.color);}});
   });
-  // MASTER VU — only lights up when audio is actually playing through master,
-  // responds tightly to the beat like the per-channel meters do.
+  // MASTER VU — real LED segments, same flow as per-channel meters
   (function paintMaster(){
     const now=performance.now();
     const haveAudio=!!masterAnalyserL&&!!masterAnalyserR;
     const anyPlaying=['A','B','C','D'].some(k=>decks[k]&&decks[k].playing);
-    const SEGS=20;
+    const SEGS=18;
     let maxLevel=0;
     ['L','R'].forEach((suffix,chan)=>{
       const an=chan===0?masterAnalyserL:masterAnalyserR;
-      const fill=document.getElementById('mvmFill'+suffix);
-      const peakEl=document.getElementById('mvmPeak'+suffix);
+      const vu=document.getElementById('masterHVu'+suffix);
       const clip=document.getElementById('clipLed'+suffix);
-      if(!fill)return;
+      if(!vu)return;
+      const leds=vu.querySelectorAll('.vu-led');
       let level=0;
       if(haveAudio&&anyPlaying){
         try{
@@ -5817,33 +5827,25 @@ function animateVU(){
           let peak=0,rms=0;
           for(let i=0;i<tArr.length;i++){const v=Math.abs(tArr[i]-128);if(v>peak)peak=v;rms+=v*v;}
           rms=Math.sqrt(rms/tArr.length);
-          // Same formula as per-deck meters (animateVU above) so master follows
-          // the beat identically to the channels.
+          // Same formula as per-deck meters so master LEDs flow identically
           const combined=peak*0.7+rms*1.6;
           level=Math.min(SEGS,(combined/128)*32);
           if(level<1.5)level=1.5;
         }catch(e){level=0;}
       }
-      // Mechanical hold — fast attack, smooth release (matches channel VU)
-      fill._hold=fill._hold||0;
-      if(level>fill._hold)fill._hold=level;
-      else fill._hold=Math.max(level,fill._hold-0.6);
-      // Peak hold line
-      fill._peak=fill._peak||0;
-      if(fill._hold>fill._peak){fill._peak=fill._hold;fill._peakTime=now;}
-      else if(now-(fill._peakTime||0)>700)fill._peak=Math.max(fill._hold,fill._peak-0.15);
-      maxLevel=Math.max(maxLevel,fill._hold);
-      const pct=(fill._hold/SEGS)*100;
-      const peakPct=(fill._peak/SEGS)*100;
-      fill.style.height=pct.toFixed(1)+'%';
-      if(peakEl){
-        peakEl.style.bottom=peakPct.toFixed(1)+'%';
-        peakEl.style.opacity=anyPlaying&&fill._peak>0.5?'1':'0';
-      }
+      vu._hold=vu._hold||0;
+      if(level>vu._hold)vu._hold=level;
+      else vu._hold=Math.max(level,vu._hold-0.6);
+      maxLevel=Math.max(maxLevel,vu._hold);
+      // Light up LEDs one by one — identical to animateVU loop above
+      leds.forEach((l,i)=>{
+        l.classList.remove('on','green','yellow','red');
+        if(i<vu._hold){l.classList.add('on');l.classList.add(l.dataset.color);}
+      });
       if(clip){
-        const nowClip=anyPlaying&&fill._hold>=SEGS-0.5;
-        if(nowClip)fill._clipUntil=now+240;
-        clip.classList.toggle('hot',(fill._clipUntil||0)>now);
+        const nowClip=anyPlaying&&vu._hold>=SEGS-0.5;
+        if(nowClip)vu._clipUntil=now+240;
+        clip.classList.toggle('hot',(vu._clipUntil||0)>now);
       }
     });
     const halo=document.getElementById('masterVuHalo');
@@ -6025,12 +6027,40 @@ function setupKeyboard(){
   document.addEventListener('keydown',e=>{
     if(['INPUT','SELECT','TEXTAREA'].includes(e.target.tagName))return;
     const k=e.key.toLowerCase();
+    // ── Ctrl / Cmd combos ──
     if(e.ctrlKey||e.metaKey){
       if(k==='a'){e.preventDefault();startAIDJ();}
       else if(k==='r'){e.preventDefault();toggleRecording();}
       else if(/^[1-9]$/.test(k)){e.preventDefault();const idx=parseInt(k)-1;const tabs=document.querySelectorAll('.tab-btn');if(tabs[idx])tabs[idx].click();}
       return;
     }
+    // ── Alt combos → mixer knobs & auto-mix ──
+    if(e.altKey){
+      const STEP=18;
+      switch(k){
+        case '-':case '_':e.preventDefault();adjustKnob('master',-STEP);return;
+        case '=':case '+':e.preventDefault();adjustKnob('master',STEP);return;
+        case '[':e.preventDefault();adjustKnob('hpVol',-STEP);return;
+        case ']':e.preventDefault();adjustKnob('hpVol',STEP);return;
+        case ';':e.preventDefault();adjustKnob('booth',-STEP);return;
+        case "'":e.preventDefault();adjustKnob('booth',STEP);return;
+        case 'm':e.preventDefault();document.getElementById('micOnBtn')?.click();return;
+        case 'r':e.preventDefault();['isoLow','isoMid','isoHi'].forEach(resetKnob);return;
+        case '1':e.preventDefault();document.querySelector('[data-mix="smooth"]')?.click();return;
+        case '2':e.preventDefault();document.querySelector('[data-mix="energy"]')?.click();return;
+        case '3':e.preventDefault();document.querySelector('[data-mix="harmonic"]')?.click();return;
+        case '4':e.preventDefault();document.querySelector('[data-mix="cut"]')?.click();return;
+        case '5':e.preventDefault();document.querySelector('[data-mix="echo"]')?.click();return;
+        case '6':e.preventDefault();document.getElementById('automixPickBtn')?.click();return;
+        case 's':e.preventDefault();document.getElementById('automixSync')?.click();return;
+      }
+    }
+    // ── Arrow keys → deck tempo fine-nudge ──
+    if(e.key==='ArrowUp'){e.preventDefault();nudgeTempo('A',0.05);return;}
+    if(e.key==='ArrowDown'){e.preventDefault();nudgeTempo('A',-0.05);return;}
+    if(e.key==='ArrowRight'){e.preventDefault();nudgeTempo('B',0.05);return;}
+    if(e.key==='ArrowLeft'){e.preventDefault();nudgeTempo('B',-0.05);return;}
+    // ── Plain keys ──
     switch(k){
       case 'q':cueDeck('A');break;
       case 'w':togglePlay('A');break;
@@ -6046,6 +6076,8 @@ function setupKeyboard(){
       case ' ':e.preventDefault();togglePlay('A');togglePlay('B');break;
       case 'f':document.getElementById('fxOnOff')?.click();break;
       case 't':document.getElementById('tapBtn').click();break;
+      case 'g':{const hpA=document.getElementById('hpCue-A');if(hpA)hpA.click();break;}
+      case 'h':{const hpB=document.getElementById('hpCue-B');if(hpB)hpB.click();break;}
     }
     const padKeys=['z','x','c','v','b','n','m',','];
     const idx=padKeys.indexOf(k);
@@ -6056,6 +6088,15 @@ function setupKeyboard(){
       if(btn)btn.click();
     }
   });
+}
+/* Shortcut helper — nudge the tempo of a deck by ±percent */
+function nudgeTempo(d,pct){
+  const dk=decks[d];if(!dk)return;
+  dk.tempo=Math.max(-50,Math.min(50,(dk.tempo||0)+pct));
+  const newRate=1+dk.tempo/100;
+  if(dk.source&&dk.source.playbackRate)dk.source.playbackRate.value=newRate;
+  const vEl=document.getElementById(`tempoVal-${d}`);if(vEl)vEl.textContent=(dk.tempo>=0?'+':'')+dk.tempo.toFixed(2)+'%';
+  const bigEl=document.getElementById(`tempoBig-${d}`);if(bigEl)bigEl.textContent=(dk.tempo>=0?'+':'')+dk.tempo.toFixed(2)+'%';
 }
 
 /* TABS */
