@@ -51,36 +51,56 @@ body{padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:
 .tap-btn:active{background:var(--orange);color:#000}
 .rgb-ambient{width:100%;max-width:1700px;height:5px;background:linear-gradient(90deg,var(--orange),var(--pink),var(--purple),var(--screen-glow),var(--play-green),var(--yellow),var(--orange));background-size:200% 100%;border-radius:3px;animation:ambient 8s linear infinite;filter:blur(3px);opacity:.6}
 @keyframes ambient{from{background-position:0% 0%}to{background-position:200% 0%}}
-/* ── Mixer toolbar (xfader + automix + hp + mic + iso) — horizontal bar above decks ── */
-.mixer-toolbar{width:100%;max-width:1700px;display:grid;grid-template-columns:minmax(300px,1.8fr) minmax(220px,1.3fr) minmax(220px,1.2fr) minmax(200px,1fr);gap:8px;padding:8px 10px;background:linear-gradient(180deg,#2a2a2e 0%,#1a1a1c 100%);border:1px solid var(--deck-border);border-radius:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 8px 24px rgba(0,0,0,.6);align-items:stretch}
-.mixer-toolbar .mtb-section{display:flex;flex-direction:column;gap:5px;padding:6px 8px;background:#0a0a0b;border-radius:8px;border:1px solid #1a1a1c;min-width:0}
-.mixer-toolbar .mtb-label{font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:2px;color:var(--orange);font-weight:700;white-space:nowrap}
-.mixer-toolbar .mtb-row{display:flex;align-items:center;gap:6px;justify-content:space-between}
-.mixer-toolbar .mtb-dir{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--screen-glow);letter-spacing:1px;margin-left:auto}
-.mixer-toolbar .crossfader-track{margin:2px 0}
-.mixer-toolbar .crossfader-ab{display:flex;justify-content:space-between;font-family:'Orbitron',sans-serif;font-size:9px;color:var(--orange);padding:0 2px}
-.mixer-toolbar .curve-switch{display:flex;gap:2px}
-.mixer-toolbar .curve-btn{padding:3px 6px;font-size:8px}
-.mixer-toolbar .mtb-automix .automix-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}
-.mixer-toolbar .mtb-automix .automix-btn{padding:5px 2px;font-size:9px;letter-spacing:.5px}
-.mixer-toolbar .mtb-automix .automix-sub{font-size:9px;gap:4px}
-.mixer-toolbar .mtb-automix .automix-bars{padding:2px 6px;font-size:10px;min-width:50px}
-.mixer-toolbar .mtb-automix .automix-sync{padding:3px 8px;font-size:9px}
-.mixer-toolbar .mtb-hp .knob.small,.mixer-toolbar .mtb-mic .knob.small,.mixer-toolbar .mtb-iso .knob.small{width:26px;height:26px}
-.mixer-toolbar .mtb-hp .knob-label,.mixer-toolbar .mtb-mic .knob-label,.mixer-toolbar .mtb-iso .knob-label{font-size:8px;letter-spacing:.5px}
-.mixer-toolbar .mtb-hp .knob-wrap,.mixer-toolbar .mtb-mic .knob-wrap,.mixer-toolbar .mtb-iso .knob-wrap{gap:2px}
-.mixer-toolbar .mtb-hp .cue-hp-buttons{display:grid;gap:2px}
-.mixer-toolbar .mtb-hp .cue-hp-btn{padding:3px;font-size:8px;letter-spacing:1px}
-.mixer-toolbar .mtb-mic .mic-btn{padding:5px 8px;font-size:9px;min-width:36px}
+/* ── Mixer toolbar — pixel-perfect horizontal bar above the decks ── */
+.mixer-toolbar{width:100%;max-width:1700px;display:grid;grid-template-columns:minmax(340px,2fr) minmax(230px,1.2fr) minmax(230px,1.1fr) minmax(200px,.95fr);gap:8px;padding:8px;background:linear-gradient(180deg,#2a2a2e 0%,#16161a 100%);border:1px solid var(--deck-border);border-radius:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 8px 24px rgba(0,0,0,.6);align-items:stretch;position:relative}
+.mixer-toolbar::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,122,0,.4) 30%,rgba(46,224,255,.35) 50%,rgba(255,122,0,.4) 70%,transparent);border-radius:12px 12px 0 0;pointer-events:none}
+
+.mixer-toolbar .mtb-section{display:flex;flex-direction:column;padding:8px 10px;background:linear-gradient(180deg,#0d0d10 0%,#070709 100%);border-radius:8px;border:1px solid #1a1a1c;min-width:0;position:relative;box-shadow:inset 0 0 24px rgba(0,0,0,.5)}
+.mixer-toolbar .mtb-section::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,122,0,.25),transparent);pointer-events:none}
+
+/* Section header — always top, always same size */
+.mixer-toolbar .mtb-head{display:flex;align-items:center;justify-content:space-between;height:16px;margin-bottom:8px;border-bottom:1px solid rgba(255,138,26,.08);padding-bottom:6px}
+.mixer-toolbar .mtb-label{font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:2.5px;color:var(--orange);font-weight:800;white-space:nowrap;text-shadow:0 0 8px rgba(255,122,0,.25)}
+.mixer-toolbar .mtb-dir{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--screen-glow);letter-spacing:1px}
+
+/* Body area — grows to fill the section so all boxes stay equal height */
+.mixer-toolbar .mtb-body{flex:1;display:flex;flex-direction:column;justify-content:space-between;gap:6px;min-height:0}
+
+/* AUTO MIX ─────────────────────────────────── */
+.mixer-toolbar .mtb-automix .automix-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.mixer-toolbar .mtb-automix .automix-btn{padding:7px 4px;font-size:10px;letter-spacing:1px;border-radius:4px}
+.mixer-toolbar .mtb-automix .automix-sub{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;padding-top:2px}
+.mixer-toolbar .mtb-automix .automix-sub > span{font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:1.5px;color:var(--text-dim);font-weight:700}
+.mixer-toolbar .mtb-automix .automix-bars{padding:4px 8px;font-size:10px;width:100%;border-radius:4px}
+.mixer-toolbar .mtb-automix .automix-sync{padding:5px 10px;font-size:9px;letter-spacing:1.5px;white-space:nowrap}
+
+/* HEADPHONES / MIC / ISOLATOR — knob rows with aligned baseline */
+.mixer-toolbar .mtb-knobrow{display:flex;justify-content:space-around;align-items:center;gap:8px;flex:1;min-height:52px}
+.mixer-toolbar .mtb-knobrow .knob-wrap{display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;min-width:0}
+.mixer-toolbar .mtb-section .knob.small{width:30px;height:30px}
+.mixer-toolbar .mtb-section .knob-label{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:1px;color:var(--text-dim);text-align:center;text-transform:uppercase}
+
+/* HP cue buttons — 4 across, equal */
+.mixer-toolbar .mtb-hp .cue-hp-buttons{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;margin-top:6px}
+.mixer-toolbar .mtb-hp .cue-hp-btn{padding:4px 2px;font-size:9px;letter-spacing:1px;border-radius:3px}
+
+/* MIC ON button — pinned right of the knob row */
+.mixer-toolbar .mtb-mic .mtb-knobrow{justify-content:space-between}
+.mixer-toolbar .mtb-mic .mic-btn{padding:6px 10px;font-size:10px;letter-spacing:1.5px;min-width:40px;border-radius:4px;align-self:center}
+
+/* ISOLATOR — red indicator + red labels */
 .mixer-toolbar .mtb-iso .knob-indicator{background:linear-gradient(180deg,#fff,var(--red))}
-.mixer-toolbar .mtb-iso .knob-label{color:var(--red)}
+.mixer-toolbar .mtb-iso .knob-label{color:var(--red);text-shadow:0 0 6px rgba(255,46,46,.35)}
+
+/* Responsive */
 @media(max-width:1400px){
   .mixer-toolbar{grid-template-columns:1fr 1fr;gap:6px}
   .mixer-toolbar .mtb-automix{grid-column:1/-1}
 }
 @media(max-width:820px){
-  .mixer-toolbar{grid-template-columns:1fr 1fr}
+  .mixer-toolbar{grid-template-columns:1fr 1fr;gap:6px;padding:6px}
   .mixer-toolbar .mtb-automix{grid-column:1/-1}
+  .mixer-toolbar .mtb-section{padding:6px 8px}
 }
 @media(max-width:520px){
   .mixer-toolbar{grid-template-columns:1fr;padding:6px;gap:5px}
@@ -3831,46 +3851,54 @@ function buildDeckHTML(d){
 
 function buildMixerToolbarHTML(){
   return `<div class="mtb-section mtb-automix">
-    <div class="mtb-row"><span class="mtb-label">⚡ AUTO MIX</span><span class="mtb-dir" id="automixDir">A→B</span></div>
-    <div class="automix-grid">
-      <button class="automix-btn" data-mix="smooth" title="Long bass-swap blend">SMOOTH</button>
-      <button class="automix-btn" data-mix="energy" title="High-pass sweep + expo fade">ENERGY</button>
-      <button class="automix-btn" data-mix="harmonic" title="Key-matched blend">HARMONIC</button>
-      <button class="automix-btn danger" data-mix="cut" title="Hard cut on next downbeat">CUT</button>
-      <button class="automix-btn echo" data-mix="echo" title="Echo tail on outgoing">ECHO</button>
-      <button class="automix-btn pick" id="automixPickBtn" title="Load smart next track">PICK</button>
-    </div>
-    <div class="mtb-row automix-sub"><span>Bars</span>
-      <select class="fx-selector automix-bars" id="automixBars">
-        <option value="4">4</option><option value="8">8</option><option value="16" selected>16</option>
-        <option value="32">32</option><option value="64">64</option>
-      </select>
-      <button class="automix-sync" id="automixSync" title="Sync incoming deck">SYNC →</button>
+    <div class="mtb-head"><span class="mtb-label">⚡ AUTO MIX</span><span class="mtb-dir" id="automixDir">A→B</span></div>
+    <div class="mtb-body">
+      <div class="automix-grid">
+        <button class="automix-btn" data-mix="smooth" title="Long bass-swap blend">SMOOTH</button>
+        <button class="automix-btn" data-mix="energy" title="High-pass sweep + expo fade">ENERGY</button>
+        <button class="automix-btn" data-mix="harmonic" title="Key-matched blend">HARMONIC</button>
+        <button class="automix-btn danger" data-mix="cut" title="Hard cut on next downbeat">CUT</button>
+        <button class="automix-btn echo" data-mix="echo" title="Echo tail on outgoing">ECHO</button>
+        <button class="automix-btn pick" id="automixPickBtn" title="Load smart next track">PICK</button>
+      </div>
+      <div class="automix-sub"><span>BARS</span>
+        <select class="fx-selector automix-bars" id="automixBars">
+          <option value="4">4</option><option value="8">8</option><option value="16" selected>16</option>
+          <option value="32">32</option><option value="64">64</option>
+        </select>
+        <button class="automix-sync" id="automixSync" title="Sync incoming deck">SYNC →</button>
+      </div>
     </div>
   </div>
   <div class="mtb-section mtb-hp">
-    <span class="mtb-label">HEADPHONES</span>
-    <div class="mtb-row">
-      <div class="knob-wrap"><div class="knob small" data-knob="hpMix"><div class="knob-indicator"></div></div><span class="knob-label">CUE MIX</span></div>
-      <div class="knob-wrap"><div class="knob small" data-knob="hpVol"><div class="knob-indicator"></div></div><span class="knob-label">HP VOL</span></div>
+    <div class="mtb-head"><span class="mtb-label">HEADPHONES</span></div>
+    <div class="mtb-body">
+      <div class="mtb-knobrow">
+        <div class="knob-wrap"><div class="knob small" data-knob="hpMix"><div class="knob-indicator"></div></div><span class="knob-label">CUE MIX</span></div>
+        <div class="knob-wrap"><div class="knob small" data-knob="hpVol"><div class="knob-indicator"></div></div><span class="knob-label">HP VOL</span></div>
+      </div>
+      <div class="cue-hp-buttons"><button class="cue-hp-btn" id="hpCue-A">CUE 1</button><button class="cue-hp-btn" id="hpCue-B">CUE 2</button><button class="cue-hp-btn" id="hpCue-C">CUE 3</button><button class="cue-hp-btn" id="hpCue-D">CUE 4</button></div>
     </div>
-    <div class="cue-hp-buttons" style="grid-template-columns:repeat(4,1fr);"><button class="cue-hp-btn" id="hpCue-A">CUE 1</button><button class="cue-hp-btn" id="hpCue-B">CUE 2</button><button class="cue-hp-btn" id="hpCue-C">CUE 3</button><button class="cue-hp-btn" id="hpCue-D">CUE 4</button></div>
   </div>
   <div class="mtb-section mtb-mic">
-    <span class="mtb-label">MIC</span>
-    <div class="mtb-row">
-      <div class="knob-wrap"><div class="knob small" data-knob="micVol"><div class="knob-indicator"></div></div><span class="knob-label">VOL</span></div>
-      <div class="knob-wrap"><div class="knob small" data-knob="micHi"><div class="knob-indicator"></div></div><span class="knob-label">HI</span></div>
-      <div class="knob-wrap"><div class="knob small" data-knob="micLow"><div class="knob-indicator"></div></div><span class="knob-label">LOW</span></div>
-      <button class="mic-btn" id="micOnBtn">ON</button>
+    <div class="mtb-head"><span class="mtb-label">MIC</span></div>
+    <div class="mtb-body">
+      <div class="mtb-knobrow">
+        <div class="knob-wrap"><div class="knob small" data-knob="micVol"><div class="knob-indicator"></div></div><span class="knob-label">VOL</span></div>
+        <div class="knob-wrap"><div class="knob small" data-knob="micHi"><div class="knob-indicator"></div></div><span class="knob-label">HI</span></div>
+        <div class="knob-wrap"><div class="knob small" data-knob="micLow"><div class="knob-indicator"></div></div><span class="knob-label">LOW</span></div>
+        <button class="mic-btn" id="micOnBtn">ON</button>
+      </div>
     </div>
   </div>
   <div class="mtb-section mtb-iso">
-    <span class="mtb-label">ISOLATOR</span>
-    <div class="mtb-row">
-      <div class="knob-wrap"><div class="knob small" data-knob="isoLow"><div class="knob-indicator"></div></div><span class="knob-label">LOW</span></div>
-      <div class="knob-wrap"><div class="knob small" data-knob="isoMid"><div class="knob-indicator"></div></div><span class="knob-label">MID</span></div>
-      <div class="knob-wrap"><div class="knob small" data-knob="isoHi"><div class="knob-indicator"></div></div><span class="knob-label">HI</span></div>
+    <div class="mtb-head"><span class="mtb-label">ISOLATOR</span></div>
+    <div class="mtb-body">
+      <div class="mtb-knobrow">
+        <div class="knob-wrap"><div class="knob small" data-knob="isoLow"><div class="knob-indicator"></div></div><span class="knob-label">LOW</span></div>
+        <div class="knob-wrap"><div class="knob small" data-knob="isoMid"><div class="knob-indicator"></div></div><span class="knob-label">MID</span></div>
+        <div class="knob-wrap"><div class="knob small" data-knob="isoHi"><div class="knob-indicator"></div></div><span class="knob-label">HI</span></div>
+      </div>
     </div>
   </div>`;
 }
@@ -3879,51 +3907,90 @@ function buildMixerHTML(){
   return `<div class="mixer-header"><div class="mixer-brand"><span class="model">DJM-</span>V10 PRO MAX</div></div>
   <div class="master-vu-analog" id="masterVuBox">
     <div class="master-vu-halo" id="masterVuHalo"></div>
-    <svg class="master-vu-svg" viewBox="0 0 240 140" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+    <svg class="master-vu-svg" viewBox="0 0 260 150" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
       <defs>
-        <radialGradient id="vuFace" cx="50%" cy="100%" r="100%">
-          <stop offset="0%" stop-color="#f6e8b8"/>
-          <stop offset="70%" stop-color="#e9d890"/>
-          <stop offset="100%" stop-color="#b89e58"/>
+        <radialGradient id="vuFace" cx="50%" cy="100%" r="95%">
+          <stop offset="0%" stop-color="#14161c"/>
+          <stop offset="60%" stop-color="#0b0d12"/>
+          <stop offset="100%" stop-color="#040507"/>
         </radialGradient>
-        <linearGradient id="vuGlow" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="rgba(255,196,64,.45)"/>
-          <stop offset="100%" stop-color="rgba(255,122,0,0)"/>
+        <linearGradient id="vuBezel" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#3a3a40"/>
+          <stop offset="50%" stop-color="#1a1a1c"/>
+          <stop offset="100%" stop-color="#0a0a0b"/>
         </linearGradient>
+        <linearGradient id="needleL" x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0%" stop-color="#ff5a00"/>
+          <stop offset="50%" stop-color="#ff8a1a"/>
+          <stop offset="100%" stop-color="#ffc66a"/>
+        </linearGradient>
+        <linearGradient id="needleR" x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0%" stop-color="#0088b4"/>
+          <stop offset="50%" stop-color="#2ee0ff"/>
+          <stop offset="100%" stop-color="#a8f4ff"/>
+        </linearGradient>
+        <radialGradient id="hubL" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#ffb366"/>
+          <stop offset="50%" stop-color="#8a3a00"/>
+          <stop offset="100%" stop-color="#1a0a00"/>
+        </radialGradient>
+        <filter id="glowN" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="1.4" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
       </defs>
-      <path d="M12,130 A118,118 0 0 1 228,130 L216,130 A106,106 0 0 0 24,130 Z" fill="url(#vuFace)" stroke="#2a1a00" stroke-width="1.5"/>
-      <path d="M26,128 A94,94 0 0 1 214,128" stroke="#0a0a0b" stroke-width="2" fill="none"/>
-      <path d="M30,128 A90,90 0 0 1 150,55" stroke="#0d3" stroke-width="2.2" fill="none"/>
-      <path d="M150,55 A90,90 0 0 1 190,78" stroke="#e0b000" stroke-width="2.2" fill="none"/>
-      <path d="M190,78 A90,90 0 0 1 210,128" stroke="#d02020" stroke-width="2.2" fill="none"/>
-      <g font-family="Share Tech Mono,monospace" font-size="8" fill="#2a1a00" text-anchor="middle">
-        <text x="34" y="118">-24</text>
-        <text x="64" y="90">-12</text>
-        <text x="100" y="70">-6</text>
-        <text x="150" y="58">0</text>
-        <text x="192" y="72">+3</text>
-        <text x="214" y="100">+6</text>
+      <!-- bezel frame -->
+      <rect x="2" y="2" width="256" height="146" rx="10" fill="url(#vuBezel)" stroke="#0a0a0b" stroke-width="1"/>
+      <rect x="6" y="6" width="248" height="138" rx="7" fill="url(#vuFace)" stroke="rgba(255,138,26,.18)" stroke-width="1"/>
+      <!-- subtle grid/sheen -->
+      <ellipse cx="130" cy="30" rx="140" ry="32" fill="rgba(46,224,255,.035)"/>
+      <!-- arc segments: green / yellow / red -->
+      <path d="M36,135 A94,94 0 0 1 156,56" stroke="#1cff8f" stroke-width="3" fill="none" opacity=".92"/>
+      <path d="M156,56 A94,94 0 0 1 200,78" stroke="#ffd400" stroke-width="3" fill="none" opacity=".92"/>
+      <path d="M200,78 A94,94 0 0 1 224,135" stroke="#ff2e2e" stroke-width="3" fill="none" opacity=".95"/>
+      <!-- inner arc faint guide -->
+      <path d="M40,135 A90,90 0 0 1 220,135" stroke="rgba(255,255,255,.08)" stroke-width="1" fill="none"/>
+      <!-- tick marks -->
+      <g stroke="rgba(255,255,255,.35)" stroke-linecap="round">
+        <line x1="36" y1="135" x2="42" y2="129" stroke-width="1.4"/>
+        <line x1="56" y1="112" x2="62" y2="108" stroke-width="1.2"/>
+        <line x1="84" y1="88" x2="90" y2="86" stroke-width="1.2"/>
+        <line x1="118" y1="70" x2="122" y2="76" stroke-width="1.2"/>
+        <line x1="156" y1="56" x2="158" y2="62" stroke-width="1.6" stroke="#ffd400"/>
+        <line x1="190" y1="66" x2="188" y2="72" stroke-width="1.2"/>
+        <line x1="218" y1="94" x2="214" y2="96" stroke-width="1.2"/>
+        <line x1="224" y1="135" x2="218" y2="129" stroke-width="1.4" stroke="#ff2e2e"/>
       </g>
-      <g stroke="#2a1a00" stroke-width="1" stroke-linecap="round">
-        <line x1="120" y1="130" x2="120" y2="124"/>
-        <line x1="80" y1="80" x2="84" y2="86"/>
-        <line x1="160" y1="80" x2="156" y2="86"/>
-        <line x1="60" y1="108" x2="66" y2="110"/>
-        <line x1="180" y1="108" x2="174" y2="110"/>
+      <!-- dB labels -->
+      <g font-family="Share Tech Mono,monospace" font-size="7.5" fill="rgba(46,224,255,.85)" text-anchor="middle" letter-spacing="1">
+        <text x="38" y="122">-24</text>
+        <text x="60" y="100">-12</text>
+        <text x="90" y="78">-6</text>
+        <text x="130" y="62">0</text>
+        <text x="178" y="68">+3</text>
+        <text x="214" y="86">+6</text>
       </g>
-      <g id="vuNeedleL" transform="rotate(-60 120 130)">
-        <line x1="120" y1="130" x2="120" y2="38" stroke="#d8000a" stroke-width="2.2" stroke-linecap="round"/>
-        <circle cx="120" cy="130" r="6" fill="#2a2a2e" stroke="#0a0a0b" stroke-width="1"/>
+      <!-- brand -->
+      <text x="130" y="100" text-anchor="middle" font-family="Orbitron,sans-serif" font-size="7.5" font-weight="800" fill="rgba(255,255,255,.55)" letter-spacing="3.5">MASTER</text>
+      <text x="130" y="112" text-anchor="middle" font-family="Share Tech Mono,monospace" font-size="6.5" fill="rgba(255,138,26,.7)" letter-spacing="2">dB VU</text>
+      <!-- channel labels -->
+      <g font-family="Orbitron,sans-serif" font-size="10" font-weight="900" letter-spacing="1">
+        <text x="46" y="142" text-anchor="middle" fill="#ff8a1a">L</text>
+        <text x="214" y="142" text-anchor="middle" fill="#2ee0ff">R</text>
       </g>
-      <g id="vuNeedleR" transform="rotate(-60 120 130)">
-        <line x1="120" y1="130" x2="120" y2="42" stroke="#ff6a1a" stroke-width="1.8" stroke-linecap="round" opacity=".9"/>
+      <!-- needles -->
+      <g id="vuNeedleL" transform="rotate(-60 130 135)" filter="url(#glowN)">
+        <line x1="130" y1="135" x2="130" y2="44" stroke="url(#needleL)" stroke-width="2.4" stroke-linecap="round"/>
+        <polygon points="130,40 127,50 133,50" fill="#ffc66a"/>
       </g>
-      <rect x="0" y="0" width="240" height="140" fill="url(#vuGlow)" opacity=".35" pointer-events="none"/>
-      <g font-family="Orbitron,sans-serif" font-size="9" font-weight="700" fill="#2a1a00">
-        <text x="52" y="132" text-anchor="middle">L</text>
-        <text x="188" y="132" text-anchor="middle">R</text>
+      <g id="vuNeedleR" transform="rotate(-60 130 135)" filter="url(#glowN)">
+        <line x1="130" y1="135" x2="130" y2="48" stroke="url(#needleR)" stroke-width="1.8" stroke-linecap="round" opacity=".95"/>
       </g>
-      <text x="120" y="95" text-anchor="middle" font-family="Orbitron,sans-serif" font-size="8" font-weight="700" fill="#2a1a00" letter-spacing="2">MASTER VU</text>
+      <!-- hub -->
+      <circle cx="130" cy="135" r="8" fill="url(#hubL)" stroke="#0a0a0b" stroke-width="1.2"/>
+      <circle cx="130" cy="135" r="3" fill="#1a1a1c" stroke="#ff8a1a" stroke-width=".6"/>
+      <!-- inset top highlight -->
+      <path d="M14,14 Q130,6 246,14" stroke="rgba(255,255,255,.06)" stroke-width="1" fill="none"/>
     </svg>
     <div class="master-vu-clip" id="clipLedL" title="Clip L"></div>
     <div class="master-vu-clip master-vu-clip-r" id="clipLedR" title="Clip R"></div>
