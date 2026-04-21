@@ -1372,6 +1372,7 @@ body.work-mode .console::before,body.work-mode .console::after{
   border-radius:3px;cursor:pointer;transition:all .15s ease;
 }
 .automix-sync:hover{background:var(--orange);color:#000;box-shadow:0 0 12px rgba(255,138,26,.6)}
+.automix-sync.active{background:var(--orange);color:#000;box-shadow:0 0 14px rgba(255,138,26,.7),inset 0 0 8px rgba(0,0,0,.3);border-color:#fff}
 
 /* DECK SWITCH BAR — 4-deck focus toggle */
 .deck-switch-bar{
@@ -4871,6 +4872,7 @@ function buildMixerToolbarHTML(){
           <option value="32">32</option><option value="64">64</option>
         </select>
         <button class="automix-sync" id="automixSync" title="Sync incoming deck">SYNC →</button>
+        <button class="automix-sync" id="automixContBtn" title="Auto-chain transitions forever" style="margin-left:4px">CONT</button>
       </div>
     </div>
   </div>
@@ -9353,72 +9355,302 @@ if(typeof window!=='undefined'){
   };
 }
 
-/* Manual Auto Mix buttons (in mixer panel) */
-let _automixRunning=false;let _automixCancelToken=null;
-function cancelAutoMix(){
-  if(!_automixRunning)return false;
-  _automixRunning=false;_automixCancelToken=null;
+/* ═══════════════════════════════════════════════════════════════════════
+   PRO AUTO-MIX ENGINE — 4-deck aware, bar-accurate, state-machine driven
+   Phases: idle → preparing → scheduled → running → tail → idle
+   ═══════════════════════════════════════════════════════════════════════ */
+const automix={
+  phase:'idle',       // idle | preparing | scheduled | running | tail
+  from:null,to:null,  // deck ids 'A'|'B'|'C'|'D'
+  style:null,bars:4,  // phrase count
+  startAt:0,          // audioCtx time when fade begins
+  endAt:0,            // audioCtx time when fade ends
+  progress:0,         // 0-1
+  continuous:false,   // auto-chain next transition
+  timers:[],          // pending setTimeout ids
+  rafId:0,            // progress animation frame
+  preVol:{},          // saved deck volumes for restore on cancel
+  preXf:0.5,          // saved crossfader position
+  usedCrossfader:false
+};
+window.automix=automix;
+
+function automixPickSource(){
+  // Priority: playing deck with a loaded track (A > B > C > D)
+  for(const id of ['A','B','C','D']){
+    const d=decks[id];if(d&&d.playing&&d.track&&d.track.source!=='yt')return id;
+  }
+  return null;
+}
+function automixPickTarget(from){
+  // Prefer a deck on the opposite crossfader side, else any idle deck
+  const xa=mixerState.xfaderAssign||{};
+  const fromSide=xa[from];
+  const candidates=['A','B','C','D'].filter(id=>id!==from&&decks[id]&&!decks[id].playing);
+  if(!candidates.length)return null;
+  const opposite=candidates.find(id=>xa[id]&&xa[id]!==fromSide&&xa[id]!=='THRU');
+  return opposite||candidates[0];
+}
+function automixSetButtonState(style,active){
   document.querySelectorAll('.automix-btn.running').forEach(b=>b.classList.remove('running'));
+  if(!active)return;
+  const btn=document.querySelector(`.automix-btn[data-mix="${style}"]`);
+  if(btn)btn.classList.add('running');
+}
+function automixClearTimers(){
+  automix.timers.forEach(id=>clearTimeout(id));
+  automix.timers.length=0;
+  if(automix.rafId){cancelAnimationFrame(automix.rafId);automix.rafId=0;}
+}
+function automixReset(){
+  automix.phase='idle';
+  automix.from=automix.to=null;
+  automix.style=null;
+  automix.progress=0;
+  automix.startAt=automix.endAt=0;
+  automix.preVol={};
+  automix.usedCrossfader=false;
+  automixSetButtonState(null,false);
+  updateAutomixDirection();
+}
+function cancelAutoMix(silent){
+  if(automix.phase==='idle')return false;
+  automixClearTimers();
   try{
+    const t=audioCtx?audioCtx.currentTime:0;
     ['A','B','C','D'].forEach(id=>{
       const d=decks[id];if(!d)return;
-      if(d.eqLow&&audioCtx){d.eqLow.gain.cancelScheduledValues(audioCtx.currentTime);d.eqLow.gain.setValueAtTime(d.eq.low*12,audioCtx.currentTime);}
-      if(d.colorFilter){d.colorFilter.type='allpass';d.colorFilter.frequency.value=1000;}
+      if(d.eqLow&&audioCtx){d.eqLow.gain.cancelScheduledValues(t);d.eqLow.gain.setValueAtTime((d.eq?.low||0)*12,t);}
+      if(d.colorFilter){d.colorFilter.type='allpass';d.colorFilter.frequency.cancelScheduledValues&&d.colorFilter.frequency.cancelScheduledValues(t);d.colorFilter.frequency.value=1000;}
+      if(automix.preVol[id]!==undefined){
+        d.volume=automix.preVol[id];
+        if(d.volumeGain)d.volumeGain.gain.value=d.volume;
+        const h=document.getElementById(`fader-${id}`);
+        if(h)h.style.bottom=`${(1-(1-d.volume)/0.9-0.1)*100}%`;
+      }
     });
-    if(window.sceneFxWet&&audioCtx){sceneFxWet.gain.cancelScheduledValues(audioCtx.currentTime);sceneFxWet.gain.setValueAtTime(0,audioCtx.currentTime);}
-  }catch(e){}
-  toast&&toast('Auto-mix cancelled','success');
+    if(window.sceneFxWet&&audioCtx){sceneFxWet.gain.cancelScheduledValues(t);sceneFxWet.gain.setValueAtTime(0,t);}
+    if(automix.usedCrossfader){
+      mixerState.crossfader=automix.preXf;
+      const h=document.getElementById('xfaderHandle');
+      if(h)h.style.left=`${automix.preXf*100}%`;
+      applyCrossfader();
+    }
+  }catch(e){console.warn('cancel cleanup',e);}
+  automix.continuous=false;
+  const wasPhase=automix.phase;
+  automixReset();
+  if(!silent)toast&&toast(wasPhase==='preparing'?'Auto-mix aborted':'Auto-mix cancelled','success');
   return true;
 }
 window.cancelAutoMix=cancelAutoMix;
+
+function automixProgressLoop(){
+  if(automix.phase!=='running'&&automix.phase!=='tail'){automix.rafId=0;return;}
+  const now=audioCtx?audioCtx.currentTime:0;
+  const total=Math.max(0.001,automix.endAt-automix.startAt);
+  automix.progress=Math.max(0,Math.min(1,(now-automix.startAt)/total));
+  updateAutomixDirection();
+  automix.rafId=requestAnimationFrame(automixProgressLoop);
+}
+
+function fadeChannelVolume(deckId,target,durSec){
+  const d=decks[deckId];if(!d||!d.volumeGain||!audioCtx)return;
+  const t0=audioCtx.currentTime,t1=t0+durSec;
+  const start=d.volume;
+  d.volumeGain.gain.cancelScheduledValues(t0);
+  d.volumeGain.gain.setValueAtTime(start,t0);
+  d.volumeGain.gain.linearRampToValueAtTime(target,t1);
+  // Animate UI fader
+  const h=document.getElementById(`fader-${deckId}`);
+  if(h){
+    const t0p=performance.now();
+    function step(){
+      const el=(performance.now()-t0p)/(durSec*1000);
+      if(el>=1){d.volume=target;h.style.bottom=`${(1-(1-target)/0.9-0.1)*100}%`;return;}
+      const v=start+(target-start)*el;
+      d.volume=v;
+      h.style.bottom=`${(1-(1-v)/0.9-0.1)*100}%`;
+      requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }else{
+    d.volume=target;
+  }
+}
+
+async function runProfessionalTransition(from,to,style,bars){
+  if(!audioCtx)return false;
+  // Snapshot state for cancel
+  automix.preXf=mixerState.crossfader;
+  ['A','B','C','D'].forEach(id=>{automix.preVol[id]=decks[id]?.volume??1;});
+
+  // 1) PREPARING — auto-load next track if target is empty, gain match, sync
+  automix.phase='preparing';
+  updateAutomixDirection();
+  if(!decks[to].track){
+    const next=smartPickNextTrack();
+    if(!next){toast('No suitable next track','error');return false;}
+    await loadTrackToDeck(to,next);
+  }
+  autoGainMatch(to);
+  await new Promise(r=>setTimeout(r,300));
+  syncDeckPhase(to,from);
+
+  // Compatibility check (warn only)
+  const bpmA=decks[from].track.bpm*(1+decks[from].tempo/100);
+  const bpmB=decks[to].track.bpm;
+  const drift=Math.abs(bpmA-bpmB)/bpmA;
+  if(drift>0.12)toast(`⚠ ${(drift*100).toFixed(0)}% BPM drift — sync may stretch`,'error');
+
+  // 2) SCHEDULE to next downbeat (up to 8 bars away)
+  const dropAt=nextDownbeatTime(from,Math.min(bars,8));
+  const beatDur=60/bpmA;
+  const durSec=beatDur*4*bars;   // bars are phrase count (4 beats each)
+  automix.phase='scheduled';
+  automix.startAt=dropAt;
+  automix.endAt=dropAt+durSec;
+
+  const waitMs=Math.max(0,(dropAt-audioCtx.currentTime)*1000);
+
+  automix.timers.push(setTimeout(()=>{
+    if(automix.phase!=='scheduled')return; // cancelled
+    automix.phase='running';
+    if(decks[to].eqLow)decks[to].eqLow.gain.setValueAtTime(0,audioCtx.currentTime);
+    playDeck(to);
+    automixProgressLoop();
+
+    // Decide fader strategy: crossfader if A↔B with proper assigns, else channel volumes
+    const xa=mixerState.xfaderAssign||{};
+    const canUseXf=((from==='A'&&to==='B')||(from==='B'&&to==='A'))
+                   &&(xa.A==='A'||!xa.A)&&(xa.B==='B'||!xa.B);
+
+    if(style==='cut'){
+      const cutDur=beatDur*4; // 1 bar
+      automix.endAt=audioCtx.currentTime+cutDur;
+      if(canUseXf){
+        const xfTarget=from==='A'?1:0;
+        automix.usedCrossfader=true;
+        fadeCrossfaderCurve(xfTarget,cutDur*1000,'cut');
+      }else{
+        fadeChannelVolume(from,0,cutDur*0.5);
+        fadeChannelVolume(to,1,0.05);
+      }
+      automix.timers.push(setTimeout(()=>automixFinish(from,to),cutDur*1000+200));
+      return;
+    }
+
+    if(style==='energy'){
+      eqSwap(from,to,durSec*0.6,'hp-sweep');
+      if(canUseXf){automix.usedCrossfader=true;fadeCrossfaderCurve(from==='A'?1:0,durSec*1000,'exp');}
+      else{fadeChannelVolume(from,0,durSec);fadeChannelVolume(to,1,durSec*0.4);}
+    }else if(style==='harmonic'||style==='smooth'){
+      eqSwap(from,to,durSec*0.8,null);
+      if(canUseXf){automix.usedCrossfader=true;fadeCrossfaderCurve(from==='A'?1:0,durSec*1000,'cosine');}
+      else{fadeChannelVolume(from,0,durSec);fadeChannelVolume(to,1,durSec*0.5);}
+    }else{ // echo
+      eqSwap(from,to,durSec*0.7,'echo-out');
+      if(canUseXf){automix.usedCrossfader=true;fadeCrossfaderCurve(from==='A'?1:0,durSec*1000,'cosine');}
+      else{fadeChannelVolume(from,0,durSec);fadeChannelVolume(to,1,durSec*0.4);}
+    }
+
+    automix.timers.push(setTimeout(()=>automixFinish(from,to),durSec*1000+400));
+  },waitMs));
+
+  return true;
+}
+
+function automixFinish(from,to){
+  if(automix.phase==='idle')return;
+  automix.phase='tail';
+  try{
+    pauseDeck(from);
+    const t=decks[from].track;
+    if(t){_recentlyPlayed.push(t.id);if(_recentlyPlayed.length>8)_recentlyPlayed.shift();}
+    if(decks[from].colorFilter){decks[from].colorFilter.type='allpass';decks[from].colorFilter.frequency.value=1000;}
+    if(decks[from].eqLow&&audioCtx)decks[from].eqLow.gain.setValueAtTime(0,audioCtx.currentTime);
+    if(window.sceneFxWet&&audioCtx)sceneFxWet.gain.setValueAtTime(0,audioCtx.currentTime);
+  }catch(e){}
+  toast&&toast(`✓ Deck ${to} now live`,'success');
+  const chain=automix.continuous;
+  automixReset();
+  if(chain){
+    automix.timers.push(setTimeout(()=>{
+      if(automix.phase!=='idle')return;
+      const style=automix.style||document.querySelector('.automix-btn.running')?.dataset.mix||'smooth';
+      manualAutoMix(style);
+    },1800));
+  }
+}
+
 function manualAutoMix(style){
-  if(_automixRunning){
+  // Toggle cancel if the same button is clicked while running
+  if(automix.phase!=='idle'){
     const btn=document.querySelector(`.automix-btn[data-mix="${style}"]`);
     if(btn&&btn.classList.contains('running')){cancelAutoMix();return;}
-    toast('Auto-mix running — click the active button to cancel','error');return;
+    toast('Auto-mix running — click the glowing button or press Esc to cancel','error');
+    return;
   }
   ensureAudio();
-  const from=decks.A.playing?'A':decks.B.playing?'B':null;
+  const from=automixPickSource();
   if(!from){toast('Start playing a deck first','error');return;}
-  const to=from==='A'?'B':'A';
-  const next=smartPickNextTrack();
-  if(!next){toast('Load more tracks to the library','error');return;}
-  const bars=Math.max(1,parseInt(document.getElementById('automixBars')?.value||16)/4);
-  _automixRunning=true;
-  const btn=document.querySelector(`.automix-btn[data-mix="${style}"]`);
-  if(btn)btn.classList.add('running');
-  proTransition(from,to,style,bars);
-  const estMs=bars*4*(60/decks[from].track.bpm)*1000+2000;
-  setTimeout(()=>{
-    _automixRunning=false;
-    document.querySelectorAll('.automix-btn.running').forEach(b=>b.classList.remove('running'));
-    updateAutomixDirection();
-  },estMs);
+  const to=automixPickTarget(from);
+  if(!to){toast('No idle deck available','error');return;}
+  const barsRaw=parseInt(document.getElementById('automixBars')?.value||16);
+  const bars=Math.max(1,Math.round(barsRaw/4));  // 4 beats per bar
+  automix.from=from;automix.to=to;automix.style=style;automix.bars=bars;
+  automixSetButtonState(style,true);
+  runProfessionalTransition(from,to,style,bars).then(ok=>{
+    if(!ok&&automix.phase!=='idle')cancelAutoMix(true);
+  }).catch(e=>{console.error('automix',e);cancelAutoMix(true);});
 }
+
 function manualSync(){
   ensureAudio();
-  const from=decks.A.playing?'A':decks.B.playing?'B':null;
+  const from=automixPickSource();
   if(!from){toast('Start playing a deck first','error');return;}
-  const to=from==='A'?'B':'A';
+  const to=automixPickTarget(from);
+  if(!to){toast('No idle deck available','error');return;}
   if(!decks[to].track){toast(`Load a track to Deck ${to} first`,'error');return;}
   syncDeckPhase(to,from);
   toast(`Synced Deck ${to} to ${from}`,'success');
+  updateAutomixDirection();
 }
+
 function manualPickNext(){
-  const idle=decks.A.playing?'B':'A';
+  const from=automixPickSource();
+  const idle=from?automixPickTarget(from):(['A','B','C','D'].find(id=>!decks[id].playing)||'A');
+  if(!idle){toast('No idle deck available','error');return;}
   const next=smartPickNextTrack();
   if(!next){toast('No suitable track found','error');return;}
   loadTrackToDeck(idle,next);
-  autoGainMatch(idle);
+  setTimeout(()=>autoGainMatch(idle),400);
   toast(`Deck ${idle}: ${next.title} (${next.bpm} BPM, ${next.key||'--'})`,'success');
   updateAutomixDirection();
 }
+
+function automixToggleContinuous(){
+  automix.continuous=!automix.continuous;
+  const btn=document.getElementById('automixContBtn');
+  if(btn)btn.classList.toggle('active',automix.continuous);
+  toast(`Continuous ${automix.continuous?'ON':'OFF'}`,'success');
+}
+
 function updateAutomixDirection(){
   const el=document.getElementById('automixDir');if(!el)return;
-  const from=decks.A.playing?'A':decks.B.playing?'B':null;
-  if(!from){el.textContent='—';return;}
-  el.textContent=`${from}→${from==='A'?'B':'A'}`;
+  if(automix.phase==='idle'){
+    const from=automixPickSource();
+    if(!from){el.textContent='—';return;}
+    const to=automixPickTarget(from);
+    el.textContent=to?`${from}→${to}`:from;
+    return;
+  }
+  const pct=Math.round(automix.progress*100);
+  const bar='▓'.repeat(Math.round(automix.progress*6))+'░'.repeat(6-Math.round(automix.progress*6));
+  const label={preparing:'PREP',scheduled:'WAIT',running:'MIX',tail:'DONE'}[automix.phase]||automix.phase;
+  el.textContent=`${automix.from}→${automix.to} ${bar} ${pct}% ${label}`;
 }
+
 document.addEventListener('DOMContentLoaded',()=>{
   setTimeout(()=>{
     document.querySelectorAll('.automix-btn[data-mix]').forEach(b=>{
@@ -9426,7 +9658,11 @@ document.addEventListener('DOMContentLoaded',()=>{
     });
     const sync=document.getElementById('automixSync');if(sync)sync.addEventListener('click',manualSync);
     const pick=document.getElementById('automixPickBtn');if(pick)pick.addEventListener('click',manualPickNext);
-    setInterval(updateAutomixDirection,1000);
+    const cont=document.getElementById('automixContBtn');if(cont)cont.addEventListener('click',automixToggleContinuous);
+    setInterval(()=>{if(automix.phase==='idle')updateAutomixDirection();},1000);
+    document.addEventListener('keydown',e=>{
+      if(e.key==='Escape'&&automix.phase!=='idle'){cancelAutoMix();e.preventDefault();}
+    });
   },200);
 });
 
