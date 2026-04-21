@@ -9140,6 +9140,238 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 
 document.addEventListener('DOMContentLoaded',init);
+
+/* ========================================================
+   PERFORMANCE LAYER — cache hot-path DOM lookups, reuse
+   typed arrays, and skip redundant writes in the 60fps
+   loop. Runs last so final tick/animateVU/drawSpectrum
+   become the fast path. No behaviour or design changes.
+   ======================================================== */
+(function(){
+  const IDS=['A','B','C','D'];
+
+  /* per-deck cache for elapsed/remain/wave + last values */
+  const deckDom={};
+  function getDeckDom(d){
+    let c=deckDom[d];
+    if(c&&c.el&&c.el.isConnected&&c.rm&&c.rm.isConnected&&c.wv&&c.wv.isConnected)return c;
+    deckDom[d]=c={
+      el:document.getElementById('elapsed-'+d),
+      rm:document.getElementById('remain-'+d),
+      wv:document.getElementById('wave-'+d),
+      lastEl:'',lastRm:'',lastTransform:'',lastOrigin:''
+    };
+    return c;
+  }
+
+  /* per-VU element LED cache + last-state diffing */
+  const vuCache=new WeakMap();
+  function getVuLeds(vu){
+    let c=vuCache.get(vu);
+    if(c&&c.leds.length&&c.leds[0].isConnected)return c;
+    const leds=vu.querySelectorAll('.vu-led');
+    const cols=new Array(leds.length);
+    for(let i=0;i<leds.length;i++)cols[i]=leds[i].dataset.color||'green';
+    c={leds,cols,state:new Int8Array(leds.length)};
+    vuCache.set(vu,c);
+    return c;
+  }
+  function paintVu(vu,level){
+    const c=getVuLeds(vu);
+    const leds=c.leds,st=c.state,cols=c.cols,n=leds.length;
+    for(let i=0;i<n;i++){
+      const want=i<level?1:0;
+      if(st[i]===want)continue;
+      const l=leds[i],col=cols[i];
+      if(want){l.classList.add('on');l.classList.add(col);}
+      else   {l.classList.remove('on');l.classList.remove(col);}
+      st[i]=want;
+    }
+  }
+
+  /* reuse Uint8Array buffers per analyser — stop churning GC */
+  const tArrCache=new WeakMap();
+  function getTArr(an){
+    let a=tArrCache.get(an);
+    if(!a||a.length!==an.frequencyBinCount){
+      a=new Uint8Array(an.frequencyBinCount);
+      tArrCache.set(an,a);
+    }
+    return a;
+  }
+
+  /* ---- animateVU fast path --------------------------- */
+  if(typeof animateVU==='function'){
+    const _fastAnimateVU=function(){
+      if(typeof decks==='undefined'||!decks)return;
+      const SEGS=20;
+      let anyPlaying=false,masterLevel=0;
+      for(let k=0;k<4;k++){
+        const d=IDS[k],dk=decks[d];
+        const vu=document.getElementById('vu-'+d);
+        if(!dk||!vu)continue;
+        let level=0;
+        if(dk.playing&&dk.analyser){
+          anyPlaying=true;
+          const tArr=getTArr(dk.analyser);
+          dk.analyser.getByteTimeDomainData(tArr);
+          let peak=0,rms=0;
+          for(let i=0;i<tArr.length;i++){const v=Math.abs(tArr[i]-128);if(v>peak)peak=v;rms+=v*v;}
+          rms=Math.sqrt(rms/tArr.length);
+          const combined=peak*0.7+rms*1.6;
+          level=Math.min(SEGS,(combined/128)*32);
+          if(level<1.5)level=1.5;
+          if(dk._vuHold==null)dk._vuHold=0;
+          if(level>dk._vuHold)dk._vuHold=level;
+          else dk._vuHold=Math.max(level,dk._vuHold-0.6);
+          level=dk._vuHold;
+        }else if(dk._vuHold){dk._vuHold=0;}
+        paintVu(vu,level);
+      }
+      /* master L/R — driven from loudest deck analyser */
+      for(let k=0;k<4;k++){
+        const d=IDS[k],dk=decks[d];
+        if(!dk||!dk.playing||!dk.analyser)continue;
+        const tArr=getTArr(dk.analyser);
+        try{
+          dk.analyser.getByteTimeDomainData(tArr);
+          let peak=0,rms=0;
+          for(let i=0;i<tArr.length;i++){const v=Math.abs(tArr[i]-128);if(v>peak)peak=v;rms+=v*v;}
+          rms=Math.sqrt(rms/tArr.length);
+          const combined=peak*0.7+rms*1.6;
+          const level=Math.min(SEGS,(combined/128)*32);
+          if(level>masterLevel)masterLevel=level;
+        }catch(e){}
+      }
+      const now=performance.now();
+      let maxLevel=0;
+      const sufs=['L','R'];
+      for(let s=0;s<2;s++){
+        const suf=sufs[s];
+        const vu=document.getElementById('masterHVu'+suf);
+        const clip=document.getElementById('clipLed'+suf);
+        if(!vu)continue;
+        const jitter=s===0?1:0.97;
+        const lvl=masterLevel*jitter;
+        vu._hold=vu._hold||0;
+        if(lvl>vu._hold)vu._hold=lvl;
+        else vu._hold=Math.max(lvl,vu._hold-0.6);
+        if(vu._hold>maxLevel)maxLevel=vu._hold;
+        paintVu(vu,vu._hold);
+        if(clip){
+          const nowClip=anyPlaying&&vu._hold>=SEGS-0.5;
+          if(nowClip)vu._clipUntil=now+240;
+          const hot=(vu._clipUntil||0)>now;
+          if(clip._hot!==hot){clip.classList.toggle('hot',hot);clip._hot=hot;}
+        }
+      }
+      const halo=document.getElementById('masterVuHalo');
+      if(halo){
+        const n=Math.min(1,maxLevel/SEGS);
+        const color=anyPlaying&&n>0.75?`rgba(255,60,60,${.22+n*.5})`
+                  :anyPlaying&&n>0.5?`rgba(255,212,0,${.18+n*.4})`
+                  :`rgba(255,138,26,${.08+n*.35})`;
+        const bg=`radial-gradient(ellipse at center,${color} 0%,transparent 70%)`;
+        if(halo._bg!==bg){halo.style.background=bg;halo._bg=bg;}
+      }
+    };
+    try{animateVU=_fastAnimateVU;}catch(_){}
+    try{window.animateVU=_fastAnimateVU;}catch(_){}
+  }
+
+  /* ---- drawSpectrum fast path ------------------------ */
+  if(typeof drawSpectrum==='function'){
+    let ctx=null,buf=null,bufLen=0;
+    const _fastDrawSpectrum=function(){
+      if(typeof spectrumCanvas==='undefined'||!spectrumCanvas||!masterAnalyserL)return;
+      if(!ctx||ctx.canvas!==spectrumCanvas)ctx=spectrumCanvas.getContext('2d');
+      const w=spectrumCanvas.width,h=spectrumCanvas.height;
+      ctx.fillStyle='rgba(5,5,6,0.4)';ctx.fillRect(0,0,w,h);
+      if(!buf||bufLen!==masterAnalyserL.frequencyBinCount){
+        bufLen=masterAnalyserL.frequencyBinCount;
+        buf=new Uint8Array(bufLen);
+      }
+      masterAnalyserL.getByteFrequencyData(buf);
+      const bars=64,step=Math.floor(buf.length/bars),bw=w/bars;
+      for(let i=0;i<bars;i++){
+        let sum=0;const base=i*step;
+        for(let j=0;j<step;j++)sum+=buf[base+j];
+        const avg=sum/step,bh=(avg/255)*h;
+        const hue=i/bars*280+20;
+        ctx.fillStyle=`hsl(${hue},100%,${40+avg/5}%)`;
+        ctx.fillRect(i*bw,h-bh,bw-1,bh);
+      }
+    };
+    try{drawSpectrum=_fastDrawSpectrum;}catch(_){}
+    try{window.drawSpectrum=_fastDrawSpectrum;}catch(_){}
+  }
+
+  /* ---- tick fast path: cache per-deck DOM lookups
+          and skip redundant textContent/transform writes */
+  if(typeof tick==='function'){
+    const _fastTick=function(){
+      if(typeof decks!=='undefined'&&decks){
+        for(let k=0;k<4;k++){
+          const d=IDS[k],dk=decks[d];
+          if(!dk||!dk.track)continue;
+          const t=dk.playing?getCurrentTime(d):(dk.offset||0);
+          const dur=dk.track.duration||0;
+          if(dk.loop&&dk.loop.active&&dk.loop.end&&t>=dk.loop.end){
+            try{seekDeck(d,dk.loop.start);}catch(e){}
+          }
+          const dom=getDeckDom(d);
+          if(dom.el){
+            const s=fmtTime(t);
+            if(dom.lastEl!==s){dom.el.textContent=s;dom.lastEl=s;}
+          }
+          if(dom.rm){
+            const s='-'+fmtTime(Math.max(0,dur-t));
+            if(dom.lastRm!==s){dom.rm.textContent=s;dom.lastRm=s;}
+          }
+          if(dom.wv&&dur){
+            const pct=t/dur;
+            const zoom=dk.waveZoom||1;
+            const tr=`translateX(${(0.5-pct)*100*zoom}%) scaleX(${zoom})`;
+            if(dom.lastTransform!==tr){
+              dom.wv.style.transform=tr;
+              dom.lastTransform=tr;
+            }
+            const og=`${pct*100}% 50%`;
+            if(dom.lastOrigin!==og){
+              dom.wv.style.transformOrigin=og;
+              dom.lastOrigin=og;
+            }
+          }
+        }
+      }
+      try{animateVU&&animateVU();}catch(e){}
+      try{drawSpectrum&&drawSpectrum();}catch(e){}
+      requestAnimationFrame(tick);
+    };
+    try{tick=_fastTick;}catch(_){}
+    try{window.tick=_fastTick;}catch(_){}
+  }
+
+  /* ---- low-risk listener hygiene: mark scroll/touch
+          listeners on library/playlist lists as passive
+          so the compositor isn't blocked during scroll.
+          Runs after init so lists exist. */
+  document.addEventListener('DOMContentLoaded',()=>{
+    setTimeout(()=>{
+      const scrollSurfaces=[
+        '.library-list','.playlist-grid','.sessions-grid',
+        '.history-list','.fullHistoryList','.tab-content'
+      ];
+      scrollSurfaces.forEach(sel=>{
+        document.querySelectorAll(sel).forEach(el=>{
+          /* no-op listener just to hint passive behaviour */
+          el.addEventListener('touchstart',()=>{},{passive:true});
+          el.addEventListener('touchmove',()=>{},{passive:true});
+        });
+      });
+    },500);
+  });
+})();
 </script>
 </body>
 </html>
