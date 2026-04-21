@@ -84,10 +84,31 @@ body.work-mode .header-bar .header-dsb{
 /* AUTO MIX ─────────────────────────────────── */
 .mixer-toolbar .mtb-automix .automix-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
 .mixer-toolbar .mtb-automix .automix-btn{padding:7px 4px;font-size:10px;letter-spacing:1px;border-radius:4px}
-.mixer-toolbar .mtb-automix .automix-sub{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;padding-top:2px}
+.mixer-toolbar .mtb-automix .automix-sub{display:grid;grid-template-columns:auto auto 1fr auto;gap:8px;align-items:center;padding-top:2px;flex-wrap:wrap}
 .mixer-toolbar .mtb-automix .automix-sub > span{font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:1.5px;color:var(--text-dim);font-weight:700}
-.mixer-toolbar .mtb-automix .automix-bars{padding:4px 8px;font-size:10px;width:100%;border-radius:4px}
+.mixer-toolbar .mtb-automix .automix-bars{padding:4px 8px;font-size:10px;width:auto;min-width:62px;border-radius:4px}
 .mixer-toolbar .mtb-automix .automix-sync{padding:5px 10px;font-size:9px;letter-spacing:1.5px;white-space:nowrap}
+
+/* WIDE-SCREEN AUTO MIX — single-row buttons + prominent progress */
+@media (min-width:1400px){
+  .mixer-toolbar .mtb-automix .automix-grid{grid-template-columns:repeat(6,1fr);gap:6px}
+  .mixer-toolbar .mtb-automix .automix-btn{padding:10px 6px;font-size:11px;letter-spacing:1.4px}
+  .mixer-toolbar .mtb-automix .mtb-dir{
+    flex:1;text-align:right;font-size:11px;font-weight:700;
+    color:var(--screen-glow);letter-spacing:1.5px;
+    padding:2px 8px;border-radius:4px;
+    background:linear-gradient(180deg,rgba(46,224,255,.08),rgba(46,224,255,.02));
+    border:1px solid rgba(46,224,255,.2);
+    box-shadow:inset 0 0 8px rgba(46,224,255,.08);
+    margin-left:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;
+  }
+  .mixer-toolbar .mtb-automix .mtb-head{height:auto;padding-bottom:8px}
+  .mixer-toolbar .mtb-automix .automix-sub{
+    grid-template-columns:auto auto 1fr auto auto;gap:6px;
+  }
+  .mixer-toolbar .mtb-automix .automix-bars{min-width:74px;font-size:11px;padding:6px 8px}
+  .mixer-toolbar .mtb-automix .automix-sync{padding:7px 14px;font-size:10px}
+}
 
 /* HEADPHONES / MIC / ISOLATOR — grouped knob rows with subtle inner frame */
 .mixer-toolbar .mtb-knobrow{display:flex;justify-content:center;align-items:center;gap:14px;flex:1;padding:6px 8px;background:rgba(255,255,255,.015);border:1px solid rgba(255,255,255,.04);border-radius:6px;box-shadow:inset 0 1px 0 rgba(255,255,255,.02)}
