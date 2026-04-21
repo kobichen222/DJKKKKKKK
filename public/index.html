@@ -51,6 +51,43 @@ body{padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:
 .tap-btn:active{background:var(--orange);color:#000}
 .rgb-ambient{width:100%;max-width:1700px;height:5px;background:linear-gradient(90deg,var(--orange),var(--pink),var(--purple),var(--screen-glow),var(--play-green),var(--yellow),var(--orange));background-size:200% 100%;border-radius:3px;animation:ambient 8s linear infinite;filter:blur(3px);opacity:.6}
 @keyframes ambient{from{background-position:0% 0%}to{background-position:200% 0%}}
+/* ── Mixer toolbar (xfader + automix + hp + mic + iso) — horizontal bar above decks ── */
+.mixer-toolbar{width:100%;max-width:1700px;display:grid;grid-template-columns:minmax(220px,1.4fr) minmax(260px,1.6fr) minmax(200px,1.3fr) minmax(200px,1.2fr) minmax(180px,1fr);gap:8px;padding:8px 10px;background:linear-gradient(180deg,#2a2a2e 0%,#1a1a1c 100%);border:1px solid var(--deck-border);border-radius:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 8px 24px rgba(0,0,0,.6);align-items:stretch}
+.mixer-toolbar .mtb-section{display:flex;flex-direction:column;gap:5px;padding:6px 8px;background:#0a0a0b;border-radius:8px;border:1px solid #1a1a1c;min-width:0}
+.mixer-toolbar .mtb-label{font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:2px;color:var(--orange);font-weight:700;white-space:nowrap}
+.mixer-toolbar .mtb-row{display:flex;align-items:center;gap:6px;justify-content:space-between}
+.mixer-toolbar .mtb-dir{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--screen-glow);letter-spacing:1px;margin-left:auto}
+.mixer-toolbar .crossfader-track{margin:2px 0}
+.mixer-toolbar .crossfader-ab{display:flex;justify-content:space-between;font-family:'Orbitron',sans-serif;font-size:9px;color:var(--orange);padding:0 2px}
+.mixer-toolbar .curve-switch{display:flex;gap:2px}
+.mixer-toolbar .curve-btn{padding:3px 6px;font-size:8px}
+.mixer-toolbar .mtb-automix .automix-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}
+.mixer-toolbar .mtb-automix .automix-btn{padding:5px 2px;font-size:9px;letter-spacing:.5px}
+.mixer-toolbar .mtb-automix .automix-sub{font-size:9px;gap:4px}
+.mixer-toolbar .mtb-automix .automix-bars{padding:2px 6px;font-size:10px;min-width:50px}
+.mixer-toolbar .mtb-automix .automix-sync{padding:3px 8px;font-size:9px}
+.mixer-toolbar .mtb-hp .knob.small,.mixer-toolbar .mtb-mic .knob.small,.mixer-toolbar .mtb-iso .knob.small{width:26px;height:26px}
+.mixer-toolbar .mtb-hp .knob-label,.mixer-toolbar .mtb-mic .knob-label,.mixer-toolbar .mtb-iso .knob-label{font-size:8px;letter-spacing:.5px}
+.mixer-toolbar .mtb-hp .knob-wrap,.mixer-toolbar .mtb-mic .knob-wrap,.mixer-toolbar .mtb-iso .knob-wrap{gap:2px}
+.mixer-toolbar .mtb-hp .cue-hp-buttons{display:grid;gap:2px}
+.mixer-toolbar .mtb-hp .cue-hp-btn{padding:3px;font-size:8px;letter-spacing:1px}
+.mixer-toolbar .mtb-mic .mic-btn{padding:5px 8px;font-size:9px;min-width:36px}
+.mixer-toolbar .mtb-iso .knob-indicator{background:linear-gradient(180deg,#fff,var(--red))}
+.mixer-toolbar .mtb-iso .knob-label{color:var(--red)}
+@media(max-width:1400px){
+  .mixer-toolbar{grid-template-columns:1fr 1fr 1fr;gap:6px}
+  .mixer-toolbar .mtb-xfader{grid-column:1/-1}
+  .mixer-toolbar .mtb-automix{grid-column:1/-1}
+}
+@media(max-width:820px){
+  .mixer-toolbar{grid-template-columns:1fr 1fr}
+  .mixer-toolbar .mtb-xfader,.mixer-toolbar .mtb-automix{grid-column:1/-1}
+}
+@media(max-width:520px){
+  .mixer-toolbar{grid-template-columns:1fr;padding:6px;gap:5px}
+  .mixer-toolbar .mtb-section{grid-column:auto}
+}
+
 .console{display:grid;grid-template-columns:1fr 400px 1fr;gap:12px;max-width:1700px;width:100%}
 @media(min-width:1920px){.console{grid-template-columns:1fr 460px 1fr;gap:16px;max-width:1850px}}
 @media(min-width:2560px){.console{grid-template-columns:1fr 540px 1fr;gap:22px;max-width:2200px}}
@@ -1682,7 +1719,7 @@ body.work-mode .header-bar,
 body.work-mode .main-tabs,
 body.work-mode canvas#spectrumCanvas,
 body.work-mode .tab-content:not(#tab-deck),
-body.work-mode #tab-deck > *:not(.console):not(.library):not(.beat-fx-panel):not(.scene-fx-panel):not(.deck-switch-bar):not(.quick-lib-overlay):not(.auth-modal):not(.wm-exit-btn):not(#toastBox){display:none !important;}
+body.work-mode #tab-deck > *:not(.console):not(.library):not(.beat-fx-panel):not(.scene-fx-panel):not(.deck-switch-bar):not(.mixer-toolbar):not(.quick-lib-overlay):not(.auth-modal):not(.wm-exit-btn):not(#toastBox){display:none !important;}
 body.work-mode .quick-lib-overlay.open{display:flex !important;z-index:100000;}
 body.work-mode .deck-switch-bar{position:fixed;top:8px;right:8px;left:auto;width:auto;max-width:none;z-index:60;background:rgba(10,10,14,.92);backdrop-filter:blur(10px);border:1px solid rgba(255,138,26,.35);box-shadow:0 10px 30px rgba(0,0,0,.7);padding:6px 10px;border-radius:10px;gap:6px;flex-wrap:wrap}
 body.work-mode .deck-switch-bar .dsb-label{color:var(--orange) !important;font-size:10px}
@@ -2759,28 +2796,24 @@ body.work-mode .deck-switch-bar{
 
 /* Big floating EXIT button visible only in WORK MODE */
 .wm-exit-btn{
-  display:none;position:fixed;top:14px;right:14px;z-index:9000;
-  padding:12px 20px;
+  display:none;position:fixed;top:8px;right:8px;z-index:9000;
+  padding:5px 10px;
   background:linear-gradient(180deg,#3a0a0a 0%,#1a0505 100%);
-  border:2px solid var(--red);color:#fff;
-  font-family:'Orbitron',sans-serif;font-size:13px;font-weight:900;letter-spacing:3px;
-  border-radius:8px;cursor:pointer;
-  box-shadow:0 0 24px rgba(255,46,46,.5),inset 0 1px 0 rgba(255,255,255,.1);
+  border:1px solid var(--red);color:#fff;
+  font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;letter-spacing:1.5px;
+  border-radius:6px;cursor:pointer;
+  box-shadow:0 2px 8px rgba(255,46,46,.35);
   text-shadow:0 1px 0 rgba(0,0,0,.6);
-  transition:all .15s ease;
+  transition:all .15s ease;opacity:.85;
 }
 .wm-exit-btn:hover{background:linear-gradient(180deg,var(--red) 0%,#8a0a0a 100%);box-shadow:0 0 32px rgba(255,46,46,.8);transform:translateY(-2px)}
 .wm-exit-btn:active{transform:translateY(0) scale(.96)}
-body.work-mode .wm-exit-btn{display:inline-flex;align-items:center;gap:8px;animation:wmExitPulse 2.5s ease-in-out infinite}
-@keyframes wmExitPulse{0%,100%{box-shadow:0 0 20px rgba(255,46,46,.45)}50%{box-shadow:0 0 34px rgba(255,46,46,.85)}}
-/* WORK MODE top exit bar — always visible, impossible to miss */
-.wm-topbar{display:none}
-body.work-mode .wm-topbar{
-  display:flex;justify-content:center;align-items:center;
-  width:100%;max-width:1700px;margin:0 auto 4px;
-  position:sticky;top:0;z-index:48;
-}
-body.work-mode.show-all + .wm-topbar,body.work-mode .wm-topbar{max-width:none}
+body.work-mode .wm-exit-btn{display:inline-flex;align-items:center;gap:4px}
+body.work-mode .wm-exit-btn:hover{opacity:1;padding:6px 12px}
+/* WORK MODE top exit strip — removed (blocked the decks). Small floating
+   .wm-exit-btn at top-right is the single exit UI. */
+.wm-topbar,.wm-exit-bar{display:none !important}
+body.work-mode .wm-topbar,body.work-mode .wm-exit-bar{display:none !important}
 .wm-exit-bar{
   padding:10px 28px;
   background:linear-gradient(90deg,rgba(40,6,6,.9) 0%,rgba(80,12,12,.95) 50%,rgba(40,6,6,.9) 100%);
@@ -3078,6 +3111,8 @@ body.work-mode .dsb-wmexit{display:inline-flex;background:linear-gradient(180deg
 <div class="wm-topbar" id="wmTopbar">
   <button class="wm-exit-bar" id="wmExitBarBtn">← EXIT WORK MODE  <span class="wm-esc-hint">(ESC)</span></button>
 </div>
+
+<div class="mixer-toolbar" id="mixer-toolbar"></div>
 
 <div class="console" id="console">
 <div class="cdj" data-deck="A" id="deckA-container"></div>
@@ -3767,6 +3802,64 @@ function buildDeckHTML(d){
   </div></div>`;
 }
 
+function buildMixerToolbarHTML(){
+  return `<div class="mtb-section mtb-xfader">
+    <div class="crossfader-ab"><span>A</span><span>B</span></div>
+    <div class="crossfader-track" id="xfader"><div class="crossfader-handle" id="xfaderHandle"></div></div>
+    <div class="mtb-row">
+      <span class="mtb-label">XFADE</span>
+      <div class="curve-switch" id="xfaderCurve">
+        <button class="curve-btn active" data-curve="smooth">SMOOTH</button>
+        <button class="curve-btn" data-curve="sharp">SHARP</button>
+        <button class="curve-btn" data-curve="cut">CUT</button>
+      </div>
+    </div>
+  </div>
+  <div class="mtb-section mtb-automix">
+    <div class="mtb-row"><span class="mtb-label">⚡ AUTO MIX</span><span class="mtb-dir" id="automixDir">A→B</span></div>
+    <div class="automix-grid">
+      <button class="automix-btn" data-mix="smooth" title="Long bass-swap blend">SMOOTH</button>
+      <button class="automix-btn" data-mix="energy" title="High-pass sweep + expo fade">ENERGY</button>
+      <button class="automix-btn" data-mix="harmonic" title="Key-matched blend">HARMONIC</button>
+      <button class="automix-btn danger" data-mix="cut" title="Hard cut on next downbeat">CUT</button>
+      <button class="automix-btn echo" data-mix="echo" title="Echo tail on outgoing">ECHO</button>
+      <button class="automix-btn pick" id="automixPickBtn" title="Load smart next track">PICK</button>
+    </div>
+    <div class="mtb-row automix-sub"><span>Bars</span>
+      <select class="fx-selector automix-bars" id="automixBars">
+        <option value="4">4</option><option value="8">8</option><option value="16" selected>16</option>
+        <option value="32">32</option><option value="64">64</option>
+      </select>
+      <button class="automix-sync" id="automixSync" title="Sync incoming deck">SYNC →</button>
+    </div>
+  </div>
+  <div class="mtb-section mtb-hp">
+    <span class="mtb-label">HEADPHONES</span>
+    <div class="mtb-row">
+      <div class="knob-wrap"><div class="knob small" data-knob="hpMix"><div class="knob-indicator"></div></div><span class="knob-label">CUE MIX</span></div>
+      <div class="knob-wrap"><div class="knob small" data-knob="hpVol"><div class="knob-indicator"></div></div><span class="knob-label">HP VOL</span></div>
+    </div>
+    <div class="cue-hp-buttons" style="grid-template-columns:repeat(4,1fr);"><button class="cue-hp-btn" id="hpCue-A">CUE 1</button><button class="cue-hp-btn" id="hpCue-B">CUE 2</button><button class="cue-hp-btn" id="hpCue-C">CUE 3</button><button class="cue-hp-btn" id="hpCue-D">CUE 4</button></div>
+  </div>
+  <div class="mtb-section mtb-mic">
+    <span class="mtb-label">MIC</span>
+    <div class="mtb-row">
+      <div class="knob-wrap"><div class="knob small" data-knob="micVol"><div class="knob-indicator"></div></div><span class="knob-label">VOL</span></div>
+      <div class="knob-wrap"><div class="knob small" data-knob="micHi"><div class="knob-indicator"></div></div><span class="knob-label">HI</span></div>
+      <div class="knob-wrap"><div class="knob small" data-knob="micLow"><div class="knob-indicator"></div></div><span class="knob-label">LOW</span></div>
+      <button class="mic-btn" id="micOnBtn">ON</button>
+    </div>
+  </div>
+  <div class="mtb-section mtb-iso">
+    <span class="mtb-label">ISOLATOR</span>
+    <div class="mtb-row">
+      <div class="knob-wrap"><div class="knob small" data-knob="isoLow"><div class="knob-indicator"></div></div><span class="knob-label">LOW</span></div>
+      <div class="knob-wrap"><div class="knob small" data-knob="isoMid"><div class="knob-indicator"></div></div><span class="knob-label">MID</span></div>
+      <div class="knob-wrap"><div class="knob small" data-knob="isoHi"><div class="knob-indicator"></div></div><span class="knob-label">HI</span></div>
+    </div>
+  </div>`;
+}
+
 function buildMixerHTML(){
   return `<div class="mixer-header"><div class="mixer-brand"><span class="model">DJM-</span>V10 PRO MAX</div></div>
   <div class="master-vu-box" id="masterVuBox">
@@ -3820,54 +3913,7 @@ function buildMixerHTML(){
       </div>
     </div>`).join('')}
   </div>
-  <div class="crossfader-section">
-    <div class="crossfader-ab"><span>A</span><span>B</span></div>
-    <div class="crossfader-track" id="xfader"><div class="crossfader-handle" id="xfaderHandle"></div></div>
-    <div class="crossfader-label">CROSSFADER</div>
-    <div class="curve-switch" id="xfaderCurve">
-      <button class="curve-btn active" data-curve="smooth">SMOOTH</button>
-      <button class="curve-btn" data-curve="sharp">SHARP</button>
-      <button class="curve-btn" data-curve="cut">CUT</button>
-    </div>
-  </div>
-  <div class="automix-panel">
-    <div class="automix-title">⚡ AUTO MIX<span id="automixDir">A→B</span></div>
-    <div class="automix-grid">
-      <button class="automix-btn" data-mix="smooth" title="Long bass-swap blend (EQ swap + cosine fade)">SMOOTH</button>
-      <button class="automix-btn" data-mix="energy" title="High-pass filter sweep + exponential fade">ENERGY</button>
-      <button class="automix-btn" data-mix="harmonic" title="Key-matched blend with slow EQ swap">HARMONIC</button>
-      <button class="automix-btn danger" data-mix="cut" title="Hard cut on next downbeat">CUT</button>
-      <button class="automix-btn echo" data-mix="echo" title="Echo tail on outgoing + cosine fade">ECHO OUT</button>
-      <button class="automix-btn pick" id="automixPickBtn" title="Load smart next track to idle deck">PICK NEXT</button>
-    </div>
-    <div class="automix-sub"><span>Bars</span>
-      <select class="fx-selector automix-bars" id="automixBars">
-        <option value="4">4</option><option value="8">8</option><option value="16" selected>16</option>
-        <option value="32">32</option><option value="64">64</option>
-      </select>
-      <button class="automix-sync" id="automixSync" title="Sync incoming deck to playing deck (BPM + phase)">SYNC →</button>
-    </div>
-  </div>
-  <div class="headphone-section">
-    <div class="knob-wrap"><div class="knob small" data-knob="hpMix"><div class="knob-indicator"></div></div><span class="knob-label">CUE MIX</span></div>
-    <div class="knob-wrap"><div class="knob small" data-knob="hpVol"><div class="knob-indicator"></div></div><span class="knob-label">HP VOL</span></div>
-    <div class="cue-hp-buttons" style="grid-template-columns:repeat(4,1fr);"><button class="cue-hp-btn" id="hpCue-A">CUE 1</button><button class="cue-hp-btn" id="hpCue-B">CUE 2</button><button class="cue-hp-btn" id="hpCue-C">CUE 3</button><button class="cue-hp-btn" id="hpCue-D">CUE 4</button></div>
-  </div>
-  <div class="mic-section">
-    <div class="mic-label">MIC</div>
-    <div class="knob-wrap"><div class="knob small" data-knob="micVol"><div class="knob-indicator"></div></div><span class="knob-label">VOL</span></div>
-    <div class="knob-wrap"><div class="knob small" data-knob="micHi"><div class="knob-indicator"></div></div><span class="knob-label">HI</span></div>
-    <div class="knob-wrap"><div class="knob small" data-knob="micLow"><div class="knob-indicator"></div></div><span class="knob-label">LOW</span></div>
-    <button class="mic-btn" id="micOnBtn">ON</button>
-  </div>
-
-  <div class="compact-decks" id="mixerCompactDecks"></div>
-
-  <div class="isolator-panel">
-    <div class="knob-wrap"><div class="knob small" data-knob="isoLow"><div class="knob-indicator"></div></div><span class="knob-label">ISO LOW</span></div>
-    <div class="knob-wrap"><div class="knob small" data-knob="isoMid"><div class="knob-indicator"></div></div><span class="knob-label">ISO MID</span></div>
-    <div class="knob-wrap"><div class="knob small" data-knob="isoHi"><div class="knob-indicator"></div></div><span class="knob-label">ISO HI</span></div>
-  </div>`;
+  <div class="compact-decks" id="mixerCompactDecks"></div>`;
 }
 
 /* ============ AUDIO ENGINE ============ */
@@ -6118,6 +6164,7 @@ function init(){
   document.getElementById('deckC-container').innerHTML=buildDeckHTML('C');
   document.getElementById('deckD-container').innerHTML=buildDeckHTML('D');
   document.getElementById('mixer-container').innerHTML=buildMixerHTML();
+  const mtb=document.getElementById('mixer-toolbar');if(mtb)mtb.innerHTML=buildMixerToolbarHTML();
   setupVU('vu-A',20);setupVU('vu-B',20);setupVU('vu-C',20);setupVU('vu-D',20);
   setupVU('masterHVuL',18);setupVU('masterHVuR',18);
   attachKnobs();attachEvents();setupBeatFxUI();setupSceneFx();setupKeyboard();setupTabs();setupSettings();
