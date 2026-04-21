@@ -3540,6 +3540,225 @@ body.work-mode .dsb-wmexit{display:inline-flex;background:linear-gradient(180deg
     border-width:.5px;
   }
 }
+
+/* ====================================================
+   STUDIO PRO — Music production studio (synth + organ
+   + drum machine + TB-303 bass + sequencer + piano).
+   Theme matches Pioneer dark/orange aesthetic.
+   ==================================================== */
+.sp-panel{padding:14px 16px;background:linear-gradient(160deg,#0a0a0c 0%,#0d0d10 100%);border:1px solid #1a1a1e;border-radius:14px;box-shadow:0 8px 40px rgba(0,0,0,.5);color:var(--text-bright,#eee);}
+.sp-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.sp-sub-label{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2.5px;color:var(--text-dim,#888);margin:8px 0 6px;text-transform:uppercase;}
+.sp-block{background:linear-gradient(180deg,#0f0f12 0%,#0a0a0c 100%);border:1px solid #26262a;border-radius:10px;padding:10px 12px;margin-bottom:10px;position:relative;}
+.sp-block-title{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2.2px;color:#ff8a1a;margin-bottom:8px;text-transform:uppercase;display:flex;align-items:center;gap:8px;}
+.sp-block-title .sp-led{width:6px;height:6px;border-radius:50%;background:#2a2a2e;box-shadow:inset 0 0 3px rgba(0,0,0,.6);}
+.sp-block-title.on .sp-led{background:#ff3b3b;box-shadow:0 0 8px #ff3b3b,inset 0 0 3px rgba(0,0,0,.4);}
+.sp-preset-row{display:flex;gap:6px;flex-wrap:wrap;}
+.sp-preset-btn{padding:8px 14px;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1.8px;background:#151519;color:#ccc;border:1px solid #2a2a2e;border-radius:6px;cursor:pointer;transition:.15s;}
+.sp-preset-btn:hover{border-color:#ff8a1a;color:#ff8a1a;background:#1a1a1e;}
+.sp-preset-btn.active{background:linear-gradient(180deg,#ff8a1a,#cc6a0a);color:#0a0a0c;border-color:#ff8a1a;font-weight:700;box-shadow:0 0 14px rgba(255,138,26,.35);}
+.sp-mini-btn{padding:5px 10px;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1.6px;background:#17171b;color:#bbb;border:1px solid #28282c;border-radius:5px;cursor:pointer;transition:.1s;}
+.sp-mini-btn:hover{border-color:#2aeaff;color:#2aeaff;}
+.sp-mini-btn.active{background:#2aeaff;color:#0a0a0c;border-color:#2aeaff;font-weight:700;}
+
+/* Synth/Organ knobs row */
+.sp-knobs{display:flex;gap:14px;flex-wrap:wrap;}
+.sp-knob-wrap{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:62px;}
+.sp-knob{width:50px;height:50px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#33333a,#141418 70%);border:2px solid #28282c;position:relative;cursor:pointer;box-shadow:0 3px 8px rgba(0,0,0,.5),inset 0 -2px 6px rgba(0,0,0,.4);touch-action:none;user-select:none;}
+.sp-knob::after{content:'';position:absolute;inset:8px;border-radius:50%;background:linear-gradient(160deg,#222228,#0a0a0c);box-shadow:inset 0 2px 3px rgba(0,0,0,.7);}
+.sp-knob-indicator{position:absolute;top:3px;left:50%;width:2px;height:12px;background:#ff8a1a;margin-left:-1px;transform-origin:center 22px;pointer-events:none;box-shadow:0 0 4px #ff8a1a;z-index:2;}
+.sp-knob-label{font-family:'Share Tech Mono',monospace;font-size:8.5px;letter-spacing:1.4px;color:#888;text-transform:uppercase;}
+.sp-knob-val{font-family:'Share Tech Mono',monospace;font-size:9px;color:#2aeaff;letter-spacing:1.2px;}
+
+/* Oscillator waveform selector */
+.sp-osc-wave{display:flex;gap:2px;}
+.sp-wave-btn{width:28px;height:24px;background:#15151a;border:1px solid #28282c;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#888;font-size:14px;}
+.sp-wave-btn:hover{color:#ff8a1a;border-color:#ff8a1a;}
+.sp-wave-btn.active{background:#ff8a1a;color:#0a0a0c;border-color:#ff8a1a;}
+
+/* Drum machine grid — 8 tracks x 16 steps */
+.sp-seq-grid{display:grid;grid-template-columns:90px repeat(16,1fr);gap:3px;padding:6px;background:#08080a;border-radius:8px;border:1px solid #22222a;}
+.sp-seq-label{display:flex;align-items:center;justify-content:space-between;padding:0 8px;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1.5px;color:#bbb;background:#0f0f13;border-radius:4px;border:1px solid #222228;}
+.sp-seq-label .sp-mute{padding:2px 6px;font-size:8px;background:#15151a;border:1px solid #2a2a30;border-radius:3px;color:#888;cursor:pointer;}
+.sp-seq-label .sp-mute.muted{background:#902020;color:#fff;border-color:#902020;}
+.sp-seq-cell{aspect-ratio:1;border-radius:4px;background:#121216;border:1px solid #22222a;cursor:pointer;position:relative;transition:.06s;}
+.sp-seq-cell:hover{border-color:#444;}
+.sp-seq-cell.on{background:linear-gradient(180deg,#ff8a1a,#cc6a0a);border-color:#ffab4a;box-shadow:0 0 6px rgba(255,138,26,.5);}
+.sp-seq-cell.on.accent{background:linear-gradient(180deg,#ff3b3b,#c42020);border-color:#ff6060;box-shadow:0 0 10px rgba(255,60,60,.7);}
+.sp-seq-cell.playing{outline:2px solid #2aeaff;outline-offset:-1px;}
+.sp-seq-cell.beat1{border-left:2px solid #2aeaff44;}
+
+/* Synth panel grid */
+.sp-synth-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;}
+
+/* Organ drawbars */
+.sp-drawbars{display:flex;gap:6px;justify-content:center;padding:12px 6px;background:linear-gradient(180deg,#1a1410,#0d0a08);border:1px solid #2e2622;border-radius:8px;}
+.sp-drawbar{display:flex;flex-direction:column;align-items:center;gap:6px;width:44px;}
+.sp-drawbar-track{width:18px;height:130px;background:linear-gradient(180deg,#1a1a20,#050507);border:1px solid #2a2a30;border-radius:3px;position:relative;cursor:ns-resize;touch-action:none;user-select:none;overflow:hidden;}
+.sp-drawbar-knob{position:absolute;left:50%;transform:translateX(-50%);width:30px;height:18px;background:linear-gradient(180deg,#e8e2d4,#a8a294);border:1px solid #5a564c;border-radius:3px;box-shadow:0 2px 3px rgba(0,0,0,.6);cursor:ns-resize;top:0;}
+.sp-drawbar-knob.white{background:linear-gradient(180deg,#f0ebdd,#bab5a6);}
+.sp-drawbar-knob.brown{background:linear-gradient(180deg,#8a6a40,#5a4220);}
+.sp-drawbar-knob.black{background:linear-gradient(180deg,#35353a,#0a0a0d);}
+.sp-drawbar-label{font-family:'Share Tech Mono',monospace;font-size:8px;color:#aaa;letter-spacing:.5px;text-align:center;}
+.sp-drawbar-num{font-family:'Share Tech Mono',monospace;font-size:10px;color:#ff8a1a;font-weight:700;}
+
+/* TB-303 bass sequencer */
+.sp-bass-seq-row{display:grid;grid-template-columns:90px repeat(16,1fr);gap:3px;margin-bottom:4px;align-items:stretch;}
+.sp-bass-step{background:#121216;border:1px solid #22222a;border-radius:4px;padding:4px 2px;display:flex;flex-direction:column;gap:2px;cursor:pointer;min-height:52px;position:relative;}
+.sp-bass-step:hover{border-color:#444;}
+.sp-bass-step.playing{outline:2px solid #2aeaff;outline-offset:-1px;}
+.sp-bass-step.on{background:linear-gradient(180deg,#1a1a22,#0a0a0e);}
+.sp-bass-step select{background:#0a0a0c;color:#ff8a1a;border:1px solid #333;border-radius:3px;font-family:'Share Tech Mono',monospace;font-size:9px;padding:1px;text-align:center;}
+.sp-bass-step .sp-bass-flags{display:flex;gap:2px;font-family:'Share Tech Mono',monospace;font-size:7.5px;}
+.sp-bass-step .sp-bass-flag{flex:1;text-align:center;background:#15151a;border:1px solid #28282c;border-radius:2px;color:#555;padding:1px 0;cursor:pointer;}
+.sp-bass-step .sp-bass-flag.on{background:#ff3b3b;color:#fff;border-color:#ff3b3b;}
+.sp-bass-step .sp-bass-flag.slide.on{background:#2aeaff;color:#0a0a0c;border-color:#2aeaff;}
+
+/* Piano keyboard */
+.sp-piano-wrap{margin-top:10px;padding:10px;background:linear-gradient(180deg,#18120c,#0a0806);border:1px solid #2e2420;border-radius:8px;}
+.sp-piano{position:relative;height:110px;background:#0a0a0c;border-radius:4px;user-select:none;overflow:hidden;}
+.sp-key{position:absolute;top:0;bottom:0;cursor:pointer;transition:.04s;}
+.sp-key-white{background:linear-gradient(180deg,#f2ebd8,#c5bea8);border:1px solid #2a2a2e;border-radius:0 0 4px 4px;z-index:1;}
+.sp-key-white.active{background:linear-gradient(180deg,#ff8a1a,#cc6a0a);}
+.sp-key-black{background:linear-gradient(180deg,#1a1a1e,#050507);border:1px solid #0a0a0d;border-radius:0 0 3px 3px;height:62%;z-index:2;box-shadow:0 2px 4px rgba(0,0,0,.6);}
+.sp-key-black.active{background:linear-gradient(180deg,#ff8a1a,#8a3f0a);}
+.sp-key-label{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);font-family:'Share Tech Mono',monospace;font-size:8px;color:#555;pointer-events:none;}
+.sp-key-black .sp-key-label{color:#777;}
+
+/* Master section */
+.sp-master{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:8px;}
+.sp-master-block{background:#0e0e12;border:1px solid #26262a;border-radius:8px;padding:10px;}
+.sp-master-title{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:#2aeaff;margin-bottom:8px;}
+
+/* Transport button states */
+.sp-transport .tool-btn.play-on{background:#2aea6a;color:#0a0a0c;border-color:#2aea6a;}
+.sp-transport .tool-btn.rec-on{background:#ff3b3b;color:#fff;border-color:#ff3b3b;animation:sp-rec-blink 1s infinite;}
+@keyframes sp-rec-blink{50%{opacity:.55;}}
+
+/* Selector chips (synth / organ / bass active instrument) */
+.sp-inst-row{display:flex;gap:4px;margin-bottom:8px;}
+.sp-inst-chip{padding:6px 14px;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1.6px;background:#13131a;color:#888;border:1px solid #26262a;border-radius:6px 6px 0 0;cursor:pointer;}
+.sp-inst-chip.active{background:linear-gradient(180deg,#2a2a30,#0a0a0c);color:#ff8a1a;border-color:#ff8a1a;border-bottom:none;}
+
+/* ====================================================
+   MOBILE-FIRST OVERRIDES — mixer 4ch single row, decks
+   stack, Studio/Studio Pro panels fit phones cleanly,
+   all controls with proper touch targets.
+   ==================================================== */
+@media(max-width:820px){
+  .console,.console.show-all{grid-template-columns:1fr!important;gap:8px}
+  .cdj{padding:8px;min-width:0}
+  /* Mixer — keep 4 channels side-by-side even on tablets */
+  .channels{grid-template-columns:repeat(4,1fr)!important;gap:4px!important}
+  .channel{min-width:0;align-items:stretch}
+  .channel .fader-wrap{width:22px;height:130px;margin:0 auto}
+  .channel .vu-meter{width:10px;height:130px;margin:0 auto}
+  .channel .knob,.channel .knob.small{width:30px;height:30px}
+  .channel .knob-label{font-size:8px;letter-spacing:.5px}
+  /* Tabs — horizontal scroll, bigger tap targets */
+  .main-tabs{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin;flex-wrap:nowrap}
+  .tab-btn{flex:0 0 auto;padding:10px 14px;font-size:11px;min-width:90px;min-height:40px}
+  /* Studio Pro fits narrow viewports */
+  .sp-synth-grid{grid-template-columns:1fr}
+  .sp-master{grid-template-columns:1fr}
+  .sp-seq-grid{grid-template-columns:62px repeat(16,1fr);gap:2px;padding:5px}
+  .sp-seq-label{font-size:9px;padding:0 4px}
+  .sp-seq-label .sp-mute{padding:1px 4px;font-size:7.5px}
+  .sp-drawbars{flex-wrap:wrap;gap:4px;justify-content:center}
+  .sp-drawbar{width:38px}
+  .sp-drawbar-track{height:100px}
+  .sp-knob{width:44px;height:44px}
+  .sp-knob-wrap{min-width:56px}
+  .sp-piano{height:92px}
+  .sp-preset-row{overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;padding-bottom:4px}
+  .sp-preset-btn{flex:0 0 auto}
+  .sp-inst-chip{flex:1;text-align:center}
+  /* Settings / editor — full width, single column blocks */
+  .settings-panel{padding:8px;max-width:100%!important}
+  .editor-grid,.studio-proc-grid{grid-template-columns:1fr!important}
+  .studio-knobs{gap:8px;flex-wrap:wrap;justify-content:center}
+  /* Library/track rows — minimal on narrow */
+  .library-actions{gap:6px}
+}
+
+@media(max-width:520px){
+  /* FORCE 4-channel mixer in single row (override previous 2-col) */
+  .channels{grid-template-columns:repeat(4,1fr)!important;gap:3px!important}
+  .channel{gap:4px}
+  .channel .fader-wrap{width:20px;height:108px}
+  .channel .vu-meter{width:9px;height:108px}
+  .channel .knob,.channel .knob.small{width:26px;height:26px}
+  .channel .knob-label{font-size:7.5px;letter-spacing:.5px}
+  /* Bigger tap targets for deck controls */
+  .hot-cues{grid-template-columns:repeat(4,1fr);gap:3px}
+  .cue-btn{padding:9px 2px;min-height:36px;font-size:10px}
+  .big-btn{padding:12px 4px;min-height:44px;font-size:11px}
+  .loop-btn,.jump-btn,.util-btn{min-height:30px;padding:6px 2px}
+  .tempo-btn{min-height:32px}
+  .tab-btn{min-height:40px;padding:10px 12px;min-width:82px}
+  /* Jog wheel size */
+  .jog-wheel{width:80vw;height:80vw;max-width:300px;max-height:300px}
+  /* Studio Pro tighter */
+  .sp-seq-grid{grid-template-columns:54px repeat(16,1fr);gap:2px;padding:4px}
+  .sp-seq-label{font-size:8.5px;padding:0 3px}
+  .sp-seq-label .sp-mute{padding:1px 3px;font-size:7px}
+  .sp-preset-btn{padding:8px 11px;font-size:9px;min-height:36px}
+  .sp-mini-btn{padding:6px 9px;font-size:9px;min-height:32px}
+  .sp-knob{width:40px;height:40px}
+  .sp-knob-wrap{min-width:52px}
+  .sp-knob-label{font-size:7.5px}
+  .sp-drawbar{width:34px}
+  .sp-drawbar-track{height:88px}
+  .sp-piano{height:82px}
+  .sp-inst-chip{padding:8px 10px;font-size:10px;min-height:36px}
+  .sp-bass-step{min-height:48px;padding:3px 2px}
+  /* Modal fits viewport */
+  .modal-box{max-width:calc(100vw - 16px);max-height:calc(100vh - 60px);overflow-y:auto}
+  /* Input fields taller for comfortable typing */
+  input[type="text"],input[type="number"],input[type="url"],select,textarea,
+  .url-input,.search-input,.sort-select,.filter-select{min-height:36px;font-size:12px}
+}
+
+@media(max-width:360px){
+  /* Tiny phone — still 4-channel mixer, minimal sizing */
+  .channels{grid-template-columns:repeat(4,1fr)!important;gap:2px!important}
+  .channel .fader-wrap{width:18px;height:92px}
+  .channel .vu-meter{width:8px;height:92px}
+  .channel .knob,.channel .knob.small{width:24px;height:24px}
+  .channel .knob-label{font-size:7px}
+  .tab-btn{min-width:72px;padding:9px 10px;font-size:10px}
+  .sp-seq-grid{grid-template-columns:46px repeat(16,1fr);gap:1px}
+  .sp-seq-label{font-size:8px;padding:0 2px}
+  .sp-knob{width:36px;height:36px}
+}
+
+/* Pointer: coarse (touch) — enforce larger tap targets & disable hover FX */
+@media (hover:none) and (pointer:coarse){
+  button,.tool-btn,.tab-btn,.big-btn,.loop-btn,.jump-btn,.util-btn,
+  .scene-btn,.pad-mode-btn,.tempo-btn,.beat-btn,.cue-btn,.mic-btn,
+  .automix-btn,.sp-preset-btn,.sp-mini-btn,.sp-inst-chip,.sp-wave-btn,
+  .studio-preset-btn,.dsb-btn{
+    -webkit-tap-highlight-color:transparent;
+  }
+  .knob,.sp-knob,.sp-drawbar-track,.fader-handle,.crossfader-handle,
+  .tempo-handle,.jog-platter,.sp-key{touch-action:none}
+  .library-list,.playlist-grid,.sessions-grid,.history-list,
+  .tab-content,.main-tabs,.sp-preset-row{
+    -webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+  }
+  /* Make sure text inputs don't trigger iOS zoom */
+  input[type="text"],input[type="number"],input[type="url"],input[type="search"],
+  select,textarea{font-size:16px!important}
+}
+
+/* Portrait lock guidance for very narrow — keep mixer usable */
+@media(max-width:480px) and (orientation:portrait){
+  .mixer{padding:6px;gap:6px}
+  .master-section,.isolator-panel{grid-template-columns:repeat(3,1fr);gap:3px;padding:4px}
+  .mic-section{grid-template-columns:repeat(4,1fr);gap:3px;padding:4px}
+  .crossfader-section{padding:6px}
+  .color-fx-row,.color-fx-grid{padding:4px;gap:3px}
+}
 </style>
 </head>
 <body>
@@ -3576,6 +3795,7 @@ body.work-mode .dsb-wmexit{display:inline-flex;background:linear-gradient(180deg
 <button class="tab-btn" data-tab="analytics" data-t="tab_analytics">📊 ANALYTICS</button>
 <button class="tab-btn" data-tab="midi" data-t="tab_midi">🎹 MIDI</button>
 <button class="tab-btn" data-tab="studio" data-t="tab_studio">🎚 STUDIO</button>
+<button class="tab-btn" data-tab="studiopro" data-t="tab_studiopro">🎹 STUDIO PRO</button>
 <button class="tab-btn" data-tab="editor" data-t="tab_editor">✂ EDITOR</button>
 <button class="tab-btn admin-only" data-tab="admin" id="adminTabBtn" style="display:none">🛡 ADMIN</button>
 <button class="tab-btn" data-tab="settings" data-t="tab_settings">⚙ SETTINGS</button>
@@ -3999,6 +4219,241 @@ No MIDI devices. Press CONNECT.
 <div class="studio-spectrum-wrap">
 <div class="studio-sub-label">REAL-TIME SPECTRUM</div>
 <canvas class="studio-spectrum" id="studioSpectrum" width="1200" height="80"></canvas>
+</div>
+</div>
+</div>
+
+<div class="tab-content" id="tab-studiopro">
+<div class="settings-panel sp-panel" style="max-width:1600px;">
+<div class="library-header" style="padding-bottom:8px;">
+<div class="library-title">🎹 STUDIO PRO — HOUSE · TECHNO · TRANCE PRODUCTION</div>
+<div class="library-actions sp-transport">
+<button class="tool-btn" id="spPlayBtn">▶ PLAY</button>
+<button class="tool-btn" id="spStopBtn">⏹ STOP</button>
+<span class="sp-sub-label" style="margin:0 4px 0 6px">BPM</span>
+<input type="number" id="spBpm" value="128" min="60" max="200" style="width:66px;padding:5px 6px;background:#0a0a0c;color:#ff8a1a;border:1px solid #2a2a30;border-radius:5px;font-family:'Share Tech Mono',monospace;text-align:center;"/>
+<span class="sp-sub-label" style="margin:0 4px 0 8px">SWING</span>
+<input type="range" id="spSwing" min="0" max="50" value="0" style="width:90px"/>
+<span class="sp-sub-label" id="spSwingVal" style="margin:0 4px;min-width:28px">0%</span>
+<button class="tool-btn" id="spRecBtn" title="Record to library">● REC</button>
+<span id="spStepIndicator" style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:1.5px;margin-left:6px;">— / 16</span>
+</div>
+</div>
+
+<!-- Genre/preset templates -->
+<div class="sp-presets">
+<div class="sp-sub-label">INSTRUMENT PRESET</div>
+<div class="sp-preset-row" id="spPresetRow">
+<button class="sp-preset-btn" data-sp-preset="house-piano">HOUSE PIANO</button>
+<button class="sp-preset-btn" data-sp-preset="trance-supersaw">TRANCE SUPERSAW</button>
+<button class="sp-preset-btn" data-sp-preset="techno-reese">TECHNO REESE</button>
+<button class="sp-preset-btn" data-sp-preset="deep-pluck">DEEP PLUCK</button>
+<button class="sp-preset-btn" data-sp-preset="warm-pad">WARM PAD</button>
+<button class="sp-preset-btn" data-sp-preset="acid-303">ACID 303</button>
+<button class="sp-preset-btn" data-sp-preset="hammond">HAMMOND JAZZ</button>
+<button class="sp-preset-btn" data-sp-preset="church-organ">CHURCH ORGAN</button>
+<button class="sp-preset-btn" data-sp-preset="fm-bell">FM BELL</button>
+<button class="sp-preset-btn" data-sp-preset="tech-stab">TECH STAB</button>
+</div>
+</div>
+
+<!-- DRUM MACHINE -->
+<div class="sp-block">
+<div class="sp-block-title"><span class="sp-led"></span>🥁 DRUM MACHINE — 16 STEP</div>
+<div class="sp-row" style="margin-bottom:8px">
+<span class="sp-sub-label">PATTERN</span>
+<button class="sp-mini-btn" data-sp-drum-preset="house">HOUSE 4/4</button>
+<button class="sp-mini-btn" data-sp-drum-preset="techno">TECHNO</button>
+<button class="sp-mini-btn" data-sp-drum-preset="trance">TRANCE</button>
+<button class="sp-mini-btn" data-sp-drum-preset="tech-house">TECH HOUSE</button>
+<button class="sp-mini-btn" data-sp-drum-preset="deep-house">DEEP HOUSE</button>
+<button class="sp-mini-btn" data-sp-drum-preset="minimal">MINIMAL</button>
+<button class="sp-mini-btn" data-sp-drum-preset="clear">CLEAR</button>
+</div>
+<div class="sp-seq-grid" id="spDrumGrid"></div>
+</div>
+
+<!-- INSTRUMENT TABS -->
+<div class="sp-inst-row">
+<button class="sp-inst-chip active" data-sp-inst="synth">🎛 SYNTHESIZER</button>
+<button class="sp-inst-chip" data-sp-inst="organ">🎹 HAMMOND ORGAN</button>
+<button class="sp-inst-chip" data-sp-inst="bass">🐍 TB-303 ACID BASS</button>
+</div>
+
+<!-- SYNTH PANEL -->
+<div id="spInstSynth">
+<div class="sp-synth-grid">
+<div class="sp-block">
+<div class="sp-block-title">🎛 OSCILLATORS</div>
+<div class="sp-row" style="margin-bottom:6px">
+<span class="sp-sub-label" style="min-width:32px">OSC 1</span>
+<div class="sp-osc-wave" data-sp-osc="1">
+<button class="sp-wave-btn active" data-sp-wave="sawtooth">≢</button>
+<button class="sp-wave-btn" data-sp-wave="square">▭</button>
+<button class="sp-wave-btn" data-sp-wave="triangle">△</button>
+<button class="sp-wave-btn" data-sp-wave="sine">∿</button>
+</div>
+</div>
+<div class="sp-row" style="margin-bottom:6px">
+<span class="sp-sub-label" style="min-width:32px">OSC 2</span>
+<div class="sp-osc-wave" data-sp-osc="2">
+<button class="sp-wave-btn" data-sp-wave="sawtooth">≢</button>
+<button class="sp-wave-btn active" data-sp-wave="square">▭</button>
+<button class="sp-wave-btn" data-sp-wave="triangle">△</button>
+<button class="sp-wave-btn" data-sp-wave="sine">∿</button>
+</div>
+</div>
+<div class="sp-knobs">
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="osc2Detune"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">OSC2 DET</span><span class="sp-knob-val" data-sp-val="osc2Detune">0</span></div>
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="osc2Octave"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">OSC2 OCT</span><span class="sp-knob-val" data-sp-val="osc2Octave">0</span></div>
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="oscMix"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">MIX</span><span class="sp-knob-val" data-sp-val="oscMix">50</span></div>
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="subLevel"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">SUB</span><span class="sp-knob-val" data-sp-val="subLevel">0</span></div>
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="unison"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">UNISON</span><span class="sp-knob-val" data-sp-val="unison">1</span></div>
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="unisonDetune"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">SPREAD</span><span class="sp-knob-val" data-sp-val="unisonDetune">10</span></div>
+</div>
+</div>
+
+<div class="sp-block">
+<div class="sp-block-title">🌊 FILTER</div>
+<div class="sp-row" style="margin-bottom:6px">
+<span class="sp-sub-label" style="min-width:32px">TYPE</span>
+<div class="sp-osc-wave" data-sp-filter-type>
+<button class="sp-wave-btn active" data-sp-filter="lowpass">LP</button>
+<button class="sp-wave-btn" data-sp-filter="highpass">HP</button>
+<button class="sp-wave-btn" data-sp-filter="bandpass">BP</button>
+</div>
+</div>
+<div class="sp-knobs">
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="filterCutoff"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">CUTOFF</span><span class="sp-knob-val" data-sp-val="filterCutoff">8k</span></div>
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="filterRes"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">RESO</span><span class="sp-knob-val" data-sp-val="filterRes">1</span></div>
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="filterEnv"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">ENV AMT</span><span class="sp-knob-val" data-sp-val="filterEnv">0</span></div>
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="filterDecay"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">ENV DEC</span><span class="sp-knob-val" data-sp-val="filterDecay">200</span></div>
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="drive"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">DRIVE</span><span class="sp-knob-val" data-sp-val="drive">0</span></div>
+</div>
+</div>
+
+<div class="sp-block">
+<div class="sp-block-title">⚡ AMP ENVELOPE</div>
+<div class="sp-knobs">
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="ampA"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">ATTACK</span><span class="sp-knob-val" data-sp-val="ampA">5</span></div>
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="ampD"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">DECAY</span><span class="sp-knob-val" data-sp-val="ampD">150</span></div>
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="ampS"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">SUSTAIN</span><span class="sp-knob-val" data-sp-val="ampS">70</span></div>
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="ampR"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">RELEASE</span><span class="sp-knob-val" data-sp-val="ampR">300</span></div>
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="glide"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">GLIDE</span><span class="sp-knob-val" data-sp-val="glide">0</span></div>
+</div>
+</div>
+
+<div class="sp-block">
+<div class="sp-block-title">〰 LFO · MOD</div>
+<div class="sp-row" style="margin-bottom:6px">
+<span class="sp-sub-label" style="min-width:32px">TARGET</span>
+<div class="sp-osc-wave" data-sp-lfo-target>
+<button class="sp-wave-btn active" data-sp-lfo="none">OFF</button>
+<button class="sp-wave-btn" data-sp-lfo="filter">FIL</button>
+<button class="sp-wave-btn" data-sp-lfo="pitch">PIT</button>
+<button class="sp-wave-btn" data-sp-lfo="amp">AMP</button>
+</div>
+</div>
+<div class="sp-knobs">
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="lfoRate"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">RATE</span><span class="sp-knob-val" data-sp-val="lfoRate">4</span></div>
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="lfoDepth"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">DEPTH</span><span class="sp-knob-val" data-sp-val="lfoDepth">30</span></div>
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="chorusMix"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">CHORUS</span><span class="sp-knob-val" data-sp-val="chorusMix">0</span></div>
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="delaySend"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">DLY SND</span><span class="sp-knob-val" data-sp-val="delaySend">0</span></div>
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="reverbSend"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">RVB SND</span><span class="sp-knob-val" data-sp-val="reverbSend">20</span></div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ORGAN PANEL -->
+<div id="spInstOrgan" style="display:none">
+<div class="sp-block">
+<div class="sp-block-title">🎹 HAMMOND B-3 DRAWBARS</div>
+<div class="sp-drawbars" id="spDrawbars"></div>
+<div class="sp-row" style="margin-top:10px;justify-content:center;">
+<div class="sp-knobs">
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="organPerc"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">PERC</span><span class="sp-knob-val" data-sp-val="organPerc">0</span></div>
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="organPercTone"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">PRC TONE</span><span class="sp-knob-val" data-sp-val="organPercTone">0</span></div>
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="organPercDec"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">PRC DEC</span><span class="sp-knob-val" data-sp-val="organPercDec">200</span></div>
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="organLeslie"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">LESLIE</span><span class="sp-knob-val" data-sp-val="organLeslie">0</span></div>
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="organLeslieRate"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">LES RATE</span><span class="sp-knob-val" data-sp-val="organLeslieRate">6</span></div>
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="organDrive"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">OVERDRV</span><span class="sp-knob-val" data-sp-val="organDrive">0</span></div>
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="organVol"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">VOLUME</span><span class="sp-knob-val" data-sp-val="organVol">70</span></div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- TB-303 BASS PANEL -->
+<div id="spInstBass" style="display:none">
+<div class="sp-block">
+<div class="sp-block-title">🐍 TB-303 ACID BASS — 16 STEP SEQUENCER</div>
+<div class="sp-row" style="margin-bottom:8px">
+<span class="sp-sub-label">PATTERN</span>
+<button class="sp-mini-btn" data-sp-bass-preset="classic-acid">CLASSIC ACID</button>
+<button class="sp-mini-btn" data-sp-bass-preset="trance-bass">TRANCE BASS</button>
+<button class="sp-mini-btn" data-sp-bass-preset="tech-riff">TECH RIFF</button>
+<button class="sp-mini-btn" data-sp-bass-preset="deep-bass">DEEP BASS</button>
+<button class="sp-mini-btn" data-sp-bass-preset="clear">CLEAR</button>
+</div>
+<div class="sp-bass-seq-row" id="spBassSeq"></div>
+<div class="sp-knobs" style="margin-top:10px">
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="bassCutoff"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">CUTOFF</span><span class="sp-knob-val" data-sp-val="bassCutoff">900</span></div>
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="bassRes"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">RESO</span><span class="sp-knob-val" data-sp-val="bassRes">15</span></div>
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="bassEnv"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">ENV MOD</span><span class="sp-knob-val" data-sp-val="bassEnv">70</span></div>
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="bassDecay"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">DECAY</span><span class="sp-knob-val" data-sp-val="bassDecay">250</span></div>
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="bassAccent"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">ACCENT</span><span class="sp-knob-val" data-sp-val="bassAccent">60</span></div>
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="bassDrive"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">DRIVE</span><span class="sp-knob-val" data-sp-val="bassDrive">30</span></div>
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="bassWave"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">WAVE</span><span class="sp-knob-val" data-sp-val="bassWave">SAW</span></div>
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="bassVol"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">VOLUME</span><span class="sp-knob-val" data-sp-val="bassVol">80</span></div>
+</div>
+</div>
+</div>
+
+<!-- MASTER BUS -->
+<div class="sp-master">
+<div class="sp-master-block">
+<div class="sp-master-title">⏱ DELAY</div>
+<div class="sp-knobs">
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="delayTime"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">TIME</span><span class="sp-knob-val" data-sp-val="delayTime">3/16</span></div>
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="delayFb"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">FEEDBACK</span><span class="sp-knob-val" data-sp-val="delayFb">35</span></div>
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="delayMix"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">MIX</span><span class="sp-knob-val" data-sp-val="delayMix">30</span></div>
+</div>
+</div>
+<div class="sp-master-block">
+<div class="sp-master-title">💧 REVERB</div>
+<div class="sp-knobs">
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="reverbSize"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">SIZE</span><span class="sp-knob-val" data-sp-val="reverbSize">60</span></div>
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="reverbDamp"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">DAMP</span><span class="sp-knob-val" data-sp-val="reverbDamp">50</span></div>
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="reverbMix"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">MIX</span><span class="sp-knob-val" data-sp-val="reverbMix">30</span></div>
+</div>
+</div>
+<div class="sp-master-block">
+<div class="sp-master-title">🎚 MIX &amp; DRIVE</div>
+<div class="sp-knobs">
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="masterDrive"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">DRIVE</span><span class="sp-knob-val" data-sp-val="masterDrive">0</span></div>
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="drumVol"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">DRUMS</span><span class="sp-knob-val" data-sp-val="drumVol">85</span></div>
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="synthVol"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">SYNTH</span><span class="sp-knob-val" data-sp-val="synthVol">75</span></div>
+<div class="sp-knob-wrap"><div class="sp-knob" data-sp-knob="masterVol"><div class="sp-knob-indicator"></div></div><span class="sp-knob-label">MASTER</span><span class="sp-knob-val" data-sp-val="masterVol">85</span></div>
+</div>
+</div>
+</div>
+
+<!-- PIANO KEYBOARD -->
+<div class="sp-piano-wrap">
+<div class="sp-row" style="margin-bottom:8px;justify-content:space-between;">
+<div style="display:flex;gap:6px;align-items:center">
+<span class="sp-sub-label">OCTAVE</span>
+<button class="sp-mini-btn" id="spOctaveDown">−</button>
+<span id="spOctaveVal" style="font-family:'Share Tech Mono',monospace;font-size:12px;color:#ff8a1a;letter-spacing:1.5px;min-width:20px;text-align:center">4</span>
+<button class="sp-mini-btn" id="spOctaveUp">+</button>
+</div>
+<div style="display:flex;gap:6px;align-items:center">
+<span class="sp-sub-label">KEY BINDINGS</span>
+<span style="font-family:'Share Tech Mono',monospace;font-size:9px;color:#666">Z S X D C V G B H N J M (white/black) — Q-U upper octave</span>
+</div>
+</div>
+<div class="sp-piano" id="spPiano"></div>
 </div>
 </div>
 </div>
