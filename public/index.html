@@ -2989,14 +2989,47 @@ body.theme-light .seq-step.on{color:#fff}
 
 /* ============================================================
    GOLD THEME — 'Vertex Luxury' premium metallic gold mixer
-   Inspired by high-end boutique mixers (Vestax, Omnitronic Gold,
-   Pioneer DJM-A9 gold edition). Deep obsidian + champagne gold.
+   Photorealistic 24k brushed gold + obsidian. Multi-stop gradients
+   simulate anisotropic metal reflection; layered shines produce
+   real specular highlights, not flat yellow.
    ============================================================ */
+:root{
+  --g-shadow:#3d2a0a;
+  --g-dark:#6b4a14;
+  --g-mid:#b8870e;
+  --g-rich:#d4a43a;
+  --g-bright:#f1c752;
+  --g-high:#ffe28a;
+  --g-spec:#fff4c2;
+  --g-white:#fffbe6;
+  --g-ink:#1a1208;
+  --g-void:#070503;
+  --g-bg:#14100a;
+  --g-panel:#1a1510;
+  --g-line:#5a4116;
+}
+/* Master gold fill — used everywhere a metallic surface appears */
+body.theme-gold{
+  --gold-metal:linear-gradient(180deg,
+    #6b4a14 0%,
+    #9a6d1f 8%,
+    #d4a43a 18%,
+    #ffe28a 26%,
+    #fff4c2 32%,
+    #ffe28a 40%,
+    #d4a43a 52%,
+    #b8870e 66%,
+    #8b6317 82%,
+    #4d340d 100%);
+  --gold-brushed:
+    repeating-linear-gradient(90deg,rgba(255,244,194,.08) 0px,rgba(255,244,194,.08) 1px,transparent 1px,transparent 2px),
+    repeating-linear-gradient(90deg,rgba(0,0,0,.05) 0px,rgba(0,0,0,.05) 1px,transparent 1px,transparent 3px);
+}
 body.theme-gold,body.theme-gold html{
   background:
-    radial-gradient(ellipse at 20% 0%,rgba(232,196,99,.14) 0%,transparent 45%),
-    radial-gradient(ellipse at 80% 100%,rgba(184,134,11,.10) 0%,transparent 45%),
-    radial-gradient(ellipse at center,#17120c 0%,#0a0806 70%);
+    radial-gradient(ellipse at 18% 0%,rgba(255,226,138,.18) 0%,transparent 40%),
+    radial-gradient(ellipse at 82% 100%,rgba(184,135,14,.14) 0%,transparent 42%),
+    radial-gradient(ellipse at center,#1c1508 0%,#070503 72%);
 }
 body.theme-gold::after{background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.6) 100%)}
 body.theme-gold ::-webkit-scrollbar-track{background:#120e08}
@@ -3016,16 +3049,26 @@ body.theme-gold .ai-dj-panel,body.theme-gold .analytics-panel,body.theme-gold .m
 body.theme-gold .settings-panel,body.theme-gold .beat-fx-panel,body.theme-gold .scene-fx-panel,
 body.theme-gold .deck-switch-bar,body.theme-gold .mixer-toolbar{
   background:
-    linear-gradient(180deg,rgba(255,240,168,.04) 0%,rgba(255,255,255,0) 14%,rgba(0,0,0,.35) 100%),
-    repeating-linear-gradient(135deg,rgba(232,196,99,.025) 0px,rgba(232,196,99,.025) 1px,transparent 1px,transparent 3px),
-    linear-gradient(180deg,#26200f 0%,#120e08 100%);
-  border:1px solid #6b4f1e;
+    /* top gold bezel highlight */
+    linear-gradient(180deg,
+      rgba(255,244,194,.35) 0%,
+      rgba(255,226,138,.12) 2px,
+      transparent 6px,
+      transparent calc(100% - 6px),
+      rgba(77,52,13,.55) 100%),
+    /* subtle brushed-metal horizontal grain */
+    repeating-linear-gradient(90deg,rgba(255,244,194,.03) 0px,rgba(255,244,194,.03) 1px,rgba(0,0,0,.04) 1px,rgba(0,0,0,.04) 2px),
+    /* warm panel fill */
+    linear-gradient(180deg,#2e2411 0%,#1a1409 48%,#0f0b05 100%);
+  border:1px solid #8b6317;
+  border-top-color:#ffe28a;
   box-shadow:
-    inset 0 1px 0 rgba(255,240,168,.25),
-    inset 0 -1px 0 rgba(0,0,0,.5),
-    0 2px 0 rgba(0,0,0,.35),
-    0 18px 40px -10px rgba(0,0,0,.8),
-    0 0 24px rgba(232,196,99,.08);
+    inset 0 1px 0 rgba(255,244,194,.55),
+    inset 0 -1px 0 rgba(255,226,138,.2),
+    inset 0 0 0 1px rgba(0,0,0,.5),
+    0 2px 0 rgba(0,0,0,.55),
+    0 18px 40px -10px rgba(0,0,0,.85),
+    0 0 32px rgba(212,164,58,.12);
 }
 
 /* Tabs */
@@ -3044,21 +3087,75 @@ body.theme-gold .master-bpm{background:#000;border:1px solid #6b4f1e;color:#fff0
 body.theme-gold .jog-center-screen .bpm-display{color:#fff0a8;text-shadow:0 0 10px rgba(255,215,100,.8)}
 body.theme-gold .jog-center-screen .bpm-sub,body.theme-gold .jog-center-screen .deck-badge{color:#e8c463}
 
-/* Deck headers */
-body.theme-gold .deck-number{background:linear-gradient(180deg,#fff0a8 0%,#e8c463 45%,#8b6914 100%);color:#1a1410;box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 2px 6px rgba(0,0,0,.6),0 0 10px rgba(232,196,99,.4)}
+/* Deck number — cast 24k plate */
+body.theme-gold .deck-number{
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.55) 0%,transparent 14%,transparent 50%,rgba(0,0,0,.35) 100%),
+    linear-gradient(180deg,#fff4c2 0%,#ffe28a 18%,#d4a43a 42%,#b8870e 66%,#6b4a14 100%);
+  color:#1a1208;
+  text-shadow:0 1px 0 rgba(255,255,255,.6),0 -1px 0 rgba(0,0,0,.25);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.85),
+    inset 0 -1px 0 rgba(77,52,13,.5),
+    0 2px 6px rgba(0,0,0,.6),
+    0 0 14px rgba(255,215,100,.45)
+}
 body.theme-gold .deck-label{color:#f3e3b0}
-body.theme-gold .deck-label .model{color:#e8c463}
+body.theme-gold .deck-label .model{color:#ffe28a;text-shadow:0 0 10px rgba(255,226,138,.4)}
 
-/* Jog wheels — polished gold platter */
-body.theme-gold .jog-outer{background:radial-gradient(circle,#2a2112 0%,#0a0806 100%);border:2px solid #6b4f1e;box-shadow:inset 0 2px 8px rgba(0,0,0,.8),0 4px 12px rgba(0,0,0,.6)}
-body.theme-gold .jog-platter{background:radial-gradient(circle,#3a2e1a 0%,#16110a 70%,#0a0806 100%);box-shadow:inset 0 0 30px rgba(0,0,0,.8),inset 0 2px 4px rgba(255,240,168,.12)}
-body.theme-gold .jog-platter-disc{background:repeating-radial-gradient(circle,rgba(255,240,168,.06) 0px,rgba(255,240,168,.06) 1px,transparent 1px,transparent 3px),radial-gradient(circle,#6b4f1e 0%,#2a1f10 100%)}
-body.theme-gold .jog-indicator{background:linear-gradient(180deg,#fff0a8 0%,#e8c463 60%,#8b6914 100%);box-shadow:0 0 6px rgba(0,0,0,.6),0 0 14px rgba(255,215,100,.9)}
+/* Jog wheels — 24k rim + dark brushed platter with anisotropic sheen */
+body.theme-gold .jog-outer{
+  background:
+    radial-gradient(circle at 50% 5%,rgba(255,244,194,.3) 0%,transparent 22%),
+    radial-gradient(circle at 50% 95%,rgba(107,74,20,.65) 0%,transparent 28%),
+    conic-gradient(from 0deg,
+      #6b4a14 0deg,#9a6d1f 20deg,#d4a43a 50deg,#fff4c2 90deg,
+      #ffe28a 130deg,#b8870e 180deg,#8b6317 230deg,
+      #ffe28a 275deg,#d4a43a 320deg,#6b4a14 360deg);
+  border:2px solid #2a1f0a;
+  box-shadow:
+    inset 0 0 0 2px rgba(255,244,194,.4),
+    inset 0 0 0 3px rgba(0,0,0,.65),
+    inset 0 2px 10px rgba(0,0,0,.75),
+    0 4px 16px rgba(0,0,0,.75),
+    0 0 26px rgba(212,164,58,.28)
+}
+body.theme-gold .jog-platter{
+  background:
+    radial-gradient(circle at 50% 18%,rgba(255,244,194,.18) 0%,transparent 32%),
+    radial-gradient(circle,#2e220f 0%,#120c06 70%,#070503 100%);
+  box-shadow:inset 0 0 42px rgba(0,0,0,.92),inset 0 2px 6px rgba(255,226,138,.1)
+}
+body.theme-gold .jog-platter-disc{
+  background:
+    repeating-radial-gradient(circle,rgba(255,244,194,.09) 0px,rgba(255,244,194,.09) 1px,transparent 1px,transparent 4px),
+    repeating-conic-gradient(from 0deg at 50% 50%,rgba(255,244,194,.04) 0deg,transparent 2deg,transparent 4deg),
+    radial-gradient(circle at 40% 35%,#8b6317 0%,#3d2a0a 60%,#1a1208 100%)
+}
+body.theme-gold .jog-indicator{
+  background:linear-gradient(180deg,#fffbe6 0%,#ffe28a 40%,#d4a43a 75%,#6b4a14 100%);
+  box-shadow:0 0 8px rgba(0,0,0,.8),0 0 20px rgba(255,226,138,1),0 0 4px rgba(255,255,255,.9)
+}
 
-/* Knobs — champagne gold */
-body.theme-gold .knob{background:radial-gradient(circle at 40% 30%,#fff0a8 0%,#e8c463 25%,#8b6914 70%,#4a3510 100%);border:1px solid #2a1f10;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -2px 4px rgba(0,0,0,.7),0 3px 6px rgba(0,0,0,.7),0 0 10px rgba(232,196,99,.18)}
-body.theme-gold .knob-indicator{background:linear-gradient(180deg,#fff0a8 0%,#fff 60%,#e8c463 100%);box-shadow:0 0 4px rgba(0,0,0,.6),0 0 6px rgba(255,215,100,.6)}
-body.theme-gold .knob-label{color:#c9a85a;font-weight:700;letter-spacing:1.5px}
+/* Knobs — cast-metal dome with top specular highlight */
+body.theme-gold .knob{
+  background:
+    radial-gradient(ellipse 60% 30% at 45% 18%,rgba(255,255,255,.92) 0%,rgba(255,244,194,.45) 28%,transparent 58%),
+    radial-gradient(circle at 50% 108%,rgba(0,0,0,.85) 0%,transparent 48%),
+    radial-gradient(circle at 40% 35%,#fffbe6 0%,#ffe28a 14%,#f1c752 30%,#d4a43a 50%,#b8870e 70%,#6b4a14 88%,#3d2a0a 100%);
+  border:1px solid #2a1f0a;
+  box-shadow:
+    inset 0 2px 1px rgba(255,255,255,.6),
+    inset 0 -3px 7px rgba(77,52,13,.9),
+    0 3px 7px rgba(0,0,0,.85),
+    0 0 16px rgba(212,164,58,.28),
+    0 1px 0 rgba(255,244,194,.15)
+}
+body.theme-gold .knob-indicator{
+  background:linear-gradient(180deg,#fffbe6 0%,#fff 35%,#ffe28a 75%,#d4a43a 100%);
+  box-shadow:0 0 4px rgba(0,0,0,.8),0 0 10px rgba(255,226,138,.9),inset 0 1px 0 rgba(255,255,255,.9)
+}
+body.theme-gold .knob-label{color:#b8870e;font-weight:800;letter-spacing:2px;text-shadow:0 1px 0 rgba(0,0,0,.7),0 0 8px rgba(212,164,58,.3)}
 
 /* VU meters — gold LEDs */
 body.theme-gold .vu-meter{background:#000;border:1px solid #6b4f1e;box-shadow:inset 0 0 6px rgba(0,0,0,.9),0 0 4px rgba(232,196,99,.12)}
@@ -3068,8 +3165,14 @@ body.theme-gold .vu-led.on.yellow{background:linear-gradient(90deg,#c8a400,#ffed
 body.theme-gold .vu-led.on.red{background:linear-gradient(90deg,#c83c3c,#ff6b4a);box-shadow:0 0 7px rgba(255,107,74,.95),inset 0 0 2px rgba(255,255,255,.35)}
 
 /* Faders */
-body.theme-gold .fader-wrap,body.theme-gold .crossfader-track,body.theme-gold .tempo-slider{background:linear-gradient(180deg,#0a0806 0%,#1a1410 100%);border:1px solid #6b4f1e;box-shadow:inset 0 2px 5px rgba(0,0,0,.8)}
-body.theme-gold .fader-handle,body.theme-gold .tempo-handle,body.theme-gold .crossfader-handle{background:linear-gradient(180deg,#fff0a8 0%,#e8c463 45%,#8b6914 100%);border:1px solid #2a1f10;box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 3px 6px rgba(0,0,0,.8),0 0 10px rgba(232,196,99,.3)}
+body.theme-gold .fader-wrap,body.theme-gold .crossfader-track,body.theme-gold .tempo-slider{background:linear-gradient(180deg,#070503 0%,#1a1208 100%);border:1px solid #6b4a14;box-shadow:inset 0 2px 6px rgba(0,0,0,.92),inset 0 0 0 1px rgba(255,244,194,.08)}
+body.theme-gold .fader-handle,body.theme-gold .tempo-handle,body.theme-gold .crossfader-handle{
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.6) 0%,transparent 18%,transparent 82%,rgba(0,0,0,.4) 100%),
+    linear-gradient(180deg,#fffbe6 0%,#ffe28a 22%,#d4a43a 48%,#b8870e 72%,#6b4a14 100%);
+  border:1px solid #2a1f0a;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.7),inset 0 -1px 0 rgba(77,52,13,.6),0 3px 8px rgba(0,0,0,.88),0 0 14px rgba(212,164,58,.35)
+}
 
 /* All buttons — brushed gold */
 body.theme-gold .big-btn,body.theme-gold .loop-btn,body.theme-gold .jump-btn,body.theme-gold .util-btn,
@@ -3079,11 +3182,19 @@ body.theme-gold .cue-btn,body.theme-gold .compact-btn,body.theme-gold .cue-hp-bt
 body.theme-gold .automix-btn,body.theme-gold .dsb-btn,body.theme-gold .search-src-btn,
 body.theme-gold .studio-preset-btn,body.theme-gold .tool-btn,body.theme-gold .assign-btn,
 body.theme-gold .curve-btn,body.theme-gold .ai-dj-btn{
-  background:linear-gradient(180deg,#2a2112 0%,#120e08 100%);
-  border:1px solid #6b4f1e;
-  color:#e8c463;
-  box-shadow:inset 0 1px 0 rgba(255,240,168,.15),inset 0 -2px 3px rgba(0,0,0,.7),0 2px 5px rgba(0,0,0,.6);
-  text-shadow:0 1px 0 rgba(0,0,0,.6)
+  background:
+    linear-gradient(180deg,rgba(255,244,194,.12) 0%,transparent 35%,rgba(0,0,0,.3) 100%),
+    repeating-linear-gradient(90deg,rgba(255,244,194,.03) 0px,rgba(255,244,194,.03) 1px,rgba(0,0,0,.05) 1px,rgba(0,0,0,.05) 2px),
+    linear-gradient(180deg,#2a2012 0%,#14100a 55%,#0a0704 100%);
+  border:1px solid #6b4a14;
+  border-top-color:rgba(255,226,138,.4);
+  color:#ffe28a;
+  box-shadow:
+    inset 0 1px 0 rgba(255,244,194,.35),
+    inset 0 -1px 0 rgba(255,226,138,.08),
+    inset 0 -2px 4px rgba(0,0,0,.75),
+    0 2px 5px rgba(0,0,0,.7);
+  text-shadow:0 1px 0 rgba(0,0,0,.85),0 0 6px rgba(255,226,138,.15)
 }
 body.theme-gold .big-btn:hover,body.theme-gold .loop-btn:hover,body.theme-gold .jump-btn:hover,
 body.theme-gold .util-btn:hover,body.theme-gold .beat-btn:hover,body.theme-gold .scene-btn:hover,
@@ -3203,6 +3314,244 @@ body.theme-gold .deck-header .deck-upload-btn:hover{background:linear-gradient(1
 /* RGB ambient adapt */
 body.theme-gold .rgb-ambient{background:linear-gradient(90deg,#8b6914 0%,#e8c463 20%,#fff0a8 50%,#e8c463 80%,#8b6914 100%);box-shadow:0 0 20px rgba(232,196,99,.6)}
 
+/* ============================================================
+   PRO THEME — 'Graphite + Red' classic two-color professional
+   Inspired by Pioneer DJM/CDJ Nexus, Allen & Heath Xone, Denon
+   Prime 4 — matte graphite body + signal red accents only.
+   ============================================================ */
+body.theme-pro{
+  --orange:#ff2e3a;        /* red accent */
+  --orange-glow:#ff5e65;
+  --cue-orange:#ff2e3a;
+  --play-green:#ff2e3a;    /* PLAY lights red too */
+  --screen-glow:#ff4555;
+  --yellow:#ff2e3a;
+  --red:#ff2e3a;
+  --purple:#ff2e3a;
+  --pink:#ff2e3a;
+  --text:#ededf0;
+  --text-dim:#8a8a92;
+  --bg:#0c0c0f;
+  --deck-bg:#18181c;
+  --deck-panel:#1e1e22;
+  --deck-border:#2c2c32;
+}
+body.theme-pro,body.theme-pro html{
+  background:
+    radial-gradient(ellipse at 18% 0%,rgba(255,46,58,.08) 0%,transparent 40%),
+    radial-gradient(ellipse at 82% 100%,rgba(255,46,58,.06) 0%,transparent 40%),
+    radial-gradient(ellipse at center,#1a1a1e 0%,#0a0a0c 72%);
+}
+body.theme-pro::after{background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.55) 100%)}
+body.theme-pro ::-webkit-scrollbar-track{background:#141418}
+body.theme-pro ::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#ff2e3a,#8a0e16);border:1px solid #2c2c32}
+
+/* Header */
+body.theme-pro .header-bar{color:#ededf0}
+body.theme-pro .brand{color:#ededf0;text-shadow:0 1px 0 rgba(0,0,0,.9),0 0 20px rgba(255,46,58,.3)}
+body.theme-pro .brand .max{background:linear-gradient(180deg,#ff5e65 0%,#ff2e3a 45%,#8a0e16 100%);color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 1px 2px rgba(0,0,0,.5),0 0 16px rgba(255,46,58,.5)}
+body.theme-pro .header-right{color:#8a8a92}
+body.theme-pro .power-led{background:radial-gradient(circle,#ff5e65,#ff2e3a);box-shadow:0 0 8px rgba(255,46,58,.9)}
+
+/* Panels — brushed graphite */
+body.theme-pro .cdj,body.theme-pro .mixer,body.theme-pro .library,
+body.theme-pro .sampler-panel,body.theme-pro .youtube-panel,body.theme-pro .playlists-panel,
+body.theme-pro .ai-dj-panel,body.theme-pro .analytics-panel,body.theme-pro .midi-panel,
+body.theme-pro .settings-panel,body.theme-pro .beat-fx-panel,body.theme-pro .scene-fx-panel,
+body.theme-pro .deck-switch-bar,body.theme-pro .mixer-toolbar{
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.05) 0%,transparent 10%,rgba(0,0,0,.35) 100%),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.015) 0px,rgba(255,255,255,.015) 1px,rgba(0,0,0,.03) 1px,rgba(0,0,0,.03) 2px),
+    linear-gradient(180deg,#26262c 0%,#16161a 48%,#0c0c10 100%);
+  border:1px solid #2c2c32;
+  border-top-color:rgba(255,255,255,.12);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.18),
+    inset 0 -1px 0 rgba(0,0,0,.4),
+    inset 0 0 0 1px rgba(0,0,0,.35),
+    0 2px 0 rgba(0,0,0,.4),
+    0 18px 40px -10px rgba(0,0,0,.8)
+}
+
+/* Tabs */
+body.theme-pro .main-tabs{background:linear-gradient(180deg,#1e1e22 0%,#0e0e12 100%);border:1px solid #2c2c32;box-shadow:inset 0 2px 6px rgba(0,0,0,.7)}
+body.theme-pro .tab-btn{color:#8a8a92}
+body.theme-pro .tab-btn:hover{color:#ededf0}
+body.theme-pro .tab-btn.active{background:linear-gradient(180deg,#ff5e65 0%,#ff2e3a 45%,#8a0e16 100%);color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 0 14px rgba(255,46,58,.55);text-shadow:0 1px 0 rgba(0,0,0,.3)}
+
+/* Screens — red LED */
+body.theme-pro .screen{background:linear-gradient(180deg,#0a0a0c 0%,#000 100%);border:1px solid #2c2c32;box-shadow:inset 0 0 12px rgba(0,0,0,.9),0 0 8px rgba(255,46,58,.12)}
+body.theme-pro .jog-center-screen{background:radial-gradient(circle,#121216 0%,#000 100%);border:1px solid #2c2c32;box-shadow:inset 0 0 22px rgba(0,0,0,.92)}
+body.theme-pro .track-title{color:#ededf0;text-shadow:0 0 6px rgba(237,237,240,.4)}
+body.theme-pro .screen-bpm{color:#ff5e65;text-shadow:0 0 12px rgba(255,46,58,.9)}
+body.theme-pro .screen-key{color:#ff2e3a}
+body.theme-pro .master-bpm{background:#000;border:1px solid #2c2c32;color:#ff5e65;text-shadow:0 0 10px rgba(255,46,58,.9)}
+body.theme-pro .jog-center-screen .bpm-display{color:#ff5e65;text-shadow:0 0 10px rgba(255,46,58,.9)}
+body.theme-pro .jog-center-screen .bpm-sub,body.theme-pro .jog-center-screen .deck-badge{color:#ededf0}
+
+/* Deck identity — red plate */
+body.theme-pro .deck-number{
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.45) 0%,transparent 14%,transparent 55%,rgba(0,0,0,.4) 100%),
+    linear-gradient(180deg,#ff8590 0%,#ff2e3a 45%,#a01420 100%);
+  color:#fff;
+  text-shadow:0 1px 0 rgba(0,0,0,.5);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -1px 0 rgba(120,10,22,.6),0 2px 6px rgba(0,0,0,.7),0 0 14px rgba(255,46,58,.5)
+}
+body.theme-pro .deck-label{color:#ededf0}
+body.theme-pro .deck-label .model{color:#ff2e3a;text-shadow:0 0 8px rgba(255,46,58,.35)}
+
+/* Jog wheels — machined graphite + red indicator */
+body.theme-pro .jog-outer{
+  background:
+    radial-gradient(circle at 50% 5%,rgba(255,255,255,.15) 0%,transparent 20%),
+    radial-gradient(circle at 50% 95%,rgba(0,0,0,.8) 0%,transparent 28%),
+    conic-gradient(from 0deg,#1a1a1e 0deg,#34343a 20deg,#52525a 45deg,#2c2c32 90deg,#16161a 135deg,#404048 180deg,#1a1a1e 225deg,#2c2c32 270deg,#48484e 315deg,#1a1a1e 360deg);
+  border:2px solid #0c0c10;
+  box-shadow:
+    inset 0 0 0 2px rgba(255,255,255,.08),
+    inset 0 0 0 3px rgba(0,0,0,.7),
+    inset 0 2px 10px rgba(0,0,0,.8),
+    0 4px 16px rgba(0,0,0,.75)
+}
+body.theme-pro .jog-platter{
+  background:
+    radial-gradient(circle at 50% 18%,rgba(255,255,255,.08) 0%,transparent 30%),
+    radial-gradient(circle,#1c1c20 0%,#0c0c10 72%,#040406 100%);
+  box-shadow:inset 0 0 42px rgba(0,0,0,.95),inset 0 2px 5px rgba(255,255,255,.05)
+}
+body.theme-pro .jog-platter-disc{
+  background:
+    repeating-radial-gradient(circle,rgba(255,255,255,.04) 0px,rgba(255,255,255,.04) 1px,transparent 1px,transparent 4px),
+    radial-gradient(circle,#2c2c32 0%,#14141a 70%,#050508 100%)
+}
+body.theme-pro .jog-indicator{background:linear-gradient(180deg,#fff 0%,#ff5e65 35%,#ff2e3a 70%,#8a0e16 100%);box-shadow:0 0 8px rgba(0,0,0,.8),0 0 20px rgba(255,46,58,1)}
+
+/* Knobs — black aluminium with red detent */
+body.theme-pro .knob{
+  background:
+    radial-gradient(ellipse 55% 28% at 45% 18%,rgba(255,255,255,.55) 0%,rgba(255,255,255,.18) 28%,transparent 58%),
+    radial-gradient(circle at 50% 108%,rgba(0,0,0,.85) 0%,transparent 48%),
+    radial-gradient(circle at 40% 35%,#48484e 0%,#2c2c32 35%,#16161a 70%,#080808 100%);
+  border:1px solid #050508;
+  box-shadow:inset 0 2px 1px rgba(255,255,255,.25),inset 0 -3px 6px rgba(0,0,0,.9),0 3px 7px rgba(0,0,0,.85),0 0 0 1px rgba(255,46,58,.08)
+}
+body.theme-pro .knob-indicator{background:linear-gradient(180deg,#fff 0%,#ff5e65 60%,#ff2e3a 100%);box-shadow:0 0 4px rgba(0,0,0,.8),0 0 10px rgba(255,46,58,.9)}
+body.theme-pro .knob-label{color:#8a8a92;font-weight:700;letter-spacing:1.8px;text-shadow:0 1px 0 rgba(0,0,0,.8)}
+
+/* VU — red-only LEDs (CDJ Nexus style) */
+body.theme-pro .vu-meter{background:#000;border:1px solid #2c2c32;box-shadow:inset 0 0 6px rgba(0,0,0,.95)}
+body.theme-pro .vu-led{background:#08080a}
+body.theme-pro .vu-led.on.green{background:linear-gradient(90deg,#8a0e16,#ff2e3a);box-shadow:0 0 6px rgba(255,46,58,.85),inset 0 0 2px rgba(255,255,255,.28)}
+body.theme-pro .vu-led.on.yellow{background:linear-gradient(90deg,#ff2e3a,#ff5e65);box-shadow:0 0 6px rgba(255,94,101,.9),inset 0 0 2px rgba(255,255,255,.3)}
+body.theme-pro .vu-led.on.red{background:linear-gradient(90deg,#ff5e65,#fff);box-shadow:0 0 8px rgba(255,255,255,.95),inset 0 0 2px rgba(255,255,255,.5)}
+
+/* Faders */
+body.theme-pro .fader-wrap,body.theme-pro .crossfader-track,body.theme-pro .tempo-slider{background:linear-gradient(180deg,#050508 0%,#16161a 100%);border:1px solid #2c2c32;box-shadow:inset 0 2px 6px rgba(0,0,0,.92)}
+body.theme-pro .fader-handle,body.theme-pro .tempo-handle,body.theme-pro .crossfader-handle{
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.45) 0%,transparent 18%,transparent 82%,rgba(0,0,0,.4) 100%),
+    linear-gradient(180deg,#52525a 0%,#34343a 45%,#1a1a1e 100%);
+  border:1px solid #050508;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 3px 8px rgba(0,0,0,.85),0 0 0 1px rgba(255,46,58,.1)
+}
+body.theme-pro .fader-handle::before,body.theme-pro .tempo-handle::before{background:linear-gradient(90deg,transparent,#ff2e3a,transparent);box-shadow:0 0 8px #ff2e3a}
+
+/* Buttons — matte black with red active */
+body.theme-pro .big-btn,body.theme-pro .loop-btn,body.theme-pro .jump-btn,body.theme-pro .util-btn,
+body.theme-pro .beat-btn,body.theme-pro .scene-btn,body.theme-pro .pad-mode-btn,
+body.theme-pro .tempo-btn,body.theme-pro .step-btn,body.theme-pro .mic-btn,
+body.theme-pro .cue-btn,body.theme-pro .compact-btn,body.theme-pro .cue-hp-btn,
+body.theme-pro .automix-btn,body.theme-pro .dsb-btn,body.theme-pro .search-src-btn,
+body.theme-pro .studio-preset-btn,body.theme-pro .tool-btn,body.theme-pro .assign-btn,
+body.theme-pro .curve-btn,body.theme-pro .ai-dj-btn{
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.08) 0%,transparent 35%,rgba(0,0,0,.25) 100%),
+    linear-gradient(180deg,#26262c 0%,#14141a 55%,#08080a 100%);
+  border:1px solid #2c2c32;
+  border-top-color:rgba(255,255,255,.12);
+  color:#ededf0;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.18),inset 0 -2px 4px rgba(0,0,0,.75),0 2px 5px rgba(0,0,0,.7);
+  text-shadow:0 1px 0 rgba(0,0,0,.9)
+}
+body.theme-pro .big-btn:hover,body.theme-pro .loop-btn:hover,body.theme-pro .jump-btn:hover,
+body.theme-pro .util-btn:hover,body.theme-pro .beat-btn:hover,body.theme-pro .scene-btn:hover,
+body.theme-pro .pad-mode-btn:hover{filter:brightness(1.2);border-color:#ff2e3a}
+body.theme-pro .big-btn.cue.active{background:linear-gradient(180deg,#ff8590 0%,#ff2e3a 45%,#8a0e16 100%);color:#fff;border-color:#ff5e65;box-shadow:0 0 22px rgba(255,46,58,.85),inset 0 1px 0 rgba(255,255,255,.45)}
+body.theme-pro .big-btn.play.active{background:linear-gradient(180deg,#ff8590 0%,#ff2e3a 45%,#8a0e16 100%);color:#fff;border-color:#ff5e65;box-shadow:0 0 22px rgba(255,46,58,.85),inset 0 1px 0 rgba(255,255,255,.45);animation:playPulse 1s ease-in-out infinite}
+body.theme-pro .loop-btn.active,body.theme-pro .beat-btn.active,body.theme-pro .scene-btn.active,
+body.theme-pro .util-btn.sync.active,body.theme-pro .util-btn.keylock.active,body.theme-pro .util-btn.quantize.active,
+body.theme-pro .util-btn.slip.active,body.theme-pro .util-btn.reverse.active,
+body.theme-pro .fx-onoff.active{background:linear-gradient(180deg,#ff5e65 0%,#ff2e3a 55%,#8a0e16 100%);color:#fff;border-color:#ff5e65;box-shadow:0 0 18px rgba(255,46,58,.75)}
+body.theme-pro .fx-onoff{background:linear-gradient(180deg,#1a1a1e 0%,#08080a 100%);border:2px solid #2c2c32;color:#ededf0}
+body.theme-pro .cue-btn.active{background:linear-gradient(180deg,#ff8590 0%,#ff2e3a 55%,#8a0e16 100%) !important;color:#fff !important;border-color:#ff5e65;box-shadow:0 0 22px rgba(255,46,58,.85),inset 0 1px 0 rgba(255,255,255,.45)}
+
+/* Sample pads */
+body.theme-pro .sample-pad{background:linear-gradient(180deg,#26262c 0%,#14141a 55%,#08080a 100%);border:1px solid #2c2c32;color:#ededf0;box-shadow:inset 0 1px 0 rgba(255,255,255,.15),inset 0 -3px 5px rgba(0,0,0,.7),0 3px 6px rgba(0,0,0,.6)}
+body.theme-pro .sample-pad .pad-num{color:#ededf0}
+body.theme-pro .sample-pad .pad-name{color:#8a8a92}
+body.theme-pro .sample-pad.playing{box-shadow:inset 0 2px 4px rgba(0,0,0,.5),0 0 32px rgba(255,46,58,.9),0 0 3px rgba(255,255,255,.7)}
+
+/* Inputs */
+body.theme-pro input,body.theme-pro select,body.theme-pro textarea{background:#14141a;color:#ededf0;border:1px solid #2c2c32}
+body.theme-pro input:focus,body.theme-pro select:focus{border-color:#ff2e3a;outline:none;box-shadow:0 0 0 3px rgba(255,46,58,.2)}
+body.theme-pro .url-input,body.theme-pro .search-input,body.theme-pro .yt-input{background:#14141a;color:#ededf0}
+body.theme-pro .fx-selector{background:#000;color:#ff5e65;border-color:#2c2c32}
+
+/* Titles */
+body.theme-pro .library-title,body.theme-pro .mixer-brand,body.theme-pro .sampler-title,
+body.theme-pro .modal-box h3,body.theme-pro .settings-section h3,
+body.theme-pro .ai-dj-title,body.theme-pro .dsb-label{color:#ededf0;text-shadow:0 0 6px rgba(255,46,58,.15)}
+body.theme-pro .count{color:#ff2e3a}
+body.theme-pro .setting-desc{color:#6a6a72}
+
+/* Cards / track rows */
+body.theme-pro .playlist-card,body.theme-pro .session-card,body.theme-pro .stat-card,body.theme-pro .midi-device,body.theme-pro .shortcut-item{background:linear-gradient(180deg,#1a1a1e 0%,#0c0c10 100%);border:1px solid #2c2c32;color:#ededf0}
+body.theme-pro .playlist-card h4,body.theme-pro .session-name,body.theme-pro .stat-card .stat-value{color:#ededf0}
+body.theme-pro .pl-meta,body.theme-pro .session-meta{color:#8a8a92}
+body.theme-pro .stat-card .stat-value{background:linear-gradient(180deg,#ff8590 0%,#8a0e16 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+body.theme-pro .track-row{background:#14141a;border:1px solid transparent;color:#ededf0}
+body.theme-pro .track-row:hover{background:#1e1e22;border-color:#ff2e3a;box-shadow:0 4px 10px rgba(0,0,0,.5),0 0 14px rgba(255,46,58,.2)}
+body.theme-pro .track-row .t-title{color:#ededf0}
+body.theme-pro .track-row .t-artist{color:#8a8a92}
+body.theme-pro .track-list-header{color:#ff2e3a;border-bottom:1px solid rgba(255,46,58,.3)}
+
+/* Modals */
+body.theme-pro .toast{background:linear-gradient(180deg,#1e1e22 0%,#0c0c10 100%);color:#ededf0;border:1px solid #ff2e3a;box-shadow:0 12px 30px rgba(0,0,0,.7),0 0 22px rgba(255,46,58,.25)}
+body.theme-pro .modal-box{background:linear-gradient(180deg,#1e1e22 0%,#0c0c10 100%);color:#ededf0;border:1px solid #2c2c32;box-shadow:0 40px 80px rgba(0,0,0,.85),0 0 40px rgba(255,46,58,.15)}
+body.theme-pro .modal-overlay{background:rgba(8,8,10,.85)}
+
+/* Mixer subsections */
+body.theme-pro .channel-label{color:#ff2e3a}
+body.theme-pro .compact-decks{background:#0c0c10;border-color:#2c2c32}
+body.theme-pro .compact-deck{background:#18181c;border-color:#2c2c32}
+body.theme-pro .compact-deck-title{background:#000;color:#ff5e65;border-color:#2c2c32}
+body.theme-pro .isolator-panel{background:#1a0e10;border-color:rgba(255,46,58,.3)}
+body.theme-pro .master-section,body.theme-pro .color-fx-row,body.theme-pro .color-fx-grid,
+body.theme-pro .crossfader-section,body.theme-pro .headphone-section,body.theme-pro .mic-section,
+body.theme-pro .automix-panel{background:#0e0e12;border:1px solid #2c2c32}
+
+/* DSB / auth / toggles */
+body.theme-pro .dsb-btn.active{background:linear-gradient(180deg,#ff5e65 0%,#ff2e3a 55%,#8a0e16 100%);color:#fff;border-color:#ff5e65;box-shadow:0 0 14px rgba(255,46,58,.7)}
+body.theme-pro .auth-btn{background:linear-gradient(180deg,#1e1e22 0%,#0c0c10 100%);border:1px solid #ff2e3a;color:#ff5e65}
+body.theme-pro .rec-btn{background:linear-gradient(180deg,#1e1e22 0%,#0c0c10 100%);border-color:#ff2e3a;color:#ff5e65}
+body.theme-pro .rec-btn.recording{background:linear-gradient(180deg,#ff5e65 0%,#8a0e16 100%);color:#fff}
+body.theme-pro .toggle-switch{background:#14141a;border:1px solid #2c2c32}
+body.theme-pro .toggle-switch.on{background:linear-gradient(180deg,#ff5e65 0%,#ff2e3a 100%);border-color:#ff5e65;box-shadow:0 0 10px rgba(255,46,58,.6)}
+body.theme-pro .master-meters{background:#000;border-color:#2c2c32;box-shadow:inset 0 2px 6px rgba(0,0,0,.95)}
+
+/* Per-deck accent → red only (monochrome accent like real CDJs) */
+body.theme-pro .cdj[data-deck]{--deck-accent:#ff2e3a;--deck-accent-rgb:255,46,58}
+
+/* RGB ambient → red pulse */
+body.theme-pro .rgb-ambient{background:linear-gradient(90deg,#8a0e16 0%,#ff2e3a 30%,#ff5e65 50%,#ff2e3a 70%,#8a0e16 100%);box-shadow:0 0 20px rgba(255,46,58,.6)}
+
+/* Sequencer + bank */
+body.theme-pro .bank-btn{color:#8a8a92}
+body.theme-pro .bank-btn.active{color:#fff;background:linear-gradient(180deg,#ff5e65 0%,#ff2e3a 100%)}
+body.theme-pro .seq-step{background:linear-gradient(180deg,#1a1a1e,#08080a);color:rgba(237,237,240,.25);border:1px solid #2c2c32}
+body.theme-pro .seq-step.on{color:#fff;background:linear-gradient(180deg,#ff5e65 0%,#ff2e3a 100%);box-shadow:0 0 10px rgba(255,46,58,.7)}
+
 body.work-mode .library{display:block !important}
 body.work-mode .tab-content#tab-deck{display:flex !important;flex-direction:column;align-items:center;gap:12px}
 body.work-mode .rgb-ambient{display:block;height:3px;opacity:.85;max-width:1700px;margin:0 auto}
@@ -3215,66 +3564,6 @@ body.work-mode .deck-switch-bar{
   border-color:rgba(255,138,26,.25);
   box-shadow:0 10px 32px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.05);
 }
-
-/* HARMONIC ASSISTANT — floating Camelot-matched suggestions panel */
-.harmonic-toggle{
-  position:fixed;top:58px;right:8px;z-index:8500;
-  padding:6px 10px;border-radius:6px;cursor:pointer;
-  font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;letter-spacing:1.5px;
-  background:linear-gradient(180deg,#2a2a2e 0%,#12121a 100%);
-  border:1px solid rgba(255,138,26,.35);color:var(--orange);
-  box-shadow:0 2px 8px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.08);
-  transition:all .15s ease;opacity:.85
-}
-.harmonic-toggle:hover{opacity:1;box-shadow:0 0 20px rgba(255,138,26,.45);transform:translateY(-1px)}
-.harmonic-toggle.open{background:linear-gradient(180deg,var(--orange) 0%,#aa3a00 100%);color:#1a0d00;border-color:#fff;box-shadow:0 0 20px rgba(255,138,26,.6)}
-.harmonic-panel{
-  display:none;position:fixed;top:92px;right:8px;z-index:8500;
-  width:280px;max-height:calc(100vh - 120px);
-  background:linear-gradient(180deg,rgba(16,16,20,.97) 0%,rgba(10,10,12,.97) 100%);
-  border:1px solid rgba(255,138,26,.35);border-radius:10px;
-  box-shadow:0 12px 36px rgba(0,0,0,.7),0 0 22px rgba(255,138,26,.12),inset 0 1px 0 rgba(255,255,255,.06);
-  backdrop-filter:blur(12px) saturate(1.2);
-  overflow:hidden;
-  font-family:'Orbitron',sans-serif;
-}
-.harmonic-panel.open{display:flex;flex-direction:column}
-.hp-head{display:flex;align-items:center;gap:8px;padding:10px 12px;background:linear-gradient(180deg,#1a1a20 0%,#0e0e14 100%);border-bottom:1px solid rgba(255,138,26,.15)}
-.hp-title{flex:1;font-size:10px;letter-spacing:2.2px;font-weight:800;color:var(--orange);text-shadow:0 0 8px rgba(255,138,26,.3)}
-.hp-ref{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--screen-glow);padding:2px 6px;border:1px solid rgba(46,224,255,.25);border-radius:4px;background:rgba(0,20,30,.4)}
-.hp-close{background:transparent;border:none;color:var(--text-dim);font-size:14px;cursor:pointer;padding:2px 6px}
-.hp-close:hover{color:var(--orange)}
-.hp-list{flex:1;overflow-y:auto;padding:6px;display:flex;flex-direction:column;gap:4px;min-height:80px}
-.hp-row{display:grid;grid-template-columns:36px 1fr auto;gap:8px;align-items:center;padding:7px 9px;background:linear-gradient(180deg,#17171c 0%,#0c0c10 100%);border:1px solid rgba(255,138,26,.08);border-radius:6px;cursor:pointer;transition:all .12s}
-.hp-row:hover{border-color:var(--orange);background:linear-gradient(180deg,#1f1f26 0%,#14141a 100%);transform:translateX(-2px);box-shadow:0 4px 10px rgba(0,0,0,.5),0 0 12px rgba(255,138,26,.15)}
-.hp-score{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;font-family:'Orbitron',sans-serif;color:#000;background:conic-gradient(var(--sc,#2eff7a) calc(var(--p,100)*1%),rgba(255,255,255,.08) 0);position:relative}
-.hp-score::after{content:'';position:absolute;inset:3px;border-radius:50%;background:#0c0c10}
-.hp-score span{position:relative;z-index:1;color:var(--sc,#2eff7a);text-shadow:0 0 8px var(--sc,#2eff7a)}
-.hp-info{min-width:0;display:flex;flex-direction:column;gap:2px}
-.hp-info .hp-t{font-size:11px;color:#e6e6ea;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.3px}
-.hp-info .hp-a{font-size:9px;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hp-meta{display:flex;flex-direction:column;align-items:flex-end;gap:2px;font-size:9px;font-family:'Share Tech Mono',monospace;white-space:nowrap}
-.hp-meta .hp-bpm{color:var(--screen-glow);font-weight:700}
-.hp-meta .hp-key{color:var(--orange);font-weight:700}
-.hp-badge{display:inline-block;padding:1px 5px;border-radius:3px;font-size:8px;letter-spacing:.8px;font-weight:700}
-.hp-badge.perfect{background:rgba(46,255,122,.15);color:#2eff7a;border:1px solid rgba(46,255,122,.35)}
-.hp-badge.energy{background:rgba(255,138,26,.15);color:var(--orange);border:1px solid rgba(255,138,26,.35)}
-.hp-badge.relative{background:rgba(176,122,255,.15);color:#b07aff;border:1px solid rgba(176,122,255,.35)}
-.hp-badge.compat{background:rgba(46,224,255,.15);color:var(--screen-glow);border:1px solid rgba(46,224,255,.35)}
-.hp-empty{padding:22px 12px;text-align:center;color:var(--text-dim);font-size:10px;letter-spacing:1.5px}
-.hp-foot{padding:6px 10px;border-top:1px solid rgba(255,138,26,.1);font-size:8px;color:var(--text-dim);letter-spacing:1px;text-align:center;background:linear-gradient(180deg,#0e0e14 0%,#0a0a0e 100%)}
-.hp-foot kbd{font-family:'Orbitron',sans-serif;background:#1a1a22;padding:1px 5px;border-radius:3px;border:1px solid rgba(255,255,255,.1);color:var(--orange)}
-@media(max-width:900px){
-  .harmonic-panel{width:calc(100vw - 16px);right:8px;left:8px;max-height:50vh}
-}
-body.theme-gold .harmonic-panel{background:linear-gradient(180deg,rgba(30,24,12,.97),rgba(16,12,6,.97));border-color:#6b4f1e}
-body.theme-gold .hp-title{color:#fff0a8}
-body.theme-gold .harmonic-toggle{border-color:#6b4f1e;color:#e8c463}
-body.theme-gold .harmonic-toggle.open{background:linear-gradient(180deg,#fff0a8,#8b6914);color:#1a1410;border-color:#fff0a8}
-body.theme-light .harmonic-panel{background:linear-gradient(180deg,rgba(255,255,255,.97),rgba(245,245,250,.97));border-color:rgba(255,138,26,.35)}
-body.theme-light .hp-row{background:#fff;border-color:rgba(0,0,0,.06)}
-body.theme-light .hp-row:hover{background:#fafafc;border-color:var(--orange)}
-body.theme-light .hp-info .hp-t{color:#1a1a1c}
 
 /* Big floating EXIT button visible only in WORK MODE */
 .wm-exit-btn{
@@ -3557,18 +3846,6 @@ body.work-mode .dsb-wmexit{display:inline-flex;background:linear-gradient(180deg
 <div class="tab-content active" id="tab-deck">
 <button class="wm-exit-btn" id="wmExitBtn" title="Exit work mode (Esc)">✕ EXIT</button>
 
-<!-- HARMONIC ASSISTANT — Camelot-matched suggestions for the active deck -->
-<button class="harmonic-toggle" id="harmonicToggle" title="Harmonic suggestions (H)">🎵 HARMONIC</button>
-<div class="harmonic-panel" id="harmonicPanel">
-  <div class="hp-head">
-    <span class="hp-title">HARMONIC MATCHES</span>
-    <span class="hp-ref" id="hpRef">—</span>
-    <button class="hp-close" id="hpClose" title="Close (H)">✕</button>
-  </div>
-  <div class="hp-list" id="hpList"></div>
-  <div class="hp-foot">Click a track → loads to free deck · <kbd>H</kbd> toggle</div>
-</div>
-
 <div class="quick-lib-overlay" id="quickLibOverlay">
   <div class="quick-lib-box">
     <div class="quick-lib-head">
@@ -3661,7 +3938,6 @@ body.work-mode .dsb-wmexit{display:inline-flex;background:linear-gradient(180deg
 </div>
 
 <canvas class="spectrum-canvas" id="spectrumCanvas" width="1700" height="40"></canvas>
-<div class="rgb-ambient" id="rgbStrip"></div>
 
 <div class="scene-fx-panel">
 <div class="scene-fx-label">SCENE FX</div>
@@ -4099,7 +4375,8 @@ No MIDI devices. Press CONNECT.
 <div><div class="setting-label">Theme</div><div class="setting-desc">Visual theme</div></div>
 <select class="fx-selector" id="settingTheme">
 <option value="dark">Dark (Pioneer)</option><option value="neon">Neon</option>
-<option value="gold">Gold</option><option value="light">Light</option>
+<option value="gold">Gold (Vertex Luxury)</option><option value="pro">Pro (Graphite + Red)</option>
+<option value="light">Light</option>
 </select></div>
 <div class="settings-row">
 <div><div class="setting-label">RGB Ambient Light</div><div class="setting-desc">Color strip above</div></div>
@@ -6362,7 +6639,7 @@ function loadFromDB(){
 
 /* SETTINGS */
 function applyTheme(name){
-  document.body.classList.remove('theme-light','theme-neon','theme-gold');
+  document.body.classList.remove('theme-light','theme-neon','theme-gold','theme-pro');
   if(name!=='dark')document.body.classList.add(`theme-${name}`);
   settings.theme=name;saveToDB();
 }
@@ -6478,7 +6755,6 @@ function setupKeyboard(){
         case ';':e.preventDefault();adjustKnob('booth',-STEP);return;
         case "'":e.preventDefault();adjustKnob('booth',STEP);return;
         case 'm':e.preventDefault();document.getElementById('micOnBtn')?.click();return;
-        case 'h':e.preventDefault();if(typeof toggleHarmonicPanel==='function')toggleHarmonicPanel();return;
         case 'r':e.preventDefault();['isoLow','isoMid','isoHi'].forEach(resetKnob);return;
         case '1':e.preventDefault();document.querySelector('[data-mix="smooth"]')?.click();return;
         case '2':e.preventDefault();document.querySelector('[data-mix="energy"]')?.click();return;
@@ -6698,101 +6974,6 @@ function getRecommendations(currentTrack){
     return bpmMatch&&(keyMatch||bpmDiff<0.03);
   }).sort((a,b)=>Math.abs(a.bpm-currentTrack.bpm)-Math.abs(b.bpm-currentTrack.bpm)).slice(0,8);
 }
-
-/* HARMONIC ASSISTANT — scored suggestions for the active deck */
-function pickReferenceDeck(){
-  const order=['A','B','C','D'];
-  const playing=order.find(d=>decks[d]?.playing&&decks[d]?.track);
-  if(playing)return playing;
-  const loaded=order.find(d=>decks[d]?.track);
-  return loaded||null;
-}
-function scoreHarmonicCandidate(ref,t){
-  const bpmDiff=Math.abs(t.bpm-ref.bpm);
-  const bpmDiffHalf=Math.min(bpmDiff,Math.abs(t.bpm*2-ref.bpm),Math.abs(t.bpm-ref.bpm*2));
-  const bpmPct=bpmDiffHalf/ref.bpm;
-  const bpmS=Math.max(0,1-bpmPct*12);
-  const keyS=(ref.key==='--'||t.key==='--')?0.5:harmonicScore(ref.key,t.key);
-  const e1=ref.energy||5,e2=t.energy||5;
-  const eS=1-Math.min(1,Math.abs(e2-e1)/6);
-  const total=keyS*0.55+bpmS*0.35+eS*0.10;
-  let badge='compat',label='OK';
-  if(keyS>=0.99&&bpmPct<0.01){badge='perfect';label='PERFECT';}
-  else if(keyS>=0.9){badge='relative';label=ref.key&&t.key&&ref.key!==t.key?'REL/NEIGHBOR':'SAME KEY';}
-  else if(eS>0.8&&bpmS>0.8){badge='energy';label='ENERGY';}
-  return {score:Math.round(total*100),badge,label,bpmDiff:bpmDiffHalf.toFixed(1)};
-}
-function getHarmonicSuggestions(ref,limit=8){
-  if(!ref)return[];
-  const loadedIds=new Set(['A','B','C','D'].map(d=>decks[d]?.track?.id).filter(Boolean));
-  return library.filter(t=>t.id!==ref.id&&!loadedIds.has(t.id)&&t.source!=='yt'&&t.bpm)
-    .map(t=>({t,...scoreHarmonicCandidate(ref,t)}))
-    .sort((a,b)=>b.score-a.score).slice(0,limit);
-}
-function renderHarmonicPanel(){
-  const panel=document.getElementById('harmonicPanel');
-  if(!panel||!panel.classList.contains('open'))return;
-  const refDeck=pickReferenceDeck();
-  const ref=refDeck?decks[refDeck]?.track:null;
-  const refEl=document.getElementById('hpRef');
-  const listEl=document.getElementById('hpList');
-  if(!ref){
-    if(refEl)refEl.textContent='—';
-    if(listEl)listEl.innerHTML='<div class="hp-empty">Load a track on any deck to see harmonic matches</div>';
-    return;
-  }
-  if(refEl)refEl.textContent=`${refDeck} · ${ref.key||'--'} · ${Math.round(ref.bpm||0)}`;
-  const suggestions=getHarmonicSuggestions(ref,8);
-  if(!suggestions.length){
-    if(listEl)listEl.innerHTML='<div class="hp-empty">No matching tracks yet — add more to your library</div>';
-    return;
-  }
-  const scColor=s=>s>=85?'#2eff7a':s>=65?'#ffd400':s>=45?'#ff8a1a':'#ff3c3c';
-  listEl.innerHTML=suggestions.map(({t,score,badge,label,bpmDiff})=>{
-    const safe=s=>(s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;');
-    return `<div class="hp-row" data-id="${safe(t.id)}" title="Click to load to a free deck">
-      <div class="hp-score" style="--sc:${scColor(score)};--p:${score}"><span>${score}</span></div>
-      <div class="hp-info">
-        <div class="hp-t">${safe(t.title||'Untitled')}</div>
-        <div class="hp-a">${safe(t.artist||'Unknown')} · <span class="hp-badge ${badge}">${label}</span></div>
-      </div>
-      <div class="hp-meta">
-        <span class="hp-bpm">${Math.round(t.bpm||0)} BPM</span>
-        <span class="hp-key">${t.key||'--'} · Δ${bpmDiff}</span>
-      </div>
-    </div>`;
-  }).join('');
-  listEl.querySelectorAll('.hp-row').forEach(row=>{
-    row.addEventListener('click',()=>{
-      const tid=row.dataset.id;
-      const track=library.find(t=>t.id===tid);if(!track)return;
-      const free=['A','B','C','D'].find(d=>!decks[d]?.track||!decks[d]?.playing);
-      if(!free){toast('All decks busy — pause one first','warn');return;}
-      if(typeof loadTrackToDeck==='function')loadTrackToDeck(free,track);
-      else if(typeof loadToDeck==='function')loadToDeck(free,track);
-      toast(`→ Deck ${free}: ${track.title}`);
-    });
-  });
-}
-function toggleHarmonicPanel(force){
-  const panel=document.getElementById('harmonicPanel');
-  const btn=document.getElementById('harmonicToggle');
-  if(!panel||!btn)return;
-  const open=typeof force==='boolean'?force:!panel.classList.contains('open');
-  panel.classList.toggle('open',open);
-  btn.classList.toggle('open',open);
-  if(open)renderHarmonicPanel();
-}
-function initHarmonicAssistant(){
-  document.getElementById('harmonicToggle')?.addEventListener('click',()=>toggleHarmonicPanel());
-  document.getElementById('hpClose')?.addEventListener('click',()=>toggleHarmonicPanel(false));
-  setInterval(()=>{
-    const p=document.getElementById('harmonicPanel');
-    if(p&&p.classList.contains('open'))renderHarmonicPanel();
-  },2000);
-}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initHarmonicAssistant);
-else initHarmonicAssistant();
 
 /* KILL SWITCH */
 function toggleKill(deckId,band){
