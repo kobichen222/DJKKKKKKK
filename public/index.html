@@ -2617,61 +2617,89 @@ body.theme-light .editor-timeline{background:#f4f4f8;border-color:rgba(0,0,0,.08
   box-shadow:inset 0 2px 6px rgba(0,0,0,.8),0 6px 18px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.04) inset;
   overflow:hidden;
 }
-/* Modern studio VU — twin vertical gradient bars, like Pro Tools / DJM */
+/* Master VU — twin LED-segment bars, DJM / Pro-Tools quality */
 .master-vu-modern{
-  position:relative;margin-bottom:6px;padding:10px 12px;
-  background:linear-gradient(180deg,#14141a 0%,#05050a 100%);
+  position:relative;margin-bottom:8px;padding:12px 14px;
+  background:linear-gradient(180deg,#141418 0%,#060609 100%);
   border:1px solid rgba(255,138,26,.22);border-radius:10px;
-  box-shadow:inset 0 2px 8px rgba(0,0,0,.9),0 6px 18px rgba(0,0,0,.6),inset 0 0 30px rgba(255,138,26,.03);
-  display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:stretch;min-height:170px;
+  box-shadow:inset 0 2px 8px rgba(0,0,0,.9),0 6px 22px rgba(0,0,0,.65),inset 0 0 30px rgba(255,138,26,.03);
+  display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:stretch;min-height:188px;
+}
+.master-vu-modern::before{
+  content:'MASTER';position:absolute;top:4px;left:50%;transform:translateX(-50%);
+  font-family:'Orbitron',sans-serif;font-size:8px;letter-spacing:3px;
+  color:rgba(255,138,26,.5);font-weight:800;pointer-events:none;
 }
 .master-vu-modern .mvm-scale{
   display:flex;flex-direction:column;justify-content:space-between;
-  font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;
-  color:rgba(46,224,255,.7);text-align:right;padding:6px 0 18px;
+  font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:.5px;
+  color:rgba(46,224,255,.6);text-align:right;padding:18px 0 22px;min-width:22px;
 }
-.master-vu-modern .mvm-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:2px 4px 0}
-.master-vu-modern .mvm-col{display:flex;flex-direction:column;align-items:center;gap:4px}
+.master-vu-modern .mvm-scale span{line-height:1}
+.master-vu-modern .mvm-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:4px 4px 2px}
+.master-vu-modern .mvm-col{display:flex;flex-direction:column;align-items:center;gap:5px;position:relative}
 .master-vu-modern .mvm-chlabel{
-  font-family:'Orbitron',sans-serif;font-size:11px;font-weight:800;letter-spacing:2px;
-  color:var(--orange);text-shadow:0 0 8px rgba(255,122,0,.5);
+  font-family:'Orbitron',sans-serif;font-size:11px;font-weight:900;letter-spacing:2px;
+  color:var(--orange);text-shadow:0 0 8px rgba(255,122,0,.55);line-height:1;
 }
 .master-vu-modern .mvm-clip{
-  width:14px;height:5px;border-radius:2px;
-  background:#1a0606;border:1px solid rgba(255,46,46,.3);
+  width:16px;height:5px;border-radius:2px;
+  background:#150505;border:1px solid rgba(255,46,46,.28);
   box-shadow:inset 0 0 2px rgba(0,0,0,.8);transition:all .08s linear;
 }
 .master-vu-modern .mvm-clip.hot{
-  background:linear-gradient(180deg,#ff5050,#c02020);
-  box-shadow:0 0 12px rgba(255,46,46,1),inset 0 1px 0 rgba(255,255,255,.4);
+  background:linear-gradient(180deg,#ff5c5c,#c01818);
+  box-shadow:0 0 14px rgba(255,46,46,1),inset 0 1px 0 rgba(255,255,255,.5);
   animation:clipFlash .25s linear;
 }
 .master-vu-modern .mvm-bar{
-  flex:1;width:16px;position:relative;
-  background:linear-gradient(180deg,#040406 0%,#0a0a0c 100%);
-  border:1px solid rgba(255,255,255,.06);border-radius:3px;
-  box-shadow:inset 0 0 10px rgba(0,0,0,.95),inset 0 1px 0 rgba(0,0,0,.5);
+  flex:1;width:20px;position:relative;
+  background:
+    linear-gradient(180deg,rgba(255,46,46,.04) 0%,rgba(255,212,0,.03) 14%,rgba(28,255,143,.02) 40%,transparent 100%),
+    linear-gradient(180deg,#030305 0%,#080810 100%);
+  border:1px solid rgba(255,255,255,.08);border-radius:3px;
+  box-shadow:inset 0 0 14px rgba(0,0,0,.95),inset 0 1px 0 rgba(0,0,0,.6),0 1px 0 rgba(255,255,255,.03);
   overflow:hidden;
 }
+/* Faint horizontal scale lines inside the bar matching the dB labels */
 .master-vu-modern .mvm-bar::before{
-  content:'';position:absolute;top:0;bottom:0;left:50%;width:1px;
-  background:repeating-linear-gradient(180deg,rgba(255,255,255,.12) 0 1px,transparent 1px 8px);
-  transform:translateX(-50%);opacity:.3;
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:
+    linear-gradient(180deg,transparent calc(0%),rgba(255,46,46,.25) calc(0% + 1px),transparent calc(0% + 2px)),
+    linear-gradient(180deg,transparent calc(30%),rgba(255,255,255,.08) calc(30% + 1px),transparent calc(30% + 2px)),
+    linear-gradient(180deg,transparent calc(45%),rgba(255,255,255,.06) calc(45% + 1px),transparent calc(45% + 2px)),
+    linear-gradient(180deg,transparent calc(60%),rgba(255,255,255,.05) calc(60% + 1px),transparent calc(60% + 2px)),
+    linear-gradient(180deg,transparent calc(75%),rgba(255,255,255,.04) calc(75% + 1px),transparent calc(75% + 2px));
+}
+/* LED-segment overlay creates the classic segmented-meter look */
+.master-vu-modern .mvm-bar::after{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:2;
+  background:repeating-linear-gradient(180deg,transparent 0,transparent 5px,rgba(0,0,0,.55) 5px,rgba(0,0,0,.55) 6px);
 }
 .master-vu-modern .mvm-bar-fill{
   position:absolute;left:1px;right:1px;bottom:1px;height:0%;
-  background:linear-gradient(0deg,#0d8a4a 0%,#1cff8f 25%,#1cff8f 55%,#ffd400 75%,#ff7a00 88%,#ff2e2e 100%);
-  box-shadow:0 0 6px rgba(255,138,26,.6),inset 0 0 4px rgba(255,255,255,.25);
+  background:linear-gradient(0deg,
+    #0a7a48 0%,#14c070 10%,#1cff8f 28%,#1cff8f 52%,
+    #ffd400 72%,#ff9a1a 86%,#ff4040 100%);
+  box-shadow:
+    0 0 8px rgba(28,255,143,.45),
+    0 -2px 14px rgba(255,138,26,.3),
+    inset 0 0 6px rgba(255,255,255,.22);
   border-radius:2px;transition:height .04s linear;
 }
 .master-vu-modern .mvm-bar-fill-r{
-  background:linear-gradient(0deg,#0088b4 0%,#2ee0ff 25%,#2ee0ff 55%,#ffd400 75%,#ff7a00 88%,#ff2e2e 100%);
-  box-shadow:0 0 6px rgba(46,224,255,.55),inset 0 0 4px rgba(255,255,255,.25);
+  background:linear-gradient(0deg,
+    #005a7a 0%,#0088b4 10%,#2ee0ff 28%,#2ee0ff 52%,
+    #ffd400 72%,#ff9a1a 86%,#ff4040 100%);
+  box-shadow:
+    0 0 8px rgba(46,224,255,.45),
+    0 -2px 14px rgba(255,138,26,.3),
+    inset 0 0 6px rgba(255,255,255,.22);
 }
 .master-vu-modern .mvm-bar-peak{
   position:absolute;left:0;right:0;height:2px;background:#fff;
-  box-shadow:0 0 6px rgba(255,255,255,.85);border-radius:1px;
-  bottom:0;opacity:0;transition:bottom .12s linear,opacity .15s;pointer-events:none;
+  box-shadow:0 0 8px rgba(255,255,255,.95),0 0 2px #fff;border-radius:1px;
+  bottom:0;opacity:0;transition:bottom .12s linear,opacity .2s;pointer-events:none;z-index:3;
 }
 .master-vu-halo{
   position:absolute;inset:-6px;pointer-events:none;
@@ -5767,12 +5795,13 @@ function animateVU(){
     }else if(dk._vuHold){dk._vuHold=0;}
     leds.forEach((l,i)=>{l.classList.remove('on','green','yellow','red');if(i<level){l.classList.add('on');l.classList.add(l.dataset.color);}});
   });
-  // MASTER modern VU — twin vertical gradient bars with peak hold + beat punch
+  // MASTER VU — only lights up when audio is actually playing through master,
+  // responds tightly to the beat like the per-channel meters do.
   (function paintMaster(){
     const now=performance.now();
     const haveAudio=!!masterAnalyserL&&!!masterAnalyserR;
     const anyPlaying=['A','B','C','D'].some(k=>decks[k]&&decks[k].playing);
-    const SEGS=18;
+    const SEGS=20;
     let maxLevel=0;
     ['L','R'].forEach((suffix,chan)=>{
       const an=chan===0?masterAnalyserL:masterAnalyserR;
@@ -5780,43 +5809,26 @@ function animateVU(){
       const peakEl=document.getElementById('mvmPeak'+suffix);
       const clip=document.getElementById('clipLed'+suffix);
       if(!fill)return;
-      let level=0,bassEnergy=0;
-      if(an){
+      let level=0;
+      if(haveAudio&&anyPlaying){
         try{
           const tArr=new Uint8Array(an.fftSize);
           an.getByteTimeDomainData(tArr);
           let peak=0,rms=0;
           for(let i=0;i<tArr.length;i++){const v=Math.abs(tArr[i]-128);if(v>peak)peak=v;rms+=v*v;}
           rms=Math.sqrt(rms/tArr.length);
-          level=Math.min(SEGS,((peak*0.55+rms*2.4)/128)*(SEGS*1.9));
-          const fArr=new Uint8Array(an.frequencyBinCount);
-          an.getByteFrequencyData(fArr);
-          const sr=(audioCtx&&audioCtx.sampleRate)||48000;
-          const binHz=sr/an.fftSize;
-          const lowEnd=Math.min(an.frequencyBinCount-1,Math.floor(150/binHz));
-          let lowSum=0,lowCount=0;
-          for(let i=1;i<=lowEnd;i++){lowSum+=fArr[i];lowCount++;}
-          bassEnergy=lowCount?lowSum/lowCount:0;
+          // Same formula as per-deck meters (animateVU above) so master follows
+          // the beat identically to the channels.
+          const combined=peak*0.7+rms*1.6;
+          level=Math.min(SEGS,(combined/128)*32);
+          if(level<1.5)level=1.5;
         }catch(e){level=0;}
       }
-      // Beat punch on kick
-      fill._bassAvg=fill._bassAvg!=null?fill._bassAvg*0.92+bassEnergy*0.08:bassEnergy;
-      const bassDelta=bassEnergy-fill._bassAvg;
-      if(bassDelta>18&&bassEnergy>70){fill._punchUntil=now+140;fill._punchAmt=Math.min(6,bassDelta/8);}
-      if((fill._punchUntil||0)>now){
-        const punchLeft=(fill._punchUntil-now)/140;
-        level+=(fill._punchAmt||3)*punchLeft;
-      }
-      // Idle breathing
-      if(!anyPlaying&&level<0.4){
-        const phase=(now/520)+chan*0.5;
-        level=1.8+Math.sin(phase)*1.2;
-      }
-      level=Math.max(0,Math.min(SEGS,level));
+      // Mechanical hold — fast attack, smooth release (matches channel VU)
       fill._hold=fill._hold||0;
-      const attack=level>fill._hold?0.45:0.14;
-      fill._hold+=(level-fill._hold)*attack;
-      // Peak hold
+      if(level>fill._hold)fill._hold=level;
+      else fill._hold=Math.max(level,fill._hold-0.6);
+      // Peak hold line
       fill._peak=fill._peak||0;
       if(fill._hold>fill._peak){fill._peak=fill._hold;fill._peakTime=now;}
       else if(now-(fill._peakTime||0)>700)fill._peak=Math.max(fill._hold,fill._peak-0.15);
@@ -5826,10 +5838,10 @@ function animateVU(){
       fill.style.height=pct.toFixed(1)+'%';
       if(peakEl){
         peakEl.style.bottom=peakPct.toFixed(1)+'%';
-        peakEl.style.opacity=fill._peak>0.5?'1':'0';
+        peakEl.style.opacity=anyPlaying&&fill._peak>0.5?'1':'0';
       }
       if(clip){
-        const nowClip=haveAudio&&fill._hold>=SEGS-0.4;
+        const nowClip=anyPlaying&&fill._hold>=SEGS-0.5;
         if(nowClip)fill._clipUntil=now+240;
         clip.classList.toggle('hot',(fill._clipUntil||0)>now);
       }
