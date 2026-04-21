@@ -112,6 +112,28 @@ body{padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:
 .console{display:grid;grid-template-columns:1fr 400px 1fr;gap:12px;max-width:1700px;width:100%}
 @media(min-width:1920px){.console{grid-template-columns:1fr 460px 1fr;gap:16px;max-width:1850px}}
 @media(min-width:2560px){.console{grid-template-columns:1fr 540px 1fr;gap:22px;max-width:2200px}}
+/* In ALL-4 mode all full-width rows share the same max-width as the console */
+body.show-all .mixer-toolbar,
+body.show-all .deck-switch-bar,
+body.show-all .beat-fx-panel,
+body.show-all .scene-fx-panel,
+body.show-all .library,
+body.show-all .rgb-ambient{max-width:1700px;width:100%}
+@media(min-width:1920px){
+  body.show-all .mixer-toolbar,body.show-all .deck-switch-bar,
+  body.show-all .beat-fx-panel,body.show-all .scene-fx-panel,
+  body.show-all .library,body.show-all .rgb-ambient{max-width:1850px}
+}
+@media(min-width:2560px){
+  body.show-all .mixer-toolbar,body.show-all .deck-switch-bar,
+  body.show-all .beat-fx-panel,body.show-all .scene-fx-panel,
+  body.show-all .library,body.show-all .rgb-ambient{max-width:2200px}
+}
+/* Make internal grids of those rows use the full horizontal space so content
+   isn't clustered on the left. */
+body.show-all .beat-fx-panel{grid-template-columns:auto auto auto 1fr auto auto auto auto}
+body.show-all .scene-fx-panel{grid-template-columns:auto 1fr auto auto}
+body.show-all .deck-switch-bar{justify-content:space-between}
 @media(max-width:1200px){.console{grid-template-columns:1fr 340px 1fr;gap:10px}}
 @media(max-width:960px){.console{grid-template-columns:1fr 300px 1fr;gap:8px}}
 /* console 820px collapse handled in responsive layer below */
@@ -6669,6 +6691,7 @@ function applyDeckPair(pair){
   document.querySelectorAll('.dsb-btn').forEach(b=>b.classList.toggle('active',b.dataset.pair===pair));
   const console=document.getElementById('console');
   if(console)console.classList.toggle('show-all',pair==='ALL');
+  document.body.classList.toggle('show-all',pair==='ALL');
   renderMixerCompactDecks();
   updateDsbMonitor();
 }
