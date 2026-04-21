@@ -2653,15 +2653,18 @@ body.theme-light .editor-timeline{background:#f4f4f8;border-color:rgba(0,0,0,.08
   box-shadow:0 0 14px rgba(255,46,46,1),inset 0 1px 0 rgba(255,255,255,.5);
   animation:clipFlash .25s linear;
 }
-/* Vertical meter same system as per-channel — segmented LEDs inside */
+/* Master VU meter — identical to per-channel .vu-meter (same segs, colors, glow) */
 .master-vu-modern .vu-meter.vu-master{
-  flex:1;width:22px;min-height:140px;
-  background:#030305;border:1px solid rgba(255,255,255,.07);border-radius:3px;
-  padding:2px;box-shadow:inset 0 0 10px rgba(0,0,0,.95),inset 0 1px 0 rgba(0,0,0,.6);
-  display:flex;flex-direction:column-reverse;gap:2px;
+  flex:1;width:16px;min-height:150px;
+  background:#000;border:1px solid #1a1a1c;border-radius:3px;
+  padding:2px;box-shadow:inset 0 0 4px rgba(0,0,0,.9);
+  display:flex;flex-direction:column-reverse;gap:1px;
 }
-/* Override default .vu-led color tint for the R channel (cyan greens) */
-.master-vu-modern .vu-master-r .vu-led.on.green{background:linear-gradient(90deg,#0088b4,#2ee0ff);box-shadow:0 0 6px rgba(46,224,255,.9),inset 0 1px 0 rgba(255,255,255,.35)}
+/* R channel uses cyan instead of green — same "moving LED" feel */
+.master-vu-modern .vu-master-r .vu-led.on.green{
+  background:var(--screen-glow);
+  box-shadow:0 0 3px var(--screen-glow);
+}
 .master-vu-halo{
   position:absolute;inset:-6px;pointer-events:none;
   background:radial-gradient(ellipse at center,rgba(28,255,143,.0) 0%,transparent 70%);
@@ -5773,13 +5776,11 @@ function setupBeatFxUI(){
 /* VU METERS */
 function setupVU(id,segs){
   const vu=document.getElementById(id);if(!vu)return;vu.innerHTML='';
-  const isMaster=vu.classList.contains('vu-master');
   for(let i=0;i<segs;i++){
     const l=document.createElement('div');l.className='vu-led';
     if(i>=segs-3)l.dataset.color='red';
     else if(i>=segs-7)l.dataset.color='yellow';
     else l.dataset.color='green';
-    if(isMaster){l.style.cssText='flex:1 1 auto;min-height:3px;border-radius:1px;width:100%;display:block;background:#0a1a15';}
     vu.appendChild(l);
   }
 }
@@ -5811,7 +5812,7 @@ function animateVU(){
     const now=performance.now();
     const haveAudio=!!masterAnalyserL&&!!masterAnalyserR;
     const anyPlaying=['A','B','C','D'].some(k=>decks[k]&&decks[k].playing);
-    const SEGS=18;
+    const SEGS=20;
     let maxLevel=0;
     ['L','R'].forEach((suffix,chan)=>{
       const an=chan===0?masterAnalyserL:masterAnalyserR;
@@ -6292,7 +6293,7 @@ function init(){
   document.getElementById('mixer-container').innerHTML=buildMixerHTML();
   const mtb=document.getElementById('mixer-toolbar');if(mtb)mtb.innerHTML=buildMixerToolbarHTML();
   setupVU('vu-A',20);setupVU('vu-B',20);setupVU('vu-C',20);setupVU('vu-D',20);
-  setupVU('masterHVuL',18);setupVU('masterHVuR',18);
+  setupVU('masterHVuL',20);setupVU('masterHVuR',20);
   attachKnobs();attachEvents();setupBeatFxUI();setupSceneFx();setupKeyboard();setupTabs();setupSettings();
   setupWaveformInteraction();setupAdvancedFeatures();renderSessions();
   renderSampler();renderPlaylists();
