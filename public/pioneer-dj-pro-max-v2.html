@@ -52,7 +52,7 @@ body{padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:
 .rgb-ambient{width:100%;max-width:1700px;height:5px;background:linear-gradient(90deg,var(--orange),var(--pink),var(--purple),var(--screen-glow),var(--play-green),var(--yellow),var(--orange));background-size:200% 100%;border-radius:3px;animation:ambient 8s linear infinite;filter:blur(3px);opacity:.6}
 @keyframes ambient{from{background-position:0% 0%}to{background-position:200% 0%}}
 /* ── Mixer toolbar (xfader + automix + hp + mic + iso) — horizontal bar above decks ── */
-.mixer-toolbar{width:100%;max-width:1700px;display:grid;grid-template-columns:minmax(220px,1.4fr) minmax(260px,1.6fr) minmax(200px,1.3fr) minmax(200px,1.2fr) minmax(180px,1fr);gap:8px;padding:8px 10px;background:linear-gradient(180deg,#2a2a2e 0%,#1a1a1c 100%);border:1px solid var(--deck-border);border-radius:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 8px 24px rgba(0,0,0,.6);align-items:stretch}
+.mixer-toolbar{width:100%;max-width:1700px;display:grid;grid-template-columns:minmax(300px,1.8fr) minmax(220px,1.3fr) minmax(220px,1.2fr) minmax(200px,1fr);gap:8px;padding:8px 10px;background:linear-gradient(180deg,#2a2a2e 0%,#1a1a1c 100%);border:1px solid var(--deck-border);border-radius:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 8px 24px rgba(0,0,0,.6);align-items:stretch}
 .mixer-toolbar .mtb-section{display:flex;flex-direction:column;gap:5px;padding:6px 8px;background:#0a0a0b;border-radius:8px;border:1px solid #1a1a1c;min-width:0}
 .mixer-toolbar .mtb-label{font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:2px;color:var(--orange);font-weight:700;white-space:nowrap}
 .mixer-toolbar .mtb-row{display:flex;align-items:center;gap:6px;justify-content:space-between}
@@ -75,13 +75,12 @@ body{padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:
 .mixer-toolbar .mtb-iso .knob-indicator{background:linear-gradient(180deg,#fff,var(--red))}
 .mixer-toolbar .mtb-iso .knob-label{color:var(--red)}
 @media(max-width:1400px){
-  .mixer-toolbar{grid-template-columns:1fr 1fr 1fr;gap:6px}
-  .mixer-toolbar .mtb-xfader{grid-column:1/-1}
+  .mixer-toolbar{grid-template-columns:1fr 1fr;gap:6px}
   .mixer-toolbar .mtb-automix{grid-column:1/-1}
 }
 @media(max-width:820px){
   .mixer-toolbar{grid-template-columns:1fr 1fr}
-  .mixer-toolbar .mtb-xfader,.mixer-toolbar .mtb-automix{grid-column:1/-1}
+  .mixer-toolbar .mtb-automix{grid-column:1/-1}
 }
 @media(max-width:520px){
   .mixer-toolbar{grid-template-columns:1fr;padding:6px;gap:5px}
@@ -151,7 +150,7 @@ body{padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:
 .cue-btn{aspect-ratio:1.8/1;border:none;border-radius:5px;background:linear-gradient(180deg,#42424a 0%,#26262a 50%,#141418 100%);color:var(--text-dim);font-family:'Orbitron',sans-serif;font-weight:700;font-size:12px;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.12),inset 0 -2px 4px rgba(0,0,0,.7),0 2px 4px rgba(0,0,0,.4);transition:transform .08s,box-shadow .1s;position:relative}
 .cue-btn:hover{transform:translateY(-1px);box-shadow:inset 0 1px 0 rgba(255,255,255,.18),inset 0 -2px 4px rgba(0,0,0,.7),0 4px 8px rgba(0,0,0,.6)}
 .cue-btn:active{transform:translateY(1px);box-shadow:inset 0 2px 4px rgba(0,0,0,.5)}
-.cue-btn.active{background:linear-gradient(180deg,color-mix(in srgb,var(--cue-color,var(--orange)) 130%,#fff 20%) 0%,var(--cue-color,var(--orange)) 50%,color-mix(in srgb,var(--cue-color,var(--orange)) 60%,#000 40%) 100%);color:#000;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -2px 3px rgba(0,0,0,.35),0 0 18px var(--cue-color,var(--orange)),0 0 4px var(--cue-color,var(--orange))}
+.cue-btn.active{background:var(--cue-color,var(--orange));color:#000;box-shadow:inset 0 1px 0 rgba(255,255,255,.45),inset 0 -2px 3px rgba(0,0,0,.3),0 0 20px var(--cue-color,var(--orange)),0 0 4px var(--cue-color,var(--orange)),0 0 1px rgba(255,255,255,.9)}
 .cue-btn[data-color="1"]{--cue-color:#00e5ff}
 .cue-btn[data-color="2"]{--cue-color:#ff3c78}
 .cue-btn[data-color="3"]{--cue-color:#ffd400}
@@ -715,10 +714,16 @@ button:active:not(:disabled),.big-btn:active,.loop-btn:active,.jump-btn:active,
 }
 .cue-btn:hover{filter:brightness(1.15)}
 .cue-btn.active{
+  background:var(--cue-color,var(--orange)) !important;
+  color:#000 !important;
+  border-color:rgba(255,255,255,.5);
   box-shadow:
-    inset 0 2px 4px rgba(0,0,0,.4),
-    0 0 20px var(--cue-color,var(--orange)),
-    0 0 2px rgba(255,255,255,.6);
+    inset 0 1px 0 rgba(255,255,255,.45),
+    inset 0 -2px 3px rgba(0,0,0,.3),
+    0 0 24px var(--cue-color,var(--orange)),
+    0 0 6px var(--cue-color,var(--orange)),
+    0 0 1px rgba(255,255,255,.9);
+  filter:brightness(1.25);
 }
 
 /* SAMPLE PADS — elevated, 3D */
@@ -2592,6 +2597,28 @@ body.theme-light .editor-timeline{background:#f4f4f8;border-color:rgba(0,0,0,.08
   box-shadow:inset 0 2px 6px rgba(0,0,0,.8),0 6px 18px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.04) inset;
   overflow:hidden;
 }
+/* Analog needle VU — looks like a vintage amplifier meter */
+.master-vu-analog{
+  position:relative;margin-bottom:6px;padding:10px 12px 8px;
+  background:linear-gradient(180deg,#1a1a1e 0%,#0a0a0b 100%);
+  border:1px solid rgba(255,138,26,.22);border-radius:10px;
+  box-shadow:inset 0 2px 6px rgba(0,0,0,.85),0 6px 18px rgba(0,0,0,.6),inset 0 0 30px rgba(255,138,26,.04);
+  overflow:hidden;
+}
+.master-vu-svg{width:100%;height:auto;display:block;filter:drop-shadow(0 2px 6px rgba(0,0,0,.7))}
+.master-vu-analog #vuNeedleL line,.master-vu-analog #vuNeedleR line{
+  transform-origin:120px 130px;
+  filter:drop-shadow(0 0 2px rgba(216,0,10,.6));
+  transition:none;
+}
+.master-vu-analog .master-vu-clip{
+  position:absolute;top:8px;left:calc(50% - 40px);
+  width:14px;height:6px;border-radius:2px;
+  background:#1a0a0a;border:1px solid rgba(255,46,46,.35);
+  box-shadow:inset 0 0 3px rgba(0,0,0,.8);transition:all .08s linear;z-index:2;
+}
+.master-vu-analog .master-vu-clip-r{left:calc(50% + 26px)}
+.master-vu-analog .master-vu-clip.hot{background:linear-gradient(180deg,#ff4040,#c41010);box-shadow:0 0 14px rgba(255,46,46,.95),inset 0 1px 0 rgba(255,255,255,.4);animation:clipFlash .3s linear}
 .master-vu-halo{
   position:absolute;inset:-6px;pointer-events:none;
   background:radial-gradient(ellipse at center,rgba(28,255,143,.0) 0%,transparent 70%);
@@ -3803,19 +3830,7 @@ function buildDeckHTML(d){
 }
 
 function buildMixerToolbarHTML(){
-  return `<div class="mtb-section mtb-xfader">
-    <div class="crossfader-ab"><span>A</span><span>B</span></div>
-    <div class="crossfader-track" id="xfader"><div class="crossfader-handle" id="xfaderHandle"></div></div>
-    <div class="mtb-row">
-      <span class="mtb-label">XFADE</span>
-      <div class="curve-switch" id="xfaderCurve">
-        <button class="curve-btn active" data-curve="smooth">SMOOTH</button>
-        <button class="curve-btn" data-curve="sharp">SHARP</button>
-        <button class="curve-btn" data-curve="cut">CUT</button>
-      </div>
-    </div>
-  </div>
-  <div class="mtb-section mtb-automix">
+  return `<div class="mtb-section mtb-automix">
     <div class="mtb-row"><span class="mtb-label">⚡ AUTO MIX</span><span class="mtb-dir" id="automixDir">A→B</span></div>
     <div class="automix-grid">
       <button class="automix-btn" data-mix="smooth" title="Long bass-swap blend">SMOOTH</button>
@@ -3862,24 +3877,56 @@ function buildMixerToolbarHTML(){
 
 function buildMixerHTML(){
   return `<div class="mixer-header"><div class="mixer-brand"><span class="model">DJM-</span>V10 PRO MAX</div></div>
-  <div class="master-vu-box" id="masterVuBox">
+  <div class="master-vu-analog" id="masterVuBox">
     <div class="master-vu-halo" id="masterVuHalo"></div>
-    <div class="master-vu-scale">
-      <span>+3</span><span>0</span><span>-6</span><span>-12</span><span>-24</span>
-    </div>
-    <div class="master-vu-col">
-      <div class="master-vu-clip" id="clipLedL" title="Clip indicator"></div>
-      <div class="vu-meter vu-master" id="masterHVuL"></div>
-      <div class="master-vu-lbl" id="lblL">L</div>
-    </div>
-    <div class="master-vu-col">
-      <div class="master-vu-clip" id="clipLedR" title="Clip indicator"></div>
-      <div class="vu-meter vu-master" id="masterHVuR"></div>
-      <div class="master-vu-lbl" id="lblR">R</div>
-    </div>
-    <div class="master-vu-scale" style="order:99">
-      <span>+3</span><span>0</span><span>-6</span><span>-12</span><span>-24</span>
-    </div>
+    <svg class="master-vu-svg" viewBox="0 0 240 140" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+      <defs>
+        <radialGradient id="vuFace" cx="50%" cy="100%" r="100%">
+          <stop offset="0%" stop-color="#f6e8b8"/>
+          <stop offset="70%" stop-color="#e9d890"/>
+          <stop offset="100%" stop-color="#b89e58"/>
+        </radialGradient>
+        <linearGradient id="vuGlow" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="rgba(255,196,64,.45)"/>
+          <stop offset="100%" stop-color="rgba(255,122,0,0)"/>
+        </linearGradient>
+      </defs>
+      <path d="M12,130 A118,118 0 0 1 228,130 L216,130 A106,106 0 0 0 24,130 Z" fill="url(#vuFace)" stroke="#2a1a00" stroke-width="1.5"/>
+      <path d="M26,128 A94,94 0 0 1 214,128" stroke="#0a0a0b" stroke-width="2" fill="none"/>
+      <path d="M30,128 A90,90 0 0 1 150,55" stroke="#0d3" stroke-width="2.2" fill="none"/>
+      <path d="M150,55 A90,90 0 0 1 190,78" stroke="#e0b000" stroke-width="2.2" fill="none"/>
+      <path d="M190,78 A90,90 0 0 1 210,128" stroke="#d02020" stroke-width="2.2" fill="none"/>
+      <g font-family="Share Tech Mono,monospace" font-size="8" fill="#2a1a00" text-anchor="middle">
+        <text x="34" y="118">-24</text>
+        <text x="64" y="90">-12</text>
+        <text x="100" y="70">-6</text>
+        <text x="150" y="58">0</text>
+        <text x="192" y="72">+3</text>
+        <text x="214" y="100">+6</text>
+      </g>
+      <g stroke="#2a1a00" stroke-width="1" stroke-linecap="round">
+        <line x1="120" y1="130" x2="120" y2="124"/>
+        <line x1="80" y1="80" x2="84" y2="86"/>
+        <line x1="160" y1="80" x2="156" y2="86"/>
+        <line x1="60" y1="108" x2="66" y2="110"/>
+        <line x1="180" y1="108" x2="174" y2="110"/>
+      </g>
+      <g id="vuNeedleL" transform="rotate(-60 120 130)">
+        <line x1="120" y1="130" x2="120" y2="38" stroke="#d8000a" stroke-width="2.2" stroke-linecap="round"/>
+        <circle cx="120" cy="130" r="6" fill="#2a2a2e" stroke="#0a0a0b" stroke-width="1"/>
+      </g>
+      <g id="vuNeedleR" transform="rotate(-60 120 130)">
+        <line x1="120" y1="130" x2="120" y2="42" stroke="#ff6a1a" stroke-width="1.8" stroke-linecap="round" opacity=".9"/>
+      </g>
+      <rect x="0" y="0" width="240" height="140" fill="url(#vuGlow)" opacity=".35" pointer-events="none"/>
+      <g font-family="Orbitron,sans-serif" font-size="9" font-weight="700" fill="#2a1a00">
+        <text x="52" y="132" text-anchor="middle">L</text>
+        <text x="188" y="132" text-anchor="middle">R</text>
+      </g>
+      <text x="120" y="95" text-anchor="middle" font-family="Orbitron,sans-serif" font-size="8" font-weight="700" fill="#2a1a00" letter-spacing="2">MASTER VU</text>
+    </svg>
+    <div class="master-vu-clip" id="clipLedL" title="Clip L"></div>
+    <div class="master-vu-clip master-vu-clip-r" id="clipLedR" title="Clip R"></div>
   </div>
   <div class="master-section">
     <div class="master-knob-wrap"><div class="knob" data-knob="master"><div class="knob-indicator"></div></div><span class="knob-label">MASTER</span></div>
@@ -3912,6 +3959,16 @@ function buildMixerHTML(){
         <button class="assign-btn ${d==='B'||d==='D'?'active':''}" data-assign="B">B</button>
       </div>
     </div>`).join('')}
+  </div>
+  <div class="crossfader-section">
+    <div class="crossfader-ab"><span>A</span><span>B</span></div>
+    <div class="crossfader-track" id="xfader"><div class="crossfader-handle" id="xfaderHandle"></div></div>
+    <div class="crossfader-label">CROSSFADER</div>
+    <div class="curve-switch" id="xfaderCurve">
+      <button class="curve-btn active" data-curve="smooth">SMOOTH</button>
+      <button class="curve-btn" data-curve="sharp">SHARP</button>
+      <button class="curve-btn" data-curve="cut">CUT</button>
+    </div>
   </div>
   <div class="compact-decks" id="mixerCompactDecks"></div>`;
 }
@@ -5681,16 +5738,18 @@ function animateVU(){
     }else if(dk._vuHold){dk._vuHold=0;}
     leds.forEach((l,i)=>{l.classList.remove('on','green','yellow','red');if(i<level){l.classList.add('on');l.classList.add(l.dataset.color);}});
   });
-  // MASTER L/R VU — always paints something, even at idle, so the meter is
-  // visibly alive even before the first track plays.
+  // MASTER analog needle VU (L=red, R=orange) — driven by beat + level
   (function paintMaster(){
     const now=performance.now();
     const haveAudio=!!masterAnalyserL&&!!masterAnalyserR;
     const anyPlaying=['A','B','C','D'].some(k=>decks[k]&&decks[k].playing);
+    const SEGS=18;
     let maxLevel=0;
-    [['masterHVuL',masterAnalyserL,18,'clipLedL','lblL',0],['masterHVuR',masterAnalyserR,18,'clipLedR','lblR',1]].forEach(([id,an,segs,clipId,lblId,chan])=>{
-      const vu=document.getElementById(id);if(!vu)return;
-      const leds=vu.querySelectorAll('.vu-led');if(!leds.length)return;
+    ['L','R'].forEach((suffix,chan)=>{
+      const an=chan===0?masterAnalyserL:masterAnalyserR;
+      const needle=document.getElementById('vuNeedle'+suffix);
+      const clip=document.getElementById('clipLed'+suffix);
+      if(!needle)return;
       let level=0,bassEnergy=0;
       if(an){
         try{
@@ -5699,9 +5758,7 @@ function animateVU(){
           let peak=0,rms=0;
           for(let i=0;i<tArr.length;i++){const v=Math.abs(tArr[i]-128);if(v>peak)peak=v;rms+=v*v;}
           rms=Math.sqrt(rms/tArr.length);
-          const combined=peak*0.55+rms*2.4;
-          level=Math.min(segs,(combined/128)*(segs*1.9));
-          // Beat detection via low-band FFT energy (20-150Hz kick range)
+          level=Math.min(SEGS,((peak*0.55+rms*2.4)/128)*(SEGS*1.9));
           const fArr=new Uint8Array(an.frequencyBinCount);
           an.getByteFrequencyData(fArr);
           const sr=(audioCtx&&audioCtx.sampleRate)||48000;
@@ -5712,59 +5769,40 @@ function animateVU(){
           bassEnergy=lowCount?lowSum/lowCount:0;
         }catch(e){level=0;}
       }
-      // Beat punch — detect sudden rise in bass energy -> brief spike
-      vu._bassAvg=vu._bassAvg!=null?vu._bassAvg*0.92+bassEnergy*0.08:bassEnergy;
-      const bassDelta=bassEnergy-vu._bassAvg;
-      if(bassDelta>18&&bassEnergy>70){vu._punchUntil=now+140;vu._punchAmt=Math.min(6,bassDelta/8);}
-      if((vu._punchUntil||0)>now){
-        const punchLeft=(vu._punchUntil-now)/140;
-        level+=(vu._punchAmt||3)*punchLeft;
+      // Beat punch on kick detection
+      needle._bassAvg=needle._bassAvg!=null?needle._bassAvg*0.92+bassEnergy*0.08:bassEnergy;
+      const bassDelta=bassEnergy-needle._bassAvg;
+      if(bassDelta>18&&bassEnergy>70){needle._punchUntil=now+140;needle._punchAmt=Math.min(6,bassDelta/8);}
+      if((needle._punchUntil||0)>now){
+        const punchLeft=(needle._punchUntil-now)/140;
+        level+=(needle._punchAmt||3)*punchLeft;
       }
-      // Idle breathing — only when nothing playing
+      // Idle breathing when no deck is playing
       if(!anyPlaying&&level<0.5){
-        const phase=(now/480)+chan*0.6;
-        level=1.6+Math.sin(phase)*1.0;
+        const phase=(now/520)+chan*0.4;
+        level=2.0+Math.sin(phase)*1.4;
       }
-      level=Math.min(segs,level);
-      vu._hold=vu._hold||0;
-      vu._peak=vu._peak||0;
-      if(level>vu._hold)vu._hold=level;else vu._hold=Math.max(level,vu._hold-0.85);
-      if(vu._hold>vu._peak){vu._peak=vu._hold;vu._peakTime=now;}
-      else if(now-(vu._peakTime||0)>500)vu._peak=Math.max(vu._hold,vu._peak-0.12);
-      const peakIdx=Math.max(0,Math.floor(vu._peak)-1);
-      maxLevel=Math.max(maxLevel,vu._hold);
-      leds.forEach((l,i)=>{
-        const col=l.dataset.color;
-        const on=i<vu._hold;
-        const isPeakMark=(!on&&i===peakIdx&&vu._peak>vu._hold+0.2);
-        if(on){
-          l.style.background=col==='red'?'linear-gradient(90deg,#ff4040,#ff9090,#ff2020)':col==='yellow'?'linear-gradient(90deg,#ffd400,#fff4a0,#ffc000)':'linear-gradient(90deg,#1cff8f,#8cffc0,#0aa05a)';
-          l.style.boxShadow=col==='red'?'0 0 8px rgba(255,60,60,1),inset 0 1px 0 rgba(255,255,255,.5)':col==='yellow'?'0 0 7px rgba(255,212,0,1),inset 0 1px 0 rgba(255,255,255,.45)':'0 0 7px rgba(28,255,143,1),inset 0 1px 0 rgba(255,255,255,.4)';
-          l.style.opacity='1';
-        }else if(isPeakMark){
-          l.style.background=col==='red'?'#ff6060':col==='yellow'?'#ffe040':'#3cff9f';
-          l.style.boxShadow='0 0 10px '+(col==='red'?'#ff2020':col==='yellow'?'#ffd400':'#1cff8f');
-          l.style.opacity='1';
-        }else{
-          // Off state — dim green outline so the meter is visibly "there"
-          l.style.background=col==='red'?'#1a0606':col==='yellow'?'#1a1605':'#08150e';
-          l.style.boxShadow='inset 0 0 2px rgba(28,255,143,.15)';
-          l.style.opacity='.9';
-        }
-      });
-      const clip=document.getElementById(clipId);
+      level=Math.max(0,Math.min(SEGS,level));
+      // Mechanical needle damping — feels like a real meter
+      needle._hold=needle._hold||0;
+      const target=level;
+      const attack=target>needle._hold?0.35:0.12;
+      needle._hold+=(target-needle._hold)*attack;
+      maxLevel=Math.max(maxLevel,needle._hold);
+      // Map 0-SEGS level to -60deg..+60deg rotation
+      const rot=-60+(needle._hold/SEGS)*120;
+      needle.setAttribute('transform',`rotate(${rot.toFixed(2)} 120 130)`);
+      // Clip LED when needle pins
       if(clip){
-        const nowClip=haveAudio&&vu._hold>=segs-0.3;
-        if(nowClip)vu._clipUntil=now+220;
-        clip.classList.toggle('hot',(vu._clipUntil||0)>now);
+        const nowClip=haveAudio&&needle._hold>=SEGS-0.4;
+        if(nowClip)needle._clipUntil=now+240;
+        clip.classList.toggle('hot',(needle._clipUntil||0)>now);
       }
-      const lbl=document.getElementById(lblId);
-      if(lbl)lbl.classList.toggle('hot',haveAudio&&vu._hold>segs*0.6);
     });
     const halo=document.getElementById('masterVuHalo');
     if(halo){
-      const n=Math.min(1,maxLevel/18);
-      const color=haveAudio&&n>0.75?`rgba(255,60,60,${.25+n*.55})`:haveAudio&&n>0.5?`rgba(255,212,0,${.2+n*.45})`:`rgba(28,255,143,${.12+n*.4})`;
+      const n=Math.min(1,maxLevel/SEGS);
+      const color=haveAudio&&n>0.75?`rgba(255,60,60,${.25+n*.55})`:haveAudio&&n>0.5?`rgba(255,212,0,${.2+n*.45})`:`rgba(255,138,26,${.1+n*.4})`;
       halo.style.background=`radial-gradient(ellipse at center,${color} 0%,transparent 70%)`;
     }
   })();
