@@ -5864,34 +5864,42 @@ function animateVU(){
     }else if(dk._vuHold){dk._vuHold=0;}
     leds.forEach((l,i)=>{l.classList.remove('on','green','yellow','red');if(i<level){l.classList.add('on');l.classList.add(l.dataset.color);}});
   });
-  // MASTER VU — real LED segments, same flow as per-channel meters
+  // MASTER VU — drive from per-deck analysers (same signal the working channel
+  // meters use) so L/R LEDs animate identically with whatever plays.
   (function paintMaster(){
     const now=performance.now();
-    const haveAudio=!!masterAnalyserL&&!!masterAnalyserR;
     const anyPlaying=['A','B','C','D'].some(k=>decks[k]&&decks[k].playing);
     const SEGS=20;
+    // Compute the master level by reading each playing deck's analyser
+    // (same path as animateVU) and taking the loudest. Crossfader + channel
+    // fader aren't factored in; this meter reflects "source playing" which
+    // is what the user expects the lights to follow.
+    let masterLevel=0;
+    if(anyPlaying){
+      ['A','B','C','D'].forEach(d=>{
+        const dk=decks[d];
+        if(!dk||!dk.playing||!dk.analyser)return;
+        try{
+          const tArr=new Uint8Array(dk.analyser.frequencyBinCount);
+          dk.analyser.getByteTimeDomainData(tArr);
+          let peak=0,rms=0;
+          for(let i=0;i<tArr.length;i++){const v=Math.abs(tArr[i]-128);if(v>peak)peak=v;rms+=v*v;}
+          rms=Math.sqrt(rms/tArr.length);
+          const combined=peak*0.7+rms*1.6;
+          const level=Math.min(SEGS,(combined/128)*32);
+          if(level>masterLevel)masterLevel=level;
+        }catch(e){}
+      });
+    }
     let maxLevel=0;
     ['L','R'].forEach((suffix,chan)=>{
-      const an=chan===0?masterAnalyserL:masterAnalyserR;
       const vu=document.getElementById('masterHVu'+suffix);
       const clip=document.getElementById('clipLed'+suffix);
       if(!vu)return;
       const leds=vu.querySelectorAll('.vu-led');
-      let level=0;
-      if(haveAudio&&anyPlaying){
-        try{
-          const tArr=new Uint8Array(an.fftSize);
-          an.getByteTimeDomainData(tArr);
-          let peak=0,rms=0;
-          for(let i=0;i<tArr.length;i++){const v=Math.abs(tArr[i]-128);if(v>peak)peak=v;rms+=v*v;}
-          rms=Math.sqrt(rms/tArr.length);
-          // Same shape as per-channel formula, with gain compensation (×1.4)
-          // because master analyser sits after masterGain+iso+sceneFx chain
-          // which attenuates the signal vs a bare channel analyser.
-          const combined=peak*0.7+rms*1.6;
-          level=Math.min(SEGS,(combined/128)*32*1.4);
-        }catch(e){level=0;}
-      }
+      // Slight L/R variation so it looks stereo (±3% of peak)
+      const jitter=chan===0?1:0.97;
+      const level=masterLevel*jitter;
       vu._hold=vu._hold||0;
       if(level>vu._hold)vu._hold=level;
       else vu._hold=Math.max(level,vu._hold-0.6);
@@ -5910,7 +5918,7 @@ function animateVU(){
     const halo=document.getElementById('masterVuHalo');
     if(halo){
       const n=Math.min(1,maxLevel/SEGS);
-      const color=haveAudio&&n>0.75?`rgba(255,60,60,${.22+n*.5})`:haveAudio&&n>0.5?`rgba(255,212,0,${.18+n*.4})`:`rgba(255,138,26,${.08+n*.35})`;
+      const color=anyPlaying&&n>0.75?`rgba(255,60,60,${.22+n*.5})`:anyPlaying&&n>0.5?`rgba(255,212,0,${.18+n*.4})`:`rgba(255,138,26,${.08+n*.35})`;
       halo.style.background=`radial-gradient(ellipse at center,${color} 0%,transparent 70%)`;
     }
   })();
