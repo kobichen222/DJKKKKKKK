@@ -2637,13 +2637,13 @@ body.theme-light .editor-timeline{background:#f4f4f8;border-color:rgba(0,0,0,.08
   box-shadow:inset 0 2px 6px rgba(0,0,0,.8),0 6px 18px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.04) inset;
   overflow:hidden;
 }
-/* Master VU — wide bars filling the frame, dB scale */
+/* Master VU — wide bars filling the frame, compact */
 .master-vu-modern{
-  position:relative;margin-bottom:8px;padding:18px 10px 10px;
+  position:relative;margin-bottom:8px;padding:16px 10px 8px;
   background:linear-gradient(180deg,#141418 0%,#060609 100%);
   border:1px solid rgba(255,138,26,.22);border-radius:10px;
   box-shadow:inset 0 2px 8px rgba(0,0,0,.9),0 6px 22px rgba(0,0,0,.65),inset 0 0 30px rgba(255,138,26,.03);
-  display:grid;grid-template-columns:30px 1fr;gap:8px;align-items:stretch;min-height:210px;
+  display:grid;grid-template-columns:28px 1fr;gap:8px;align-items:stretch;min-height:140px;
 }
 .master-vu-modern::before{
   content:'MASTER';position:absolute;top:4px;left:50%;transform:translateX(-50%);
@@ -2652,8 +2652,8 @@ body.theme-light .editor-timeline{background:#f4f4f8;border-color:rgba(0,0,0,.08
 }
 .master-vu-modern .mvm-scale{
   display:flex;flex-direction:column;justify-content:space-between;
-  font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:.5px;
-  color:rgba(46,224,255,.7);text-align:right;padding:22px 0 22px;
+  font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:.5px;
+  color:rgba(46,224,255,.7);text-align:right;padding:18px 0 12px;
 }
 .master-vu-modern .mvm-scale span{line-height:1;padding-right:4px;position:relative}
 .master-vu-modern .mvm-scale span::after{
@@ -2679,7 +2679,7 @@ body.theme-light .editor-timeline{background:#f4f4f8;border-color:rgba(0,0,0,.08
 }
 /* Wide master VU meter — fills column width, same LED system as channels */
 .master-vu-modern .vu-meter.vu-master{
-  flex:1;width:100%;min-height:160px;
+  flex:1;width:100%;min-height:100px;
   background:#000;border:1px solid #1a1a1c;border-radius:3px;
   padding:2px;box-shadow:inset 0 0 6px rgba(0,0,0,.95);
   display:flex;flex-direction:column-reverse;gap:1px;
@@ -5863,10 +5863,11 @@ function animateVU(){
           let peak=0,rms=0;
           for(let i=0;i<tArr.length;i++){const v=Math.abs(tArr[i]-128);if(v>peak)peak=v;rms+=v*v;}
           rms=Math.sqrt(rms/tArr.length);
-          // Same formula as per-deck meters so master LEDs flow identically
+          // Same shape as per-channel formula, with gain compensation (×1.4)
+          // because master analyser sits after masterGain+iso+sceneFx chain
+          // which attenuates the signal vs a bare channel analyser.
           const combined=peak*0.7+rms*1.6;
-          level=Math.min(SEGS,(combined/128)*32);
-          if(level<1.5)level=1.5;
+          level=Math.min(SEGS,(combined/128)*32*1.4);
         }catch(e){level=0;}
       }
       vu._hold=vu._hold||0;
