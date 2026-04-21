@@ -3027,48 +3027,53 @@ body.theme-gold{
 }
 body.theme-gold,body.theme-gold html{
   background:
-    radial-gradient(ellipse at 18% 0%,rgba(255,226,138,.18) 0%,transparent 40%),
-    radial-gradient(ellipse at 82% 100%,rgba(184,135,14,.14) 0%,transparent 42%),
-    radial-gradient(ellipse at center,#1c1508 0%,#070503 72%);
+    radial-gradient(ellipse at 18% 0%,rgba(255,230,140,.22) 0%,transparent 38%),
+    radial-gradient(ellipse at 82% 100%,rgba(184,135,14,.18) 0%,transparent 42%),
+    radial-gradient(ellipse at center,#2a1f0c 0%,#100a04 72%);
 }
-body.theme-gold::after{background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.6) 100%)}
-body.theme-gold ::-webkit-scrollbar-track{background:#120e08}
-body.theme-gold ::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#f5d76e,#8b6914);border:1px solid #6b4f1e}
+body.theme-gold::after{background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.5) 100%)}
+body.theme-gold ::-webkit-scrollbar-track{background:#1a1208}
+body.theme-gold ::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#fff0a8,#b8870e);border:1px solid #6b4f1e}
 
 /* Header */
-body.theme-gold .header-bar{color:#f3e3b0}
-body.theme-gold .brand{color:#f3e3b0;text-shadow:0 1px 0 rgba(0,0,0,.8),0 0 20px rgba(255,215,100,.4)}
-body.theme-gold .brand .max{background:linear-gradient(180deg,#fff0a8 0%,#e8c463 45%,#8b6914 100%);color:#1a1410;box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 1px 2px rgba(0,0,0,.4),0 0 16px rgba(232,196,99,.55)}
-body.theme-gold .header-right{color:#c9a85a}
-body.theme-gold .power-led{background:radial-gradient(circle,#fff0a8,#e8c463);box-shadow:0 0 8px rgba(232,196,99,.8)}
+body.theme-gold .header-bar{color:#2a1f0a}
+body.theme-gold .brand{color:#2a1f0a;text-shadow:0 1px 0 rgba(255,244,194,.55),0 0 18px rgba(255,244,194,.5)}
+body.theme-gold .brand .max{background:linear-gradient(180deg,#fffbe6 0%,#ffe28a 40%,#b8870e 100%);color:#1a1208;box-shadow:inset 0 1px 0 rgba(255,255,255,.7),0 1px 2px rgba(0,0,0,.4),0 0 18px rgba(255,226,138,.7)}
+body.theme-gold .header-right{color:#3d2a0a}
+body.theme-gold .power-led{background:radial-gradient(circle,#fffbe6,#ffe28a);box-shadow:0 0 10px rgba(255,226,138,.95)}
 
-/* Panels — brushed gold metal look */
+/* Panels — real champagne/24k gold metallic surface */
 body.theme-gold .cdj,body.theme-gold .mixer,body.theme-gold .library,
 body.theme-gold .sampler-panel,body.theme-gold .youtube-panel,body.theme-gold .playlists-panel,
 body.theme-gold .ai-dj-panel,body.theme-gold .analytics-panel,body.theme-gold .midi-panel,
 body.theme-gold .settings-panel,body.theme-gold .beat-fx-panel,body.theme-gold .scene-fx-panel,
 body.theme-gold .deck-switch-bar,body.theme-gold .mixer-toolbar{
   background:
-    /* top gold bezel highlight */
+    /* top specular hot-spot */
+    radial-gradient(ellipse 70% 24% at 50% 0%,rgba(255,255,240,.6) 0%,transparent 60%),
+    /* anisotropic brushed grain */
+    repeating-linear-gradient(90deg,
+      rgba(255,255,220,.07) 0px,rgba(255,255,220,.07) 1px,
+      rgba(90,60,10,.05) 1px,rgba(90,60,10,.05) 2px),
+    /* actual gold fill — light on top, rich in middle, deep at bottom */
     linear-gradient(180deg,
-      rgba(255,244,194,.35) 0%,
-      rgba(255,226,138,.12) 2px,
-      transparent 6px,
-      transparent calc(100% - 6px),
-      rgba(77,52,13,.55) 100%),
-    /* subtle brushed-metal horizontal grain */
-    repeating-linear-gradient(90deg,rgba(255,244,194,.03) 0px,rgba(255,244,194,.03) 1px,rgba(0,0,0,.04) 1px,rgba(0,0,0,.04) 2px),
-    /* warm panel fill */
-    linear-gradient(180deg,#2e2411 0%,#1a1409 48%,#0f0b05 100%);
-  border:1px solid #8b6317;
-  border-top-color:#ffe28a;
+      #fff4c2 0%,
+      #ffe28a 10%,
+      #f1c752 28%,
+      #d4a43a 50%,
+      #b8870e 74%,
+      #8b6317 92%,
+      #6b4a14 100%);
+  border:1px solid #5a4116;
+  border-top-color:#fff4c2;
+  color:#2a1f0a;
   box-shadow:
-    inset 0 1px 0 rgba(255,244,194,.55),
-    inset 0 -1px 0 rgba(255,226,138,.2),
-    inset 0 0 0 1px rgba(0,0,0,.5),
-    0 2px 0 rgba(0,0,0,.55),
-    0 18px 40px -10px rgba(0,0,0,.85),
-    0 0 32px rgba(212,164,58,.12);
+    inset 0 1px 0 rgba(255,255,240,.85),
+    inset 0 -2px 0 rgba(90,65,22,.55),
+    inset 0 0 0 1px rgba(0,0,0,.18),
+    0 2px 0 rgba(0,0,0,.45),
+    0 18px 40px -10px rgba(0,0,0,.75),
+    0 0 36px rgba(212,164,58,.35);
 }
 
 /* Tabs */
@@ -3077,9 +3082,9 @@ body.theme-gold .tab-btn{color:#c9a85a}
 body.theme-gold .tab-btn:hover{color:#fff0a8}
 body.theme-gold .tab-btn.active{background:linear-gradient(180deg,#fff0a8 0%,#e8c463 45%,#8b6914 100%);color:#1a1410;box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 0 18px rgba(232,196,99,.55);text-shadow:0 1px 0 rgba(255,255,255,.3)}
 
-/* Screens / displays — warm amber instead of cyan */
-body.theme-gold .screen{background:linear-gradient(180deg,#0a0806 0%,#000 100%);border:1px solid #6b4f1e;box-shadow:inset 0 0 12px rgba(0,0,0,.9),0 0 8px rgba(232,196,99,.14)}
-body.theme-gold .jog-center-screen{background:radial-gradient(circle,#120e08 0%,#000 100%);border:1px solid #6b4f1e;box-shadow:inset 0 0 20px rgba(0,0,0,.9)}
+/* Screens / displays — deep black LCD framed by gold bezel */
+body.theme-gold .screen{background:linear-gradient(180deg,#0a0806 0%,#000 100%);border:2px solid #5a4116;box-shadow:inset 0 0 12px rgba(0,0,0,.95),0 0 0 1px rgba(255,244,194,.35),0 0 10px rgba(0,0,0,.55)}
+body.theme-gold .jog-center-screen{background:radial-gradient(circle,#120e08 0%,#000 100%);border:2px solid #5a4116;box-shadow:inset 0 0 22px rgba(0,0,0,.95),0 0 0 1px rgba(255,244,194,.4)}
 body.theme-gold .track-title{color:#ffd97a;text-shadow:0 0 10px rgba(255,215,100,.7)}
 body.theme-gold .screen-bpm{color:#fff0a8;text-shadow:0 0 12px rgba(255,215,100,.8)}
 body.theme-gold .screen-key{color:#e8c463}
@@ -3100,8 +3105,8 @@ body.theme-gold .deck-number{
     0 2px 6px rgba(0,0,0,.6),
     0 0 14px rgba(255,215,100,.45)
 }
-body.theme-gold .deck-label{color:#f3e3b0}
-body.theme-gold .deck-label .model{color:#ffe28a;text-shadow:0 0 10px rgba(255,226,138,.4)}
+body.theme-gold .deck-label{color:#2a1f0a;text-shadow:0 1px 0 rgba(255,244,194,.55)}
+body.theme-gold .deck-label .model{color:#1a1208;text-shadow:0 1px 0 rgba(255,244,194,.45)}
 
 /* Jog wheels — 24k rim + dark brushed platter with anisotropic sheen */
 body.theme-gold .jog-outer{
@@ -3174,7 +3179,7 @@ body.theme-gold .fader-handle,body.theme-gold .tempo-handle,body.theme-gold .cro
   box-shadow:inset 0 1px 0 rgba(255,255,255,.7),inset 0 -1px 0 rgba(77,52,13,.6),0 3px 8px rgba(0,0,0,.88),0 0 14px rgba(212,164,58,.35)
 }
 
-/* All buttons — brushed gold */
+/* All buttons — polished bronze / dark-gold against the gold panel */
 body.theme-gold .big-btn,body.theme-gold .loop-btn,body.theme-gold .jump-btn,body.theme-gold .util-btn,
 body.theme-gold .beat-btn,body.theme-gold .scene-btn,body.theme-gold .pad-mode-btn,
 body.theme-gold .tempo-btn,body.theme-gold .step-btn,body.theme-gold .mic-btn,
@@ -3183,18 +3188,17 @@ body.theme-gold .automix-btn,body.theme-gold .dsb-btn,body.theme-gold .search-sr
 body.theme-gold .studio-preset-btn,body.theme-gold .tool-btn,body.theme-gold .assign-btn,
 body.theme-gold .curve-btn,body.theme-gold .ai-dj-btn{
   background:
-    linear-gradient(180deg,rgba(255,244,194,.12) 0%,transparent 35%,rgba(0,0,0,.3) 100%),
-    repeating-linear-gradient(90deg,rgba(255,244,194,.03) 0px,rgba(255,244,194,.03) 1px,rgba(0,0,0,.05) 1px,rgba(0,0,0,.05) 2px),
-    linear-gradient(180deg,#2a2012 0%,#14100a 55%,#0a0704 100%);
-  border:1px solid #6b4a14;
-  border-top-color:rgba(255,226,138,.4);
-  color:#ffe28a;
+    linear-gradient(180deg,rgba(255,244,194,.55) 0%,transparent 30%,rgba(60,40,10,.35) 100%),
+    linear-gradient(180deg,#6b4a14 0%,#3d2a0a 55%,#1a1208 100%);
+  border:1px solid #2a1f0a;
+  border-top-color:#ffe28a;
+  color:#fff4c2;
   box-shadow:
-    inset 0 1px 0 rgba(255,244,194,.35),
-    inset 0 -1px 0 rgba(255,226,138,.08),
-    inset 0 -2px 4px rgba(0,0,0,.75),
-    0 2px 5px rgba(0,0,0,.7);
-  text-shadow:0 1px 0 rgba(0,0,0,.85),0 0 6px rgba(255,226,138,.15)
+    inset 0 1px 0 rgba(255,244,194,.55),
+    inset 0 -2px 5px rgba(0,0,0,.8),
+    0 2px 5px rgba(0,0,0,.75),
+    0 0 0 1px rgba(255,244,194,.08);
+  text-shadow:0 1px 0 rgba(0,0,0,.9),0 0 6px rgba(255,226,138,.25)
 }
 body.theme-gold .big-btn:hover,body.theme-gold .loop-btn:hover,body.theme-gold .jump-btn:hover,
 body.theme-gold .util-btn:hover,body.theme-gold .beat-btn:hover,body.theme-gold .scene-btn:hover,
@@ -3231,10 +3235,10 @@ body.theme-gold .fx-selector{background:#000;color:#ffd97a;border-color:#6b4f1e}
 
 /* Titles */
 body.theme-gold .library-title,body.theme-gold .mixer-brand,body.theme-gold .sampler-title,
-body.theme-gold .modal-box h3,body.theme-gold .settings-section h3,
-body.theme-gold .ai-dj-title,body.theme-gold .dsb-label{color:#fff0a8;text-shadow:0 0 8px rgba(232,196,99,.3)}
-body.theme-gold .count{color:#e8c463}
-body.theme-gold .setting-desc{color:#a68845}
+body.theme-gold .ai-dj-title,body.theme-gold .dsb-label{color:#1a1208;text-shadow:0 1px 0 rgba(255,244,194,.55),0 0 10px rgba(255,255,230,.3)}
+body.theme-gold .modal-box h3,body.theme-gold .settings-section h3{color:#fff0a8;text-shadow:0 0 8px rgba(232,196,99,.3)}
+body.theme-gold .count{color:#2a1f0a;font-weight:800}
+body.theme-gold .setting-desc{color:#6b4a14}
 body.theme-gold .ai-log{background:#000;color:#ffd97a;border-color:#6b4f1e}
 
 /* Cards */
@@ -3263,19 +3267,19 @@ body.theme-gold .studio-block{background:#1a1410;border-color:#6b4f1e}
 body.theme-gold .studio-presets,body.theme-gold .studio-eq,body.theme-gold .studio-spectrum-wrap{background:#120e08;border-color:#6b4f1e}
 body.theme-gold .studio-block-title{color:#fff0a8;border-bottom-color:#6b4f1e}
 
-/* Mixer subsections */
-body.theme-gold .channel-label{color:#e8c463}
-body.theme-gold .compact-decks{background:#0e0b06;border-color:#6b4f1e}
-body.theme-gold .compact-deck{background:#1a1410;border-color:#6b4f1e}
-body.theme-gold .compact-deck-title{background:#000;color:#ffd97a;border-color:#6b4f1e}
-body.theme-gold .isolator-panel{background:#1f170a;border-color:rgba(232,196,99,.35)}
+/* Mixer subsections — recessed pockets in the gold panel */
+body.theme-gold .channel-label{color:#2a1f0a;font-weight:800;text-shadow:0 1px 0 rgba(255,244,194,.5)}
+body.theme-gold .compact-decks{background:linear-gradient(180deg,#3d2a0a,#1a1208);border-color:#6b4a14;box-shadow:inset 0 2px 6px rgba(0,0,0,.65)}
+body.theme-gold .compact-deck{background:linear-gradient(180deg,#5a4116,#2a1f0a);border-color:#2a1f0a;box-shadow:inset 0 1px 0 rgba(255,226,138,.35),inset 0 -2px 4px rgba(0,0,0,.6)}
+body.theme-gold .compact-deck-title{background:#000;color:#ffe28a;border-color:#5a4116}
+body.theme-gold .isolator-panel{background:linear-gradient(180deg,#3d2a0a,#1a1208);border-color:#6b4a14;box-shadow:inset 0 2px 6px rgba(0,0,0,.65)}
 body.theme-gold .master-section,body.theme-gold .color-fx-row,body.theme-gold .color-fx-grid,
 body.theme-gold .crossfader-section,body.theme-gold .headphone-section,body.theme-gold .mic-section,
-body.theme-gold .automix-panel{background:#120e08;border:1px solid #6b4f1e}
+body.theme-gold .automix-panel{background:linear-gradient(180deg,#3d2a0a,#1a1208);border:1px solid #6b4a14;box-shadow:inset 0 2px 6px rgba(0,0,0,.6)}
 
 /* DSB (deck focus header) */
-body.theme-gold .dsb-btn{background:linear-gradient(180deg,#2a2112 0%,#120e08 100%);border:1px solid #6b4f1e;color:#e8c463}
-body.theme-gold .dsb-btn.active{background:linear-gradient(180deg,#fff0a8 0%,#e8c463 55%,#8b6914 100%);color:#1a1410;border-color:#fff0a8;box-shadow:0 0 14px rgba(232,196,99,.7)}
+body.theme-gold .dsb-btn{background:linear-gradient(180deg,#6b4a14 0%,#2a1f0a 100%);border:1px solid #2a1f0a;color:#fff4c2;text-shadow:0 1px 0 rgba(0,0,0,.8)}
+body.theme-gold .dsb-btn.active{background:linear-gradient(180deg,#fffbe6 0%,#ffe28a 45%,#b8870e 100%);color:#1a1208;border-color:#fff4c2;box-shadow:0 0 16px rgba(255,226,138,.85),inset 0 1px 0 rgba(255,255,255,.7)}
 
 /* Auth */
 body.theme-gold .auth-btn{background:linear-gradient(180deg,#2a2112 0%,#120e08 100%);border:1px solid #e8c463;color:#fff0a8}
@@ -3551,6 +3555,250 @@ body.theme-pro .bank-btn{color:#8a8a92}
 body.theme-pro .bank-btn.active{color:#fff;background:linear-gradient(180deg,#ff5e65 0%,#ff2e3a 100%)}
 body.theme-pro .seq-step{background:linear-gradient(180deg,#1a1a1e,#08080a);color:rgba(237,237,240,.25);border:1px solid #2c2c32}
 body.theme-pro .seq-step.on{color:#fff;background:linear-gradient(180deg,#ff5e65 0%,#ff2e3a 100%);box-shadow:0 0 10px rgba(255,46,58,.7)}
+
+/* ============================================================
+   PIONEER THEME — authentic CDJ-3000 club-standard look:
+   matte graphite body, brushed-aluminum silver jog rim,
+   glossy black platter, Pioneer signature amber/orange accents.
+   ============================================================ */
+body.theme-pioneer{
+  --orange:#ff9020;
+  --orange-glow:#ffb060;
+  --cue-orange:#ff9020;
+  --play-green:#3de55f;
+  --screen-glow:#2ed5ff;
+  --yellow:#ffc840;
+  --red:#ff3c3c;
+  --purple:#b07aff;
+  --pink:#ff4faa;
+  --text:#e6e6ea;
+  --text-dim:#8a8a92;
+  --bg:#060608;
+  --deck-bg:#14141a;
+  --deck-panel:#1a1a20;
+  --deck-border:#2a2a30;
+}
+body.theme-pioneer,body.theme-pioneer html{
+  background:
+    radial-gradient(ellipse at 20% 0%,rgba(255,144,32,.04) 0%,transparent 38%),
+    radial-gradient(ellipse at center,#12121a 0%,#040406 80%);
+}
+body.theme-pioneer::after{background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.6) 100%)}
+body.theme-pioneer ::-webkit-scrollbar-track{background:#0a0a0c}
+body.theme-pioneer ::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#505058,#24242a);border:1px solid #2a2a30}
+
+/* Header */
+body.theme-pioneer .header-bar{color:#e6e6ea}
+body.theme-pioneer .brand{color:#e6e6ea;text-shadow:0 1px 0 rgba(0,0,0,.9),0 0 18px rgba(255,144,32,.25)}
+body.theme-pioneer .brand .max{background:linear-gradient(180deg,#ffc080 0%,#ff9020 50%,#c35a00 100%);color:#1a0800;box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 1px 2px rgba(0,0,0,.5),0 0 14px rgba(255,144,32,.55)}
+body.theme-pioneer .header-right{color:#8a8a92}
+body.theme-pioneer .power-led{background:radial-gradient(circle,#ffc080,#ff9020);box-shadow:0 0 8px rgba(255,144,32,.9)}
+
+/* Panels — matte CDJ-3000 body, very subtle vertical sheen */
+body.theme-pioneer .cdj,body.theme-pioneer .mixer,body.theme-pioneer .library,
+body.theme-pioneer .sampler-panel,body.theme-pioneer .youtube-panel,body.theme-pioneer .playlists-panel,
+body.theme-pioneer .ai-dj-panel,body.theme-pioneer .analytics-panel,body.theme-pioneer .midi-panel,
+body.theme-pioneer .settings-panel,body.theme-pioneer .beat-fx-panel,body.theme-pioneer .scene-fx-panel,
+body.theme-pioneer .deck-switch-bar,body.theme-pioneer .mixer-toolbar{
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.055) 0%,transparent 6%,transparent calc(100% - 2px),rgba(0,0,0,.55) 100%),
+    repeating-linear-gradient(0deg,rgba(255,255,255,.008) 0px,rgba(255,255,255,.008) 1px,transparent 1px,transparent 3px),
+    linear-gradient(180deg,#1e1e22 0%,#131317 50%,#0a0a0c 100%);
+  border:1px solid #2a2a30;
+  border-top-color:rgba(255,255,255,.1);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.07),
+    inset 0 -1px 0 rgba(0,0,0,.55),
+    0 2px 0 rgba(0,0,0,.55),
+    0 18px 40px -10px rgba(0,0,0,.88)
+}
+
+/* Tabs */
+body.theme-pioneer .main-tabs{background:linear-gradient(180deg,#1e1e22 0%,#0c0c10 100%);border:1px solid #2a2a30;box-shadow:inset 0 2px 6px rgba(0,0,0,.7)}
+body.theme-pioneer .tab-btn{color:#8a8a92}
+body.theme-pioneer .tab-btn:hover{color:#e6e6ea}
+body.theme-pioneer .tab-btn.active{background:linear-gradient(180deg,#ffc080 0%,#ff9020 45%,#c35a00 100%);color:#1a0800;box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 0 16px rgba(255,144,32,.55);text-shadow:0 1px 0 rgba(255,255,255,.25)}
+
+/* Screen — black LCD with crisp white/cyan text */
+body.theme-pioneer .screen{background:linear-gradient(180deg,#05050a 0%,#000 100%);border:2px solid #0c0c10;box-shadow:inset 0 0 14px rgba(0,0,0,.95),0 0 0 1px rgba(255,255,255,.07),0 0 10px rgba(46,213,255,.08)}
+body.theme-pioneer .jog-center-screen{background:radial-gradient(circle,#0a0a10 0%,#000 100%);border:2px solid #0c0c10;box-shadow:inset 0 0 22px rgba(0,0,0,.95),0 0 0 1px rgba(255,255,255,.06)}
+body.theme-pioneer .track-title{color:#fff;text-shadow:0 0 8px rgba(255,255,255,.45)}
+body.theme-pioneer .screen-bpm{color:#2ed5ff;text-shadow:0 0 12px rgba(46,213,255,.9)}
+body.theme-pioneer .screen-key{color:#ff9020}
+body.theme-pioneer .master-bpm{background:#000;border:1px solid #2a2a30;color:#2ed5ff;text-shadow:0 0 10px rgba(46,213,255,.85)}
+body.theme-pioneer .jog-center-screen .bpm-display{color:#2ed5ff;text-shadow:0 0 10px rgba(46,213,255,.85)}
+body.theme-pioneer .jog-center-screen .bpm-sub,body.theme-pioneer .jog-center-screen .deck-badge{color:#e6e6ea}
+
+/* Deck number — small silver etched nameplate */
+body.theme-pioneer .deck-number{
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.45) 0%,transparent 14%,transparent 55%,rgba(0,0,0,.45) 100%),
+    linear-gradient(180deg,#d0d0d6 0%,#808088 40%,#40404a 72%,#1a1a20 100%);
+  color:#fff;
+  text-shadow:0 1px 0 rgba(0,0,0,.55),0 -1px 0 rgba(255,255,255,.2);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -1px 0 rgba(0,0,0,.55),0 2px 6px rgba(0,0,0,.7)
+}
+body.theme-pioneer .deck-label{color:#e6e6ea}
+body.theme-pioneer .deck-label .model{color:#ff9020;text-shadow:0 0 8px rgba(255,144,32,.35)}
+
+/* Jog wheel — BRUSHED ALUMINUM SILVER RIM + glossy black platter (CDJ-3000 signature) */
+body.theme-pioneer .jog-outer{
+  background:
+    radial-gradient(circle at 50% 5%,rgba(255,255,255,.65) 0%,transparent 22%),
+    radial-gradient(circle at 50% 95%,rgba(0,0,0,.7) 0%,transparent 30%),
+    conic-gradient(from 0deg,
+      #6a6a72 0deg,#9a9aa2 28deg,#d4d4da 58deg,#f0f0f4 88deg,
+      #c8c8ce 118deg,#8a8a92 150deg,#b4b4ba 190deg,#6a6a72 220deg,
+      #a8a8b0 260deg,#d8d8de 300deg,#8a8a92 340deg,#6a6a72 360deg);
+  border:3px solid #06060a;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.5),
+    inset 0 0 0 2px rgba(0,0,0,.75),
+    inset 0 2px 12px rgba(0,0,0,.7),
+    0 4px 18px rgba(0,0,0,.88),
+    0 0 0 1px rgba(255,255,255,.1)
+}
+body.theme-pioneer .jog-platter{
+  background:
+    radial-gradient(circle at 50% 20%,rgba(255,255,255,.22) 0%,transparent 30%),
+    radial-gradient(circle at 50% 92%,rgba(0,0,0,.8) 0%,transparent 30%),
+    radial-gradient(circle,#1a1a20 0%,#0a0a0e 68%,#000 100%);
+  box-shadow:
+    inset 0 0 44px rgba(0,0,0,.96),
+    inset 0 2px 6px rgba(255,255,255,.12),
+    0 0 0 2px rgba(255,255,255,.04)
+}
+body.theme-pioneer .jog-platter-disc{
+  background:
+    repeating-conic-gradient(from 0deg at 50% 50%,rgba(255,255,255,.035) 0deg,transparent 3deg,transparent 6deg),
+    radial-gradient(circle at 50% 35%,rgba(255,80,180,.55) 0%,transparent 14%),
+    radial-gradient(circle at 50% 55%,rgba(46,213,255,.45) 0%,transparent 14%),
+    radial-gradient(circle,#141418 0%,#05050a 72%,#000 100%);
+}
+body.theme-pioneer .jog-indicator{
+  background:linear-gradient(180deg,#fff 0%,#ffc080 35%,#ff9020 70%,#c35a00 100%);
+  box-shadow:0 0 8px rgba(0,0,0,.85),0 0 20px rgba(255,144,32,.98),0 0 4px rgba(255,255,255,.9)
+}
+
+/* Knobs — dark polished plastic with subtle sheen */
+body.theme-pioneer .knob{
+  background:
+    radial-gradient(ellipse 55% 28% at 45% 18%,rgba(255,255,255,.6) 0%,rgba(255,255,255,.2) 30%,transparent 58%),
+    radial-gradient(circle at 50% 108%,rgba(0,0,0,.85) 0%,transparent 48%),
+    radial-gradient(circle at 40% 35%,#5a5a62 0%,#2c2c32 35%,#141418 70%,#06060a 100%);
+  border:1px solid #04040a;
+  box-shadow:inset 0 2px 1px rgba(255,255,255,.3),inset 0 -3px 6px rgba(0,0,0,.9),0 3px 7px rgba(0,0,0,.85)
+}
+body.theme-pioneer .knob-indicator{background:linear-gradient(180deg,#fff 0%,#ffc080 50%,#ff9020 100%);box-shadow:0 0 4px rgba(0,0,0,.8),0 0 10px rgba(255,144,32,.9)}
+body.theme-pioneer .knob-label{color:#9a9aa0;font-weight:700;letter-spacing:1.8px;text-shadow:0 1px 0 rgba(0,0,0,.85)}
+
+/* VU — classic Pioneer green/yellow/red */
+body.theme-pioneer .vu-meter{background:#000;border:1px solid #2a2a30;box-shadow:inset 0 0 6px rgba(0,0,0,.95)}
+body.theme-pioneer .vu-led{background:#08080a}
+body.theme-pioneer .vu-led.on.green{background:linear-gradient(90deg,#15a030,#3de55f);box-shadow:0 0 6px rgba(61,229,95,.9),inset 0 0 2px rgba(255,255,255,.3)}
+body.theme-pioneer .vu-led.on.yellow{background:linear-gradient(90deg,#c89000,#ffc840);box-shadow:0 0 6px rgba(255,200,64,.9),inset 0 0 2px rgba(255,255,255,.3)}
+body.theme-pioneer .vu-led.on.red{background:linear-gradient(90deg,#c82020,#ff4a4a);box-shadow:0 0 7px rgba(255,74,74,.95),inset 0 0 2px rgba(255,255,255,.3)}
+
+/* Faders — brushed aluminum handles */
+body.theme-pioneer .fader-wrap,body.theme-pioneer .crossfader-track,body.theme-pioneer .tempo-slider{background:linear-gradient(180deg,#04040a 0%,#141418 100%);border:1px solid #2a2a30;box-shadow:inset 0 2px 6px rgba(0,0,0,.95)}
+body.theme-pioneer .fader-handle,body.theme-pioneer .tempo-handle,body.theme-pioneer .crossfader-handle{
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.55) 0%,transparent 18%,transparent 82%,rgba(0,0,0,.45) 100%),
+    linear-gradient(180deg,#d8d8de 0%,#a0a0a8 25%,#606068 60%,#2a2a30 100%);
+  border:1px solid #04040a;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.7),inset 0 -1px 0 rgba(0,0,0,.45),0 3px 8px rgba(0,0,0,.88)
+}
+body.theme-pioneer .fader-handle::before,body.theme-pioneer .tempo-handle::before{background:linear-gradient(90deg,transparent,#ff9020,transparent);box-shadow:0 0 8px #ff9020}
+
+/* Buttons — matte dark plastic CDJ-3000 caps */
+body.theme-pioneer .big-btn,body.theme-pioneer .loop-btn,body.theme-pioneer .jump-btn,body.theme-pioneer .util-btn,
+body.theme-pioneer .beat-btn,body.theme-pioneer .scene-btn,body.theme-pioneer .pad-mode-btn,
+body.theme-pioneer .tempo-btn,body.theme-pioneer .step-btn,body.theme-pioneer .mic-btn,
+body.theme-pioneer .cue-btn,body.theme-pioneer .compact-btn,body.theme-pioneer .cue-hp-btn,
+body.theme-pioneer .automix-btn,body.theme-pioneer .dsb-btn,body.theme-pioneer .search-src-btn,
+body.theme-pioneer .studio-preset-btn,body.theme-pioneer .tool-btn,body.theme-pioneer .assign-btn,
+body.theme-pioneer .curve-btn,body.theme-pioneer .ai-dj-btn{
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.12) 0%,transparent 30%,rgba(0,0,0,.35) 100%),
+    linear-gradient(180deg,#3a3a42 0%,#1e1e24 55%,#0c0c10 100%);
+  border:1px solid #04040a;
+  border-top-color:rgba(255,255,255,.22);
+  color:#e6e6ea;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.28),inset 0 -2px 4px rgba(0,0,0,.75),0 2px 5px rgba(0,0,0,.7);
+  text-shadow:0 1px 0 rgba(0,0,0,.9)
+}
+body.theme-pioneer .big-btn:hover,body.theme-pioneer .loop-btn:hover,body.theme-pioneer .jump-btn:hover,
+body.theme-pioneer .util-btn:hover,body.theme-pioneer .beat-btn:hover,body.theme-pioneer .scene-btn:hover,
+body.theme-pioneer .pad-mode-btn:hover{filter:brightness(1.25);border-color:#ff9020}
+
+/* Signature Pioneer colors for active states */
+body.theme-pioneer .big-btn.cue.active{background:linear-gradient(180deg,#ffd4a0 0%,#ff9020 50%,#a04000 100%);color:#1a0800;border-color:#ffc080;box-shadow:0 0 24px rgba(255,144,32,.9),inset 0 1px 0 rgba(255,255,255,.5)}
+body.theme-pioneer .big-btn.play.active{background:linear-gradient(180deg,#b8ffc8 0%,#3de55f 50%,#15a030 100%);color:#00200a;border-color:#a8ffb8;box-shadow:0 0 24px rgba(61,229,95,.85),inset 0 1px 0 rgba(255,255,255,.5);animation:playPulse 1s ease-in-out infinite}
+body.theme-pioneer .loop-btn.active,body.theme-pioneer .beat-btn.active,body.theme-pioneer .scene-btn.active{background:linear-gradient(180deg,#ffc080 0%,#ff9020 55%,#a04000 100%);color:#1a0800;box-shadow:0 0 18px rgba(255,144,32,.85)}
+body.theme-pioneer .util-btn.sync.active{background:linear-gradient(180deg,#8ee8ff 0%,#2ed5ff 100%);color:#001a22}
+body.theme-pioneer .util-btn.keylock.active{background:linear-gradient(180deg,#ffc080 0%,#ff9020 100%);color:#1a0800}
+body.theme-pioneer .util-btn.quantize.active{background:linear-gradient(180deg,#e0d0ff 0%,#b07aff 100%);color:#12001e}
+body.theme-pioneer .util-btn.slip.active{background:linear-gradient(180deg,#ffd4a0 0%,#ff9020 100%);color:#1a0800}
+body.theme-pioneer .util-btn.reverse.active{background:linear-gradient(180deg,#ff8a8a 0%,#c82020 100%);color:#fff}
+body.theme-pioneer .fx-onoff{background:linear-gradient(180deg,#1a1a20 0%,#08080a 100%);border:2px solid #2a2a30;color:#e6e6ea}
+body.theme-pioneer .fx-onoff.active{background:linear-gradient(180deg,#ffc080 0%,#ff9020 55%,#a04000 100%);color:#1a0800;border-color:#ffc080;box-shadow:0 0 16px rgba(255,144,32,.75)}
+body.theme-pioneer .cue-btn.active{background:linear-gradient(180deg,#ffd4a0 0%,#ff9020 55%,#a04000 100%) !important;color:#1a0800 !important;border-color:#ffc080;box-shadow:0 0 22px rgba(255,144,32,.85),inset 0 1px 0 rgba(255,255,255,.45)}
+
+/* Sample pads */
+body.theme-pioneer .sample-pad{background:linear-gradient(180deg,#2a2a30 0%,#12121a 100%);border:1px solid #2a2a30;color:#e6e6ea;box-shadow:inset 0 1px 0 rgba(255,255,255,.2),inset 0 -3px 5px rgba(0,0,0,.75),0 3px 6px rgba(0,0,0,.65)}
+body.theme-pioneer .sample-pad .pad-num{color:#ff9020}
+body.theme-pioneer .sample-pad .pad-name{color:#8a8a92}
+body.theme-pioneer .sample-pad.playing{box-shadow:inset 0 2px 4px rgba(0,0,0,.5),0 0 32px rgba(255,144,32,.9),0 0 3px rgba(255,192,128,.9)}
+
+/* Inputs / toasts / modals */
+body.theme-pioneer input,body.theme-pioneer select,body.theme-pioneer textarea{background:#12121a;color:#e6e6ea;border:1px solid #2a2a30}
+body.theme-pioneer input:focus,body.theme-pioneer select:focus{border-color:#ff9020;outline:none;box-shadow:0 0 0 3px rgba(255,144,32,.22)}
+body.theme-pioneer .fx-selector{background:#000;color:#2ed5ff;border-color:#2a2a30}
+body.theme-pioneer .library-title,body.theme-pioneer .mixer-brand,body.theme-pioneer .sampler-title,
+body.theme-pioneer .modal-box h3,body.theme-pioneer .settings-section h3,
+body.theme-pioneer .ai-dj-title,body.theme-pioneer .dsb-label{color:#ffc080;text-shadow:0 0 8px rgba(255,144,32,.3)}
+body.theme-pioneer .count{color:#ff9020}
+body.theme-pioneer .setting-desc{color:#6a6a72}
+body.theme-pioneer .playlist-card,body.theme-pioneer .session-card,body.theme-pioneer .stat-card,body.theme-pioneer .midi-device,body.theme-pioneer .shortcut-item{background:linear-gradient(180deg,#1a1a20 0%,#0c0c10 100%);border:1px solid #2a2a30;color:#e6e6ea}
+body.theme-pioneer .track-row{background:#12121a;border:1px solid transparent;color:#e6e6ea}
+body.theme-pioneer .track-row:hover{background:#1e1e24;border-color:#ff9020;box-shadow:0 4px 10px rgba(0,0,0,.5),0 0 14px rgba(255,144,32,.2)}
+body.theme-pioneer .track-row .t-title{color:#fff}
+body.theme-pioneer .track-row .t-artist{color:#8a8a92}
+body.theme-pioneer .track-list-header{color:#ff9020;border-bottom:1px solid rgba(255,144,32,.3)}
+body.theme-pioneer .toast{background:linear-gradient(180deg,#1e1e22 0%,#0c0c10 100%);color:#e6e6ea;border:1px solid #ff9020;box-shadow:0 12px 30px rgba(0,0,0,.7),0 0 22px rgba(255,144,32,.25)}
+body.theme-pioneer .modal-box{background:linear-gradient(180deg,#1e1e22 0%,#0c0c10 100%);color:#e6e6ea;border:1px solid #2a2a30;box-shadow:0 40px 80px rgba(0,0,0,.85)}
+body.theme-pioneer .modal-overlay{background:rgba(6,6,8,.85)}
+
+/* Mixer subsections */
+body.theme-pioneer .channel-label{color:#ff9020}
+body.theme-pioneer .compact-decks{background:#0c0c10;border-color:#2a2a30}
+body.theme-pioneer .compact-deck{background:#16161c;border-color:#2a2a30}
+body.theme-pioneer .compact-deck-title{background:#000;color:#2ed5ff;border-color:#2a2a30}
+body.theme-pioneer .isolator-panel{background:#14141a;border-color:rgba(255,144,32,.25)}
+body.theme-pioneer .master-section,body.theme-pioneer .color-fx-row,body.theme-pioneer .color-fx-grid,
+body.theme-pioneer .crossfader-section,body.theme-pioneer .headphone-section,body.theme-pioneer .mic-section,
+body.theme-pioneer .automix-panel{background:#0e0e14;border:1px solid #2a2a30}
+
+/* DSB + toggles + auth */
+body.theme-pioneer .dsb-btn.active{background:linear-gradient(180deg,#ffc080 0%,#ff9020 55%,#a04000 100%);color:#1a0800;border-color:#ffc080;box-shadow:0 0 14px rgba(255,144,32,.75)}
+body.theme-pioneer .auth-btn{background:linear-gradient(180deg,#1e1e22,#0c0c10);border:1px solid #ff9020;color:#ffc080}
+body.theme-pioneer .rec-btn{background:linear-gradient(180deg,#1e1e22,#0c0c10);border-color:#ff3c3c;color:#ff8a8a}
+body.theme-pioneer .rec-btn.recording{background:linear-gradient(180deg,#ff6060,#c82020);color:#fff}
+body.theme-pioneer .toggle-switch{background:#14141a;border:1px solid #2a2a30}
+body.theme-pioneer .toggle-switch.on{background:linear-gradient(180deg,#ffc080,#ff9020);border-color:#ffc080;box-shadow:0 0 10px rgba(255,144,32,.6)}
+body.theme-pioneer .master-meters{background:#000;border-color:#2a2a30;box-shadow:inset 0 2px 6px rgba(0,0,0,.95)}
+
+/* Per-deck accent stays Pioneer orange */
+body.theme-pioneer .cdj[data-deck]{--deck-accent:#ff9020;--deck-accent-rgb:255,144,32}
+
+/* RGB ambient adapt */
+body.theme-pioneer .rgb-ambient{background:linear-gradient(90deg,#a04000 0%,#ff9020 30%,#ffc080 50%,#ff9020 70%,#a04000 100%);box-shadow:0 0 20px rgba(255,144,32,.55)}
+
+/* Sequencer */
+body.theme-pioneer .bank-btn{color:#8a8a92}
+body.theme-pioneer .bank-btn.active{color:#1a0800;background:linear-gradient(180deg,#ffc080,#ff9020)}
+body.theme-pioneer .seq-step{background:linear-gradient(180deg,#1a1a20,#08080c);color:rgba(230,230,234,.25);border:1px solid #2a2a30}
+body.theme-pioneer .seq-step.on{color:#1a0800;background:linear-gradient(180deg,#ffc080,#ff9020);box-shadow:0 0 10px rgba(255,144,32,.7)}
 
 body.work-mode .library{display:block !important}
 body.work-mode .tab-content#tab-deck{display:flex !important;flex-direction:column;align-items:center;gap:12px}
@@ -4372,7 +4620,8 @@ No MIDI devices. Press CONNECT.
 <div class="settings-row">
 <div><div class="setting-label">Theme</div><div class="setting-desc">Visual theme</div></div>
 <select class="fx-selector" id="settingTheme">
-<option value="dark">Dark (Pioneer)</option><option value="neon">Neon</option>
+<option value="dark">Dark</option><option value="neon">Neon</option>
+<option value="pioneer">Pioneer (CDJ-3000)</option>
 <option value="gold">Gold (Vertex Luxury)</option><option value="pro">Pro (Graphite + Red)</option>
 <option value="light">Light</option>
 </select></div>
@@ -6637,7 +6886,7 @@ function loadFromDB(){
 
 /* SETTINGS */
 function applyTheme(name){
-  document.body.classList.remove('theme-light','theme-neon','theme-gold','theme-pro');
+  document.body.classList.remove('theme-light','theme-neon','theme-gold','theme-pro','theme-pioneer');
   if(name!=='dark')document.body.classList.add(`theme-${name}`);
   settings.theme=name;saveToDB();
 }
