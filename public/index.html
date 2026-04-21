@@ -3208,6 +3208,66 @@ body.work-mode .deck-switch-bar{
   box-shadow:0 10px 32px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.05);
 }
 
+/* HARMONIC ASSISTANT — floating Camelot-matched suggestions panel */
+.harmonic-toggle{
+  position:fixed;top:58px;right:8px;z-index:8500;
+  padding:6px 10px;border-radius:6px;cursor:pointer;
+  font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;letter-spacing:1.5px;
+  background:linear-gradient(180deg,#2a2a2e 0%,#12121a 100%);
+  border:1px solid rgba(255,138,26,.35);color:var(--orange);
+  box-shadow:0 2px 8px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.08);
+  transition:all .15s ease;opacity:.85
+}
+.harmonic-toggle:hover{opacity:1;box-shadow:0 0 20px rgba(255,138,26,.45);transform:translateY(-1px)}
+.harmonic-toggle.open{background:linear-gradient(180deg,var(--orange) 0%,#aa3a00 100%);color:#1a0d00;border-color:#fff;box-shadow:0 0 20px rgba(255,138,26,.6)}
+.harmonic-panel{
+  display:none;position:fixed;top:92px;right:8px;z-index:8500;
+  width:280px;max-height:calc(100vh - 120px);
+  background:linear-gradient(180deg,rgba(16,16,20,.97) 0%,rgba(10,10,12,.97) 100%);
+  border:1px solid rgba(255,138,26,.35);border-radius:10px;
+  box-shadow:0 12px 36px rgba(0,0,0,.7),0 0 22px rgba(255,138,26,.12),inset 0 1px 0 rgba(255,255,255,.06);
+  backdrop-filter:blur(12px) saturate(1.2);
+  overflow:hidden;
+  font-family:'Orbitron',sans-serif;
+}
+.harmonic-panel.open{display:flex;flex-direction:column}
+.hp-head{display:flex;align-items:center;gap:8px;padding:10px 12px;background:linear-gradient(180deg,#1a1a20 0%,#0e0e14 100%);border-bottom:1px solid rgba(255,138,26,.15)}
+.hp-title{flex:1;font-size:10px;letter-spacing:2.2px;font-weight:800;color:var(--orange);text-shadow:0 0 8px rgba(255,138,26,.3)}
+.hp-ref{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--screen-glow);padding:2px 6px;border:1px solid rgba(46,224,255,.25);border-radius:4px;background:rgba(0,20,30,.4)}
+.hp-close{background:transparent;border:none;color:var(--text-dim);font-size:14px;cursor:pointer;padding:2px 6px}
+.hp-close:hover{color:var(--orange)}
+.hp-list{flex:1;overflow-y:auto;padding:6px;display:flex;flex-direction:column;gap:4px;min-height:80px}
+.hp-row{display:grid;grid-template-columns:36px 1fr auto;gap:8px;align-items:center;padding:7px 9px;background:linear-gradient(180deg,#17171c 0%,#0c0c10 100%);border:1px solid rgba(255,138,26,.08);border-radius:6px;cursor:pointer;transition:all .12s}
+.hp-row:hover{border-color:var(--orange);background:linear-gradient(180deg,#1f1f26 0%,#14141a 100%);transform:translateX(-2px);box-shadow:0 4px 10px rgba(0,0,0,.5),0 0 12px rgba(255,138,26,.15)}
+.hp-score{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;font-family:'Orbitron',sans-serif;color:#000;background:conic-gradient(var(--sc,#2eff7a) calc(var(--p,100)*1%),rgba(255,255,255,.08) 0);position:relative}
+.hp-score::after{content:'';position:absolute;inset:3px;border-radius:50%;background:#0c0c10}
+.hp-score span{position:relative;z-index:1;color:var(--sc,#2eff7a);text-shadow:0 0 8px var(--sc,#2eff7a)}
+.hp-info{min-width:0;display:flex;flex-direction:column;gap:2px}
+.hp-info .hp-t{font-size:11px;color:#e6e6ea;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.3px}
+.hp-info .hp-a{font-size:9px;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hp-meta{display:flex;flex-direction:column;align-items:flex-end;gap:2px;font-size:9px;font-family:'Share Tech Mono',monospace;white-space:nowrap}
+.hp-meta .hp-bpm{color:var(--screen-glow);font-weight:700}
+.hp-meta .hp-key{color:var(--orange);font-weight:700}
+.hp-badge{display:inline-block;padding:1px 5px;border-radius:3px;font-size:8px;letter-spacing:.8px;font-weight:700}
+.hp-badge.perfect{background:rgba(46,255,122,.15);color:#2eff7a;border:1px solid rgba(46,255,122,.35)}
+.hp-badge.energy{background:rgba(255,138,26,.15);color:var(--orange);border:1px solid rgba(255,138,26,.35)}
+.hp-badge.relative{background:rgba(176,122,255,.15);color:#b07aff;border:1px solid rgba(176,122,255,.35)}
+.hp-badge.compat{background:rgba(46,224,255,.15);color:var(--screen-glow);border:1px solid rgba(46,224,255,.35)}
+.hp-empty{padding:22px 12px;text-align:center;color:var(--text-dim);font-size:10px;letter-spacing:1.5px}
+.hp-foot{padding:6px 10px;border-top:1px solid rgba(255,138,26,.1);font-size:8px;color:var(--text-dim);letter-spacing:1px;text-align:center;background:linear-gradient(180deg,#0e0e14 0%,#0a0a0e 100%)}
+.hp-foot kbd{font-family:'Orbitron',sans-serif;background:#1a1a22;padding:1px 5px;border-radius:3px;border:1px solid rgba(255,255,255,.1);color:var(--orange)}
+@media(max-width:900px){
+  .harmonic-panel{width:calc(100vw - 16px);right:8px;left:8px;max-height:50vh}
+}
+body.theme-gold .harmonic-panel{background:linear-gradient(180deg,rgba(30,24,12,.97),rgba(16,12,6,.97));border-color:#6b4f1e}
+body.theme-gold .hp-title{color:#fff0a8}
+body.theme-gold .harmonic-toggle{border-color:#6b4f1e;color:#e8c463}
+body.theme-gold .harmonic-toggle.open{background:linear-gradient(180deg,#fff0a8,#8b6914);color:#1a1410;border-color:#fff0a8}
+body.theme-light .harmonic-panel{background:linear-gradient(180deg,rgba(255,255,255,.97),rgba(245,245,250,.97));border-color:rgba(255,138,26,.35)}
+body.theme-light .hp-row{background:#fff;border-color:rgba(0,0,0,.06)}
+body.theme-light .hp-row:hover{background:#fafafc;border-color:var(--orange)}
+body.theme-light .hp-info .hp-t{color:#1a1a1c}
+
 /* Big floating EXIT button visible only in WORK MODE */
 .wm-exit-btn{
   display:none;position:fixed;top:8px;right:8px;z-index:9000;
@@ -3488,6 +3548,18 @@ body.work-mode .dsb-wmexit{display:inline-flex;background:linear-gradient(180deg
 
 <div class="tab-content active" id="tab-deck">
 <button class="wm-exit-btn" id="wmExitBtn" title="Exit work mode (Esc)">✕ EXIT</button>
+
+<!-- HARMONIC ASSISTANT — Camelot-matched suggestions for the active deck -->
+<button class="harmonic-toggle" id="harmonicToggle" title="Harmonic suggestions (H)">🎵 HARMONIC</button>
+<div class="harmonic-panel" id="harmonicPanel">
+  <div class="hp-head">
+    <span class="hp-title">HARMONIC MATCHES</span>
+    <span class="hp-ref" id="hpRef">—</span>
+    <button class="hp-close" id="hpClose" title="Close (H)">✕</button>
+  </div>
+  <div class="hp-list" id="hpList"></div>
+  <div class="hp-foot">Click a track → loads to free deck · <kbd>H</kbd> toggle</div>
+</div>
 
 <div class="quick-lib-overlay" id="quickLibOverlay">
   <div class="quick-lib-box">
@@ -6398,6 +6470,7 @@ function setupKeyboard(){
         case ';':e.preventDefault();adjustKnob('booth',-STEP);return;
         case "'":e.preventDefault();adjustKnob('booth',STEP);return;
         case 'm':e.preventDefault();document.getElementById('micOnBtn')?.click();return;
+        case 'h':e.preventDefault();if(typeof toggleHarmonicPanel==='function')toggleHarmonicPanel();return;
         case 'r':e.preventDefault();['isoLow','isoMid','isoHi'].forEach(resetKnob);return;
         case '1':e.preventDefault();document.querySelector('[data-mix="smooth"]')?.click();return;
         case '2':e.preventDefault();document.querySelector('[data-mix="energy"]')?.click();return;
@@ -6617,6 +6690,101 @@ function getRecommendations(currentTrack){
     return bpmMatch&&(keyMatch||bpmDiff<0.03);
   }).sort((a,b)=>Math.abs(a.bpm-currentTrack.bpm)-Math.abs(b.bpm-currentTrack.bpm)).slice(0,8);
 }
+
+/* HARMONIC ASSISTANT — scored suggestions for the active deck */
+function pickReferenceDeck(){
+  const order=['A','B','C','D'];
+  const playing=order.find(d=>decks[d]?.playing&&decks[d]?.track);
+  if(playing)return playing;
+  const loaded=order.find(d=>decks[d]?.track);
+  return loaded||null;
+}
+function scoreHarmonicCandidate(ref,t){
+  const bpmDiff=Math.abs(t.bpm-ref.bpm);
+  const bpmDiffHalf=Math.min(bpmDiff,Math.abs(t.bpm*2-ref.bpm),Math.abs(t.bpm-ref.bpm*2));
+  const bpmPct=bpmDiffHalf/ref.bpm;
+  const bpmS=Math.max(0,1-bpmPct*12);
+  const keyS=(ref.key==='--'||t.key==='--')?0.5:harmonicScore(ref.key,t.key);
+  const e1=ref.energy||5,e2=t.energy||5;
+  const eS=1-Math.min(1,Math.abs(e2-e1)/6);
+  const total=keyS*0.55+bpmS*0.35+eS*0.10;
+  let badge='compat',label='OK';
+  if(keyS>=0.99&&bpmPct<0.01){badge='perfect';label='PERFECT';}
+  else if(keyS>=0.9){badge='relative';label=ref.key&&t.key&&ref.key!==t.key?'REL/NEIGHBOR':'SAME KEY';}
+  else if(eS>0.8&&bpmS>0.8){badge='energy';label='ENERGY';}
+  return {score:Math.round(total*100),badge,label,bpmDiff:bpmDiffHalf.toFixed(1)};
+}
+function getHarmonicSuggestions(ref,limit=8){
+  if(!ref)return[];
+  const loadedIds=new Set(['A','B','C','D'].map(d=>decks[d]?.track?.id).filter(Boolean));
+  return library.filter(t=>t.id!==ref.id&&!loadedIds.has(t.id)&&t.source!=='yt'&&t.bpm)
+    .map(t=>({t,...scoreHarmonicCandidate(ref,t)}))
+    .sort((a,b)=>b.score-a.score).slice(0,limit);
+}
+function renderHarmonicPanel(){
+  const panel=document.getElementById('harmonicPanel');
+  if(!panel||!panel.classList.contains('open'))return;
+  const refDeck=pickReferenceDeck();
+  const ref=refDeck?decks[refDeck]?.track:null;
+  const refEl=document.getElementById('hpRef');
+  const listEl=document.getElementById('hpList');
+  if(!ref){
+    if(refEl)refEl.textContent='—';
+    if(listEl)listEl.innerHTML='<div class="hp-empty">Load a track on any deck to see harmonic matches</div>';
+    return;
+  }
+  if(refEl)refEl.textContent=`${refDeck} · ${ref.key||'--'} · ${Math.round(ref.bpm||0)}`;
+  const suggestions=getHarmonicSuggestions(ref,8);
+  if(!suggestions.length){
+    if(listEl)listEl.innerHTML='<div class="hp-empty">No matching tracks yet — add more to your library</div>';
+    return;
+  }
+  const scColor=s=>s>=85?'#2eff7a':s>=65?'#ffd400':s>=45?'#ff8a1a':'#ff3c3c';
+  listEl.innerHTML=suggestions.map(({t,score,badge,label,bpmDiff})=>{
+    const safe=s=>(s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+    return `<div class="hp-row" data-id="${safe(t.id)}" title="Click to load to a free deck">
+      <div class="hp-score" style="--sc:${scColor(score)};--p:${score}"><span>${score}</span></div>
+      <div class="hp-info">
+        <div class="hp-t">${safe(t.title||'Untitled')}</div>
+        <div class="hp-a">${safe(t.artist||'Unknown')} · <span class="hp-badge ${badge}">${label}</span></div>
+      </div>
+      <div class="hp-meta">
+        <span class="hp-bpm">${Math.round(t.bpm||0)} BPM</span>
+        <span class="hp-key">${t.key||'--'} · Δ${bpmDiff}</span>
+      </div>
+    </div>`;
+  }).join('');
+  listEl.querySelectorAll('.hp-row').forEach(row=>{
+    row.addEventListener('click',()=>{
+      const tid=row.dataset.id;
+      const track=library.find(t=>t.id===tid);if(!track)return;
+      const free=['A','B','C','D'].find(d=>!decks[d]?.track||!decks[d]?.playing);
+      if(!free){toast('All decks busy — pause one first','warn');return;}
+      if(typeof loadTrackToDeck==='function')loadTrackToDeck(free,track);
+      else if(typeof loadToDeck==='function')loadToDeck(free,track);
+      toast(`→ Deck ${free}: ${track.title}`);
+    });
+  });
+}
+function toggleHarmonicPanel(force){
+  const panel=document.getElementById('harmonicPanel');
+  const btn=document.getElementById('harmonicToggle');
+  if(!panel||!btn)return;
+  const open=typeof force==='boolean'?force:!panel.classList.contains('open');
+  panel.classList.toggle('open',open);
+  btn.classList.toggle('open',open);
+  if(open)renderHarmonicPanel();
+}
+function initHarmonicAssistant(){
+  document.getElementById('harmonicToggle')?.addEventListener('click',()=>toggleHarmonicPanel());
+  document.getElementById('hpClose')?.addEventListener('click',()=>toggleHarmonicPanel(false));
+  setInterval(()=>{
+    const p=document.getElementById('harmonicPanel');
+    if(p&&p.classList.contains('open'))renderHarmonicPanel();
+  },2000);
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initHarmonicAssistant);
+else initHarmonicAssistant();
 
 /* KILL SWITCH */
 function toggleKill(deckId,band){
