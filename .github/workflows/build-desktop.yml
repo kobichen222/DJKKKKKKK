@@ -4,8 +4,8 @@ on:
   # Manual trigger from Actions tab
   workflow_dispatch:
     inputs:
-      release_tag:
-        description: 'Release tag (e.g. v1.0.0). Leave empty to skip release.'
+      version:
+        description: 'Version to publish (e.g. 1.0.1). Leave blank to use package.json version.'
         required: false
         default: ''
   # Automatic on tag push matching v*
@@ -36,53 +36,28 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Build Electron app (${{ matrix.platform }})
+      - name: Derive version from tag or input
+        shell: bash
+        run: |
+          V=""
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            V="${{ github.event.inputs.version }}"
+          elif [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            V="${GITHUB_REF_NAME#v}"
+          fi
+          if [ -n "$V" ]; then
+            node -e "const fs=require('fs');const p=require('./package.json');p.version='$V';fs.writeFileSync('package.json',JSON.stringify(p,null,2)+'\n');"
+            echo "Version set to $V"
+          else
+            echo "Using package.json version: $(node -p "require('./package.json').version")"
+          fi
+
+      - name: Build + publish Electron app (${{ matrix.platform }})
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npm run electron:${{ matrix.platform }} -- --publish=never
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: dj-max-${{ matrix.platform }}
-          path: |
-            dist-electron/*.exe
-            dist-electron/*.dmg
-            dist-electron/*.AppImage
-            dist-electron/*.deb
-          if-no-files-found: warn
-
-  release:
-    name: Publish Release
-    needs: build
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v') || github.event.inputs.release_tag != ''
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: artifacts
-
-      - name: Create / update GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ github.event.inputs.release_tag || github.ref_name }}
-          name: DJ MAX ${{ github.event.inputs.release_tag || github.ref_name }}
-          body: |
-            Desktop installers for DJ MAX — Ultimate AI DJ Console.
-
-            - Windows: `.exe` installer (NSIS) and portable `.exe`
-            - macOS: `.dmg` (Intel + Apple Silicon)
-            - Linux: `.AppImage` and `.deb`
-
-            All builds run the full DJ MAX app offline — no internet required
-            for core DJ / mixer / decks / sampler / studio / vinyl features.
-          files: artifacts/**/*
-          draft: false
-          prerelease: false
+        run: npm run electron:${{ matrix.platform }} -- --publish always
