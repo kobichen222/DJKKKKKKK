@@ -5362,6 +5362,14 @@ body.work-mode .automix-sync{
 }
 .disc-src-btn:hover{color:#fff}
 .disc-src-btn.active{background:linear-gradient(180deg,#2ee0ff,#007a9a);color:#0a0a0c;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 0 8px rgba(46,224,255,.4)}
+.disc-src-tag{
+  display:inline-block;margin-left:5px;padding:1px 5px;border-radius:3px;
+  font-family:'Share Tech Mono',monospace;font-size:8.5px;letter-spacing:1px;font-weight:700;
+  background:rgba(255,255,255,.08);color:inherit;opacity:.85;
+}
+.disc-src-tag.full{background:linear-gradient(180deg,#00ff7a,#008844);color:#0a0a0c}
+.disc-src-btn.active .disc-src-tag{background:rgba(0,0,0,.18)}
+.disc-src-btn.active .disc-src-tag.full{background:#0a0a0c;color:#9aff9a}
 .disc-search{flex:1;min-width:260px;display:flex;gap:6px;align-items:stretch}
 .disc-input{
   flex:1;padding:8px 12px;border-radius:5px;
@@ -5786,8 +5794,9 @@ body.work-mode .automix-sync{
 <div class="discover-wrap" id="discoverWrap">
   <div class="disc-topbar">
     <div class="disc-sources">
-      <button class="disc-src-btn active" data-disc-src="itunes">🍎 iTunes</button>
-      <button class="disc-src-btn" data-disc-src="deezer">🎵 Deezer</button>
+      <button class="disc-src-btn active" data-disc-src="itunes" title="30-second previews">🍎 iTunes <span class="disc-src-tag">30s</span></button>
+      <button class="disc-src-btn" data-disc-src="deezer" title="30-second previews">🎵 Deezer <span class="disc-src-tag">30s</span></button>
+      <button class="disc-src-btn" data-disc-src="jamendo" title="Full-length Creative-Commons tracks">🎶 Jamendo <span class="disc-src-tag full">FULL</span></button>
     </div>
     <div class="disc-search">
       <input type="text" class="disc-input" id="discoverInput" placeholder="Search tracks, artists, genres — e.g. 'Armin van Buuren', 'progressive house 2024'"/>
@@ -6743,9 +6752,15 @@ Two options — both work completely offline:<br/>
   <div class="setting-label">YouTube API Key <span class="setting-desc">(console.cloud.google.com — YouTube Data API v3)</span></div>
   <input type="password" id="youtubeApiKey" class="url-input" placeholder="Optional — enables YouTube search" style="padding:8px 12px;" />
 </div>
+<div class="settings-row" style="flex-direction:column;align-items:stretch;gap:8px;">
+  <div class="setting-label">🎶 Jamendo Client ID
+    <span class="setting-desc">— FULL-LENGTH Creative-Commons tracks (free register at <a href="https://developer.jamendo.com" target="_blank" rel="noopener" style="color:var(--screen-glow)">developer.jamendo.com</a>)</span>
+  </div>
+  <input type="text" id="jamendoClientId" class="url-input" placeholder="Optional but recommended — enables Jamendo DISCOVER with full songs" style="padding:8px 12px;" />
+</div>
 <div class="settings-row">
   <button class="tool-btn" id="saveMusicServices">SAVE CREDENTIALS</button>
-  <span class="setting-desc">iTunes search always works without credentials.</span>
+  <span class="setting-desc">iTunes works without credentials. Jamendo gives <b>full tracks</b>.</span>
 </div>
 </div>
 </div>
@@ -9403,6 +9418,49 @@ function setupDiscover(){
         }));
       }else if(currentSource==='deezer'){
         results=await deezerSearchJsonp(q);
+      }else if(currentSource==='jamendo'){
+        const cid=(typeof musicCreds!=='undefined'&&musicCreds.jamendoId)||'';
+        if(!cid){
+          out.innerHTML=
+            '<div class="disc-note" style="grid-column:1/-1">'+
+            '🎶 <b>Jamendo needs a free Client ID.</b> Go to <b>Settings → 🎵 MUSIC SERVICES</b> and paste a Client ID from '+
+            '<a href="https://developer.jamendo.com" target="_blank" rel="noopener" style="color:#2ee0ff">developer.jamendo.com</a> '+
+            '(free 2-minute signup). Jamendo gives you <b>full-length Creative-Commons tracks</b> — house, trance, techno, and more.'+
+            '</div>';
+          setStatus('Configure Jamendo in Settings','err');
+          return;
+        }
+        // Map genre queries to Jamendo tags where possible; fall back to free search
+        const TAG_MAP={'trance':'trance','house music':'house','deep house':'deephouse','progressive house':'progressive','tech house':'techhouse','techno':'techno','edm anthems':'edm','hardstyle':'hardstyle','psytrance':'psytrance','dubstep':'dubstep','drum and bass':'drumnbass','future house':'house','big room house':'edm','melodic techno':'techno','afro house':'afrohouse','festival anthem':'edm'};
+        const tag=TAG_MAP[q.toLowerCase()]||null;
+        const base='https://api.jamendo.com/v3.0/tracks/';
+        const params=new URLSearchParams({
+          client_id:cid,
+          format:'json',
+          limit:'50',
+          audioformat:'mp32',
+          order:'popularity_total',
+          include:'musicinfo',
+        });
+        if(tag){params.set('tags',tag);}
+        else{params.set('search',q);}
+        const url=base+'?'+params.toString();
+        const r=await fetch(url);
+        if(!r.ok)throw new Error('Jamendo '+r.status);
+        const j=await r.json();
+        if(j.headers&&j.headers.status&&j.headers.status!=='success'){
+          throw new Error('Jamendo: '+(j.headers.error_message||j.headers.code));
+        }
+        results=(j.results||[]).filter(x=>x.audio).map(x=>({
+          title:x.name,
+          artist:x.artist_name,
+          album:x.album_name||'',
+          duration:x.duration||0,
+          artwork:x.album_image||x.image||'',
+          previewUrl:x.audio,             // full-length MP3 URL
+          source:'jamendo',
+          fullLength:true,
+        }));
       }
       renderResults(results,q);
       setStatus(`${results.length} results from ${currentSource}`,'ok');
@@ -9445,7 +9503,9 @@ function setupDiscover(){
       out.innerHTML='<div class="disc-empty">No results for "'+escapeHtml(q)+'"</div>';
       return;
     }
-    const note='<div class="disc-note">ℹ️ These are 30-second previews from '+(currentSource==='itunes'?'Apple iTunes':'Deezer')+'. Adding to library saves the preview locally — great for practice, demos, and sampling. For full tracks, use + FILES / + URL / + YOUTUBE.</div>';
+    const note = currentSource==='jamendo'
+      ? '<div class="disc-note" style="color:#9aff9a;border-color:rgba(28,255,143,.3);background:rgba(28,255,143,.05)">✓ These are <b>FULL-LENGTH</b> Creative-Commons tracks from Jamendo — free to play, remix and DJ with. Each track includes its CC license info on the artist\'s Jamendo page.</div>'
+      : '<div class="disc-note">ℹ️ These are 30-second previews from '+(currentSource==='itunes'?'Apple iTunes':'Deezer')+'. Adding to library saves the preview locally — great for practice, demos, and sampling. For <b>full tracks</b>: switch to 🎶 Jamendo, or use + FILES / + URL / + YOUTUBE.</div>';
     out.innerHTML=note+list.map((t,i)=>`
       <div class="disc-row" data-i="${i}">
         <img class="disc-art" src="${escapeHtml(t.artwork||'')}" loading="lazy" onerror="this.style.visibility='hidden'"/>
@@ -11518,13 +11578,14 @@ document.addEventListener('DOMContentLoaded',()=>{
    MUSIC SEARCH — iTunes (free), Spotify (creds), YouTube (API key)
    ======================================================== */
 const MUSIC_CREDS_KEY='djpro_music_creds_v1';
-let musicCreds={spotifyId:'',spotifySecret:'',ytKey:''};
+let musicCreds={spotifyId:'',spotifySecret:'',ytKey:'',jamendoId:''};
 try{const raw=localStorage.getItem(MUSIC_CREDS_KEY);if(raw)musicCreds={...musicCreds,...JSON.parse(raw)};}catch(e){}
 function saveMusicCreds(){
   const sId=document.getElementById('spotifyClientId')?.value?.trim()||'';
   const sSec=document.getElementById('spotifyClientSecret')?.value?.trim()||'';
   const yKey=document.getElementById('youtubeApiKey')?.value?.trim()||'';
-  musicCreds={spotifyId:sId,spotifySecret:sSec,ytKey:yKey};
+  const jId=document.getElementById('jamendoClientId')?.value?.trim()||'';
+  musicCreds={spotifyId:sId,spotifySecret:sSec,ytKey:yKey,jamendoId:jId};
   localStorage.setItem(MUSIC_CREDS_KEY,JSON.stringify(musicCreds));
   _spotifyToken=null;_spotifyTokenExp=0;
   toast('Music service credentials saved','success');
@@ -11678,6 +11739,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     document.getElementById('spotifyClientId')&&(document.getElementById('spotifyClientId').value=musicCreds.spotifyId||'');
     document.getElementById('spotifyClientSecret')&&(document.getElementById('spotifyClientSecret').value=musicCreds.spotifySecret||'');
     document.getElementById('youtubeApiKey')&&(document.getElementById('youtubeApiKey').value=musicCreds.ytKey||'');
+    document.getElementById('jamendoClientId')&&(document.getElementById('jamendoClientId').value=musicCreds.jamendoId||'');
     const saveBtn=document.getElementById('saveMusicServices');if(saveBtn)saveBtn.addEventListener('click',saveMusicCreds);
     document.querySelectorAll('.search-src-btn').forEach(b=>b.addEventListener('click',()=>{
       document.querySelectorAll('.search-src-btn').forEach(x=>x.classList.remove('active'));
