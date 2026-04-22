@@ -7039,6 +7039,135 @@ body.dj-focus-mode .cdj .hot-cues .cue-btn{
   .tt-platter-wrap{max-width:220px !important}
   .tt-platter{width:min(200px,100%) !important}
 }
+
+/* ================================================================
+   DECK PAD AREA — clean, balanced, premium look
+   (PAD MODES + HOT CUES — the area the user flagged)
+   Scoped to .cdj only. Keeps vinyl / mixer untouched.
+   ================================================================ */
+.cdj .pad-modes{
+  display:grid !important;
+  grid-template-columns:repeat(3,1fr) !important;
+  gap:5px !important;
+  margin:6px 0 8px !important;
+  padding:6px !important;border-radius:8px !important;
+  background:linear-gradient(180deg,#0a0a0c 0%,#050507 100%);
+  border:1px solid #22222a;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04),inset 0 0 12px rgba(0,0,0,.6);
+}
+.cdj .pad-mode-btn{
+  padding:8px 6px !important;min-height:30px !important;
+  font-size:9.5px !important;letter-spacing:1.4px !important;font-weight:800 !important;
+  background:linear-gradient(180deg,#2a2a32 0%,#141418 100%) !important;
+  border:1px solid #2e2e36 !important;color:#b0b0b6 !important;
+  border-radius:5px !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.06),
+    inset 0 -1px 1px rgba(0,0,0,.5),
+    0 1px 2px rgba(0,0,0,.6) !important;
+  transition:all .12s;cursor:pointer;
+}
+.cdj .pad-mode-btn:hover{
+  color:#fff !important;border-color:rgba(255,255,255,.22) !important;
+  background:linear-gradient(180deg,#363640 0%,#1c1c22 100%) !important;
+}
+.cdj .pad-mode-btn.active{
+  color:#0a0a0c !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 0 12px currentColor !important;
+  text-shadow:0 1px 1px rgba(0,0,0,.25) !important;
+  border-color:currentColor !important;
+}
+.cdj .pad-mode-btn[data-pad-mode="cue"].active{background:linear-gradient(180deg,#5af0ff 0%,#00a0c0 100%) !important;color:#071420 !important}
+.cdj .pad-mode-btn[data-pad-mode="roll"].active{background:linear-gradient(180deg,#ff5a90 0%,#b02060 100%) !important;color:#fff !important}
+.cdj .pad-mode-btn[data-pad-mode="slicer"].active{background:linear-gradient(180deg,#ffe046 0%,#c49a00 100%) !important;color:#201800 !important}
+.cdj .pad-mode-btn[data-pad-mode="sampler"].active{background:linear-gradient(180deg,#5affa0 0%,#009440 100%) !important;color:#06140a !important}
+.cdj .pad-mode-btn[data-pad-mode="loop"].active{background:linear-gradient(180deg,#d85aff 0%,#7820b0 100%) !important;color:#fff !important}
+.cdj .pad-mode-btn[data-pad-mode="pitch"].active{background:linear-gradient(180deg,#ffa84a 0%,#c85a00 100%) !important;color:#1a0a00 !important}
+
+/* HOT CUES grid — 4×2 with taller cells, cleaner body */
+.cdj .hot-cues{
+  display:grid !important;
+  grid-template-columns:repeat(4,1fr) !important;
+  gap:6px !important;
+  padding:6px !important;margin:0 0 8px !important;border-radius:8px !important;
+  background:linear-gradient(180deg,#0a0a0c 0%,#050507 100%);
+  border:1px solid #22222a;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04),inset 0 0 12px rgba(0,0,0,.6);
+}
+.cdj .cue-btn{
+  aspect-ratio:1.4/1 !important;
+  border:1px solid #2a2a32 !important;border-radius:6px !important;
+  background:
+    radial-gradient(ellipse at 50% 120%,rgba(var(--cue-color-rgb,255,122,0),.18) 0%,transparent 65%),
+    linear-gradient(180deg,#35353d 0%,#1c1c22 50%,#0c0c10 100%) !important;
+  color:#e0e3e8 !important;
+  font-family:'Orbitron',sans-serif !important;font-weight:900 !important;font-size:15px !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.14),
+    inset 0 -2px 4px rgba(0,0,0,.7),
+    0 2px 4px rgba(0,0,0,.55),
+    0 0 0 1px rgba(0,0,0,.35) !important;
+  cursor:pointer;transition:transform .08s,box-shadow .1s,filter .12s;
+  position:relative;overflow:hidden;
+}
+.cdj .cue-btn::before{
+  content:'';position:absolute;top:4px;left:50%;transform:translateX(-50%);
+  width:32%;height:3px;border-radius:2px;
+  background:var(--cue-color,#ff7a00);
+  box-shadow:0 0 6px var(--cue-color,#ff7a00);
+  opacity:.35;transition:opacity .12s;
+}
+.cdj .cue-btn:hover{filter:brightness(1.15);transform:translateY(-1px)}
+.cdj .cue-btn:hover::before{opacity:.85}
+.cdj .cue-btn.active,.cdj .cue-btn.armed{
+  background:
+    radial-gradient(ellipse at 50% 120%,rgba(var(--cue-color-rgb,255,122,0),.55) 0%,transparent 70%),
+    linear-gradient(180deg,var(--cue-color,#ff7a00) 0%,color-mix(in srgb,var(--cue-color,#ff7a00) 60%,#000) 100%) !important;
+  color:#0a0a0a !important;
+  text-shadow:0 1px 1px rgba(255,255,255,.25) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.35),
+    inset 0 -2px 4px rgba(0,0,0,.35),
+    0 0 14px rgba(var(--cue-color-rgb,255,122,0),.6),
+    0 2px 4px rgba(0,0,0,.55) !important;
+}
+.cdj .cue-btn.active::before,.cdj .cue-btn.armed::before{opacity:1}
+.cdj .cue-btn:active{transform:translateY(1px)}
+
+/* Pad-color RGBs so the glow has alpha */
+.cdj .cue-btn[data-color="1"]{--cue-color-rgb:0,229,255}
+.cdj .cue-btn[data-color="2"]{--cue-color-rgb:255,60,120}
+.cdj .cue-btn[data-color="3"]{--cue-color-rgb:255,212,0}
+.cdj .cue-btn[data-color="4"]{--cue-color-rgb:0,255,122}
+.cdj .cue-btn[data-color="5"]{--cue-color-rgb:255,122,0}
+.cdj .cue-btn[data-color="6"]{--cue-color-rgb:200,0,255}
+.cdj .cue-btn[data-color="7"]{--cue-color-rgb:0,255,212}
+.cdj .cue-btn[data-color="8"]{--cue-color-rgb:255,90,0}
+
+/* Compact layouts (all-4 / work mode) — keep the polish but tighter */
+.console.show-all .cdj .pad-modes{padding:4px !important;gap:3px !important}
+.console.show-all .cdj .pad-mode-btn{padding:5px 3px !important;font-size:8.5px !important;letter-spacing:1px !important;min-height:24px !important}
+.console.show-all .cdj .hot-cues{padding:4px !important;gap:4px !important}
+.console.show-all .cdj .cue-btn{font-size:13px !important;aspect-ratio:1.5/1 !important}
+
+/* Light-theme adjustments */
+body.theme-light .cdj .pad-modes,
+body.theme-light .cdj .hot-cues{
+  background:linear-gradient(180deg,#f0ebde,#e4ddcd) !important;
+  border:1px solid #c4bdab !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.8),inset 0 0 8px rgba(80,60,30,.08) !important;
+}
+body.theme-light .cdj .pad-mode-btn{
+  background:linear-gradient(180deg,#ffffff,#ebe4d4) !important;
+  border:1px solid #c4bdab !important;color:#3a342a !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 1px 2px rgba(80,60,30,.08) !important;
+  text-shadow:0 1px 0 rgba(255,255,255,.6) !important;
+}
+body.theme-light .cdj .cue-btn{
+  background:linear-gradient(180deg,#ffffff,#e0d8c5) !important;
+  color:#3a342a !important;border:1px solid #c4bdab !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,1),inset 0 -2px 4px rgba(0,0,0,.06),0 2px 4px rgba(80,60,30,.1) !important;
+}
 </style>
 </head>
 <body>
