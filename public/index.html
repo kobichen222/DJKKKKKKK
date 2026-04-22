@@ -6073,6 +6073,54 @@ body.theme-light ::-webkit-scrollbar-thumb{
 }
 
 /* ================================================================
+   SAMPLER PADS — loaded-by-default look (soft colored LED glow)
+   ================================================================ */
+.sample-pad.loaded{
+  border-color:var(--pad-color,var(--orange)) !important;
+  background:
+    radial-gradient(ellipse at 50% 120%,rgba(var(--pad-color-rgb,255,122,0),.25) 0%,transparent 60%),
+    linear-gradient(180deg,#3a3a42 0%,#1a1a1c 60%,#0d0d10 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.08),
+    inset 0 -2px 4px rgba(0,0,0,.6),
+    0 0 0 1px rgba(var(--pad-color-rgb,255,122,0),.15),
+    0 0 12px rgba(var(--pad-color-rgb,255,122,0),.18),
+    0 3px 6px rgba(0,0,0,.5) !important;
+}
+.sample-pad.loaded::after{
+  content:'';position:absolute;top:4px;left:4px;width:6px;height:6px;border-radius:50%;
+  background:var(--pad-color,var(--orange));
+  box-shadow:0 0 8px var(--pad-color,var(--orange)),inset 0 0 2px rgba(255,255,255,.6);
+  animation:padLedPulse 2.4s ease-in-out infinite;z-index:2;pointer-events:none;
+}
+@keyframes padLedPulse{0%,100%{opacity:.6}50%{opacity:1}}
+.sample-pad.loaded .pad-num{
+  color:var(--pad-color,var(--orange)) !important;
+  text-shadow:0 0 8px rgba(var(--pad-color-rgb,255,122,0),.7),0 0 2px rgba(255,255,255,.3) !important;
+}
+.sample-pad.loaded .pad-name{
+  color:var(--pad-color,var(--orange)) !important;opacity:.85 !important;
+  text-shadow:0 0 4px rgba(var(--pad-color-rgb,255,122,0),.55) !important;
+}
+/* Per-pad accent RGB so box-shadows can render with alpha */
+.sample-pad[data-color="0"]{--pad-color-rgb:0,229,255}
+.sample-pad[data-color="1"]{--pad-color-rgb:255,60,120}
+.sample-pad[data-color="2"]{--pad-color-rgb:255,212,0}
+.sample-pad[data-color="3"]{--pad-color-rgb:0,255,122}
+.sample-pad[data-color="4"]{--pad-color-rgb:255,122,0}
+.sample-pad[data-color="5"]{--pad-color-rgb:200,0,255}
+.sample-pad[data-color="6"]{--pad-color-rgb:0,255,212}
+.sample-pad[data-color="7"]{--pad-color-rgb:255,90,0}
+.sample-pad[data-color="8"]{--pad-color-rgb:155,255,0}
+.sample-pad[data-color="9"]{--pad-color-rgb:255,0,155}
+.sample-pad[data-color="10"]{--pad-color-rgb:0,176,255}
+.sample-pad[data-color="11"]{--pad-color-rgb:255,136,0}
+.sample-pad[data-color="12"]{--pad-color-rgb:176,0,255}
+.sample-pad[data-color="13"]{--pad-color-rgb:255,255,0}
+.sample-pad[data-color="14"]{--pad-color-rgb:0,255,0}
+.sample-pad[data-color="15"]{--pad-color-rgb:255,0,170}
+
+/* ================================================================
    VINYL PRO v4 — realistic 1200-style turntables + wider mixer core
    Larger platters, refined tonearm (counterweight + cueing lever +
    cartridge), pitch fader with scale ticks and zero LED, bigger
@@ -9018,23 +9066,105 @@ function clearBank(){
   samplerSelected=null;renderSampler();saveToDB();toast('Bank cleared','success');
 }
 
+/* ===== FACTORY SAMPLES — 4 banks × 16 pads = 64 built-in sounds =====
+   Bank A: DRUMS  ·  Bank B: BASS  ·  Bank C: SYNTH & FX  ·  Bank D: LOOPS & VOX
+   All synthesized into AudioBuffers at runtime so the app ships no audio files.
+   ==================================================================== */
+function _spBufRender(seconds,render){
+  const sr=audioCtx.sampleRate;
+  const len=Math.max(1,Math.floor(sr*seconds));
+  const b=audioCtx.createBuffer(1,len,sr);
+  const d=b.getChannelData(0);
+  render(d,sr,len);
+  const fade=Math.min(len,Math.floor(sr*0.006));
+  for(let i=0;i<fade;i++)d[len-1-i]*=(i/fade);
+  return b;
+}
+const _spVoices={
+  // ---- DRUMS ----
+  kick808:()=>_spBufRender(0.55,(d,sr,n)=>{for(let i=0;i<n;i++){const t=i/sr;const f=55*Math.exp(-t*8)+32;d[i]=Math.sin(2*Math.PI*f*t)*Math.exp(-t*3.2)*0.95}}),
+  kickHouse:()=>_spBufRender(0.28,(d,sr,n)=>{for(let i=0;i<n;i++){const t=i/sr;const f=150*Math.exp(-t*30)+55;d[i]=Math.sin(2*Math.PI*f*t)*Math.exp(-t*13)*0.92;if(t<0.003)d[i]+=(Math.random()*2-1)*0.6}}),
+  snare:()=>_spBufRender(0.25,(d,sr,n)=>{for(let i=0;i<n;i++){const t=i/sr;const tone=Math.sin(2*Math.PI*190*t)+0.3*Math.sin(2*Math.PI*265*t);const nz=Math.random()*2-1;d[i]=tone*Math.exp(-t*16)*0.4+nz*Math.exp(-t*9)*0.52}}),
+  clap:()=>_spBufRender(0.32,(d,sr,n)=>{const bursts=[0,0.012,0.025,0.040];for(let i=0;i<n;i++){const t=i/sr;const nz=Math.random()*2-1;let env=0;bursts.forEach(b=>{const dt=t-b;if(dt>=0)env+=Math.exp(-dt*38)});env=Math.min(env,1.1);d[i]=nz*env*0.55}}),
+  hatClosed:()=>_spBufRender(0.06,(d,sr,n)=>{for(let i=0;i<n;i++){const t=i/sr;d[i]=(Math.random()*2-1)*Math.exp(-t*85)*0.42}}),
+  hatOpen:()=>_spBufRender(0.38,(d,sr,n)=>{for(let i=0;i<n;i++){const t=i/sr;d[i]=(Math.random()*2-1)*Math.exp(-t*6.5)*0.38}}),
+  ride:()=>_spBufRender(0.85,(d,sr,n)=>{for(let i=0;i<n;i++){const t=i/sr;const tone=Math.sin(2*Math.PI*3500*t)+Math.sin(2*Math.PI*5200*t)*0.5;d[i]=(Math.random()*2-1)*0.55+tone*0.12;d[i]*=Math.exp(-t*2.8)*0.35}}),
+  crash:()=>_spBufRender(1.7,(d,sr,n)=>{for(let i=0;i<n;i++){const t=i/sr;d[i]=(Math.random()*2-1)*Math.exp(-t*2.1)*0.42}}),
+  tomHi:()=>_spBufRender(0.32,(d,sr,n)=>{for(let i=0;i<n;i++){const t=i/sr;const f=230*Math.exp(-t*6.5)+160;d[i]=Math.sin(2*Math.PI*f*t)*Math.exp(-t*7)*0.75}}),
+  tomLow:()=>_spBufRender(0.38,(d,sr,n)=>{for(let i=0;i<n;i++){const t=i/sr;const f=110*Math.exp(-t*6)+75;d[i]=Math.sin(2*Math.PI*f*t)*Math.exp(-t*6.5)*0.8}}),
+  rim:()=>_spBufRender(0.08,(d,sr,n)=>{for(let i=0;i<n;i++){const t=i/sr;const tone=Math.sin(2*Math.PI*1700*t);const click=Math.random()*2-1;d[i]=(tone*0.7+click*0.5)*Math.exp(-t*48)*0.55}}),
+  cowbell:()=>_spBufRender(0.42,(d,sr,n)=>{for(let i=0;i<n;i++){const t=i/sr;const tone=Math.sin(2*Math.PI*540*t)+Math.sin(2*Math.PI*800*t)*0.8;d[i]=tone*Math.exp(-t*4.6)*0.26}}),
+  conga:()=>_spBufRender(0.3,(d,sr,n)=>{for(let i=0;i<n;i++){const t=i/sr;const f=260*Math.exp(-t*10)+180;d[i]=Math.sin(2*Math.PI*f*t)*Math.exp(-t*9)*0.56}}),
+  shaker:()=>_spBufRender(0.1,(d,sr,n)=>{for(let i=0;i<n;i++){const t=i/sr;const env=Math.exp(-t*42)*Math.min(1,t*60);d[i]=(Math.random()*2-1)*env*0.32}}),
+  percHi:()=>_spBufRender(0.18,(d,sr,n)=>{for(let i=0;i<n;i++){const t=i/sr;d[i]=Math.sin(2*Math.PI*1100*t)*Math.exp(-t*22)*0.5}}),
+  percLow:()=>_spBufRender(0.22,(d,sr,n)=>{for(let i=0;i<n;i++){const t=i/sr;d[i]=Math.sin(2*Math.PI*420*t)*Math.exp(-t*18)*0.55}}),
+  // ---- BASS (chromatic C1..D#2) ----
+  bass:midi=>{const f=440*Math.pow(2,(midi-69)/12);return _spBufRender(0.7,(d,sr,n)=>{for(let i=0;i<n;i++){const t=i/sr;const saw=2*(t*f-Math.floor(t*f+0.5));const sub=Math.sin(2*Math.PI*f*0.5*t);const env=Math.min(1,t*80)*Math.exp(-t*3.2);d[i]=(saw*0.55+sub*0.5)*env*0.7}})},
+  // ---- SYNTH & FX ----
+  stab:()=>_spBufRender(0.4,(d,sr,n)=>{const r=220,chord=[r,r*Math.pow(2,3/12),r*Math.pow(2,7/12),r*Math.pow(2,10/12)];for(let i=0;i<n;i++){const t=i/sr;let v=0;chord.forEach(f=>{v+=2*(t*f-Math.floor(t*f+0.5))});v/=chord.length;d[i]=v*Math.exp(-t*6)*Math.min(1,t*80)*0.55}}),
+  lead:f=>_spBufRender(0.55,(d,sr,n)=>{for(let i=0;i<n;i++){const t=i/sr;d[i]=2*(t*f-Math.floor(t*f+0.5))*Math.exp(-t*3)*Math.min(1,t*80)*0.55}}),
+  pluck:f=>_spBufRender(0.4,(d,sr,n)=>{for(let i=0;i<n;i++){const t=i/sr;const v=Math.sin(2*Math.PI*f*t)+Math.sin(2*Math.PI*f*2*t)*0.3;d[i]=v*Math.exp(-t*12)*0.48}}),
+  chord:()=>_spBufRender(1.4,(d,sr,n)=>{const base=220,freqs=[base,base*Math.pow(2,3/12),base*Math.pow(2,7/12)];for(let i=0;i<n;i++){const t=i/sr;let v=0;freqs.forEach(f=>{v+=Math.sin(2*Math.PI*f*t)+2*(t*f*2-Math.floor(t*f*2+0.5))*0.15});v/=freqs.length;d[i]=v*Math.exp(-t*1.5)*Math.min(1,t*4)*0.5}}),
+  sub:()=>_spBufRender(0.9,(d,sr,n)=>{for(let i=0;i<n;i++){const t=i/sr;const f=50;d[i]=Math.sin(2*Math.PI*f*t)*Math.exp(-t*1.5)*Math.min(1,t*20)*0.95}}),
+  laser:()=>_spBufRender(0.35,(d,sr,n)=>{for(let i=0;i<n;i++){const t=i/sr;const f=2000*Math.exp(-t*6)+200;d[i]=Math.sin(2*Math.PI*f*t)*Math.exp(-t*4)*0.5}}),
+  zap:()=>_spBufRender(0.22,(d,sr,n)=>{for(let i=0;i<n;i++){const t=i/sr;const f=800*Math.exp(-t*10)+100;d[i]=2*(t*f-Math.floor(t*f+0.5))*Math.exp(-t*10)*0.55}}),
+  sweepUp:()=>_spBufRender(1.2,(d,sr,n)=>{for(let i=0;i<n;i++){const t=i/sr;const f=100*Math.pow(16,t/1.2);const nz=Math.random()*2-1;d[i]=(nz*0.45+Math.sin(2*Math.PI*f*t)*0.32)*(t/1.2)*0.5}}),
+  sweepDn:()=>_spBufRender(1.2,(d,sr,n)=>{for(let i=0;i<n;i++){const t=i/sr;const f=1600*Math.exp(-t*2.2);const nz=Math.random()*2-1;d[i]=(nz*0.4+Math.sin(2*Math.PI*f*t)*0.3)*(1-t/1.2)*0.5}}),
+  noiseUp:()=>_spBufRender(1.5,(d,sr,n)=>{for(let i=0;i<n;i++){const t=i/sr;d[i]=(Math.random()*2-1)*(t/1.5)*0.5}}),
+  pad:()=>_spBufRender(2.0,(d,sr,n)=>{const freqs=[220,261.63,329.63,440];for(let i=0;i<n;i++){const t=i/sr;let v=0;freqs.forEach((f,j)=>{v+=Math.sin(2*Math.PI*f*t)*(1-j*0.12)});v/=freqs.length;d[i]=v*Math.min(1,t*1.6)*Math.exp(-t*0.9)*0.48}}),
+  bell:()=>_spBufRender(1.3,(d,sr,n)=>{const f=880;for(let i=0;i<n;i++){const t=i/sr;const v=Math.sin(2*Math.PI*f*t)+Math.sin(2*Math.PI*f*2*t)*0.5+Math.sin(2*Math.PI*f*3*t)*0.25;d[i]=v*Math.exp(-t*1.9)*0.32}}),
+  sqrLead:f=>_spBufRender(0.4,(d,sr,n)=>{for(let i=0;i<n;i++){const t=i/sr;const v=Math.sin(2*Math.PI*f*t)>0?1:-1;d[i]=v*Math.exp(-t*5)*0.45}}),
+  sawLead:f=>_spBufRender(0.4,(d,sr,n)=>{for(let i=0;i<n;i++){const t=i/sr;d[i]=2*(t*f-Math.floor(t*f+0.5))*Math.exp(-t*4)*0.5}}),
+  blip:()=>_spBufRender(0.08,(d,sr,n)=>{for(let i=0;i<n;i++){const t=i/sr;d[i]=Math.sin(2*Math.PI*1200*t)*Math.exp(-t*40)*0.5}}),
+  whoosh:()=>_spBufRender(0.9,(d,sr,n)=>{for(let i=0;i<n;i++){const t=i/sr;d[i]=(Math.random()*2-1)*Math.exp(-Math.pow((t-0.45)*3.6,2))*0.55}}),
+  // ---- LOOPS & VOX ----
+  horn:base=>_spBufRender(0.45,(d,sr,n)=>{const freqs=[base,base*Math.pow(2,4/12),base*Math.pow(2,7/12)];for(let i=0;i<n;i++){const t=i/sr;let v=0;freqs.forEach(f=>{v+=2*(t*f-Math.floor(t*f+0.5))+Math.sin(2*Math.PI*f*t)*0.3});v/=freqs.length;d[i]=v*Math.min(1,t*120)*Math.exp(-t*3.5)*0.58}}),
+  hit:()=>_spBufRender(0.7,(d,sr,n)=>{for(let i=0;i<n;i++){const t=i/sr;const f=60*Math.exp(-t*4)+30;d[i]=(Math.sin(2*Math.PI*f*t)*0.65+(Math.random()*2-1)*0.28)*Math.exp(-t*3)}}),
+  rumble:()=>_spBufRender(1.4,(d,sr,n)=>{let p=0;for(let i=0;i<n;i++){const t=i/sr;p=p*0.985+(Math.random()*2-1)*0.015;d[i]=p*Math.exp(-t*1.1)*4.5}}),
+  kickLoop:()=>{const bpm=128,step=60/bpm,dur=step*4;return _spBufRender(dur,(d,sr,n)=>{for(let i=0;i<n;i++){const t=i/sr;const local=t%step;const f=150*Math.exp(-local*28)+55;d[i]=Math.sin(2*Math.PI*f*local)*Math.exp(-local*13)*0.85}})},
+  percLoop:()=>{const bpm=128,step=60/bpm/4,dur=step*16;return _spBufRender(dur,(d,sr,n)=>{for(let i=0;i<n;i++){const t=i/sr;const idx=Math.floor(t/step);const local=t-idx*step;const hit=[0,3,5,9,11,13].includes(idx%16);const f=200+((idx*7)%11)*30;d[i]=hit?Math.sin(2*Math.PI*f*local)*Math.exp(-local*25)*0.42:0}})},
+  hatLoop:()=>{const bpm=128,beat=60/bpm,half=beat/2,dur=beat*4;return _spBufRender(dur,(d,sr,n)=>{for(let i=0;i<n;i++){const t=i/sr;const halfIdx=Math.floor(t/half);const local=t-halfIdx*half;d[i]=(halfIdx%2===1)?(Math.random()*2-1)*Math.exp(-local*65)*0.5:0}})},
+  vox1:()=>_spBufRender(0.35,(d,sr,n)=>{for(let i=0;i<n;i++){const t=i/sr;const f=440+Math.sin(2*Math.PI*6*t)*40;d[i]=(2*(t*f-Math.floor(t*f+0.5))*0.5+(Math.random()*2-1)*0.15)*Math.exp(-t*3.5)*Math.min(1,t*25)*0.55}}),
+  vox2:()=>_spBufRender(0.4,(d,sr,n)=>{for(let i=0;i<n;i++){const t=i/sr;const f=660+Math.sin(2*Math.PI*8*t)*50;d[i]=(Math.sin(2*Math.PI*f*t)*0.5+2*(t*f-Math.floor(t*f+0.5))*0.35)*Math.exp(-t*3)*Math.min(1,t*30)*0.55}}),
+  airhorn:()=>_spBufRender(0.6,(d,sr,n)=>{for(let i=0;i<n;i++){const t=i/sr;const f=330+Math.sin(2*Math.PI*12*t)*8;const v=2*(t*f-Math.floor(t*f+0.5))+2*(t*f*1.5-Math.floor(t*f*1.5+0.5))*0.6;d[i]=v*Math.min(1,t*20)*Math.exp(-t*1.5)*0.45}}),
+  siren:()=>_spBufRender(1.2,(d,sr,n)=>{for(let i=0;i<n;i++){const t=i/sr;const f=500+Math.sin(2*Math.PI*1.6*t)*200;d[i]=Math.sin(2*Math.PI*f*t)*0.45*Math.min(1,t*6)}}),
+  scratch:()=>_spBufRender(0.35,(d,sr,n)=>{for(let i=0;i<n;i++){const t=i/sr;const ph=t<0.15?t/0.15:1-(t-0.15)/0.2;const f=300+ph*1400;d[i]=(Math.sin(2*Math.PI*f*t)*0.5+(Math.random()*2-1)*0.2)*Math.min(1,t*20)*Math.exp(-Math.max(0,t-0.25)*20)*0.55}}),
+  vinylCrackle:()=>_spBufRender(1.5,(d,sr,n)=>{for(let i=0;i<n;i++){const t=i/sr;const crackle=Math.random()<0.003?(Math.random()*2-1):0;d[i]=crackle*Math.exp(-t*0.5)*0.7}}),
+  fxDrop:()=>_spBufRender(0.8,(d,sr,n)=>{for(let i=0;i<n;i++){const t=i/sr;const f=800*Math.exp(-t*5);d[i]=(Math.sin(2*Math.PI*f*t)*0.6+(Math.random()*2-1)*Math.exp(-t*2)*0.3)*0.55}}),
+};
+
+/* Fill ALL four banks with the factory set */
 function loadDefaultSamples(){
   ensureAudio();if(!audioCtx)return;
-  const sr=audioCtx.sampleRate;const bank=getCurBank();
-  const names=['KICK','SNARE','HAT','CLAP','OPEN','TOM','CYMBAL','RIDE','SUB','LASER','HORN','VOX','FX1','FX2','FX3','LOOP'];
-  for(let i=0;i<16;i++){
-    const dur=0.3,buf=audioCtx.createBuffer(1,sr*dur,sr),data=buf.getChannelData(0);
-    const type=i%4;
-    for(let j=0;j<data.length;j++){
-      const t=j/sr;
-      if(type===0)data[j]=Math.sin(2*Math.PI*60*t)*Math.exp(-t*15)*0.8;
-      else if(type===1)data[j]=(Math.random()*2-1)*Math.exp(-t*20)*0.6;
-      else if(type===2)data[j]=(Math.random()*2-1)*Math.exp(-t*40)*0.3;
-      else data[j]=Math.sin(2*Math.PI*(200+i*50)*t)*Math.exp(-t*8)*0.4;
-    }
-    bank[i]=_ensurePadDefaults({buffer:buf,name:names[i]});
-  }
-  renderSampler();saveToDB();toast('Default samples loaded','success');
+  const DRUMS=[
+    ['KICK 808',_spVoices.kick808],['KICK',_spVoices.kickHouse],['SNARE',_spVoices.snare],['CLAP',_spVoices.clap],
+    ['HAT',_spVoices.hatClosed],['OPEN HAT',_spVoices.hatOpen],['RIDE',_spVoices.ride],['CRASH',_spVoices.crash],
+    ['TOM HI',_spVoices.tomHi],['TOM LO',_spVoices.tomLow],['RIM',_spVoices.rim],['COWBELL',_spVoices.cowbell],
+    ['CONGA',_spVoices.conga],['SHAKER',_spVoices.shaker],['PERC HI',_spVoices.percHi],['PERC LO',_spVoices.percLow],
+  ];
+  const BASS_MIDI=[24,26,28,29,31,33,35,36,38,40,41,43,45,47,48,50]; // C1..D3
+  const NOTE=m=>{const N=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];return N[m%12]+Math.floor(m/12-1)};
+  const BASS=BASS_MIDI.map(m=>[`BASS ${NOTE(m)}`,()=>_spVoices.bass(m)]);
+  const FX=[
+    ['STAB',_spVoices.stab],['LEAD A',()=>_spVoices.lead(440)],['PLUCK',()=>_spVoices.pluck(587)],['CHORD',_spVoices.chord],
+    ['SUB',_spVoices.sub],['LASER',_spVoices.laser],['ZAP',_spVoices.zap],['SWEEP UP',_spVoices.sweepUp],
+    ['SWEEP DN',_spVoices.sweepDn],['NOISE UP',_spVoices.noiseUp],['PAD',_spVoices.pad],['BELL',_spVoices.bell],
+    ['SQR LEAD',()=>_spVoices.sqrLead(440)],['SAW LEAD',()=>_spVoices.sawLead(660)],['BLIP',_spVoices.blip],['WHOOSH',_spVoices.whoosh],
+  ];
+  const LOOPS=[
+    ['HORN LO',()=>_spVoices.horn(220)],['HORN MID',()=>_spVoices.horn(277)],['HORN HI',()=>_spVoices.horn(330)],['HIT',_spVoices.hit],
+    ['KICK LOOP',_spVoices.kickLoop],['PERC LOOP',_spVoices.percLoop],['HAT LOOP',_spVoices.hatLoop],['RUMBLE',_spVoices.rumble],
+    ['VOX 1',_spVoices.vox1],['VOX 2',_spVoices.vox2],['AIRHORN',_spVoices.airhorn],['SIREN',_spVoices.siren],
+    ['SCRATCH',_spVoices.scratch],['CRACKLE',_spVoices.vinylCrackle],['DROP',_spVoices.fxDrop],['LASER 2',_spVoices.laser],
+  ];
+  const banks=[DRUMS,BASS,FX,LOOPS];
+  banks.forEach((set,bi)=>{
+    set.forEach(([name,gen],i)=>{
+      try{samplerBanks[bi][i]=_ensurePadDefaults({buffer:gen(),name})}
+      catch(e){console.warn('sample gen failed',name,e)}
+    });
+  });
+  renderSampler();saveToDB();toast('64 factory sounds loaded: DRUMS · BASS · FX · LOOPS','success');
 }
 
 /* Step Sequencer scheduler */
@@ -9133,24 +9263,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   },400);
 });
 
-function loadDefaultSamples(){
-  ensureAudio();
-  const sr=audioCtx.sampleRate;
-  const names=['KICK','SNARE','HAT','CLAP','OPEN','TOM','CYMBAL','RIDE','SUB','LASER','HORN','VOX','FX1','FX2','FX3','LOOP'];
-  for(let i=0;i<16;i++){
-    const dur=0.3,buf=audioCtx.createBuffer(1,sr*dur,sr),data=buf.getChannelData(0);
-    const type=i%4;
-    for(let j=0;j<data.length;j++){
-      const t=j/sr;
-      if(type===0)data[j]=Math.sin(2*Math.PI*60*t)*Math.exp(-t*15)*0.8;
-      else if(type===1)data[j]=(Math.random()*2-1)*Math.exp(-t*20)*0.6;
-      else if(type===2)data[j]=(Math.random()*2-1)*Math.exp(-t*40)*0.3;
-      else data[j]=Math.sin(2*Math.PI*(200+i*50)*t)*Math.exp(-t*8)*0.4;
-    }
-    samples[i]={buffer:buf,name:names[i]};
-  }
-  renderSampler();saveToDB();toast('Default samples loaded','success');
-}
+/* legacy loadDefaultSamples removed — the 4-bank factory above supersedes it */
 
 /* PLAYLISTS */
 function renderPlaylists(){
@@ -11456,6 +11569,23 @@ function init(){
   attachKnobs();attachEvents();setupBeatFxUI();setupSceneFx();setupKeyboard();setupTabs();setupSettings();setupVinylTurntables();setupOfflineDownload();setupDiscover();setupTitanClock();
   setupWaveformInteraction();setupAdvancedFeatures();renderSessions();
   renderSampler();renderPlaylists();
+  // First-run: fill all 4 sampler banks with the factory sounds so every
+  // pad is already "loaded" and lit on first open.
+  (function spSeedFactoryOnce(){
+    try{
+      const allEmpty=samplerBanks.every(b=>!b.some(Boolean));
+      if(allEmpty){
+        const seed=()=>{try{loadDefaultSamples();}catch(e){console.warn('factory seed failed',e)}};
+        if(typeof audioCtx!=='undefined'&&audioCtx){seed();}
+        else{
+          // audioCtx only exists after user gesture; seed on first interaction
+          const once=()=>{seed();window.removeEventListener('pointerdown',once,true);window.removeEventListener('keydown',once,true)};
+          window.addEventListener('pointerdown',once,true);
+          window.addEventListener('keydown',once,true);
+        }
+      }
+    }catch(e){console.warn(e)}
+  })();
 
   // Demo tracks
   if(!library.length){
