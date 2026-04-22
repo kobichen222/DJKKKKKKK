@@ -5292,6 +5292,153 @@ body.work-mode .automix-sync{
   .tt-pitch-track::after{top:50%;left:50%;width:1px;height:14px}
   .tt-bottom{grid-template-columns:repeat(2,1fr)}
 }
+
+/* ================================================================
+   JOG WHEEL PRO v3 — premium, modern, uniform across every deck and
+   every display mode (all-4 / DJ focus / work-mode / compact / mobile
+   / every theme). Uses !important + high specificity to dominate the
+   earlier cascade layers.
+   ================================================================ */
+
+/* Chrome highlight arc on the outer bezel (top lit rim reflection) */
+.cdj .jog-wheel .jog-outer{
+  background:
+    radial-gradient(circle at 32% 22%,rgba(255,255,255,.28) 0%,transparent 36%),
+    radial-gradient(circle at 68% 85%,rgba(var(--deck-accent-rgb),.09) 0%,transparent 48%),
+    conic-gradient(from 210deg,#6a6a72 0deg,#2a2a30 60deg,#3a3a42 120deg,#1a1a20 200deg,#3a3a42 270deg,#5e5e66 360deg),
+    radial-gradient(circle at 30% 30%,#6a6a72 0%,#2a2a2e 55%,#050506 100%) !important;
+  box-shadow:
+    0 0 0 2px #050506,
+    0 0 0 3px rgba(255,255,255,.07),
+    0 0 0 5px #1a1a20,
+    0 0 0 6px rgba(0,0,0,.75),
+    inset 0 3px 14px rgba(255,255,255,.16),
+    inset 0 -10px 24px rgba(0,0,0,.95),
+    0 18px 46px rgba(0,0,0,.85),
+    0 0 34px rgba(var(--deck-accent-rgb),.06) !important;
+}
+
+/* Inner bevel ring — gives a second rim of depth inside the bezel */
+.cdj .jog-wheel .jog-outer::before{
+  content:'';position:absolute;inset:3.5%;border-radius:50%;pointer-events:none;
+  border:1px solid rgba(255,255,255,.1);
+  box-shadow:
+    inset 0 0 0 1px rgba(0,0,0,.7),
+    inset 0 3px 6px rgba(255,255,255,.06),
+    inset 0 -3px 8px rgba(0,0,0,.7);
+}
+
+/* Refined tick markers — every 9°, with stronger majors every 90° */
+.cdj .jog-markers::before{
+  background:
+    repeating-conic-gradient(from 0deg,
+      rgba(255,255,255,.5) 0deg .8deg,
+      transparent .8deg 9deg) !important;
+  -webkit-mask:radial-gradient(circle,transparent 54%,#000 54%,#000 59%,transparent 59%) !important;
+  mask:radial-gradient(circle,transparent 54%,#000 54%,#000 59%,transparent 59%) !important;
+}
+/* 4 accent dots at N / E / S / W (north is deck color, others white) */
+.cdj .jog-markers::after{
+  content:'';position:absolute;inset:0;border-radius:50%;pointer-events:none;z-index:2;
+  background:
+    radial-gradient(circle 3.5px at 50% 7%,var(--deck-accent,#fff) 0 50%,transparent 60%),
+    radial-gradient(circle 3px at 93% 50%,rgba(255,255,255,.55) 0 50%,transparent 60%),
+    radial-gradient(circle 3px at 50% 93%,rgba(255,255,255,.55) 0 50%,transparent 60%),
+    radial-gradient(circle 3px at 7% 50%,rgba(255,255,255,.55) 0 50%,transparent 60%);
+  filter:drop-shadow(0 0 5px rgba(var(--deck-accent-rgb),.75));
+}
+
+/* Platter gets a soft accent-colored gradient halo */
+.cdj .jog-platter{
+  background:
+    radial-gradient(circle at 35% 30%,rgba(255,255,255,.16) 0%,transparent 30%),
+    conic-gradient(from 0deg,rgba(255,255,255,.03) 0deg 1.5deg,transparent 1.5deg 3deg),
+    radial-gradient(circle at 50% 50%,rgba(var(--deck-accent-rgb),.05) 0%,#14141a 45%,#06060a 100%) !important;
+  box-shadow:
+    inset 0 3px 14px rgba(255,255,255,.12),
+    inset 0 -10px 24px rgba(0,0,0,.95),
+    inset 0 0 0 1px rgba(255,255,255,.05),
+    0 0 0 1px rgba(0,0,0,.8),
+    0 0 30px rgba(var(--deck-accent-rgb),.08) !important;
+}
+
+/* Accent halo just outside the center screen */
+.cdj .jog-center-screen::before{
+  content:'';position:absolute;inset:-14%;border-radius:50%;pointer-events:none;z-index:-1;
+  background:radial-gradient(circle,rgba(var(--deck-accent-rgb),.25) 0%,transparent 70%);
+}
+/* CRT-style subtle scan-lines inside the screen */
+.cdj .jog-center-screen::after{
+  content:'';position:absolute;inset:4px;border-radius:50%;pointer-events:none;
+  background:repeating-linear-gradient(0deg,rgba(255,255,255,.045) 0 1px,transparent 1px 3px);
+  mix-blend-mode:overlay;opacity:.7;
+}
+
+/* Recessed beveled center screen */
+.cdj .jog-center-screen{
+  background:
+    linear-gradient(180deg,rgba(var(--deck-accent-rgb),.14) 0%,transparent 40%),
+    radial-gradient(circle at 50% 45%,#0e1820 0%,#04080c 60%,#020407 100%) !important;
+  border:2px solid rgba(var(--deck-accent-rgb),.5) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.08),
+    inset 0 0 26px rgba(var(--deck-accent-rgb),.25),
+    inset 0 3px 6px rgba(0,0,0,.95),
+    inset 0 -2px 4px rgba(var(--deck-accent-rgb),.18),
+    0 0 0 1px rgba(0,0,0,.85),
+    0 0 24px rgba(var(--deck-accent-rgb),.38),
+    0 4px 14px rgba(0,0,0,.75) !important;
+}
+
+/* Refined BPM readout — tabular digits, tight kerning, stronger glow */
+.cdj .jog-center-screen .bpm-display{
+  font-family:'Orbitron',sans-serif !important;
+  font-size:22px !important;
+  font-weight:900 !important;
+  letter-spacing:-.4px !important;
+  line-height:1 !important;
+  color:var(--deck-accent) !important;
+  text-shadow:
+    0 0 10px rgba(var(--deck-accent-rgb),.95),
+    0 0 2px rgba(255,255,255,.55) !important;
+  font-variant-numeric:tabular-nums !important;
+}
+.cdj .jog-center-screen .bpm-sub{
+  font-family:'Share Tech Mono',monospace !important;
+  font-size:8px !important;
+  letter-spacing:3px !important;
+  color:rgba(255,255,255,.6) !important;
+  opacity:1 !important;
+  margin-top:4px !important;
+  text-shadow:0 0 2px rgba(var(--deck-accent-rgb),.55) !important;
+}
+
+/* Subtle "breathing" pulse on the center screen when the deck is playing */
+.jog-wheel.playing .jog-center-screen{
+  animation:jogBeatPulseV3 2.1s ease-in-out infinite;
+}
+@keyframes jogBeatPulseV3{
+  0%,100%{
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,.08),
+      inset 0 0 26px rgba(var(--deck-accent-rgb),.25),
+      inset 0 3px 6px rgba(0,0,0,.95),
+      inset 0 -2px 4px rgba(var(--deck-accent-rgb),.18),
+      0 0 0 1px rgba(0,0,0,.85),
+      0 0 24px rgba(var(--deck-accent-rgb),.38),
+      0 4px 14px rgba(0,0,0,.75);
+  }
+  50%{
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,.14),
+      inset 0 0 32px rgba(var(--deck-accent-rgb),.42),
+      inset 0 3px 6px rgba(0,0,0,.95),
+      inset 0 -2px 4px rgba(var(--deck-accent-rgb),.28),
+      0 0 0 1px rgba(0,0,0,.85),
+      0 0 38px rgba(var(--deck-accent-rgb),.7),
+      0 4px 14px rgba(0,0,0,.75);
+  }
+}
 </style>
 </head>
 <body>
