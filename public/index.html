@@ -8287,7 +8287,25 @@ No MIDI devices. Press CONNECT.
 <!-- ORGAN PANEL -->
 <div id="spInstOrgan" style="display:none">
 <div class="sp-block">
-<div class="sp-block-title">🎹 HAMMOND B-3 DRAWBARS</div>
+<div class="sp-block-title">🎹 HAMMOND B-3 · ORGAN PRESETS</div>
+<div class="sp-row" style="margin-bottom:10px;flex-wrap:wrap;gap:6px;">
+<span class="sp-sub-label">PRESET</span>
+<button class="sp-mini-btn" data-sp-organ-preset="hammond-jazz">HAMMOND JAZZ</button>
+<button class="sp-mini-btn" data-sp-organ-preset="full-jazz">FULL JAZZ</button>
+<button class="sp-mini-btn" data-sp-organ-preset="gospel">GOSPEL</button>
+<button class="sp-mini-btn" data-sp-organ-preset="rock-organ">ROCK ORGAN</button>
+<button class="sp-mini-btn" data-sp-organ-preset="dirty-b3">DIRTY B-3</button>
+<button class="sp-mini-btn" data-sp-organ-preset="church-organ">CHURCH</button>
+<button class="sp-mini-btn" data-sp-organ-preset="trance-pad">TRANCE PAD</button>
+<button class="sp-mini-btn" data-sp-organ-preset="house-bass">HOUSE BASS</button>
+<button class="sp-mini-btn" data-sp-organ-preset="deep-bass">DEEP BASS</button>
+<button class="sp-mini-btn" data-sp-organ-preset="techno-sub">TECHNO SUB</button>
+<button class="sp-mini-btn" data-sp-organ-preset="trance-sub">TRANCE SUB</button>
+<button class="sp-mini-btn" data-sp-organ-preset="psy-bass">PSY BASS</button>
+<button class="sp-mini-btn" data-sp-organ-preset="acid-organ">ACID ORGAN</button>
+<button class="sp-mini-btn" data-sp-organ-preset="reese-organ">REESE ORGAN</button>
+<button class="sp-mini-btn" data-sp-organ-preset="big-room-lead">BIG ROOM LEAD</button>
+</div>
 <div class="sp-drawbars" id="spDrawbars"></div>
 <div class="sp-row" style="margin-top:10px;justify-content:center;">
 <div class="sp-knobs">
@@ -11892,7 +11910,7 @@ function setupDiscover(){
    ==================================================================== */
 const SP={
   ready:false,nodes:{},
-  transport:{playing:false,bpm:128,swing:0,step:0,timerId:null,nextTime:0},
+  transport:{playing:false,bpm:128,swing:0,step:0,timerId:null,nextTime:0,_pending:[]},
   synth:{osc1Wave:'sawtooth',osc2Wave:'square',filterType:'lowpass',lfoTarget:'none',knobs:{},voices:new Map()},
   drum:{voices:['KICK','SNARE','CHH','OHH','CLAP','CRASH','LOWTOM','HITOM','RIM','RIDE','SHAKER','PERC','COWBELL'],pattern:null,stepEls:[]},
   bass:{knobs:{},pattern:null,voice:null,currentMidi:null,stepEls:[]},
@@ -12027,12 +12045,13 @@ function spInitAudio(){
   const reverbWet=ctx.createGain();reverbWet.gain.value=0;
   mixBus.connect(reverb);reverb.connect(reverbWet);
   mkStrip('REVERB',reverbWet,master);
-  // limiter + master strip
+  // master strip — separate gain so the MASTER fader is independent of the masterVol knob
+  const masterStripGain=ctx.createGain();masterStripGain.gain.value=1;
   const masterAn=ctx.createAnalyser();masterAn.fftSize=512;
   const lim=ctx.createDynamicsCompressor();
   lim.threshold.value=-3;lim.knee.value=2;lim.ratio.value=12;lim.attack.value=0.003;lim.release.value=0.12;
-  master.connect(masterAn);masterAn.connect(lim);lim.connect(out);
-  SP.mix.strips['MASTER']={gain:master,pan:null,meter:masterAn,muted:false,solo:false,vol:(spVal('masterVol',SP.master.knobs.masterVol??.85)),panV:0,isMaster:true};
+  master.connect(masterStripGain);masterStripGain.connect(masterAn);masterAn.connect(lim);lim.connect(out);
+  SP.mix.strips['MASTER']={gain:masterStripGain,pan:null,meter:masterAn,muted:false,solo:false,vol:1,panV:0,isMaster:true};
   // record destination
   let streamDest=null;
   try{streamDest=ctx.createMediaStreamDestination();master.connect(streamDest);}catch(_){}
@@ -12064,11 +12083,18 @@ function spMakeIR(ctx,dur,decay,damp){
   }
   return ir;
 }
+let _spRevIrTimer=null;
 function spRebuildReverbIR(){
-  if(!SP.ready||!SP.nodes.reverb)return;
-  const size=spVal('reverbSize',SP.master.knobs.reverbSize??.6)/100; // 0..1
-  const damp=spVal('reverbDamp',SP.master.knobs.reverbDamp??.5)/100;
-  SP.nodes.reverb.buffer=spMakeIR(audioCtx,0.3+size*3.5,2.2+damp*2.5,damp);
+  if(!SP.ready||!SP.nodes.reverb||!audioCtx)return;
+  if(_spRevIrTimer)clearTimeout(_spRevIrTimer);
+  _spRevIrTimer=setTimeout(()=>{
+    _spRevIrTimer=null;
+    try{
+      const size=spVal('reverbSize',SP.master.knobs.reverbSize??.6)/100;
+      const damp=spVal('reverbDamp',SP.master.knobs.reverbDamp??.5)/100;
+      SP.nodes.reverb.buffer=spMakeIR(audioCtx,0.3+size*3.5,2.2+damp*2.5,damp);
+    }catch(e){console.warn('IR rebuild failed',e);}
+  },60);
 }
 
 /* --- Knob UI --- */
@@ -12646,8 +12672,14 @@ function spTransportStop(){
   if(!SP.transport.playing)return;
   SP.transport.playing=false;
   if(SP.transport.timerId){clearTimeout(SP.transport.timerId);SP.transport.timerId=null;}
+  // cancel any pending per-step scheduled timeouts
+  if(SP.transport._pending){SP.transport._pending.forEach(id=>clearTimeout(id));SP.transport._pending=[];}
   if(SP.bass.voice)spBassNoteOff(true);
   if(SP.chords)spChordNoteOff();
+  // belt-and-braces: release any stray synth voices
+  if(SP.synth && SP.synth.voices){
+    try{SP.synth.voices.forEach((_,m)=>spSynthNoteOff(m));}catch(_){}
+  }
   const ind=document.getElementById('spStepIndicator');
   if(ind)ind.textContent='— / 16';
   document.querySelectorAll('.sp-seq-cell.playing,.sp-bass-step.playing').forEach(el=>el.classList.remove('playing'));
@@ -12672,6 +12704,9 @@ function spTransportTick(){
   SP.transport.timerId=setTimeout(spTransportTick,25);
 }
 function spScheduleStep(step,time){
+  if(!SP.transport._pending)SP.transport._pending=[];
+  const pend=SP.transport._pending;
+  const addTimer=(fn,ms)=>{const id=setTimeout(()=>{pend.splice(pend.indexOf(id),1);if(SP.transport.playing)fn();},ms);pend.push(id);return id;};
   // drums
   if(SP.drum.pattern){
     SP.drum.voices.forEach((name,i)=>{
@@ -12686,23 +12721,20 @@ function spScheduleStep(step,time){
     if(s && s.on){
       const uiMidi=s.midi+(s.octave||0)*12;
       const delay=Math.max(0,(time-audioCtx.currentTime)*1000);
-      setTimeout(()=>{
-        spBassNoteOn(uiMidi,!!s.accent,!!s.slide);
-      },delay);
+      addTimer(()=>{spBassNoteOn(uiMidi,!!s.accent,!!s.slide);},delay);
       // release after 1 step unless next step is a slide continuation
       const next=SP.bass.pattern[(step+1)%16];
       const gate=(next&&next.on&&next.slide)?(60/SP.transport.bpm/4*1000*0.95):(60/SP.transport.bpm/4*1000*0.75);
-      setTimeout(()=>{
+      addTimer(()=>{
         if(SP.bass.currentMidi===uiMidi && !(next&&next.on&&next.slide))spBassNoteOff(false);
       },delay+gate);
     }
   }
-  // VIBE chord progression — advance one chord per bar (16-step loop), legato with a short gap
+  // VIBE chord progression — advance one chord per bar, legato with a short gap
   if(SP.chords && SP.chords.progression && SP.chords.progression.length){
     const delay=Math.max(0,(time-audioCtx.currentTime)*1000);
     if(step===0){
-      setTimeout(()=>{
-        if(!SP.transport.playing)return;
+      addTimer(()=>{
         spChordNoteOff();
         const chord=SP.chords.progression[SP.chords.index%SP.chords.progression.length];
         spChordNoteOn(chord);
@@ -12710,13 +12742,12 @@ function spScheduleStep(step,time){
       },delay);
     }else if(step===15){
       const barMs=60/SP.transport.bpm/4*1000;
-      setTimeout(()=>{spChordNoteOff();},delay+barMs*0.85);
+      addTimer(()=>{spChordNoteOff();},delay+barMs*0.85);
     }
   }
   // UI highlight
   const uid=Math.max(0,(time-audioCtx.currentTime)*1000);
-  setTimeout(()=>{
-    if(!SP.transport.playing)return;
+  addTimer(()=>{
     document.querySelectorAll('.sp-seq-cell.playing,.sp-bass-step.playing').forEach(el=>el.classList.remove('playing'));
     if(SP.drum.stepEls){
       SP.drum.stepEls.forEach(row=>{const el=row[step];if(el)el.classList.add('playing');});
@@ -13066,6 +13097,37 @@ function spApplySynthPreset(key){
 }
 
 /* ====================================================================
+   TITAN LAB — Hammond organ preset bank
+   ==================================================================== */
+const SP_ORGAN_PRESETS={
+  // drawbars: 16', 5 1/3', 8', 4', 2 2/3', 2', 1 3/5', 1 1/3', 1'
+  // knobs normalised 0..1 for the 7 organ knobs
+  'hammond-jazz':  {drawbars:[8,8,8,0,0,0,0,0,0], knobs:{organPerc:.55,organPercTone:1,organPercDec:.3,organLeslie:.45,organLeslieRate:.55,organDrive:.2,organVol:.75}},
+  'full-jazz':     {drawbars:[8,8,8,8,6,4,0,0,0], knobs:{organPerc:.45,organPercTone:0,organPercDec:.25,organLeslie:.4,organLeslieRate:.5,organDrive:.25,organVol:.8}},
+  'gospel':        {drawbars:[8,0,8,8,0,6,0,8,6], knobs:{organPerc:.3,organPercTone:1,organPercDec:.2,organLeslie:.55,organLeslieRate:.6,organDrive:.2,organVol:.8}},
+  'rock-organ':    {drawbars:[8,8,8,0,6,0,0,6,8], knobs:{organPerc:.1,organPercTone:1,organPercDec:.2,organLeslie:.65,organLeslieRate:.75,organDrive:.65,organVol:.85}},
+  'dirty-b3':      {drawbars:[8,8,8,8,0,0,0,6,8], knobs:{organPerc:.7,organPercTone:1,organPercDec:.22,organLeslie:.7,organLeslieRate:.8,organDrive:.75,organVol:.85}},
+  'church-organ':  {drawbars:[8,0,8,8,8,8,0,0,0], knobs:{organPerc:0,organPercTone:0,organPercDec:.2,organLeslie:0,organLeslieRate:.25,organDrive:0,organVol:.78}},
+  'trance-pad':    {drawbars:[8,0,8,8,0,0,0,0,0], knobs:{organPerc:0,organPercTone:0,organPercDec:.2,organLeslie:.55,organLeslieRate:.4,organDrive:.12,organVol:.75}},
+  // BASS presets — 16' dominant, 8' for body, no high drawbars
+  'house-bass':    {drawbars:[8,0,8,0,0,0,0,0,0], knobs:{organPerc:0,organPercTone:0,organPercDec:.2,organLeslie:0,organLeslieRate:.2,organDrive:.4,organVol:.9}},
+  'deep-bass':     {drawbars:[8,0,6,0,0,0,0,0,0], knobs:{organPerc:0,organPercTone:0,organPercDec:.2,organLeslie:.15,organLeslieRate:.2,organDrive:.45,organVol:.88}},
+  'techno-sub':    {drawbars:[8,0,0,0,0,0,0,0,0], knobs:{organPerc:0,organPercTone:0,organPercDec:.2,organLeslie:0,organLeslieRate:.2,organDrive:.3,organVol:.95}},
+  'trance-sub':    {drawbars:[8,0,2,0,0,0,0,0,0], knobs:{organPerc:0,organPercTone:0,organPercDec:.2,organLeslie:.25,organLeslieRate:.2,organDrive:.4,organVol:.9}},
+  'psy-bass':      {drawbars:[8,0,4,0,0,2,0,0,0], knobs:{organPerc:0,organPercTone:1,organPercDec:.15,organLeslie:.15,organLeslieRate:.3,organDrive:.6,organVol:.9}},
+  'acid-organ':    {drawbars:[8,0,8,0,0,4,0,0,0], knobs:{organPerc:.3,organPercTone:1,organPercDec:.15,organLeslie:.3,organLeslieRate:.5,organDrive:.55,organVol:.85}},
+  'reese-organ':   {drawbars:[8,6,8,4,0,0,0,0,0], knobs:{organPerc:.1,organPercTone:0,organPercDec:.25,organLeslie:.25,organLeslieRate:.3,organDrive:.55,organVol:.88}},
+  'big-room-lead': {drawbars:[4,0,8,8,6,6,0,0,0], knobs:{organPerc:.5,organPercTone:1,organPercDec:.25,organLeslie:.35,organLeslieRate:.55,organDrive:.4,organVol:.85}},
+};
+function spApplyOrganPreset(key){
+  const p=SP_ORGAN_PRESETS[key];if(!p)return;
+  SP.organ.drawbars=p.drawbars.slice();
+  spBuildDrawbars();
+  if(p.knobs){Object.keys(p.knobs).forEach(k=>spSetKnob(k,p.knobs[k],'#spInstOrgan'));}
+  document.querySelectorAll('[data-sp-organ-preset]').forEach(b=>b.classList.toggle('active',b.dataset.spOrganPreset===key));
+}
+
+/* ====================================================================
    TITAN LAB — VIBE SOUND CODING engine
    ==================================================================== */
 const SP_CHORD_PROGRESSIONS={
@@ -13227,17 +13289,19 @@ const SP_MIXER_LABELS={
   DELAY:'DELAY',REVERB:'REVERB',CHORUS:'CHORUS',MASTER:'MASTER',
 };
 function spApplyMixer(){
+  if(!audioCtx||!SP.ready)return;
   const strips=SP.mix.strips||{};
   const ids=Object.keys(strips);
   const anySolo=ids.some(id=>id!=='MASTER' && strips[id].solo);
   SP.mix.soloActive=anySolo;
+  const now=audioCtx.currentTime;
   ids.forEach(id=>{
     const s=strips[id];if(!s||!s.gain)return;
     const isMaster=!!s.isMaster;
     let audible=!s.muted && (!anySolo || s.solo || isMaster);
     const target=audible?s.vol:0;
-    try{s.gain.gain.setTargetAtTime(target,audioCtx.currentTime,0.015);}catch(_){}
-    if(s.pan){try{s.pan.pan.setTargetAtTime(s.panV,audioCtx.currentTime,0.015);}catch(_){}}
+    try{s.gain.gain.setTargetAtTime(target,now,0.015);}catch(_){}
+    if(s.pan){try{s.pan.pan.setTargetAtTime(s.panV,now,0.015);}catch(_){}}
   });
 }
 function spBuildStudioMixer(){
@@ -13347,6 +13411,15 @@ function setupStudioPro(){
 
   // hammond drawbars
   spBuildDrawbars();
+
+  // organ preset buttons
+  document.querySelectorAll('[data-sp-organ-preset]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      spApplyOrganPreset(btn.dataset.spOrganPreset);
+      // auto-switch to the organ panel so the user sees the change
+      document.querySelector('[data-sp-inst="organ"]')?.click();
+    });
+  });
 
   // bass preset buttons
   document.querySelectorAll('[data-sp-bass-preset]').forEach(btn=>{
