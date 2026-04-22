@@ -3718,6 +3718,13 @@ body.work-mode .dsb-wmexit{display:inline-flex;background:linear-gradient(180deg
 }
 .vibe-sub{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:1.5px;color:#aaa;}
 .vibe-body{display:flex;gap:10px;align-items:stretch;margin-bottom:10px;}
+.vibe-btn-col{display:flex;flex-direction:column;gap:6px;min-width:170px;}
+.vibe-btn-row{display:flex;gap:6px;}
+.vibe-var-btn{flex:1;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:1.5px;background:#15151a !important;color:#2aeaff !important;border:1px solid #2aeaff !important;cursor:pointer;}
+.vibe-var-btn:hover{filter:brightness(1.2);}
+.vibe-mode-btn{flex:1;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:1.5px;background:#15151a !important;color:#ff8a1a !important;border:1px solid #ff8a1a !important;cursor:pointer;}
+.vibe-mode-btn[data-mode="loop"]{color:#ffc94a !important;border-color:#ffc94a !important;}
+.vibe-mode-btn:hover{filter:brightness(1.2);}
 .vibe-input{
   flex:1;min-height:60px;resize:vertical;
   font-family:'Share Tech Mono',monospace;font-size:13px;letter-spacing:.5px;
@@ -3741,7 +3748,7 @@ body.work-mode .dsb-wmexit{display:inline-flex;background:linear-gradient(180deg
 }
 .vibe-chip:hover{border-color:#2aeaff;color:#2aeaff;background:#161a1e;}
 .vibe-chip.active{background:linear-gradient(180deg,#2aeaff,#0a8fa0);color:#0a0a0c;border-color:#2aeaff;font-weight:700;}
-.vibe-status{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:1.4px;color:#2aeaff;min-height:15px;padding-top:4px;}
+.vibe-status{font-family:'Share Tech Mono',monospace;font-size:11.5px;letter-spacing:1.1px;color:#cfeaff;min-height:15px;padding:8px 10px 4px;line-height:1.7;background:rgba(42,234,255,.05);border-left:2px solid #2aeaff;border-radius:0 6px 6px 0;margin-top:4px;}
 .vibe-status.warn{color:#ffb84d;}
 @media (max-width:720px){
   .vibe-body{flex-direction:column;}
@@ -8110,7 +8117,13 @@ No MIDI devices. Press CONNECT.
   <div class="vibe-body">
     <textarea id="spVibeInput" class="vibe-input" rows="2"
       placeholder="e.g. 'dark uplifting trance 138 bpm peak hour' or 'deep house summer night piano pad' or 'psytrance 145 acid'"></textarea>
-    <button class="tool-btn vibe-gen-btn" id="spVibeGen">✨ GENERATE &amp; PLAY</button>
+    <div class="vibe-btn-col">
+      <button class="tool-btn vibe-gen-btn" id="spVibeGen">✨ GENERATE &amp; PLAY</button>
+      <div class="vibe-btn-row">
+        <button class="tool-btn vibe-var-btn" id="spVibeVariation" title="Regenerate with the same vibe but a new seed">🎲 VARIATION</button>
+        <button class="tool-btn vibe-mode-btn" id="spVibeModeToggle" data-mode="song" title="Toggle song-structure mode vs. single-bar loop">📼 SONG</button>
+      </div>
+    </div>
   </div>
   <div class="vibe-chips" id="spVibeChips">
     <button class="vibe-chip" data-vibe="dark techno 128 acid bass driving">🌒 DARK TECHNO</button>
@@ -12002,7 +12015,11 @@ function spInitAudio(){
     mkStrip('DR_'+name,inG,drumBus);
   });
   // Instrument strips — re-insert in path before mixBus
-  mkStrip('SYNTH',synthBus,mixBus);
+  // Synth first goes through an automation lowpass (used by VIBE 2.0 for filter sweeps)
+  const synthAutoFilter=ctx.createBiquadFilter();
+  synthAutoFilter.type='lowpass';synthAutoFilter.frequency.value=22000;synthAutoFilter.Q.value=0.7;
+  synthBus.connect(synthAutoFilter);
+  mkStrip('SYNTH',synthAutoFilter,mixBus);
   mkStrip('BASS',bassBus,mixBus);
   mkStrip('ORGAN',organBus,mixBus);
   mkStrip('DRUMS',drumBus,mixBus);
@@ -12055,7 +12072,7 @@ function spInitAudio(){
   // record destination
   let streamDest=null;
   try{streamDest=ctx.createMediaStreamDestination();master.connect(streamDest);}catch(_){}
-  SP.nodes={synthBus,drumBus,bassBus,organBus,mixBus,drive,master,delay,delayFb,delayFilter,delayWet,reverb,reverbWet,chorusIn,chorusWet,chorusLDelay,chorusRDelay,limiter:lim,streamDest};
+  SP.nodes={synthBus,drumBus,bassBus,organBus,mixBus,drive,master,delay,delayFb,delayFilter,delayWet,reverb,reverbWet,chorusIn,chorusWet,chorusLDelay,chorusRDelay,synthAutoFilter,masterStripGain,limiter:lim,streamDest};
   SP.rec.streamDest=streamDest;
   SP.ready=true;
 }
@@ -12664,6 +12681,10 @@ function spTransportStart(){
   SP.transport.playing=true;
   SP.transport.step=0;
   SP.transport.nextTime=audioCtx.currentTime+0.06;
+  // Reset song section pointer so we always start at INTRO when SONG mode is on
+  if(SP.song && SP.song.enabled){
+    SP.song.sectionIdx=0;SP.song.barInSection=0;
+  }
   const btn=document.getElementById('spPlayBtn');
   if(btn){btn.classList.add('active');btn.style.background='linear-gradient(180deg,#ff8a1a,#cc6a0a)';btn.style.color='#0a0a0c';}
   spTransportTick();
@@ -12707,16 +12728,30 @@ function spScheduleStep(step,time){
   if(!SP.transport._pending)SP.transport._pending=[];
   const pend=SP.transport._pending;
   const addTimer=(fn,ms)=>{const id=setTimeout(()=>{pend.splice(pend.indexOf(id),1);if(SP.transport.playing)fn();},ms);pend.push(id);return id;};
+  // Song-mode: advance section state at every bar start
+  if(step===0 && SP.song && SP.song.enabled)spSongAdvanceBar();
+  const song=SP.song||{};
+  const songOn=!!song.enabled;
+  const drumsOk=!songOn||song.activeDrums!==false;
+  const bassOk=!songOn||song.activeBass!==false;
+  const synthOk=!songOn||song.activeSynth!==false;
   // drums
-  if(SP.drum.pattern){
+  if(SP.drum.pattern && drumsOk){
     SP.drum.voices.forEach((name,i)=>{
       if(SP.drum.mutes&&SP.drum.mutes[i])return;
       const v=SP.drum.pattern[i]?.[step]||0;
-      if(v>0)spDrumHit(name,time,v);
+      if(v>0)spDrumHit(name,time,spHumanizeVel(v));
     });
+    // Snare roll on the last bar of a build
+    if(song.snareRoll){
+      const vel=0.4+0.6*(step/15);
+      spDrumHit('SNARE',time,vel);
+      // ghost closed-hat on every step during the roll
+      if(step%2===0)spDrumHit('CHH',time,0.35);
+    }
   }
   // bass
-  if(SP.bass.pattern){
+  if(SP.bass.pattern && bassOk){
     const s=SP.bass.pattern[step];
     if(s && s.on){
       const uiMidi=s.midi+(s.octave||0)*12;
@@ -12731,7 +12766,7 @@ function spScheduleStep(step,time){
     }
   }
   // VIBE chord progression — advance one chord per bar, legato with a short gap
-  if(SP.chords && SP.chords.progression && SP.chords.progression.length){
+  if(SP.chords && SP.chords.progression && SP.chords.progression.length && synthOk){
     const delay=Math.max(0,(time-audioCtx.currentTime)*1000);
     if(step===0){
       addTimer(()=>{
@@ -12744,6 +12779,9 @@ function spScheduleStep(step,time){
       const barMs=60/SP.transport.bpm/4*1000;
       addTimer(()=>{spChordNoteOff();},delay+barMs*0.85);
     }
+  }else if(!synthOk && SP.chords && SP.chords.held && SP.chords.held.length){
+    // silence chords when the section disables synth (e.g. intro / outro / break)
+    addTimer(()=>{spChordNoteOff();},Math.max(0,(time-audioCtx.currentTime)*1000));
   }
   // UI highlight
   const uid=Math.max(0,(time-audioCtx.currentTime)*1000);
@@ -13210,6 +13248,130 @@ function spVibeRandomizeDrums(){
   if(shakerIdx>=0){for(let s=0;s<16;s++)if(pat[shakerIdx][s]===0 && rand())pat[shakerIdx][s]=1;}
   if(percIdx>=0){for(let s=1;s<16;s+=2)if(pat[percIdx][s]===0 && Math.random()<0.2)pat[percIdx][s]=1;}
 }
+/* ====================================================================
+   VIBE 2.0 — song structure engine (intro / build / drop / break / outro)
+   ==================================================================== */
+const SP_SONG_TEMPLATES={
+  'trance':[
+    {name:'INTRO',bars:4,kind:'intro'},
+    {name:'BUILD',bars:4,kind:'build'},
+    {name:'DROP',bars:8,kind:'drop'},
+    {name:'BREAK',bars:4,kind:'break'},
+    {name:'DROP 2',bars:8,kind:'drop'},
+    {name:'OUTRO',bars:4,kind:'outro'},
+  ],
+  'techno':[
+    {name:'INTRO',bars:4,kind:'intro-techno'},
+    {name:'BUILD',bars:4,kind:'build'},
+    {name:'DROP',bars:16,kind:'drop'},
+    {name:'BREAK',bars:4,kind:'break-techno'},
+    {name:'DROP 2',bars:16,kind:'drop'},
+    {name:'OUTRO',bars:4,kind:'outro'},
+  ],
+  'house':[
+    {name:'INTRO',bars:4,kind:'intro'},
+    {name:'BUILD',bars:4,kind:'build'},
+    {name:'DROP',bars:8,kind:'drop'},
+    {name:'BREAK',bars:4,kind:'break'},
+    {name:'DROP 2',bars:8,kind:'drop'},
+    {name:'OUTRO',bars:4,kind:'outro'},
+  ],
+  'psytrance':[
+    {name:'INTRO',bars:4,kind:'intro-techno'},
+    {name:'BUILD',bars:4,kind:'build'},
+    {name:'DROP',bars:16,kind:'drop'},
+    {name:'BREAK',bars:4,kind:'break-techno'},
+    {name:'DROP 2',bars:16,kind:'drop'},
+    {name:'OUTRO',bars:4,kind:'outro'},
+  ],
+  'dreamy':[
+    {name:'INTRO',bars:4,kind:'break'},
+    {name:'MOVE',bars:8,kind:'build'},
+    {name:'OPEN',bars:8,kind:'drop'},
+    {name:'FLOAT',bars:8,kind:'break'},
+    {name:'OUTRO',bars:4,kind:'outro'},
+  ],
+};
+function spSongSectionsFor(vibeName){
+  // map vibe preset name to template
+  if(/trance|hoover|uplifting/.test(vibeName))return SP_SONG_TEMPLATES.trance.map(s=>({...s}));
+  if(/psy/.test(vibeName))return SP_SONG_TEMPLATES.psytrance.map(s=>({...s}));
+  if(/techno|minimal|acid/.test(vibeName))return SP_SONG_TEMPLATES.techno.map(s=>({...s}));
+  if(/dreamy|ambient/.test(vibeName))return SP_SONG_TEMPLATES.dreamy.map(s=>({...s}));
+  return SP_SONG_TEMPLATES.house.map(s=>({...s}));
+}
+function spSongReset(vibeName){
+  SP.song=SP.song||{};
+  SP.song.enabled=true;
+  SP.song.sections=spSongSectionsFor(vibeName||'');
+  SP.song.sectionIdx=0;
+  SP.song.barInSection=0;
+  SP.song.activeDrums=true;
+  SP.song.activeBass=true;
+  SP.song.activeSynth=true;
+  SP.song.snareRoll=false;
+  SP.song.seed=(Math.random()*1e9)|0;
+  // kick automation filter back to fully open
+  if(SP.nodes&&SP.nodes.synthAutoFilter){
+    try{SP.nodes.synthAutoFilter.frequency.cancelScheduledValues(audioCtx.currentTime);
+      SP.nodes.synthAutoFilter.frequency.setValueAtTime(22000,audioCtx.currentTime);}catch(_){}
+  }
+}
+function spSongAdvanceBar(){
+  if(!SP.song||!SP.song.enabled||!SP.song.sections||!audioCtx)return;
+  let section=SP.song.sections[SP.song.sectionIdx];
+  if(SP.song.barInSection>=section.bars){
+    SP.song.sectionIdx=(SP.song.sectionIdx+1)%SP.song.sections.length;
+    SP.song.barInSection=0;
+    section=SP.song.sections[SP.song.sectionIdx];
+    // flash section name in status
+    const st=document.getElementById('spVibeStatus');
+    if(st){
+      const full=st.getAttribute('data-ai')||st.textContent||'';
+      st.innerHTML=full+` <span style="color:#ff8a1a">§ ${section.name}</span>`;
+    }
+  }
+  const k=section.kind;
+  const now=audioCtx.currentTime;
+  const barSec=60/SP.transport.bpm*4;
+  const sf=SP.nodes&&SP.nodes.synthAutoFilter;
+  // defaults
+  SP.song.activeDrums=true;SP.song.activeBass=true;SP.song.activeSynth=true;SP.song.snareRoll=false;
+  if(k==='intro'){
+    SP.song.activeSynth=false;
+    SP.song.activeBass=SP.song.barInSection>=2; // bass enters halfway
+    if(sf){try{sf.frequency.cancelScheduledValues(now);sf.frequency.setTargetAtTime(700,now,0.1);}catch(_){}}
+  }else if(k==='intro-techno'){
+    SP.song.activeSynth=false;
+    SP.song.activeBass=true;
+    if(sf){try{sf.frequency.cancelScheduledValues(now);sf.frequency.setTargetAtTime(400,now,0.2);}catch(_){}}
+  }else if(k==='build'){
+    // open filter gradually across the build section
+    if(sf && SP.song.barInSection===0){
+      try{sf.frequency.cancelScheduledValues(now);
+        sf.frequency.setValueAtTime(600,now);
+        sf.frequency.linearRampToValueAtTime(20000,now+section.bars*barSec);}catch(_){}
+    }
+    // snare roll on the last bar
+    if(SP.song.barInSection===section.bars-1)SP.song.snareRoll=true;
+  }else if(k==='drop'){
+    if(sf){try{sf.frequency.cancelScheduledValues(now);sf.frequency.setTargetAtTime(22000,now,0.08);}catch(_){}}
+  }else if(k==='break'){
+    SP.song.activeDrums=false;SP.song.activeBass=false;
+    if(sf){try{sf.frequency.cancelScheduledValues(now);sf.frequency.setTargetAtTime(22000,now,0.2);}catch(_){}}
+  }else if(k==='break-techno'){
+    SP.song.activeDrums=false;
+    if(sf){try{sf.frequency.cancelScheduledValues(now);sf.frequency.setTargetAtTime(8000,now,0.2);}catch(_){}}
+  }else if(k==='outro'){
+    SP.song.activeBass=false;SP.song.activeSynth=false;
+    if(sf){try{sf.frequency.cancelScheduledValues(now);sf.frequency.linearRampToValueAtTime(300,now+section.bars*barSec);}catch(_){}}
+  }
+  SP.song.barInSection++;
+}
+
+/* Drum velocity humanize — ±8% per hit for groove */
+function spHumanizeVel(v){return Math.max(0.1,Math.min(1.6,v*(1+(Math.random()-0.5)*0.16)));}
+
 function spVibeApply(spec){
   spInitAudio();
   // BPM
@@ -13231,14 +13393,42 @@ function spVibeApply(spec){
   if(spec.fx){
     const fx=spec.fx;
     Object.keys(fx).forEach(k=>{
-      // Send knobs live on the synth scope; master scope hosts drive/chorusMix aren't on master scope — handle each
       if(k==='masterDrive'){spSetKnob('masterDrive',Math.min(1,Math.max(0,fx[k])),'.sp-master');}
       else if(k==='chorusMix'){spSetKnob('chorusMix',Math.min(1,Math.max(0,fx[k])),'#spInstSynth');}
       else if(k==='delaySend'||k==='reverbSend'){spSetKnob(k,Math.min(1,Math.max(0,fx[k])),'#spInstSynth');}
     });
   }
-  // CHORD progression
-  SP.chords={progression:SP_CHORD_PROGRESSIONS[spec.chord]||SP_CHORD_PROGRESSIONS['am-trance'],index:0,held:[]};
+  // CHORD progression — pick one of the variants for diversity
+  const baseChord=SP_CHORD_PROGRESSIONS[spec.chord]||SP_CHORD_PROGRESSIONS['am-trance'];
+  SP.chords={progression:baseChord,index:0,held:[]};
+  // SONG structure — intro/build/drop/break/outro
+  if(spec._songMode!==false)spSongReset(spec._name||'trance');
+  else{SP.song=SP.song||{};SP.song.enabled=false;}
+}
+
+/* Build a friendly multi-line AI status string describing what was generated */
+function spVibeBuildStatus(spec){
+  const lines=[];
+  const name=(spec._name||'trance').replace(/-/g,' ').toUpperCase();
+  lines.push(`🎛 <b style="color:#ff8a1a">TITAN AI</b> — built a ${name} track at <b>${spec.bpm} BPM</b>.`);
+  lines.push(`🥁 Drums: <b>${spec.drum.toUpperCase()}</b>` + (spec._peak?' · peak-hour punch':'') + (spec._dark?' · darkened':''));
+  lines.push(`🐍 Bass: <b>${spec.bass.toUpperCase()}</b>`);
+  lines.push(`🎛 Lead synth: <b>${spec.synth.toUpperCase()}</b>`);
+  lines.push(`🎵 Chords: <b>${(spec.chord||'am-trance').toUpperCase()}</b> progression`);
+  const fxBits=[];
+  if(spec.fx){
+    if(spec.fx.reverbSend)fxBits.push(`reverb ${Math.round(spec.fx.reverbSend*100)}%`);
+    if(spec.fx.delaySend)fxBits.push(`delay ${Math.round(spec.fx.delaySend*100)}%`);
+    if(spec.fx.chorusMix)fxBits.push(`chorus ${Math.round(spec.fx.chorusMix*100)}%`);
+    if(spec.fx.masterDrive)fxBits.push(`drive ${Math.round(spec.fx.masterDrive*100)}%`);
+  }
+  if(fxBits.length)lines.push(`⚡ Mix: ${fxBits.join(' · ')}`);
+  if(SP.song && SP.song.sections && SP.song.enabled){
+    const arr=SP.song.sections.map(s=>`${s.name} (${s.bars})`).join(' → ');
+    lines.push(`🎼 Arrangement: ${arr}`);
+  }
+  lines.push(`▶ Playing now — tap <b>🎲 VARIATION</b> for a different take.`);
+  return lines.join('<br>');
 }
 function spChordNoteOn(midis){
   if(!midis)return;
@@ -13250,23 +13440,35 @@ function spChordNoteOff(){
   SP.chords.held.forEach(m=>{try{spSynthNoteOff(m);}catch(_){}});
   SP.chords.held=[];
 }
-function spVibeGenerate(){
+function spVibeGenerate(keepText){
   const input=document.getElementById('spVibeInput');
   const status=document.getElementById('spVibeStatus');
   const btn=document.getElementById('spVibeGen');
   const text=(input&&input.value)||'';
   if(!text.trim()){status&&(status.textContent='Type a vibe, or tap one of the chips below…',status.className='vibe-status warn');return;}
   const spec=spVibeParse(text);
+  // honor song/loop toggle
+  const modeToggle=document.getElementById('spVibeModeToggle');
+  spec._songMode=!modeToggle||modeToggle.dataset.mode!=='loop';
   btn&&btn.classList.add('working');
+  // Stop currently playing before re-arranging so the section state resets cleanly
+  if(SP.transport.playing)spTransportStop();
   spVibeApply(spec);
-  const label=spec._name.replace(/-/g,' ').toUpperCase();
   if(status){
-    const fxSum=[spec.fx?.reverbSend?'reverb':null,spec.fx?.delaySend?'delay':null,spec.fx?.chorusMix?'chorus':null,spec.fx?.masterDrive?'drive':null].filter(Boolean).join(' · ');
-    status.textContent=`▶ ${label} · ${spec.bpm} BPM · ${spec.drum.toUpperCase()} drums · ${spec.bass.toUpperCase()} bass · ${spec.synth.toUpperCase()} synth${fxSum?' · '+fxSum:''}`;
+    status.innerHTML=spVibeBuildStatus(spec);
     status.className='vibe-status';
+    status.setAttribute('data-ai',status.innerHTML);
   }
-  if(!SP.transport.playing)spTransportStart();
+  spTransportStart();
   setTimeout(()=>btn&&btn.classList.remove('working'),600);
+}
+/* 🎲 VARIATION — regenerate with the same prompt but new seeded content */
+function spVibeVariation(){
+  const input=document.getElementById('spVibeInput');
+  if(input && input.value.trim()){spVibeGenerate(true);return;}
+  // no prompt yet — pick a random chip
+  const chips=document.querySelectorAll('.vibe-chip');
+  if(chips.length){const pick=chips[Math.floor(Math.random()*chips.length)];pick.click();}
 }
 
 /* ====================================================================
@@ -13601,7 +13803,7 @@ function setupStudioPro(){
   // VIBE SOUND CODING — generate & play
   const vibeInp=document.getElementById('spVibeInput');
   const vibeBtn=document.getElementById('spVibeGen');
-  vibeBtn?.addEventListener('click',spVibeGenerate);
+  vibeBtn?.addEventListener('click',()=>spVibeGenerate());
   vibeInp?.addEventListener('keydown',e=>{
     if((e.key==='Enter')&&(e.ctrlKey||e.metaKey||!e.shiftKey)){
       e.preventDefault();spVibeGenerate();
@@ -13613,6 +13815,18 @@ function setupStudioPro(){
       if(vibeInp)vibeInp.value=chip.dataset.vibe||chip.textContent.trim();
       spVibeGenerate();
     });
+  });
+  document.getElementById('spVibeVariation')?.addEventListener('click',spVibeVariation);
+  const modeToggle=document.getElementById('spVibeModeToggle');
+  modeToggle?.addEventListener('click',()=>{
+    const next=modeToggle.dataset.mode==='song'?'loop':'song';
+    modeToggle.dataset.mode=next;
+    modeToggle.textContent=next==='song'?'📼 SONG':'♻ LOOP';
+    // if the transport is playing, re-apply current prompt to swap modes
+    if(SP.transport.playing){
+      const input=document.getElementById('spVibeInput');
+      if(input && input.value.trim())spVibeGenerate();
+    }
   });
   // Esc closes the mixer
   document.addEventListener('keydown',e=>{
