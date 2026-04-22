@@ -1,8 +1,8 @@
 import type { Metadata, Viewport } from "next";
 
 export const metadata: Metadata = {
-  title: "Pioneer DJ Pro MAX - Ultimate DJ Console",
-  description: "Professional DJ console with dual decks, mixer, effects, and YouTube integration",
+  title: "DJ TITAN — Professional DJ Studio",
+  description: "Professional DJ studio with 4 TITAN-3K decks, TITAN CORE mixer, TITAN VINYL turntables, TITAN LAB production, effects, AI mixing and offline support",
 };
 
 export const viewport: Viewport = {

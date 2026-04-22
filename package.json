@@ -2,8 +2,8 @@
   "name": "pioneer-dj-pro-max",
   "version": "1.0.0",
   "private": true,
-  "description": "DJ MAX — Ultimate AI DJ Console",
-  "author": "DJ MAX",
+  "description": "DJ TITAN — Professional DJ Studio",
+  "author": "DJ TITAN",
   "main": "electron/main.js",
   "scripts": {
     "dev": "next dev --turbopack",
@@ -30,8 +30,8 @@
     "typescript": "^5.7.0"
   },
   "build": {
-    "appId": "com.djmax.ultimate",
-    "productName": "DJ MAX",
+    "appId": "com.djtitan.studio",
+    "productName": "DJ TITAN",
     "directories": {
       "output": "dist-electron",
       "buildResources": "build"
@@ -63,7 +63,7 @@
       "allowToChangeInstallationDir": false,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "DJ MAX",
+      "shortcutName": "DJ TITAN",
       "deleteAppDataOnUninstall": false,
       "differentialPackage": true
     },

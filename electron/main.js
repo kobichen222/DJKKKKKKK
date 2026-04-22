@@ -17,7 +17,7 @@ function createWindow() {
     minWidth: 1100,
     minHeight: 720,
     backgroundColor: '#0a0a0a',
-    title: 'DJ MAX — Ultimate AI DJ Console',
+    title: 'DJ TITAN — Professional DJ Studio',
     autoHideMenuBar: true,
     icon: path.join(__dirname, '..', 'public', 'icon.svg'),
     webPreferences: {
@@ -54,13 +54,13 @@ function createWindow() {
       label: 'Help',
       submenu: [
         {
-          label: 'About DJ MAX',
+          label: 'About DJ TITAN',
           click: () => {
             dialog.showMessageBox(mainWindow, {
               type: 'info',
-              title: 'About DJ MAX',
-              message: 'DJ MAX — Ultimate AI DJ Console',
-              detail: `Version: ${app.getVersion()}\nAuto-updates enabled from GitHub Releases.`,
+              title: 'About DJ TITAN',
+              message: 'DJ TITAN — Professional DJ Studio',
+              detail: `DJ TITAN\nVersion: ${app.getVersion()}\nAuto-updates enabled from GitHub Releases.`,
               buttons: ['OK'],
             });
           },

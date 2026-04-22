@@ -12,7 +12,7 @@ export default function DJPage() {
         top: 0,
         left: 0,
       }}
-      title="Pioneer DJ Pro MAX"
+      title="DJ TITAN — Professional DJ Studio"
     />
   );
 }

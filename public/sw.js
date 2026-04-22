@@ -1,12 +1,12 @@
-/* DJ MAX Ai — Offline-first Service Worker
+/* DJ TITAN — Offline-first Service Worker
    Strategy:
    - HTML/navigation → network-first with cache fallback
    - Same-origin static (CSS/JS/images/fonts) → stale-while-revalidate
    - CDN assets (Google Fonts, jsDelivr) → cache-first once seen
    - Everything cached stays reachable offline forever */
 
-const CACHE = 'djmaxai-shell-v62';
-const CDN_CACHE = 'djmaxai-cdn-v62';
+const CACHE = 'djtitan-shell-v63';
+const CDN_CACHE = 'djtitan-cdn-v63';
 const SHELL = [
   './','./index.html','./pioneer-dj-pro-max-v2.html',
   './analyzer.worker.js','./manifest.json','./icon.svg','./auth.sql'

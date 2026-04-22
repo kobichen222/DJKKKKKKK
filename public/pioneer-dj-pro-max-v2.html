@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>DJ MAX Ai — Ultimate AI DJ Console</title>
+<title>DJ TITAN — Professional DJ Studio</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Share+Tech+Mono&family=Barlow+Condensed:wght@400;500;600;700&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
@@ -5659,7 +5659,7 @@ body.work-mode .automix-sync{
 </head>
 <body>
 <div class="header-bar">
-<div class="brand"><span class="max">Ai</span>DJ <span>MAX</span> — Ultimate AI DJ Console</div>
+<div class="brand"><span class="max">DJ</span> <span>TITAN</span> — Professional DJ Studio</div>
 <div class="deck-switch-bar header-dsb">
   <span class="dsb-label">DECK FOCUS</span>
   <button class="dsb-btn" data-pair="AB">1 · 2</button>
@@ -5694,7 +5694,7 @@ body.work-mode .automix-sync{
 <button class="tab-btn" data-tab="analytics" data-t="tab_analytics">📊 ANALYTICS</button>
 <button class="tab-btn" data-tab="midi" data-t="tab_midi">🎹 MIDI</button>
 <button class="tab-btn" data-tab="studio" data-t="tab_studio">🎚 STUDIO</button>
-<button class="tab-btn" data-tab="studiopro" data-t="tab_studiopro">🎹 STUDIO PRO</button>
+<button class="tab-btn" data-tab="studiopro" data-t="tab_studiopro">🎹 TITAN LAB</button>
 <button class="tab-btn" data-tab="editor" data-t="tab_editor">✂ EDITOR</button>
 <button class="tab-btn admin-only" data-tab="admin" id="adminTabBtn" style="display:none">🛡 ADMIN</button>
 <button class="tab-btn" data-tab="settings" data-t="tab_settings">⚙ SETTINGS</button>
@@ -5900,7 +5900,7 @@ body.work-mode .automix-sync{
     <span class="corner-screw c-tl"></span><span class="corner-screw c-tr"></span>
     <span class="corner-screw c-bl"></span><span class="corner-screw c-br"></span>
     <div class="tt-topbar">
-      <span class="tt-brand">TECHN<span class="brand-accent">I</span>CS · SL-MAX</span>
+      <span class="tt-brand">TITAN · <span class="brand-accent">V</span>INYL</span>
       <div class="tt-screen">
         <span class="tt-scr-title" id="ttL-title">— NO TRACK —</span>
         <span class="tt-scr-bpm" id="ttL-bpm">128.0</span>
@@ -5970,7 +5970,7 @@ body.work-mode .automix-sync{
   <div class="vx-mixer">
     <span class="corner-screw tl"></span><span class="corner-screw tr"></span>
     <span class="corner-screw bl"></span><span class="corner-screw br"></span>
-    <div class="vx-brand">DJM-<b>MAX</b> · CORE</div>
+    <div class="vx-brand">TITAN · <b>VINYL</b> CORE</div>
     <div class="vx-vu">
       <div class="vx-vu-col"><div class="vx-vu-fill" id="vxVuL" style="height:60%"></div></div>
       <div class="vx-vu-col"><div class="vx-vu-fill" id="vxVuR" style="height:55%"></div></div>
@@ -6023,7 +6023,7 @@ body.work-mode .automix-sync{
     <span class="corner-screw c-tl"></span><span class="corner-screw c-tr"></span>
     <span class="corner-screw c-bl"></span><span class="corner-screw c-br"></span>
     <div class="tt-topbar">
-      <span class="tt-brand">TECHN<span class="brand-accent">I</span>CS · SL-MAX</span>
+      <span class="tt-brand">TITAN · <span class="brand-accent">V</span>INYL</span>
       <div class="tt-screen">
         <span class="tt-scr-title" id="ttR-title">— NO TRACK —</span>
         <span class="tt-scr-bpm" id="ttR-bpm">128.0</span>
@@ -6399,7 +6399,7 @@ No MIDI devices. Press CONNECT.
 <div class="tab-content" id="tab-studiopro">
 <div class="settings-panel sp-panel" style="max-width:1600px;">
 <div class="library-header" style="padding-bottom:8px;">
-<div class="library-title">🎹 STUDIO PRO — HOUSE · TECHNO · TRANCE PRODUCTION</div>
+<div class="library-title">🎹 TITAN LAB — HOUSE · TECHNO · TRANCE PRODUCTION</div>
 <div class="library-actions sp-transport">
 <button class="tool-btn" id="spPlayBtn">▶ PLAY</button>
 <button class="tool-btn" id="spStopBtn">⏹ STOP</button>
@@ -6919,8 +6919,8 @@ Two options — both work completely offline:<br/>
 </div>
 <div class="settings-section"><h3>ℹ ABOUT</h3>
 <div style="font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text-dim);line-height:1.8;">
-<p><strong style="color:var(--orange);">DJ MAX Ai</strong> v1.0 — Ultimate AI-powered browser DJ console</p>
-<p>Built with Web Audio API. Inspired by Pioneer CDJ-3000 + DJM-V10.</p>
+<p><strong style="color:var(--orange);">DJ TITAN</strong> v1.0 — Professional DJ Studio</p>
+<p>Built with Web Audio API. 4 decks (TITAN-3K) · TITAN CORE mixer · TITAN VINYL turntables · TITAN LAB studio.</p>
 <p>All audio processing local. No data leaves your device.</p>
 <p style="margin-top:10px;">Created by <strong style="color:var(--screen-glow);">Kobi Chen / Media Deal</strong></p>
 </div>
@@ -6967,7 +6967,7 @@ const DEMO_TRACKS=[
 
 /* ============ DECK HTML BUILDER ============ */
 function buildDeckHTML(d){
-  return `<div class="deck-header"><div class="deck-label"><span class="model">CDJ-3000</span><span class="suffix">DECK</span></div><button class="deck-upload-btn" data-deck-upload="${d}" title="Upload audio files and load to deck ${d}"><span class="btn-icon">⬆</span><span class="btn-text">⬆ UPLOAD</span></button><button class="deck-lib-btn" data-deck-lib="${d}" title="Browse library and load to deck ${d}"><span class="btn-icon">📚</span><span class="btn-text">📚 LIBRARY</span></button><div class="deck-number">${d}</div></div>
+  return `<div class="deck-header"><div class="deck-label"><span class="model">TITAN-3K</span><span class="suffix">DECK</span></div><button class="deck-upload-btn" data-deck-upload="${d}" title="Upload audio files and load to deck ${d}"><span class="btn-icon">⬆</span><span class="btn-text">⬆ UPLOAD</span></button><button class="deck-lib-btn" data-deck-lib="${d}" title="Browse library and load to deck ${d}"><span class="btn-icon">📚</span><span class="btn-text">📚 LIBRARY</span></button><div class="deck-number">${d}</div></div>
   <div class="screen"><div class="screen-top"><div><div class="track-title" id="title-${d}">— NO TRACK LOADED —</div><div class="track-artist" id="artist-${d}">LOAD A TRACK</div></div><div class="screen-right"><div class="screen-bpm" id="bpm-${d}">---.--</div><div class="screen-bpm-label">BPM</div><div class="screen-key" id="key-${d}">--</div></div></div>
   <div class="waveform"><canvas class="waveform-canvas" id="wave-${d}" width="600" height="48"></canvas><div class="phrase-markers" id="phrase-${d}"></div><div class="playhead"></div></div>
   <div class="time-row"><div><div class="time-label">ELAPSED</div><div class="time-value" id="elapsed-${d}">00:00.0</div></div><div style="text-align:right;"><div class="time-label">REMAIN</div><div class="time-value remain" id="remain-${d}">-00:00.0</div></div></div></div>
@@ -7098,7 +7098,7 @@ function buildMixerToolbarHTML(){
 }
 
 function buildMixerHTML(){
-  return `<div class="mixer-header"><div class="mixer-brand"><span class="model">DJM-</span>V10 PRO MAX</div></div>
+  return `<div class="mixer-header"><div class="mixer-brand"><span class="model">TITAN</span>CORE</div></div>
   <div class="master-vu-modern" id="masterVuBox">
     <div class="master-vu-halo" id="masterVuHalo"></div>
     <div class="mvm-scale">
@@ -9795,6 +9795,411 @@ function setupDiscover(){
         }
       });
     });
+  }
+}
+
+/* ====================================================================
+   STUDIO PRO — House · Techno · Trance production suite
+   Synth + TB-303 acid bass + Hammond organ + 16-step drum machine
+   + tempo-sync delay + reverb + drive + REC-to-library
+   ==================================================================== */
+const SP={
+  ready:false,nodes:{},
+  transport:{playing:false,bpm:128,swing:0,step:0,timerId:null,nextTime:0},
+  synth:{osc1Wave:'sawtooth',osc2Wave:'square',filterType:'lowpass',lfoTarget:'none',knobs:{},voices:new Map()},
+  drum:{voices:['KICK','SNARE','CHH','OHH','CLAP','CRASH','LOWTOM','HITOM','RIM'],pattern:null,stepEls:[]},
+  bass:{knobs:{},pattern:null,voice:null,currentMidi:null,stepEls:[]},
+  organ:{drawbars:[8,0,8,0,0,0,0,0,8],knobs:{},voices:new Map()},
+  master:{knobs:{}},
+  octave:4,activeInst:'synth',
+  rec:{recorder:null,chunks:[],streamDest:null,startedAt:0}
+};
+const SP_P={
+  osc2Detune:[-50,50,0.5,'lin',v=>Math.round(v)+'c'],
+  osc2Octave:[-2,2,0.5,'int',v=>(Math.round(v)>=0?'+':'')+Math.round(v)],
+  oscMix:[0,100,0.5,'lin',v=>Math.round(v)+'%'],
+  subLevel:[0,100,0,'lin',v=>Math.round(v)+'%'],
+  unison:[1,7,0,'int',v=>String(Math.round(v))],
+  unisonDetune:[0,50,0.2,'lin',v=>Math.round(v)+'c'],
+  filterCutoff:[50,20000,0.75,'log',v=>v>=1000?(v/1000).toFixed(1)+'k':Math.round(v)+'Hz'],
+  filterRes:[0.1,20,0.05,'log',v=>v.toFixed(1)],
+  filterEnv:[0,100,0,'lin',v=>Math.round(v)+'%'],
+  filterDecay:[10,2000,0.2,'log',v=>Math.round(v)+'ms'],
+  drive:[0,100,0,'lin',v=>Math.round(v)+'%'],
+  ampA:[1,2000,0.05,'log',v=>Math.round(v)+'ms'],
+  ampD:[1,2000,0.2,'log',v=>Math.round(v)+'ms'],
+  ampS:[0,100,0.7,'lin',v=>Math.round(v)+'%'],
+  ampR:[1,5000,0.3,'log',v=>Math.round(v)+'ms'],
+  glide:[0,500,0,'lin',v=>Math.round(v)+'ms'],
+  lfoRate:[0.1,20,0.5,'log',v=>v.toFixed(1)+'Hz'],
+  lfoDepth:[0,100,0.3,'lin',v=>Math.round(v)+'%'],
+  chorusMix:[0,100,0,'lin',v=>Math.round(v)+'%'],
+  delaySend:[0,100,0,'lin',v=>Math.round(v)+'%'],
+  reverbSend:[0,100,0.2,'lin',v=>Math.round(v)+'%'],
+  organPerc:[0,100,0,'lin',v=>Math.round(v)+'%'],
+  organPercTone:[0,1,0,'int',v=>v<.5?'2nd':'3rd'],
+  organPercDec:[50,2000,0.2,'log',v=>Math.round(v)+'ms'],
+  organLeslie:[0,100,0,'lin',v=>Math.round(v)+'%'],
+  organLeslieRate:[0.5,12,0.5,'lin',v=>v.toFixed(1)+'Hz'],
+  organDrive:[0,100,0,'lin',v=>Math.round(v)+'%'],
+  organVol:[0,100,0.7,'lin',v=>Math.round(v)+'%'],
+  bassCutoff:[100,5000,0.3,'log',v=>Math.round(v)+'Hz'],
+  bassRes:[1,30,0.5,'lin',v=>v.toFixed(1)],
+  bassEnv:[0,100,0.7,'lin',v=>Math.round(v)+'%'],
+  bassDecay:[50,2000,0.25,'log',v=>Math.round(v)+'ms'],
+  bassAccent:[0,100,0.6,'lin',v=>Math.round(v)+'%'],
+  bassDrive:[0,100,0.3,'lin',v=>Math.round(v)+'%'],
+  bassWave:[0,1,0,'int',v=>v<.5?'SAW':'SQR'],
+  bassVol:[0,100,0.8,'lin',v=>Math.round(v)+'%'],
+  delayTime:[0,6,0.3,'int',v=>['1/32','1/16','1/8','3/16','1/4','3/8','1/2'][Math.max(0,Math.min(6,Math.round(v)))]],
+  delayFb:[0,90,0.39,'lin',v=>Math.round(v)+'%'],
+  delayMix:[0,100,0.3,'lin',v=>Math.round(v)+'%'],
+  reverbSize:[0,100,0.6,'lin',v=>Math.round(v)+'%'],
+  reverbDamp:[0,100,0.5,'lin',v=>Math.round(v)+'%'],
+  reverbMix:[0,100,0.3,'lin',v=>Math.round(v)+'%'],
+  masterDrive:[0,100,0,'lin',v=>Math.round(v)+'%'],
+  drumVol:[0,100,0.85,'lin',v=>Math.round(v)+'%'],
+  synthVol:[0,100,0.75,'lin',v=>Math.round(v)+'%'],
+  masterVol:[0,100,0.85,'lin',v=>Math.round(v)+'%'],
+};
+function spVal(k,n){const d=SP_P[k];if(!d)return n;const[lo,hi,,curve]=d;if(curve==='log')return lo*Math.pow(hi/lo,n);if(curve==='int')return Math.round(lo+(hi-lo)*n);return lo+(hi-lo)*n}
+function spFmt(k,n){const d=SP_P[k];if(!d)return String(n);return d[4](spVal(k,n))}
+function spParamInit(target){for(const k in SP_P)target[k]=SP_P[k][2]}
+
+/* --- Audio graph --- */
+function spInitAudio(){
+  if(SP.ready)return;
+  ensureAudio();
+  const ctx=audioCtx,out=ctx.destination;
+  const synthBus=ctx.createGain();synthBus.gain.value=spVal('synthVol',SP.master.knobs.synthVol??.75);
+  const drumBus=ctx.createGain();drumBus.gain.value=spVal('drumVol',SP.master.knobs.drumVol??.85);
+  const bassBus=ctx.createGain();bassBus.gain.value=1;
+  const organBus=ctx.createGain();organBus.gain.value=1;
+  const mixBus=ctx.createGain();mixBus.gain.value=1;
+  synthBus.connect(mixBus);drumBus.connect(mixBus);bassBus.connect(mixBus);organBus.connect(mixBus);
+  // drive (waveshaper)
+  const drive=ctx.createWaveShaper();drive.curve=spMakeDriveCurve(0);drive.oversample='2x';
+  mixBus.connect(drive);
+  // master gain
+  const master=ctx.createGain();master.gain.value=spVal('masterVol',SP.master.knobs.masterVol??.85);
+  drive.connect(master);
+  // delay (feedback + damp filter)
+  const delay=ctx.createDelay(2.0);
+  const delayFb=ctx.createGain();delayFb.gain.value=0;
+  const delayFilter=ctx.createBiquadFilter();delayFilter.type='lowpass';delayFilter.frequency.value=6000;
+  const delayWet=ctx.createGain();delayWet.gain.value=0;
+  mixBus.connect(delay);delay.connect(delayFilter);delayFilter.connect(delayFb);delayFb.connect(delay);
+  delay.connect(delayWet);delayWet.connect(master);
+  // reverb (convolver with generated IR)
+  const reverb=ctx.createConvolver();reverb.buffer=spMakeIR(ctx,2.0,3);
+  const reverbWet=ctx.createGain();reverbWet.gain.value=0;
+  mixBus.connect(reverb);reverb.connect(reverbWet);reverbWet.connect(master);
+  // limiter
+  const lim=ctx.createDynamicsCompressor();
+  lim.threshold.value=-3;lim.knee.value=2;lim.ratio.value=12;lim.attack.value=0.003;lim.release.value=0.12;
+  master.connect(lim);lim.connect(out);
+  // record destination
+  let streamDest=null;
+  try{streamDest=ctx.createMediaStreamDestination();master.connect(streamDest);}catch(_){}
+  SP.nodes={synthBus,drumBus,bassBus,organBus,mixBus,drive,master,delay,delayFb,delayFilter,delayWet,reverb,reverbWet,limiter:lim,streamDest};
+  SP.rec.streamDest=streamDest;
+  SP.ready=true;
+}
+function spMakeDriveCurve(amount){
+  // amount 0..1 → soft saturation via tanh
+  const n=1024,curve=new Float32Array(n);const k=1+amount*8;
+  for(let i=0;i<n;i++){const x=(i/(n-1))*2-1;curve[i]=Math.tanh(x*k)/Math.tanh(k);}
+  return curve;
+}
+function spMakeIR(ctx,dur,decay){
+  const rate=ctx.sampleRate,len=Math.floor(rate*dur);
+  const ir=ctx.createBuffer(2,len,rate);
+  for(let ch=0;ch<2;ch++){
+    const d=ir.getChannelData(ch);
+    for(let i=0;i<len;i++){const t=i/len;d[i]=(Math.random()*2-1)*Math.pow(1-t,decay);}
+  }
+  return ir;
+}
+
+/* --- Knob UI --- */
+function spWireKnobs(targetStore,scopeSel){
+  const root=scopeSel?document.querySelector(scopeSel):document;
+  if(!root)return;
+  root.querySelectorAll('.sp-knob[data-sp-knob]').forEach(knob=>{
+    const name=knob.dataset.spKnob;const def=SP_P[name];if(!def)return;
+    const store=targetStore;
+    let v=store[name]!=null?store[name]:def[2];
+    store[name]=v;
+    const ind=knob.querySelector('.sp-knob-indicator');
+    const disp=document.querySelector(`.sp-knob-val[data-sp-val="${name}"]`);
+    function render(){const deg=-135+v*270;if(ind)ind.style.transform=`rotate(${deg}deg)`;if(disp)disp.textContent=spFmt(name,v);spApplyKnob(name,v);}
+    render();
+    let dragging=false,startY=0,startV=0;
+    knob.addEventListener('pointerdown',e=>{dragging=true;startY=e.clientY;startV=v;try{knob.setPointerCapture(e.pointerId)}catch(_){}});
+    knob.addEventListener('pointermove',e=>{if(!dragging)return;v=Math.max(0,Math.min(1,startV+(startY-e.clientY)/200));store[name]=v;render();});
+    const stop=e=>{if(dragging){dragging=false;try{knob.releasePointerCapture(e.pointerId)}catch(_){}};};
+    knob.addEventListener('pointerup',stop);knob.addEventListener('pointercancel',stop);
+    knob.addEventListener('dblclick',()=>{v=def[2];store[name]=v;render();});
+    knob.addEventListener('wheel',e=>{e.preventDefault();v=Math.max(0,Math.min(1,v+(e.deltaY<0?.02:-.02)));store[name]=v;render();},{passive:false});
+  });
+}
+function spApplyKnob(name,v){
+  if(!SP.ready)return;
+  const n=SP.nodes;
+  if(name==='delayTime'){
+    const idx=Math.round(spVal('delayTime',v));
+    const divs=[1/32,1/16,1/8,3/16,1/4,3/8,1/2];
+    const sec=60/SP.transport.bpm*4*divs[idx];
+    if(n.delay)n.delay.delayTime.setTargetAtTime(sec,audioCtx.currentTime,0.02);
+  }else if(name==='delayFb'){
+    if(n.delayFb)n.delayFb.gain.setTargetAtTime(spVal('delayFb',v)/100,audioCtx.currentTime,0.02);
+  }else if(name==='delayMix'){
+    if(n.delayWet)n.delayWet.gain.setTargetAtTime(spVal('delayMix',v)/100,audioCtx.currentTime,0.02);
+  }else if(name==='reverbSize'){
+    n.reverb.buffer=spMakeIR(audioCtx,0.3+spVal('reverbSize',v)/100*3.5,3);
+  }else if(name==='reverbDamp'){
+    // re-create IR with damping characteristic
+  }else if(name==='reverbMix'){
+    if(n.reverbWet)n.reverbWet.gain.setTargetAtTime(spVal('reverbMix',v)/100,audioCtx.currentTime,0.02);
+  }else if(name==='masterDrive'){
+    if(n.drive)n.drive.curve=spMakeDriveCurve(v);
+  }else if(name==='drumVol'){
+    if(n.drumBus)n.drumBus.gain.setTargetAtTime(spVal('drumVol',v)/100,audioCtx.currentTime,0.02);
+  }else if(name==='synthVol'){
+    if(n.synthBus)n.synthBus.gain.setTargetAtTime(spVal('synthVol',v)/100,audioCtx.currentTime,0.02);
+  }else if(name==='masterVol'){
+    if(n.master)n.master.gain.setTargetAtTime(spVal('masterVol',v)/100,audioCtx.currentTime,0.02);
+  }
+}
+
+/* ---------- Synth voice ---------- */
+function spMidiToHz(m){return 440*Math.pow(2,(m-69)/12)}
+function spSynthNoteOn(midi){
+  spInitAudio();const ctx=audioCtx,t=ctx.currentTime;
+  const k=SP.synth.knobs;
+  const voice={oscs:[],gain:ctx.createGain(),filter:ctx.createBiquadFilter(),
+    subOsc:null,delayTap:null,reverbTap:null,_releaseScheduled:false};
+  voice.gain.gain.value=0;
+  voice.filter.type=SP.synth.filterType;
+  const cutoff=spVal('filterCutoff',k.filterCutoff??.75);
+  voice.filter.frequency.value=cutoff;voice.filter.Q.value=spVal('filterRes',k.filterRes??.05);
+  // unison
+  const n=Math.max(1,Math.round(spVal('unison',k.unison??0)));
+  const detuneCents=spVal('unisonDetune',k.unisonDetune??.2);
+  const mix=spVal('oscMix',k.oscMix??.5)/100;
+  const baseHz=spMidiToHz(midi);
+  const oscGain=ctx.createGain();oscGain.gain.value=(1-mix)/Math.sqrt(n);
+  const osc2Gain=ctx.createGain();osc2Gain.gain.value=mix/Math.sqrt(n);
+  for(let i=0;i<n;i++){
+    const o=ctx.createOscillator();o.type=SP.synth.osc1Wave;
+    const d=n>1?((i/(n-1))*2-1)*detuneCents:0;
+    o.detune.value=d;o.frequency.value=baseHz;
+    o.connect(oscGain);o.start(t);voice.oscs.push(o);
+  }
+  // osc2 (one voice with octave + detune)
+  if(mix>0.01){
+    const o2=ctx.createOscillator();o2.type=SP.synth.osc2Wave;
+    const oct=Math.round(spVal('osc2Octave',k.osc2Octave??.5));
+    o2.frequency.value=baseHz*Math.pow(2,oct);
+    o2.detune.value=spVal('osc2Detune',k.osc2Detune??.5);
+    o2.connect(osc2Gain);o2.start(t);voice.oscs.push(o2);
+  }
+  // sub osc
+  const subAmt=spVal('subLevel',k.subLevel??0)/100;
+  if(subAmt>0.01){
+    const s=ctx.createOscillator();s.type='sine';s.frequency.value=baseHz*0.5;
+    const sg=ctx.createGain();sg.gain.value=subAmt;
+    s.connect(sg);sg.connect(voice.filter);s.start(t);voice.subOsc=s;
+  }
+  oscGain.connect(voice.filter);osc2Gain.connect(voice.filter);
+  voice.filter.connect(voice.gain);
+  voice.gain.connect(SP.nodes.synthBus);
+  // sends
+  const dSend=spVal('delaySend',k.delaySend??0)/100;
+  const rSend=spVal('reverbSend',k.reverbSend??.2)/100;
+  if(dSend>0.01){const g=ctx.createGain();g.gain.value=dSend;voice.gain.connect(g);g.connect(SP.nodes.delay);voice.delayTap=g;}
+  if(rSend>0.01){const g=ctx.createGain();g.gain.value=rSend;voice.gain.connect(g);g.connect(SP.nodes.reverb);voice.reverbTap=g;}
+  // envelopes (amp ADSR)
+  const A=spVal('ampA',k.ampA??.05)/1000;
+  const D=spVal('ampD',k.ampD??.2)/1000;
+  const S=spVal('ampS',k.ampS??.7)/100;
+  const env=voice.gain.gain;
+  env.cancelScheduledValues(t);env.setValueAtTime(0,t);
+  env.linearRampToValueAtTime(0.75,t+A);
+  env.linearRampToValueAtTime(0.75*S,t+A+D);
+  // filter env
+  const fEnv=spVal('filterEnv',k.filterEnv??0)/100;
+  const fDec=spVal('filterDecay',k.filterDecay??.2)/1000;
+  if(fEnv>0.01){
+    const peak=Math.min(18000,cutoff*(1+fEnv*6));
+    voice.filter.frequency.cancelScheduledValues(t);
+    voice.filter.frequency.setValueAtTime(cutoff,t);
+    voice.filter.frequency.linearRampToValueAtTime(peak,t+0.003);
+    voice.filter.frequency.setTargetAtTime(cutoff,t+0.003,Math.max(0.05,fDec/3));
+  }
+  SP.synth.voices.set(midi,voice);
+}
+function spSynthNoteOff(midi){
+  const v=SP.synth.voices.get(midi);if(!v)return;
+  if(v._releaseScheduled)return;v._releaseScheduled=true;
+  const ctx=audioCtx,t=ctx.currentTime;
+  const R=spVal('ampR',SP.synth.knobs.ampR??.3)/1000;
+  const g=v.gain.gain;
+  g.cancelScheduledValues(t);g.setValueAtTime(g.value,t);
+  g.linearRampToValueAtTime(0,t+R);
+  setTimeout(()=>{try{v.oscs.forEach(o=>{try{o.stop()}catch(_){}});if(v.subOsc)try{v.subOsc.stop()}catch(_){}}catch(_){}
+    try{v.gain.disconnect();v.filter.disconnect();if(v.delayTap)v.delayTap.disconnect();if(v.reverbTap)v.reverbTap.disconnect();}catch(_){}
+    SP.synth.voices.delete(midi);
+  },(R+0.1)*1000);
+}
+
+/* ---------- Organ voice (additive drawbars + Leslie) ---------- */
+const ORGAN_RATIOS=[0.5,1.5,1,2,3,4,5,6,8]; // 16',5 1/3',8',4',2 2/3',2',1 3/5',1 1/3',1'
+function spOrganNoteOn(midi){
+  spInitAudio();const ctx=audioCtx,t=ctx.currentTime,k=SP.organ.knobs;
+  const baseHz=spMidiToHz(midi);
+  const voice={oscs:[],gain:ctx.createGain(),leslieLFO:null,_r:false};
+  voice.gain.gain.value=0;voice.gain.gain.setValueAtTime(0,t);voice.gain.gain.linearRampToValueAtTime(1,t+0.008);
+  const outGain=ctx.createGain();outGain.gain.value=spVal('organVol',k.organVol??.7)/100;
+  voice.gain.connect(outGain);outGain.connect(SP.nodes.organBus);voice.outGain=outGain;
+  // Leslie (tremolo via amp LFO)
+  const leslieAmt=spVal('organLeslie',k.organLeslie??0)/100;
+  if(leslieAmt>0.01){
+    const lfo=ctx.createOscillator();lfo.frequency.value=spVal('organLeslieRate',k.organLeslieRate??.5);
+    const lfoGain=ctx.createGain();lfoGain.gain.value=leslieAmt*0.35;
+    lfo.connect(lfoGain);lfoGain.connect(outGain.gain);lfo.start(t);voice.leslieLFO=lfo;
+  }
+  // 9 drawbars
+  SP.organ.drawbars.forEach((bar,i)=>{
+    if(bar<=0)return;
+    const o=ctx.createOscillator();o.type='sine';o.frequency.value=baseHz*ORGAN_RATIOS[i];
+    const g=ctx.createGain();g.gain.value=(bar/8)*0.22;
+    o.connect(g);g.connect(voice.gain);o.start(t);voice.oscs.push(o);
+  });
+  // percussion
+  const perc=spVal('organPerc',k.organPerc??0)/100;
+  if(perc>0.01){
+    const tone=Math.round(spVal('organPercTone',k.organPercTone??0));
+    const p=ctx.createOscillator();p.type='sine';p.frequency.value=baseHz*(tone?3:2);
+    const pg=ctx.createGain();pg.gain.value=0;
+    p.connect(pg);pg.connect(voice.gain);p.start(t);
+    const dec=spVal('organPercDec',k.organPercDec??.2)/1000;
+    pg.gain.setValueAtTime(0,t);pg.gain.linearRampToValueAtTime(perc*0.5,t+0.005);
+    pg.gain.setTargetAtTime(0,t+0.005,Math.max(0.02,dec/3));
+    setTimeout(()=>{try{p.stop();p.disconnect();pg.disconnect();}catch(_){}},(dec+.3)*1000);
+  }
+  SP.organ.voices.set(midi,voice);
+}
+function spOrganNoteOff(midi){
+  const v=SP.organ.voices.get(midi);if(!v||v._r)return;v._r=true;
+  const ctx=audioCtx,t=ctx.currentTime;
+  v.gain.gain.cancelScheduledValues(t);v.gain.gain.setValueAtTime(v.gain.gain.value,t);
+  v.gain.gain.linearRampToValueAtTime(0,t+0.1);
+  setTimeout(()=>{try{v.oscs.forEach(o=>{try{o.stop()}catch(_){}});if(v.leslieLFO)try{v.leslieLFO.stop()}catch(_){}}catch(_){}
+    try{v.gain.disconnect();v.outGain.disconnect();}catch(_){}
+    SP.organ.voices.delete(midi);
+  },150);
+}
+
+/* ---------- TB-303 bass voice ---------- */
+function spBassNoteOn(midi,accent,slide){
+  spInitAudio();const ctx=audioCtx,t=ctx.currentTime,k=SP.bass.knobs;
+  const hz=spMidiToHz(midi);
+  // Slide: re-use existing voice if slide & one is active
+  if(slide&&SP.bass.voice){
+    const v=SP.bass.voice;
+    try{v.osc.frequency.setTargetAtTime(hz,t,0.04);}catch(_){}
+    SP.bass.currentMidi=midi;return;
+  }
+  // Otherwise stop existing
+  if(SP.bass.voice)spBassNoteOff(true);
+  const voice={osc:ctx.createOscillator(),filter:ctx.createBiquadFilter(),gain:ctx.createGain(),drive:ctx.createWaveShaper(),outGain:ctx.createGain()};
+  voice.osc.type=(Math.round(spVal('bassWave',k.bassWave??0))===0)?'sawtooth':'square';
+  voice.osc.frequency.value=hz;
+  voice.filter.type='lowpass';
+  const baseCut=spVal('bassCutoff',k.bassCutoff??.3);
+  voice.filter.frequency.value=baseCut;voice.filter.Q.value=spVal('bassRes',k.bassRes??.5);
+  voice.drive.curve=spMakeDriveCurve(spVal('bassDrive',k.bassDrive??.3)/100);voice.drive.oversample='2x';
+  voice.gain.gain.value=0;
+  voice.osc.connect(voice.filter);voice.filter.connect(voice.drive);voice.drive.connect(voice.gain);
+  voice.gain.connect(voice.outGain);voice.outGain.connect(SP.nodes.bassBus);
+  const vol=spVal('bassVol',k.bassVol??.8)/100;
+  const accentAmt=spVal('bassAccent',k.bassAccent??.6)/100;
+  voice.outGain.gain.value=vol*(accent?(1+accentAmt*0.8):1);
+  // amp env (click-style)
+  voice.gain.gain.setValueAtTime(0,t);voice.gain.gain.linearRampToValueAtTime(0.9,t+0.003);
+  const dec=spVal('bassDecay',k.bassDecay??.25)/1000;
+  voice.gain.gain.setTargetAtTime(0.2,t+0.005,Math.max(0.03,dec/3));
+  // filter env
+  const envAmt=spVal('bassEnv',k.bassEnv??.7)/100*(accent?1.4:1);
+  const peak=Math.min(14000,baseCut*(1+envAmt*8));
+  voice.filter.frequency.cancelScheduledValues(t);
+  voice.filter.frequency.setValueAtTime(baseCut,t);
+  voice.filter.frequency.linearRampToValueAtTime(peak,t+0.005);
+  voice.filter.frequency.setTargetAtTime(baseCut,t+0.008,Math.max(0.03,dec/3));
+  voice.osc.start(t);
+  SP.bass.voice=voice;SP.bass.currentMidi=midi;
+}
+function spBassNoteOff(immediate){
+  const v=SP.bass.voice;if(!v)return;SP.bass.voice=null;SP.bass.currentMidi=null;
+  const ctx=audioCtx,t=ctx.currentTime;
+  const R=immediate?0.02:0.06;
+  v.gain.gain.cancelScheduledValues(t);v.gain.gain.setValueAtTime(v.gain.gain.value,t);
+  v.gain.gain.linearRampToValueAtTime(0,t+R);
+  setTimeout(()=>{try{v.osc.stop()}catch(_){}
+    try{v.osc.disconnect();v.filter.disconnect();v.drive.disconnect();v.gain.disconnect();v.outGain.disconnect();}catch(_){}
+  },(R+.05)*1000);
+}
+
+/* ---------- Drum voices ---------- */
+function spDrumHit(name,time,vel){
+  spInitAudio();const ctx=audioCtx,bus=SP.nodes.drumBus,v=vel||1;
+  const out=ctx.createGain();out.gain.value=v;out.connect(bus);
+  const g=ctx.createGain();g.gain.value=0;g.connect(out);
+  const t=time;
+  const noise=()=>{const b=ctx.createBuffer(1,ctx.sampleRate*0.5,ctx.sampleRate);const d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;const s=ctx.createBufferSource();s.buffer=b;return s;};
+  if(name==='KICK'){
+    const o=ctx.createOscillator();o.type='sine';o.connect(g);
+    o.frequency.setValueAtTime(150,t);o.frequency.exponentialRampToValueAtTime(55,t+0.08);
+    g.gain.setValueAtTime(1.1,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.35);
+    o.start(t);o.stop(t+0.45);
+    // click
+    const cl=noise();const clg=ctx.createGain();clg.gain.setValueAtTime(0.35,t);clg.gain.exponentialRampToValueAtTime(0.001,t+0.006);cl.connect(clg);clg.connect(out);cl.start(t);cl.stop(t+0.015);
+  }else if(name==='SNARE'){
+    const o=ctx.createOscillator();o.type='triangle';o.frequency.value=190;o.connect(g);
+    g.gain.setValueAtTime(0.55,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.12);o.start(t);o.stop(t+0.15);
+    const nz=noise();const nf=ctx.createBiquadFilter();nf.type='highpass';nf.frequency.value=1500;const ng=ctx.createGain();
+    nz.connect(nf);nf.connect(ng);ng.connect(out);ng.gain.setValueAtTime(0.8,t);ng.gain.exponentialRampToValueAtTime(0.001,t+0.18);nz.start(t);nz.stop(t+0.2);
+  }else if(name==='CHH'){
+    const nz=noise();const f=ctx.createBiquadFilter();f.type='highpass';f.frequency.value=7000;f.Q.value=2;
+    const ng=ctx.createGain();nz.connect(f);f.connect(ng);ng.connect(out);
+    ng.gain.setValueAtTime(0.5,t);ng.gain.exponentialRampToValueAtTime(0.001,t+0.045);nz.start(t);nz.stop(t+0.06);
+  }else if(name==='OHH'){
+    const nz=noise();const f=ctx.createBiquadFilter();f.type='highpass';f.frequency.value=6500;f.Q.value=1.5;
+    const ng=ctx.createGain();nz.connect(f);f.connect(ng);ng.connect(out);
+    ng.gain.setValueAtTime(0.45,t);ng.gain.exponentialRampToValueAtTime(0.001,t+0.3);nz.start(t);nz.stop(t+0.35);
+  }else if(name==='CLAP'){
+    for(const off of [0,0.01,0.02,0.03]){
+      const nz=noise();const f=ctx.createBiquadFilter();f.type='bandpass';f.frequency.value=1500;f.Q.value=1.5;
+      const ng=ctx.createGain();nz.connect(f);f.connect(ng);ng.connect(out);
+      ng.gain.setValueAtTime(0,t+off);ng.gain.linearRampToValueAtTime(0.8,t+off+0.002);ng.gain.exponentialRampToValueAtTime(0.001,t+off+0.04);
+      nz.start(t+off);nz.stop(t+off+0.08);
+    }
+  }else if(name==='CRASH'){
+    const nz=noise();const f=ctx.createBiquadFilter();f.type='highpass';f.frequency.value=5000;
+    const ng=ctx.createGain();nz.connect(f);f.connect(ng);ng.connect(out);
+    ng.gain.setValueAtTime(0.45,t);ng.gain.exponentialRampToValueAtTime(0.001,t+1.2);nz.start(t);nz.stop(t+1.3);
+  }else if(name==='LOWTOM'){
+    const o=ctx.createOscillator();o.type='sine';o.frequency.setValueAtTime(110,t);o.frequency.exponentialRampToValueAtTime(70,t+0.12);
+    o.connect(g);g.gain.setValueAtTime(0.8,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.25);o.start(t);o.stop(t+0.3);
+  }else if(name==='HITOM'){
+    const o=ctx.createOscillator();o.type='sine';o.frequency.setValueAtTime(200,t);o.frequency.exponentialRampToValueAtTime(140,t+0.1);
+    o.connect(g);g.gain.setValueAtTime(0.7,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.2);o.start(t);o.stop(t+0.25);
+  }else if(name==='RIM'){
+    const o=ctx.createOscillator();o.type='square';o.frequency.value=1700;
+    const f=ctx.createBiquadFilter();f.type='bandpass';f.frequency.value=2200;f.Q.value=3;
+    o.connect(f);f.connect(g);g.gain.setValueAtTime(0.3,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.03);
+    o.start(t);o.stop(t+0.04);
   }
 }
 
