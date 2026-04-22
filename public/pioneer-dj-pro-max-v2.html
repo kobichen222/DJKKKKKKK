@@ -5294,6 +5294,119 @@ body.work-mode .automix-sync{
 }
 
 /* ================================================================
+   DISCOVER — world music catalog search (iTunes + Deezer) + genres
+   ================================================================ */
+.disc-btn{
+  padding:7px 12px;border:none;border-radius:4px;
+  font-family:'Orbitron',sans-serif;font-size:10px;font-weight:800;letter-spacing:2px;
+  color:#0a0a0c;cursor:pointer;
+  background:linear-gradient(180deg,#2ee0ff 0%,#007a9a 100%);
+  box-shadow:0 2px 6px rgba(46,224,255,.35),inset 0 1px 0 rgba(255,255,255,.25);
+  transition:all .15s ease;
+}
+.disc-btn:hover{filter:brightness(1.08);box-shadow:0 2px 10px rgba(46,224,255,.5)}
+.disc-btn.open{background:linear-gradient(180deg,#5afdff,#00a6c9);box-shadow:0 0 18px rgba(46,224,255,.6)}
+
+.discover-wrap{
+  display:none;width:100%;max-width:1700px;margin:6px 0 4px;
+  padding:12px 14px;border-radius:10px;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%,rgba(46,224,255,.08) 0%,transparent 60%),
+    linear-gradient(180deg,#0f1418 0%,#05080b 100%);
+  border:1px solid rgba(46,224,255,.22);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 10px 28px rgba(0,0,0,.55),0 0 22px rgba(46,224,255,.08);
+}
+.discover-wrap.open{display:flex;flex-direction:column;gap:10px;animation:fadeIn .2s}
+.disc-topbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.disc-sources{display:flex;gap:4px;background:rgba(255,255,255,.03);border:1px solid #1a2a30;padding:3px;border-radius:6px}
+.disc-src-btn{
+  padding:6px 12px;border:none;border-radius:4px;cursor:pointer;
+  background:transparent;color:var(--text-dim);
+  font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;letter-spacing:1.5px;
+  transition:all .12s;
+}
+.disc-src-btn:hover{color:#fff}
+.disc-src-btn.active{background:linear-gradient(180deg,#2ee0ff,#007a9a);color:#0a0a0c;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 0 8px rgba(46,224,255,.4)}
+.disc-search{flex:1;min-width:260px;display:flex;gap:6px;align-items:stretch}
+.disc-input{
+  flex:1;padding:8px 12px;border-radius:5px;
+  background:#020608;border:1px solid #1a2a30;color:#7ce8ff;
+  font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:.5px;
+  outline:none;
+}
+.disc-input:focus{border-color:#2ee0ff;box-shadow:0 0 8px rgba(46,224,255,.3)}
+.disc-input::placeholder{color:#3a4a52}
+.disc-go{
+  padding:8px 18px;border:none;border-radius:5px;cursor:pointer;
+  background:linear-gradient(180deg,#2ee0ff,#00a6c9);color:#0a0a0c;
+  font-family:'Orbitron',sans-serif;font-size:10px;font-weight:800;letter-spacing:2px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 2px 6px rgba(46,224,255,.35);
+  transition:all .12s;
+}
+.disc-go:hover{filter:brightness(1.08);box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 2px 10px rgba(46,224,255,.55)}
+
+.disc-genres{display:flex;flex-wrap:wrap;gap:6px}
+.disc-genre-btn{
+  padding:6px 12px;border-radius:20px;cursor:pointer;
+  background:linear-gradient(180deg,rgba(46,224,255,.06),rgba(46,224,255,.02));
+  border:1px solid rgba(46,224,255,.28);
+  color:#9fd8ff;
+  font-family:'Orbitron',sans-serif;font-size:9.5px;font-weight:700;letter-spacing:1.5px;
+  transition:all .12s;white-space:nowrap;
+}
+.disc-genre-btn:hover{background:rgba(46,224,255,.14);color:#fff;border-color:rgba(46,224,255,.6)}
+.disc-genre-btn.active{background:linear-gradient(180deg,#2ee0ff,#007a9a);color:#0a0a0c;border-color:#baf1ff;box-shadow:0 0 12px rgba(46,224,255,.55)}
+
+.disc-sub-row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.5px}
+.disc-hint{color:#6a8a92}
+.disc-hint b{color:#2ee0ff}
+.disc-status{color:var(--orange)}
+
+.disc-results{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:8px;
+  max-height:52vh;overflow-y:auto;padding:4px 2px;
+}
+.disc-row{
+  display:grid;grid-template-columns:44px 1fr auto auto;gap:10px;align-items:center;
+  padding:6px 10px;border-radius:6px;
+  background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);
+  transition:background .1s;
+}
+.disc-row:hover{background:rgba(46,224,255,.06);border-color:rgba(46,224,255,.2)}
+.disc-art{width:44px;height:44px;border-radius:4px;object-fit:cover;background:#0a0a0c;border:1px solid #1a2a30}
+.disc-info{min-width:0}
+.disc-title-txt{font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.disc-artist-txt{font-family:'Share Tech Mono',monospace;font-size:9.5px;color:#7ca2ac;letter-spacing:.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.disc-preview,.disc-add{
+  padding:6px 10px;border:1px solid #1a2a30;border-radius:4px;cursor:pointer;
+  background:#0a0a0c;color:#9fd8ff;
+  font-family:'Orbitron',sans-serif;font-size:9.5px;font-weight:700;letter-spacing:1.2px;
+  transition:all .12s;min-width:40px;
+}
+.disc-preview:hover{border-color:#2ee0ff;color:#fff;box-shadow:0 0 8px rgba(46,224,255,.35)}
+.disc-preview.playing{background:#2ee0ff;color:#0a0a0c;border-color:#baf1ff}
+.disc-add{color:#9aff9a;border-color:rgba(28,255,143,.35)}
+.disc-add:hover{background:rgba(28,255,143,.14);color:#fff;border-color:rgba(28,255,143,.7);box-shadow:0 0 10px rgba(28,255,143,.4)}
+.disc-add:disabled{opacity:.5;cursor:wait}
+
+.disc-loading,.disc-empty,.disc-error{
+  grid-column:1/-1;padding:20px;text-align:center;
+  font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text-dim);letter-spacing:1px;
+}
+.disc-error{color:var(--red)}
+.disc-note{
+  grid-column:1/-1;padding:6px 10px;font-size:10px;color:#8fa6ad;
+  font-family:'Share Tech Mono',monospace;letter-spacing:.4px;
+  background:rgba(46,224,255,.04);border:1px solid rgba(46,224,255,.12);border-radius:4px;
+}
+
+@media(max-width:720px){
+  .disc-results{grid-template-columns:1fr;max-height:60vh}
+  .disc-topbar{flex-direction:column;align-items:stretch}
+  .disc-search{min-width:0}
+}
+
+/* ================================================================
    JOG WHEEL PRO v3 — premium, modern, uniform across every deck and
    every display mode (all-4 / DJ focus / work-mode / compact / mobile
    / every theme). Uses !important + high specificity to dominate the
@@ -5610,6 +5723,7 @@ body.work-mode .automix-sync{
 <button class="url-btn" id="urlBtnToggle">+ URL</button>
 <button class="yt-btn" id="ytBtnToggle">+ YOUTUBE</button>
 <button class="playlist-btn" id="saveToPlaylistBtn">+ PLAYLIST</button>
+<button class="disc-btn" id="discoverBtnToggle">🌍 DISCOVER</button>
 <div class="search-wrap">
 <input type="text" class="search-input" id="searchInput" placeholder="Search..." />
 <select class="sort-select" id="sortSelect">
@@ -5633,6 +5747,41 @@ body.work-mode .automix-sync{
 <input type="text" class="yt-input" id="ytInput" placeholder="Paste YouTube URL or video ID..." />
 <button class="yt-load" id="ytLoad">ADD</button>
 <span class="url-status" id="ytStatus">READY</span>
+</div>
+<div class="discover-wrap" id="discoverWrap">
+  <div class="disc-topbar">
+    <div class="disc-sources">
+      <button class="disc-src-btn active" data-disc-src="itunes">🍎 iTunes</button>
+      <button class="disc-src-btn" data-disc-src="deezer">🎵 Deezer</button>
+    </div>
+    <div class="disc-search">
+      <input type="text" class="disc-input" id="discoverInput" placeholder="Search tracks, artists, genres — e.g. 'Armin van Buuren', 'progressive house 2024'"/>
+      <button class="disc-go" id="discoverSearch">SEARCH</button>
+    </div>
+  </div>
+  <div class="disc-genres">
+    <button class="disc-genre-btn" data-disc-genre="house">HOUSE</button>
+    <button class="disc-genre-btn" data-disc-genre="trance">TRANCE</button>
+    <button class="disc-genre-btn" data-disc-genre="techno">TECHNO</button>
+    <button class="disc-genre-btn" data-disc-genre="edm">EDM</button>
+    <button class="disc-genre-btn" data-disc-genre="deep-house">DEEP HOUSE</button>
+    <button class="disc-genre-btn" data-disc-genre="progressive">PROGRESSIVE</button>
+    <button class="disc-genre-btn" data-disc-genre="tech-house">TECH HOUSE</button>
+    <button class="disc-genre-btn" data-disc-genre="drum-bass">DRUM &amp; BASS</button>
+    <button class="disc-genre-btn" data-disc-genre="hardstyle">HARDSTYLE</button>
+    <button class="disc-genre-btn" data-disc-genre="psytrance">PSYTRANCE</button>
+    <button class="disc-genre-btn" data-disc-genre="dubstep">DUBSTEP</button>
+    <button class="disc-genre-btn" data-disc-genre="festival">FESTIVAL</button>
+    <button class="disc-genre-btn" data-disc-genre="future-house">FUTURE HOUSE</button>
+    <button class="disc-genre-btn" data-disc-genre="bigroom">BIG ROOM</button>
+    <button class="disc-genre-btn" data-disc-genre="melodic-techno">MELODIC TECHNO</button>
+    <button class="disc-genre-btn" data-disc-genre="afro-house">AFRO HOUSE</button>
+  </div>
+  <div class="disc-sub-row">
+    <span class="disc-hint">Tap a genre for top tracks, or type a search. Preview ▶ · click <b>+ ADD</b> to pull it into your library.</span>
+    <span class="disc-status" id="discoverStatus"></span>
+  </div>
+  <div class="disc-results" id="discoverResults"></div>
 </div>
 <div class="track-list-header"><span>#</span><span>TITLE</span><span class="th-artist">ARTIST</span><span class="th-bpm">BPM</span><span class="th-key">KEY</span><span class="th-rating">RATING</span><span class="th-actions">ACTIONS</span></div>
 <div class="track-list" id="trackList"></div>
@@ -9121,6 +9270,225 @@ function setupOfflineDownload(){
   htmlDl?.addEventListener('click',()=>{if(isUnlocked())doHtmlDownload()});
 }
 
+/* ====================================================================
+   DISCOVER — world music catalog search (iTunes + Deezer)
+   ==================================================================== */
+function setupDiscover(){
+  const GENRE_QUERY={
+    'house':'house music',
+    'trance':'trance',
+    'techno':'techno',
+    'edm':'edm anthems',
+    'deep-house':'deep house',
+    'progressive':'progressive house',
+    'tech-house':'tech house',
+    'drum-bass':'drum and bass',
+    'hardstyle':'hardstyle',
+    'psytrance':'psytrance',
+    'dubstep':'dubstep',
+    'festival':'festival anthem',
+    'future-house':'future house',
+    'bigroom':'big room house',
+    'melodic-techno':'melodic techno',
+    'afro-house':'afro house',
+  };
+  let currentSource='itunes';
+
+  const toggleBtn=document.getElementById('discoverBtnToggle');
+  const panel=document.getElementById('discoverWrap');
+  const srcBtns=document.querySelectorAll('.disc-src-btn');
+  const genreBtns=document.querySelectorAll('.disc-genre-btn');
+  const input=document.getElementById('discoverInput');
+  const go=document.getElementById('discoverSearch');
+  const out=document.getElementById('discoverResults');
+  const status=document.getElementById('discoverStatus');
+  if(!panel||!out)return;
+
+  toggleBtn?.addEventListener('click',()=>{
+    const open=panel.classList.toggle('open');
+    toggleBtn.classList.toggle('open',open);
+    if(open&&!out.dataset.loaded){
+      // Seed with a popular genre on first open
+      doSearch(GENRE_QUERY['house']);
+      out.dataset.loaded='1';
+    }
+  });
+
+  srcBtns.forEach(b=>{
+    b.addEventListener('click',()=>{
+      srcBtns.forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      currentSource=b.dataset.discSrc;
+      const q=(input?.value||'').trim();
+      if(q)doSearch(q);
+    });
+  });
+
+  genreBtns.forEach(b=>{
+    b.addEventListener('click',()=>{
+      genreBtns.forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      const q=GENRE_QUERY[b.dataset.discGenre]||b.dataset.discGenre;
+      if(input)input.value=q;
+      doSearch(q);
+    });
+  });
+
+  go?.addEventListener('click',()=>{
+    const q=(input?.value||'').trim();
+    if(q)doSearch(q);
+  });
+  input?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();go.click()}});
+
+  function setStatus(msg,cls){
+    if(!status)return;
+    status.textContent=msg||'';
+    status.style.color=cls==='err'?'var(--red)':cls==='ok'?'var(--play-green)':'var(--orange)';
+  }
+
+  async function doSearch(q){
+    out.innerHTML='<div class="disc-loading">Searching '+currentSource+' for "'+escapeHtml(q)+'"…</div>';
+    setStatus('Searching…','');
+    try{
+      let results=[];
+      if(currentSource==='itunes'){
+        const url=`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&media=music&entity=song&limit=50`;
+        const r=await fetch(url);
+        if(!r.ok)throw new Error('iTunes '+r.status);
+        const j=await r.json();
+        results=(j.results||[]).filter(x=>x.previewUrl).map(x=>({
+          title:x.trackName,
+          artist:x.artistName,
+          album:x.collectionName,
+          duration:x.trackTimeMillis?x.trackTimeMillis/1000:30,
+          artwork:(x.artworkUrl100||'').replace('100x100','200x200'),
+          previewUrl:x.previewUrl,
+          source:'itunes',
+          fullLength:false,
+        }));
+      }else if(currentSource==='deezer'){
+        results=await deezerSearchJsonp(q);
+      }
+      renderResults(results,q);
+      setStatus(`${results.length} results from ${currentSource}`,'ok');
+    }catch(e){
+      out.innerHTML=`<div class="disc-error">Search failed: ${escapeHtml(e.message||String(e))}</div>`;
+      setStatus('Failed','err');
+    }
+  }
+
+  function deezerSearchJsonp(q){
+    return new Promise((resolve,reject)=>{
+      const cbName='djmaxDeezerCb_'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+      window[cbName]=data=>{
+        delete window[cbName];
+        try{s.remove()}catch(_){}
+        const items=(data&&data.data)||[];
+        resolve(items.filter(x=>x.preview).map(x=>({
+          title:x.title,
+          artist:x.artist&&x.artist.name,
+          album:x.album&&x.album.title,
+          duration:x.duration||30,
+          artwork:(x.album&&(x.album.cover_medium||x.album.cover))||'',
+          previewUrl:x.preview,
+          source:'deezer',
+          fullLength:false,
+        })));
+      };
+      const s=document.createElement('script');
+      s.src=`https://api.deezer.com/search?q=${encodeURIComponent(q)}&limit=50&output=jsonp&callback=${cbName}`;
+      s.onerror=()=>{try{delete window[cbName]}catch(_){}try{s.remove()}catch(_){}reject(new Error('Deezer request blocked'))};
+      document.body.appendChild(s);
+      setTimeout(()=>{if(window[cbName]){try{delete window[cbName]}catch(_){}try{s.remove()}catch(_){}reject(new Error('Deezer timeout'))}},10000);
+    });
+  }
+
+  let previewAudio=null;
+  let currentPlayBtn=null;
+  function renderResults(list,q){
+    if(!list.length){
+      out.innerHTML='<div class="disc-empty">No results for "'+escapeHtml(q)+'"</div>';
+      return;
+    }
+    const note='<div class="disc-note">ℹ️ These are 30-second previews from '+(currentSource==='itunes'?'Apple iTunes':'Deezer')+'. Adding to library saves the preview locally — great for practice, demos, and sampling. For full tracks, use + FILES / + URL / + YOUTUBE.</div>';
+    out.innerHTML=note+list.map((t,i)=>`
+      <div class="disc-row" data-i="${i}">
+        <img class="disc-art" src="${escapeHtml(t.artwork||'')}" loading="lazy" onerror="this.style.visibility='hidden'"/>
+        <div class="disc-info">
+          <div class="disc-title-txt">${escapeHtml(t.title||'—')}</div>
+          <div class="disc-artist-txt">${escapeHtml(t.artist||'—')}${t.duration?' · '+Math.round(t.duration)+'s':''}${t.album?' · '+escapeHtml(t.album):''}</div>
+        </div>
+        <button class="disc-preview" data-i="${i}" title="Preview">▶</button>
+        <button class="disc-add" data-i="${i}">+ ADD</button>
+      </div>
+    `).join('');
+
+    out.querySelectorAll('.disc-preview').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const t=list[+btn.dataset.i];
+        if(!t||!t.previewUrl)return;
+        if(!previewAudio){previewAudio=new Audio();previewAudio.crossOrigin='anonymous'}
+        if(currentPlayBtn===btn&&!previewAudio.paused){
+          previewAudio.pause();btn.classList.remove('playing');btn.textContent='▶';currentPlayBtn=null;return;
+        }
+        if(currentPlayBtn){currentPlayBtn.classList.remove('playing');currentPlayBtn.textContent='▶'}
+        previewAudio.src=t.previewUrl;
+        previewAudio.play().catch(()=>toast&&toast('Preview blocked — tap once on the page first','warn'));
+        btn.classList.add('playing');btn.textContent='■';currentPlayBtn=btn;
+        previewAudio.onended=()=>{btn.classList.remove('playing');btn.textContent='▶';currentPlayBtn=null};
+      });
+    });
+
+    out.querySelectorAll('.disc-add').forEach(btn=>{
+      btn.addEventListener('click',async()=>{
+        const idx=+btn.dataset.i;
+        const t=list[idx];
+        if(!t||!t.previewUrl)return;
+        btn.disabled=true;btn.textContent='…';
+        try{
+          ensureAudio();
+          const resp=await fetch(t.previewUrl);
+          if(!resp.ok)throw new Error('HTTP '+resp.status);
+          const ab=await resp.arrayBuffer();
+          const abCopy=ab.slice(0);
+          const buf=await audioCtx.decodeAudioData(ab);
+          let bpm=0;try{bpm=await detectBPM(buf);}catch(_){}
+          const track={
+            id:(t.source||'disc')+'_'+Date.now().toString(36)+'_'+idx,
+            title:t.title||'Untitled',
+            artist:t.artist||'—',
+            album:t.album||'',
+            bpm:bpm||0,
+            key:'--',
+            duration:buf.duration,
+            buffer:buf,
+            url:t.previewUrl,
+            artwork:t.artwork||'',
+            source:'url',          // treat as URL for filtering
+            origin:t.source,       // 'itunes' / 'deezer' — for future filtering
+            preview:true,
+            rating:0,
+            addedAt:Date.now(),
+          };
+          library.push(track);
+          if(typeof renderLibrary==='function')renderLibrary();
+          if(typeof saveToDB==='function')saveToDB();
+          if(typeof idbPutAudio==='function')idbPutAudio(track.id,abCopy);
+          if(typeof enrichTrackAsync==='function')enrichTrackAsync(track,buf);
+          btn.textContent='✓ ADDED';btn.style.background='rgba(28,255,143,.2)';btn.style.color='#9aff9a';
+          toast&&toast(`Added "${track.title}" to library`,'success');
+        }catch(err){
+          btn.textContent='✗ ERR';btn.style.background='rgba(255,46,46,.2)';btn.style.color='#ff6666';
+          console.warn('discover add failed',err);
+          toast&&toast('Add failed: '+(err.message||err),'error');
+        }finally{
+          setTimeout(()=>{btn.textContent='+ ADD';btn.disabled=false;btn.style.background='';btn.style.color=''},3200);
+        }
+      });
+    });
+  }
+}
+
 /* TABS */
 function setupTabs(){
   document.querySelectorAll('.tab-btn').forEach(btn=>{
@@ -9618,7 +9986,7 @@ function init(){
   const mtb=document.getElementById('mixer-toolbar');if(mtb)mtb.innerHTML=buildMixerToolbarHTML();
   setupVU('vu-A',20);setupVU('vu-B',20);setupVU('vu-C',20);setupVU('vu-D',20);
   setupVU('masterHVuL',20);setupVU('masterHVuR',20);
-  attachKnobs();attachEvents();setupBeatFxUI();setupSceneFx();setupKeyboard();setupTabs();setupSettings();setupVinylTurntables();setupOfflineDownload();
+  attachKnobs();attachEvents();setupBeatFxUI();setupSceneFx();setupKeyboard();setupTabs();setupSettings();setupVinylTurntables();setupOfflineDownload();setupDiscover();
   setupWaveformInteraction();setupAdvancedFeatures();renderSessions();
   renderSampler();renderPlaylists();
 
