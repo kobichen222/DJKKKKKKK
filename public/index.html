@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>DJ MAX Ai — Ultimate AI DJ Console</title>
+<title>DJ TITAN — Professional DJ Studio</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Share+Tech+Mono&family=Barlow+Condensed:wght@400;500;600;700&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
@@ -5659,7 +5659,7 @@ body.work-mode .automix-sync{
 </head>
 <body>
 <div class="header-bar">
-<div class="brand"><span class="max">Ai</span>DJ <span>MAX</span> — Ultimate AI DJ Console</div>
+<div class="brand"><span class="max">DJ</span> <span>TITAN</span> — Professional DJ Studio</div>
 <div class="deck-switch-bar header-dsb">
   <span class="dsb-label">DECK FOCUS</span>
   <button class="dsb-btn" data-pair="AB">1 · 2</button>
@@ -5694,7 +5694,7 @@ body.work-mode .automix-sync{
 <button class="tab-btn" data-tab="analytics" data-t="tab_analytics">📊 ANALYTICS</button>
 <button class="tab-btn" data-tab="midi" data-t="tab_midi">🎹 MIDI</button>
 <button class="tab-btn" data-tab="studio" data-t="tab_studio">🎚 STUDIO</button>
-<button class="tab-btn" data-tab="studiopro" data-t="tab_studiopro">🎹 STUDIO PRO</button>
+<button class="tab-btn" data-tab="studiopro" data-t="tab_studiopro">🎹 TITAN LAB</button>
 <button class="tab-btn" data-tab="editor" data-t="tab_editor">✂ EDITOR</button>
 <button class="tab-btn admin-only" data-tab="admin" id="adminTabBtn" style="display:none">🛡 ADMIN</button>
 <button class="tab-btn" data-tab="settings" data-t="tab_settings">⚙ SETTINGS</button>
@@ -5900,7 +5900,7 @@ body.work-mode .automix-sync{
     <span class="corner-screw c-tl"></span><span class="corner-screw c-tr"></span>
     <span class="corner-screw c-bl"></span><span class="corner-screw c-br"></span>
     <div class="tt-topbar">
-      <span class="tt-brand">TECHN<span class="brand-accent">I</span>CS · SL-MAX</span>
+      <span class="tt-brand">TITAN · <span class="brand-accent">V</span>INYL</span>
       <div class="tt-screen">
         <span class="tt-scr-title" id="ttL-title">— NO TRACK —</span>
         <span class="tt-scr-bpm" id="ttL-bpm">128.0</span>
@@ -5970,7 +5970,7 @@ body.work-mode .automix-sync{
   <div class="vx-mixer">
     <span class="corner-screw tl"></span><span class="corner-screw tr"></span>
     <span class="corner-screw bl"></span><span class="corner-screw br"></span>
-    <div class="vx-brand">DJM-<b>MAX</b> · CORE</div>
+    <div class="vx-brand">TITAN · <b>VINYL</b> CORE</div>
     <div class="vx-vu">
       <div class="vx-vu-col"><div class="vx-vu-fill" id="vxVuL" style="height:60%"></div></div>
       <div class="vx-vu-col"><div class="vx-vu-fill" id="vxVuR" style="height:55%"></div></div>
@@ -6023,7 +6023,7 @@ body.work-mode .automix-sync{
     <span class="corner-screw c-tl"></span><span class="corner-screw c-tr"></span>
     <span class="corner-screw c-bl"></span><span class="corner-screw c-br"></span>
     <div class="tt-topbar">
-      <span class="tt-brand">TECHN<span class="brand-accent">I</span>CS · SL-MAX</span>
+      <span class="tt-brand">TITAN · <span class="brand-accent">V</span>INYL</span>
       <div class="tt-screen">
         <span class="tt-scr-title" id="ttR-title">— NO TRACK —</span>
         <span class="tt-scr-bpm" id="ttR-bpm">128.0</span>
@@ -6399,7 +6399,7 @@ No MIDI devices. Press CONNECT.
 <div class="tab-content" id="tab-studiopro">
 <div class="settings-panel sp-panel" style="max-width:1600px;">
 <div class="library-header" style="padding-bottom:8px;">
-<div class="library-title">🎹 STUDIO PRO — HOUSE · TECHNO · TRANCE PRODUCTION</div>
+<div class="library-title">🎹 TITAN LAB — HOUSE · TECHNO · TRANCE PRODUCTION</div>
 <div class="library-actions sp-transport">
 <button class="tool-btn" id="spPlayBtn">▶ PLAY</button>
 <button class="tool-btn" id="spStopBtn">⏹ STOP</button>
@@ -6919,8 +6919,8 @@ Two options — both work completely offline:<br/>
 </div>
 <div class="settings-section"><h3>ℹ ABOUT</h3>
 <div style="font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text-dim);line-height:1.8;">
-<p><strong style="color:var(--orange);">DJ MAX Ai</strong> v1.0 — Ultimate AI-powered browser DJ console</p>
-<p>Built with Web Audio API. Inspired by Pioneer CDJ-3000 + DJM-V10.</p>
+<p><strong style="color:var(--orange);">DJ TITAN</strong> v1.0 — Professional DJ Studio</p>
+<p>Built with Web Audio API. 4 decks (TITAN-3K) · TITAN CORE mixer · TITAN VINYL turntables · TITAN LAB studio.</p>
 <p>All audio processing local. No data leaves your device.</p>
 <p style="margin-top:10px;">Created by <strong style="color:var(--screen-glow);">Kobi Chen / Media Deal</strong></p>
 </div>
@@ -6967,7 +6967,7 @@ const DEMO_TRACKS=[
 
 /* ============ DECK HTML BUILDER ============ */
 function buildDeckHTML(d){
-  return `<div class="deck-header"><div class="deck-label"><span class="model">CDJ-3000</span><span class="suffix">DECK</span></div><button class="deck-upload-btn" data-deck-upload="${d}" title="Upload audio files and load to deck ${d}"><span class="btn-icon">⬆</span><span class="btn-text">⬆ UPLOAD</span></button><button class="deck-lib-btn" data-deck-lib="${d}" title="Browse library and load to deck ${d}"><span class="btn-icon">📚</span><span class="btn-text">📚 LIBRARY</span></button><div class="deck-number">${d}</div></div>
+  return `<div class="deck-header"><div class="deck-label"><span class="model">TITAN-3K</span><span class="suffix">DECK</span></div><button class="deck-upload-btn" data-deck-upload="${d}" title="Upload audio files and load to deck ${d}"><span class="btn-icon">⬆</span><span class="btn-text">⬆ UPLOAD</span></button><button class="deck-lib-btn" data-deck-lib="${d}" title="Browse library and load to deck ${d}"><span class="btn-icon">📚</span><span class="btn-text">📚 LIBRARY</span></button><div class="deck-number">${d}</div></div>
   <div class="screen"><div class="screen-top"><div><div class="track-title" id="title-${d}">— NO TRACK LOADED —</div><div class="track-artist" id="artist-${d}">LOAD A TRACK</div></div><div class="screen-right"><div class="screen-bpm" id="bpm-${d}">---.--</div><div class="screen-bpm-label">BPM</div><div class="screen-key" id="key-${d}">--</div></div></div>
   <div class="waveform"><canvas class="waveform-canvas" id="wave-${d}" width="600" height="48"></canvas><div class="phrase-markers" id="phrase-${d}"></div><div class="playhead"></div></div>
   <div class="time-row"><div><div class="time-label">ELAPSED</div><div class="time-value" id="elapsed-${d}">00:00.0</div></div><div style="text-align:right;"><div class="time-label">REMAIN</div><div class="time-value remain" id="remain-${d}">-00:00.0</div></div></div></div>
@@ -7098,7 +7098,7 @@ function buildMixerToolbarHTML(){
 }
 
 function buildMixerHTML(){
-  return `<div class="mixer-header"><div class="mixer-brand"><span class="model">DJM-</span>V10 PRO MAX</div></div>
+  return `<div class="mixer-header"><div class="mixer-brand"><span class="model">TITAN</span>CORE</div></div>
   <div class="master-vu-modern" id="masterVuBox">
     <div class="master-vu-halo" id="masterVuHalo"></div>
     <div class="mvm-scale">

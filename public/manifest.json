@@ -1,7 +1,7 @@
 {
-  "name": "DJ MAX Ai — Ultimate AI DJ Console",
-  "short_name": "DJ MAX Ai",
-  "description": "Professional AI-powered browser DJ console with 4 decks, Pro Mix engine, Studio mastering, stems, and offline support",
+  "name": "DJ TITAN — Professional DJ Studio",
+  "short_name": "DJ TITAN",
+  "description": "Professional DJ studio with 4 TITAN-3K decks, TITAN CORE mixer, TITAN VINYL turntables, TITAN LAB production, effects, AI mixing and offline support",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
