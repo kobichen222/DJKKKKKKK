@@ -6073,6 +6073,119 @@ body.theme-light ::-webkit-scrollbar-thumb{
 }
 
 /* ================================================================
+   COMING SOON — banner on TITAN LAB while the engine is wired up
+   ================================================================ */
+.coming-soon-card{
+  width:100%;max-width:1600px;margin:0 auto 14px;
+  padding:20px 24px 22px;border-radius:14px;
+  background:
+    radial-gradient(ellipse 60% 60% at 100% 0%,rgba(255,138,26,.18) 0%,transparent 55%),
+    radial-gradient(ellipse 60% 60% at 0% 100%,rgba(46,224,255,.14) 0%,transparent 55%),
+    linear-gradient(180deg,#14141a 0%,#080810 100%);
+  border:1px solid rgba(255,138,26,.45);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.08),
+    inset 0 0 0 1px rgba(0,0,0,.6),
+    0 10px 30px rgba(0,0,0,.5),
+    0 0 28px rgba(255,138,26,.15);
+  position:relative;overflow:hidden;
+}
+.coming-soon-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--orange) 30%,#2ee0ff 70%,transparent);
+  box-shadow:0 0 12px rgba(255,138,26,.65);
+  animation:csTopLine 6s linear infinite;
+}
+@keyframes csTopLine{0%{opacity:.5}50%{opacity:1}100%{opacity:.5}}
+.coming-soon-card::after{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(90deg,rgba(255,255,255,.02) 0 1px,transparent 1px 3px);
+  mix-blend-mode:overlay;opacity:.4;
+}
+.cs-head{
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px;padding-bottom:12px;
+  border-bottom:1px solid rgba(255,138,26,.18);
+}
+.cs-led{
+  width:12px;height:12px;border-radius:50%;flex:0 0 auto;
+  background:radial-gradient(circle at 30% 30%,#ffe5b0,var(--orange) 50%,#5a1c00 100%);
+  box-shadow:0 0 10px rgba(255,138,26,.9),inset 0 0 2px rgba(255,255,255,.5);
+  animation:csLedPulse 1.2s ease-in-out infinite;
+}
+@keyframes csLedPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.9)}}
+.cs-badge{
+  font-family:'Orbitron',sans-serif;font-size:12px;font-weight:900;letter-spacing:3px;
+  color:#0a0a0a;padding:6px 14px;border-radius:6px;
+  background:linear-gradient(180deg,#ffa84a 0%,var(--orange) 50%,#b84000 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 2px 6px rgba(255,138,26,.55),0 0 12px rgba(255,138,26,.35);
+  text-shadow:0 1px 1px rgba(0,0,0,.2);
+}
+.cs-sub{font-family:'Share Tech Mono',monospace;font-size:12px;color:#9fd8ff;letter-spacing:1.2px;flex:1;text-align:right}
+.cs-body h3{
+  font-family:'Orbitron',sans-serif;font-size:18px;font-weight:900;letter-spacing:2.5px;
+  color:#fff;margin:0 0 10px;
+  text-shadow:0 0 12px rgba(255,138,26,.35);
+}
+.cs-body p{
+  font-family:'Share Tech Mono',monospace;font-size:12.5px;color:#c8cdd3;letter-spacing:.4px;line-height:1.7;margin:0 0 10px;
+}
+.cs-sub-line{color:#8a9aa4 !important;font-size:11.5px !important;font-style:italic}
+.cs-progress{
+  display:flex;flex-direction:column;gap:6px;margin:16px 0 12px;
+  padding:14px;border-radius:10px;
+  background:linear-gradient(180deg,rgba(0,0,0,.4),rgba(0,0,0,.55));
+  border:1px solid rgba(255,255,255,.05);
+}
+.cs-progress-row{
+  display:grid;grid-template-columns:minmax(160px,1fr) 3fr auto;gap:12px;align-items:center;
+  font-family:'Share Tech Mono',monospace;font-size:11px;color:#bfbfc4;letter-spacing:.5px;
+}
+.cs-progress-row span:first-child{color:#e8e8ea}
+.cs-bar{
+  height:8px;border-radius:4px;overflow:hidden;
+  background:#050507;border:1px solid #1a1a1e;
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.9);
+}
+.cs-bar-fill{
+  height:100%;border-radius:3px;
+  background:linear-gradient(90deg,#ff7a00 0%,#ffa84a 50%,#2ee0ff 100%);
+  box-shadow:0 0 8px rgba(255,138,26,.6);
+  animation:csBarShine 4s ease-in-out infinite;
+}
+@keyframes csBarShine{0%,100%{filter:brightness(1)}50%{filter:brightness(1.15)}}
+.cs-pct{color:var(--orange);font-weight:800;min-width:36px;text-align:right}
+.cs-cta{
+  margin-top:14px;padding:10px 12px;border-radius:8px;
+  background:rgba(46,224,255,.06);border:1px solid rgba(46,224,255,.22);
+  color:#bfe8f0 !important;font-size:12px !important;
+}
+.cs-cta a{color:#2ee0ff;text-decoration:none;font-weight:700;border-bottom:1px solid rgba(46,224,255,.4)}
+.cs-cta a:hover{background:rgba(46,224,255,.15);border-bottom-color:#2ee0ff}
+
+/* Preview overlay label on the (muted) real panel below */
+.cs-preview-overlay{
+  position:absolute;top:10px;right:10px;z-index:5;pointer-events:none;
+  font-family:'Orbitron',sans-serif;font-size:11px;font-weight:900;letter-spacing:3px;color:var(--orange);
+  padding:5px 10px;border-radius:5px;
+  background:rgba(10,10,12,.85);border:1px solid rgba(255,138,26,.55);
+  box-shadow:0 0 12px rgba(255,138,26,.3);
+}
+
+/* Light theme variants */
+body.theme-light .coming-soon-card{
+  background:
+    radial-gradient(ellipse 60% 60% at 100% 0%,rgba(255,138,26,.12) 0%,transparent 55%),
+    radial-gradient(ellipse 60% 60% at 0% 100%,rgba(46,160,200,.1) 0%,transparent 55%),
+    linear-gradient(180deg,#fdfcf7 0%,#f0ebde 100%) !important;
+  border:1px solid rgba(184,64,0,.5) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.85),0 6px 18px rgba(80,60,30,.18),0 0 24px rgba(255,138,26,.15) !important;
+}
+body.theme-light .cs-body h3{color:#1a1814 !important;text-shadow:0 1px 0 rgba(255,255,255,.6) !important}
+body.theme-light .cs-body p{color:#3a342a !important}
+body.theme-light .cs-sub-line{color:#6a645a !important}
+body.theme-light .cs-sub{color:#1a5a70 !important}
+
+/* ================================================================
    SUPPORT TAB — contact form + purchase request
    ================================================================ */
 .support-panel{padding:18px !important}
@@ -7309,7 +7422,43 @@ No MIDI devices. Press CONNECT.
 </div>
 
 <div class="tab-content" id="tab-studiopro">
-<div class="settings-panel sp-panel" style="max-width:1600px;">
+
+<!-- "Coming soon" banner — TITAN LAB is still under active development -->
+<div class="coming-soon-card">
+  <div class="cs-head">
+    <span class="cs-led" aria-hidden="true"></span>
+    <span class="cs-badge">UNDER DEVELOPMENT</span>
+    <span class="cs-sub">בפיתוח נמרץ · Coming Soon</span>
+  </div>
+  <div class="cs-body">
+    <h3>🎹 TITAN LAB — House · Techno · Trance Production</h3>
+    <p>
+      אנחנו בונים עבורכם סטודיו הפקה מלא: 10 פריסטים (HOUSE PIANO · TRANCE SUPERSAW · TECHNO REESE · ACID 303 · HAMMOND · FM BELL ועוד),
+      סינתיסייזר מלא עם אוסילטורים / פילטר / מעטפות / LFO, אורגן המונד עם drawbars ו-Leslie, בס TB-303 עם סטפ-סקוונסר,
+      ומכונת תופים 16-step עם פטרנים (HOUSE · TECHNO · TRANCE · TECH-HOUSE · DEEP-HOUSE · MINIMAL).
+    </p>
+    <p class="cs-sub-line">
+      The full mix + production suite is under active development —
+      drums, bass, synth, organ, effects and the step-sequencer engine will all be wired up in the next release.
+      Meanwhile all the UI you see is the real final layout.
+    </p>
+    <div class="cs-progress">
+      <div class="cs-progress-row"><span>Audio engine + transport</span><div class="cs-bar"><div class="cs-bar-fill" style="width:95%"></div></div><span class="cs-pct">95%</span></div>
+      <div class="cs-progress-row"><span>Drum voices + 16-step sequencer</span><div class="cs-bar"><div class="cs-bar-fill" style="width:60%"></div></div><span class="cs-pct">60%</span></div>
+      <div class="cs-progress-row"><span>Synth engine + 10 presets</span><div class="cs-bar"><div class="cs-bar-fill" style="width:55%"></div></div><span class="cs-pct">55%</span></div>
+      <div class="cs-progress-row"><span>TB-303 bass + sequencer</span><div class="cs-bar"><div class="cs-bar-fill" style="width:35%"></div></div><span class="cs-pct">35%</span></div>
+      <div class="cs-progress-row"><span>Hammond organ + Leslie</span><div class="cs-bar"><div class="cs-bar-fill" style="width:30%"></div></div><span class="cs-pct">30%</span></div>
+      <div class="cs-progress-row"><span>Master FX + REC-to-library</span><div class="cs-bar"><div class="cs-bar-fill" style="width:20%"></div></div><span class="cs-pct">20%</span></div>
+    </div>
+    <p class="cs-cta">
+      💡 Want early access or have feature requests?
+      <a href="#" onclick="document.querySelector('.tab-btn[data-tab=&quot;support&quot;]')?.click();return false;">Contact us via SUPPORT</a>
+    </p>
+  </div>
+</div>
+
+<div class="settings-panel sp-panel" style="max-width:1600px;opacity:.55;pointer-events:none;filter:saturate(.7);position:relative">
+<div class="cs-preview-overlay" aria-hidden="true">PREVIEW · UNDER DEVELOPMENT</div>
 <div class="library-header" style="padding-bottom:8px;">
 <div class="library-title">🎹 TITAN LAB — HOUSE · TECHNO · TRANCE PRODUCTION</div>
 <div class="library-actions sp-transport">
