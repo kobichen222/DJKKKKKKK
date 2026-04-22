@@ -1180,12 +1180,18 @@ body.work-mode .jog-indicator{
   font-weight:800 !important;
   letter-spacing:.5px !important;
 }
-.cdj .jog-center-screen .bpm-sub,
-.cdj .jog-center-screen .deck-badge{
+.cdj .jog-center-screen .bpm-sub{
   color:#fff !important;
   opacity:.85 !important;
   text-shadow:0 0 4px rgba(var(--deck-accent-rgb),.55) !important;
 }
+/* Hide the inner "DECK X" label on the jog wheel across every display
+   mode (all-4, DJ focus, work-mode, compact, all themes) */
+.jog-center-screen .deck-badge,
+.cdj .jog-center-screen .deck-badge,
+.console.show-all .cdj .jog-center-screen .deck-badge,
+body.work-mode .jog-center-screen .deck-badge,
+body.dj-focus-mode .jog-center-screen .deck-badge{display:none !important}
 
 /* Work-mode jog wheels: clean, slow, crisp — no motion trails. */
 body.work-mode .jog-platter.spinning{animation-duration:4.8s}
@@ -6553,7 +6559,7 @@ function buildDeckHTML(d){
     <button class="pad-mode-btn" data-pad-mode="pitch" data-deck="${d}">PITCH</button>
   </div>
   <div class="hot-cues" data-deck="${d}">${[1,2,3,4,5,6,7,8].map(n=>`<button class="cue-btn" data-color="${n}" data-cue="${n}">${n}</button>`).join('')}</div>
-  <div class="jog-wrapper"><div class="jog-wheel" id="jog-${d}"><div class="jog-outer"></div><div class="jog-ring"><div class="jog-ring-light"></div></div><div class="jog-markers"></div><div class="jog-platter" id="platter-${d}"><div class="jog-platter-disc"></div><div class="jog-indicator"></div><div class="jog-center-screen"><div class="bpm-display" id="centerBpm-${d}">---.-</div><div class="bpm-sub">BPM</div><div class="deck-badge">DECK ${d}</div></div></div></div></div>
+  <div class="jog-wrapper"><div class="jog-wheel" id="jog-${d}"><div class="jog-outer"></div><div class="jog-ring"><div class="jog-ring-light"></div></div><div class="jog-markers"></div><div class="jog-platter" id="platter-${d}"><div class="jog-platter-disc"></div><div class="jog-indicator"></div><div class="jog-center-screen"><div class="bpm-display" id="centerBpm-${d}">---.-</div><div class="bpm-sub">BPM</div></div></div></div></div>
   <div class="transport">
     <button class="big-btn cue" data-deck="${d}" data-action="cue"><span class="icon">◄◄</span><span class="lbl">CUE</span></button>
     <button class="big-btn play" data-deck="${d}" data-action="play"><span class="icon" id="playIcon-${d}">▶</span><span class="lbl" id="playLabel-${d}">PLAY</span></button>
