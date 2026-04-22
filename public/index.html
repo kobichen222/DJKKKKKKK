@@ -4901,6 +4901,136 @@ body.work-mode .automix-sync{
   box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 2px 5px rgba(0,0,0,.7);
 }
 
+/* ---------- PRO v2 polish: realistic turntable body + details ---------- */
+/* Brushed-metal top surface with screw accents and raised edge */
+.turntable{
+  background:
+    linear-gradient(180deg,#d6d6da 0%,#9a9a9f 2%,#525258 7%,#2a2a2f 16%,#181820 36%,#0d0d11 100%);
+  border:1px solid #1c1c22;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.7),
+    inset 0 2px 0 rgba(255,255,255,.12),
+    inset 0 0 0 3px #0c0c10,
+    inset 0 -1px 0 rgba(0,0,0,.9),
+    inset 0 0 60px rgba(0,0,0,.55),
+    0 28px 60px rgba(0,0,0,.75),
+    0 2px 0 rgba(255,255,255,.05);
+}
+.turntable::after{
+  content:'';position:absolute;inset:6px;border-radius:12px;pointer-events:none;
+  border:1px solid rgba(255,255,255,.04);
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.5);
+  z-index:0;
+}
+.turntable .corner-screw{
+  position:absolute;width:10px;height:10px;border-radius:50%;
+  background:radial-gradient(circle at 30% 30%,#e4e4e8 0%,#8a8a90 45%,#2a2a30 100%);
+  box-shadow:inset 0 -1px 1px rgba(0,0,0,.8),0 1px 1px rgba(0,0,0,.5),0 0 0 1px rgba(0,0,0,.6);
+  z-index:2;pointer-events:none;
+}
+.turntable .corner-screw::after{
+  content:'';position:absolute;inset:3px;border-radius:50%;
+  background:linear-gradient(45deg,#1a1a1c,#505056);
+}
+.turntable .corner-screw.c-tl{top:8px;left:8px}
+.turntable .corner-screw.c-tr{top:8px;right:8px}
+.turntable .corner-screw.c-bl{bottom:8px;left:8px}
+.turntable .corner-screw.c-br{bottom:8px;right:8px}
+
+/* Side pitch scale markers */
+.tt-pitch-scale{
+  position:absolute;inset:6px 0;display:flex;flex-direction:column;
+  justify-content:space-between;pointer-events:none;
+}
+.tt-pitch-scale i{
+  display:block;height:1px;background:rgba(255,255,255,.28);margin-left:0;
+}
+.tt-pitch-scale i.major{background:rgba(255,255,255,.6);box-shadow:0 0 4px rgba(var(--tt-accent-rgb),.35)}
+.tt-pitch-center-mark{
+  position:absolute;left:-8px;top:50%;transform:translateY(-50%);
+  font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--tt-accent);
+  text-shadow:0 0 4px rgba(var(--tt-accent-rgb),.6);letter-spacing:.8px;
+}
+
+/* Target/strobe light next to the start button */
+.tt-target{
+  width:14px;height:14px;border-radius:50%;
+  background:radial-gradient(circle at 30% 30%,#ffe5b0,var(--tt-accent) 55%,#3a0f00 100%);
+  box-shadow:0 0 10px rgba(var(--tt-accent-rgb),.75),inset 0 0 2px rgba(255,255,255,.35);
+  opacity:.45;
+}
+.tt-startstop.playing ~ .tt-target,
+#ttL-startstop.playing ~ .tt-target,
+#ttR-startstop.playing ~ .tt-target{opacity:1;animation:ttTarget 1.1s ease-in-out infinite}
+@keyframes ttTarget{0%,100%{box-shadow:0 0 8px rgba(var(--tt-accent-rgb),.6)}50%{box-shadow:0 0 18px rgba(var(--tt-accent-rgb),1)}}
+
+/* Premium vinyl groove sheen + ring depth */
+.tt-vinyl{
+  background:
+    radial-gradient(circle at 30% 25%,rgba(255,255,255,.12),transparent 32%),
+    repeating-radial-gradient(circle,rgba(255,255,255,.045) 0 1px,transparent 1px 3px),
+    radial-gradient(circle at 50% 50%,#1a1a1e 0%,#0b0b0d 72%,#000 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.06),
+    inset 0 2px 4px rgba(255,255,255,.05),
+    inset 0 -4px 10px rgba(0,0,0,.95),
+    0 0 0 1px #000,
+    0 0 14px rgba(0,0,0,.8);
+}
+
+/* Polished platter edge ring with reflective cap */
+.tt-platter{
+  box-shadow:
+    0 0 0 3px #0a0a0c,
+    0 0 0 4px linear-gradient(180deg,#c0c0c6,#3a3a40),
+    0 0 0 5px #0a0a0c,
+    inset 0 2px 6px rgba(255,255,255,.14),
+    inset 0 -6px 18px rgba(0,0,0,.95),
+    0 14px 40px rgba(0,0,0,.8),
+    0 0 80px rgba(var(--tt-accent-rgb),.12);
+}
+
+/* Better tonearm — counterweight, cueing lever shadows, anti-skate */
+.tt-tonearm{filter:drop-shadow(0 5px 8px rgba(0,0,0,.7))}
+
+/* Pro START/STOP — brushed alloy with red LED */
+.tt-startstop{
+  background:
+    radial-gradient(circle at 35% 28%,#fff 0%,#d4d4da 22%,#9a9aa0 48%,#4a4a50 78%,#141418 100%);
+  border:1px solid #0a0a0c;
+  box-shadow:
+    inset 0 2px 2px rgba(255,255,255,.7),
+    inset 0 -4px 6px rgba(0,0,0,.8),
+    0 5px 12px rgba(0,0,0,.8),
+    0 0 0 4px #0a0a0c,
+    0 0 0 5px #3a3a40,
+    0 0 0 6px #0a0a0c;
+}
+
+/* Premium pitch-fader thumb */
+.tt-pitch-input::-webkit-slider-thumb{
+  width:36px;height:22px;border-radius:4px;
+  background:
+    linear-gradient(90deg,#ededf0 0%,#bebec3 18%,#6a6a70 52%,#2a2a30 100%),
+    repeating-linear-gradient(90deg,rgba(0,0,0,.35) 0 1px,transparent 1px 3px);
+  background-blend-mode:overlay;
+  border:1px solid #080808;
+  box-shadow:
+    inset 0 2px 2px rgba(255,255,255,.7),
+    inset 0 -2px 4px rgba(0,0,0,.8),
+    0 2px 4px rgba(0,0,0,.8),
+    0 0 10px rgba(var(--tt-accent-rgb),.25);
+}
+.tt-pitch-input::-moz-range-thumb{
+  width:36px;height:22px;border-radius:4px;
+  background:linear-gradient(90deg,#ededf0,#6a6a70 55%,#2a2a30);
+  border:1px solid #080808;
+  box-shadow:inset 0 2px 2px rgba(255,255,255,.7),inset 0 -2px 4px rgba(0,0,0,.8),0 2px 4px rgba(0,0,0,.8);
+}
+.tt-pitch-track{
+  box-shadow:inset 0 2px 5px rgba(0,0,0,.95),inset 0 0 12px rgba(var(--tt-accent-rgb),.08),0 1px 0 rgba(255,255,255,.06);
+}
+
 /* Load buttons in the turntable topbar */
 .tt-load-btn{
   padding:3px 8px;min-width:26px;height:22px;
@@ -4938,6 +5068,122 @@ body.work-mode .automix-sync{
   color:#fff;background:rgba(var(--tt-accent-rgb),.85);
   box-shadow:0 0 24px rgba(var(--tt-accent-rgb),.7);
   z-index:5;pointer-events:none;
+}
+
+/* ---------- PRO v2 polish: mixer core ---------- */
+.vx-mixer{
+  background:
+    linear-gradient(180deg,#c8c8cd 0%,#868690 2%,#2d2d33 7%,#1a1a1e 18%,#0a0a0c 100%);
+  border:1px solid #1c1c22;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.7),
+    inset 0 -1px 0 rgba(0,0,0,.9),
+    inset 0 0 0 3px #0c0c10,
+    inset 0 0 40px rgba(0,0,0,.6),
+    0 24px 50px rgba(0,0,0,.8);
+}
+.vx-mixer > *{z-index:1}
+.vx-mixer .corner-screw{
+  position:absolute;width:9px;height:9px;border-radius:50%;
+  background:radial-gradient(circle at 30% 30%,#e4e4e8 0%,#8a8a90 45%,#2a2a30 100%);
+  box-shadow:inset 0 -1px 1px rgba(0,0,0,.8),0 1px 1px rgba(0,0,0,.5);
+  z-index:2;
+}
+.vx-mixer .corner-screw.tl{top:8px;left:8px}
+.vx-mixer .corner-screw.tr{top:8px;right:8px}
+.vx-mixer .corner-screw.bl{bottom:8px;left:8px}
+.vx-mixer .corner-screw.br{bottom:8px;right:8px}
+
+.vx-brand{
+  background:linear-gradient(180deg,#050506 0%,#0d0d10 100%);
+  border:1px solid #1a1a1e;
+  border-radius:5px;padding:5px 6px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04),inset 0 0 10px rgba(0,0,0,.6);
+  position:relative;
+}
+.vx-brand::before{
+  content:'';position:absolute;inset:0;border-radius:5px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(255,138,26,.14) 40%,rgba(46,224,255,.14) 60%,transparent);
+}
+
+.vx-vu{background:linear-gradient(180deg,#030304 0%,#0a0a0c 100%)}
+
+.vx-ch{
+  background:linear-gradient(180deg,#16161a 0%,#060608 100%);
+  border:1px solid #212128;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05),inset 0 0 20px rgba(0,0,0,.7);
+  position:relative;
+}
+.vx-ch::before{
+  content:'';position:absolute;top:-1px;left:12%;right:12%;height:2px;border-radius:2px;
+  background:linear-gradient(90deg,transparent,var(--vx-hi,#ff7a00),transparent);
+  box-shadow:0 0 6px var(--vx-hi,#ff7a00);
+}
+.vx-ch[data-ch="B"]::before{--vx-hi:#2ee0ff}
+.vx-ch-head{
+  background:linear-gradient(180deg,rgba(255,122,0,.14),rgba(255,122,0,.05));
+  border:1px solid rgba(255,122,0,.35) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 0 8px rgba(255,122,0,.15);
+}
+.vx-ch[data-ch="B"] .vx-ch-head{
+  background:linear-gradient(180deg,rgba(46,224,255,.14),rgba(46,224,255,.05));
+  border:1px solid rgba(46,224,255,.35) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 0 8px rgba(46,224,255,.15);
+}
+
+.vx-knob{
+  background:
+    radial-gradient(circle at 35% 28%,#fff 0%,#d0d0d5 18%,#8a8a90 40%,#3a3a40 75%,#0a0a0c 100%);
+  box-shadow:
+    inset 0 2px 2px rgba(255,255,255,.7),
+    inset 0 -2px 3px rgba(0,0,0,.8),
+    0 2px 5px rgba(0,0,0,.8),
+    0 0 0 2px #050507,
+    0 0 0 3px rgba(255,255,255,.05);
+}
+.vx-knob::before{
+  content:'';position:absolute;inset:4px;border-radius:50%;pointer-events:none;
+  background:repeating-conic-gradient(from 0deg,rgba(0,0,0,.35) 0 2deg,transparent 2deg 12deg);
+  opacity:.35;
+}
+
+.vx-fader-wrap{
+  background:linear-gradient(180deg,#020203 0%,#0a0a0c 100%);
+  box-shadow:inset 0 0 12px rgba(0,0,0,.95),inset 0 1px 0 rgba(255,255,255,.04);
+}
+.vx-fader::-webkit-slider-thumb{
+  width:26px;height:32px;border-radius:3px;
+  background:
+    linear-gradient(90deg,#fafafd 0%,#c4c4ca 28%,#6a6a70 60%,#2a2a30 100%),
+    repeating-linear-gradient(90deg,rgba(0,0,0,.35) 0 1px,transparent 1px 3px);
+  background-blend-mode:overlay;
+  border:1px solid #050507;
+  box-shadow:inset 0 2px 2px rgba(255,255,255,.7),inset 0 -2px 4px rgba(0,0,0,.85),0 3px 6px rgba(0,0,0,.85);
+}
+.vx-fader::-moz-range-thumb{
+  width:26px;height:32px;border-radius:3px;
+  background:linear-gradient(90deg,#fafafd,#6a6a70 60%,#2a2a30);
+  border:1px solid #050507;
+  box-shadow:inset 0 2px 2px rgba(255,255,255,.7),inset 0 -2px 4px rgba(0,0,0,.85),0 3px 6px rgba(0,0,0,.85);
+}
+
+.vx-xfader-wrap{background:linear-gradient(180deg,#0a0a0c 0%,#030304 100%)}
+.vx-xfader-track{
+  background:linear-gradient(180deg,#030304,#0a0a0c 55%,#050506);
+  box-shadow:inset 0 3px 6px rgba(0,0,0,.95),inset 0 -1px 0 rgba(255,255,255,.04),0 1px 0 rgba(255,255,255,.04);
+}
+.vx-xfader-track::before{
+  background:linear-gradient(90deg,#ff7a00 0%,#ffd3a8 50%,#2ee0ff 100%);opacity:.65;
+  box-shadow:0 0 8px rgba(255,138,26,.4),0 0 8px rgba(46,224,255,.4);
+}
+.vx-xfader::-webkit-slider-thumb{
+  width:24px;height:30px;border-radius:3px;
+  background:
+    linear-gradient(180deg,#fafafd 0%,#c4c4ca 28%,#6a6a70 60%,#2a2a30 100%),
+    repeating-linear-gradient(90deg,rgba(0,0,0,.35) 0 1px,transparent 1px 3px);
+  background-blend-mode:overlay;
+  border:1px solid #050507;
+  box-shadow:inset 0 2px 2px rgba(255,255,255,.7),inset 0 -2px 4px rgba(0,0,0,.85),0 3px 6px rgba(0,0,0,.85);
 }
 
 /* Responsive */
@@ -5163,6 +5409,8 @@ body.work-mode .automix-sync{
   <div class="vinyl-floor"></div>
 
   <div class="turntable" data-tt="L" id="ttL" data-tt-deck="A">
+    <span class="corner-screw c-tl"></span><span class="corner-screw c-tr"></span>
+    <span class="corner-screw c-bl"></span><span class="corner-screw c-br"></span>
     <div class="tt-topbar">
       <span class="tt-brand">TECHN<span class="brand-accent">I</span>CS · SL-MAX</span>
       <div class="tt-screen">
@@ -5181,6 +5429,7 @@ body.work-mode .automix-sync{
         </div>
         <button class="tt-startstop" id="ttL-startstop" title="Start / Stop"></button>
         <span class="tt-startstop-label">START/STOP</span>
+        <span class="tt-target" aria-hidden="true"></span>
       </div>
       <div class="tt-platter-wrap">
         <div class="tt-platter" id="ttL-platter">
@@ -5212,6 +5461,12 @@ body.work-mode .automix-sync{
         <span class="tt-pitch-label">PITCH</span>
         <span class="tt-pitch-val" id="ttL-pitch-val">+0.00%</span>
         <div class="tt-pitch-track">
+          <div class="tt-pitch-scale" aria-hidden="true">
+            <i class="major"></i><i></i><i></i><i></i>
+            <i class="major"></i>
+            <i></i><i></i><i></i><i class="major"></i>
+          </div>
+          <span class="tt-pitch-center-mark">0</span>
           <input type="range" class="tt-pitch-input" id="ttL-pitch" min="-8" max="8" step="0.1" value="0"/>
         </div>
       </div>
@@ -5225,6 +5480,8 @@ body.work-mode .automix-sync{
   </div>
 
   <div class="vx-mixer">
+    <span class="corner-screw tl"></span><span class="corner-screw tr"></span>
+    <span class="corner-screw bl"></span><span class="corner-screw br"></span>
     <div class="vx-brand">DJM-<b>MAX</b> · CORE</div>
     <div class="vx-vu">
       <div class="vx-vu-col"><div class="vx-vu-fill" id="vxVuL" style="height:60%"></div></div>
@@ -5275,6 +5532,8 @@ body.work-mode .automix-sync{
   </div>
 
   <div class="turntable" data-tt="R" id="ttR" data-tt-deck="B">
+    <span class="corner-screw c-tl"></span><span class="corner-screw c-tr"></span>
+    <span class="corner-screw c-bl"></span><span class="corner-screw c-br"></span>
     <div class="tt-topbar">
       <span class="tt-brand">TECHN<span class="brand-accent">I</span>CS · SL-MAX</span>
       <div class="tt-screen">
@@ -5293,6 +5552,7 @@ body.work-mode .automix-sync{
         </div>
         <button class="tt-startstop" id="ttR-startstop" title="Start / Stop"></button>
         <span class="tt-startstop-label">START/STOP</span>
+        <span class="tt-target" aria-hidden="true"></span>
       </div>
       <div class="tt-platter-wrap">
         <div class="tt-platter" id="ttR-platter">
@@ -5324,6 +5584,12 @@ body.work-mode .automix-sync{
         <span class="tt-pitch-label">PITCH</span>
         <span class="tt-pitch-val" id="ttR-pitch-val">+0.00%</span>
         <div class="tt-pitch-track">
+          <div class="tt-pitch-scale" aria-hidden="true">
+            <i class="major"></i><i></i><i></i><i></i>
+            <i class="major"></i>
+            <i></i><i></i><i></i><i class="major"></i>
+          </div>
+          <span class="tt-pitch-center-mark">0</span>
           <input type="range" class="tt-pitch-input" id="ttR-pitch" min="-8" max="8" step="0.1" value="0"/>
         </div>
       </div>
@@ -8500,70 +8766,93 @@ function setupTabs(){
 
 /* VINYL view — realistic twin turntables + mixer */
 function setupVinylTurntables(){
-  const state={
-    L:{playing:false,pitch:0,rpm:33,cue:false,sync:false},
-    R:{playing:false,pitch:0,rpm:33,cue:false,sync:false},
-    xfader:50,vuL:60,vuR:55
-  };
+  const SIDE2DECK={L:'A',R:'B'};
   const baseBpm={L:128.0,R:128.0};
 
+  function deck(side){return (typeof decks!=='undefined')?decks[SIDE2DECK[side]]:null}
+
   function applySpin(side){
-    const s=state[side];
+    const d=deck(side);
     const vinyl=document.getElementById(`tt${side}-vinyl`);
     const platter=document.getElementById(`tt${side}-platter`);
     const tonearm=document.getElementById(`tt${side}-tonearm`);
     if(!vinyl||!platter||!tonearm)return;
-    if(s.playing){
-      const rpm=s.rpm*(1+s.pitch/100);
-      const dur=(60/rpm).toFixed(3);
-      vinyl.style.setProperty('--tt-spin',dur+'s');
-      vinyl.classList.add('spinning');
-      platter.classList.add('spinning');
-      tonearm.classList.add('dropped');
-    }else{
-      vinyl.classList.remove('spinning');
-      platter.classList.remove('spinning');
-      tonearm.classList.remove('dropped');
-    }
+    const playing=!!(d&&d.playing);
+    const pitch=d?d.tempo:0;
+    const rpm=33*(1+pitch/100);
+    const dur=(60/rpm).toFixed(3);
+    vinyl.style.setProperty('--tt-spin',dur+'s');
+    vinyl.classList.toggle('spinning',playing);
+    platter.classList.toggle('spinning',playing);
+    tonearm.classList.toggle('dropped',playing||!!(d&&d.track));
     const bpmEl=document.getElementById(`tt${side}-bpm`);
     if(bpmEl){
-      const bpm=(baseBpm[side]*(1+s.pitch/100)).toFixed(1);
-      bpmEl.textContent=bpm;
+      const src=d&&d.track&&d.track.bpm?+d.track.bpm:baseBpm[side];
+      bpmEl.textContent=(src*(1+pitch/100)).toFixed(1);
     }
   }
 
   ['L','R'].forEach(side=>{
+    const dId=SIDE2DECK[side];
+    // START/STOP → real play/pause
     const startBtn=document.getElementById(`tt${side}-startstop`);
     startBtn?.addEventListener('click',()=>{
-      state[side].playing=!state[side].playing;
-      startBtn.classList.toggle('playing',state[side].playing);
-      applySpin(side);
+      const d=deck(side);
+      if(!d||!d.track){toast&&toast(`Load a track to Deck ${dId} first`,'warn');return;}
+      if(typeof togglePlay==='function')togglePlay(dId);
+      setTimeout(()=>{applySpin(side);startBtn.classList.toggle('playing',!!deck(side)?.playing)},30);
     });
+    // PITCH → real tempo
     const pitch=document.getElementById(`tt${side}-pitch`);
     const pitchVal=document.getElementById(`tt${side}-pitch-val`);
     pitch?.addEventListener('input',()=>{
       const v=parseFloat(pitch.value);
-      state[side].pitch=v;
       if(pitchVal)pitchVal.textContent=(v>=0?'+':'')+v.toFixed(2)+'%';
+      if(typeof setTempo==='function')setTempo(dId,v);
       applySpin(side);
     });
+    // RPM (visual only)
     document.querySelectorAll(`#tt${side} .tt-rpm-btn`).forEach(btn=>{
       btn.addEventListener('click',()=>{
         document.querySelectorAll(`#tt${side} .tt-rpm-btn`).forEach(b=>b.classList.remove('active'));
         btn.classList.add('active');
-        state[side].rpm=parseInt(btn.dataset.rpm,10);
-        applySpin(side);
       });
     });
+    // Bottom actions → real cue/sync/loop/fx
     document.querySelectorAll(`#tt${side} .tt-bottom .tt-btn`).forEach(btn=>{
       btn.addEventListener('click',()=>{
         const k=btn.dataset.ttBtn;
-        if(k==='cue')btn.classList.toggle('armed');
-        else if(k==='sync')btn.classList.toggle('active');
-        else btn.classList.toggle('active');
+        if(k==='cue'){
+          if(typeof cueDeck==='function')cueDeck(dId);
+          btn.classList.add('armed');setTimeout(()=>btn.classList.remove('armed'),220);
+        }else if(k==='sync'){
+          const d=decks&&decks[dId];if(!d||!d.track)return;
+          const other=decks[dId==='A'?'B':'A'];
+          if(other&&other.track&&other.track.bpm&&d.track.bpm){
+            const pct=((other.track.bpm*(1+other.tempo/100))/d.track.bpm-1)*100;
+            const clamped=Math.max(-8,Math.min(8,pct));
+            if(typeof setTempo==='function')setTempo(dId,clamped);
+            const p=document.getElementById(`tt${side}-pitch`);
+            const pv=document.getElementById(`tt${side}-pitch-val`);
+            if(p)p.value=clamped;
+            if(pv)pv.textContent=(clamped>=0?'+':'')+clamped.toFixed(2)+'%';
+          }
+          btn.classList.add('active');setTimeout(()=>btn.classList.remove('active'),600);
+          applySpin(side);
+        }else if(k==='loop'){
+          btn.classList.toggle('active');
+          const d=decks&&decks[dId];if(!d||!d.track)return;
+          if(d.loop&&d.loop.active&&typeof exitLoop==='function')exitLoop(dId);
+          else if(typeof setAutoLoop==='function')setAutoLoop(dId,4);
+        }else if(k==='fx'){
+          btn.classList.toggle('active');
+          if(typeof toggleBeatFx==='function')toggleBeatFx();
+          else{const f=document.getElementById('fxOnOff');if(f)f.click();}
+        }
       });
     });
-    // drag-to-scratch on vinyl
+    // Drag-to-scratch on the vinyl — visual only (scrubbing the real audio
+    // would need sample-accurate seek which is out of scope here)
     const vinyl=document.getElementById(`tt${side}-vinyl`);
     if(vinyl){
       let dragging=false,lastAngle=0,manualAngle=0;
@@ -8583,7 +8872,7 @@ function setupVinylTurntables(){
       const release=()=>{
         if(!dragging)return;dragging=false;
         vinyl.style.transform='';
-        if(state[side].playing){vinyl.classList.add('spinning')}
+        if(deck(side)?.playing)vinyl.classList.add('spinning');
       };
       vinyl.addEventListener('pointerup',release);
       vinyl.addEventListener('pointercancel',release);
@@ -8591,36 +8880,87 @@ function setupVinylTurntables(){
     }
   });
 
-  // mixer cue buttons
+  // Mixer CUE → real headphone cue
   document.querySelectorAll('.vx-cue').forEach(btn=>{
-    btn.addEventListener('click',()=>btn.classList.toggle('active'));
+    btn.addEventListener('click',()=>{
+      const d=btn.dataset.vxCue;
+      btn.classList.toggle('active');
+      if(typeof mixerState!=='undefined'&&mixerState.hpCue)mixerState.hpCue[d]=btn.classList.contains('active');
+      const hpBtn=document.getElementById(`hpCue-${d}`);
+      if(hpBtn)hpBtn.classList.toggle('active',btn.classList.contains('active'));
+    });
   });
-  // mixer knobs — rotate indicator on drag
+  // Mixer knobs → real EQ/TRIM
   document.querySelectorAll('.vx-knob').forEach(knob=>{
-    let val=0.5,dragY=0,dragging=false;
+    const raw=knob.dataset.vxknob||'';
+    const m=raw.match(/^(trim|hi|mid|low)([AB])$/);
+    const kind=m?m[1]:null,dId=m?m[2]:null;
+    let val=(kind==='trim')?0.33:0.5; // -1..1 center at 0 → val 0.5
+    let dragY=0,dragging=false;
     const render=()=>{const deg=-135+val*270;knob.style.transform=`rotate(${deg}deg)`};
-    render();
+    const applyVal=()=>{
+      if(!kind||!dId||typeof applyKnob!=='function')return;
+      const v=(val*2)-1;                                // 0..1 → -1..1
+      const id=kind==='trim'?`trim-${dId}`
+        :kind==='hi'?`hi-${dId}`
+        :kind==='mid'?`mid-${dId}`
+        :`low-${dId}`;
+      applyKnob(id,v);
+    };
+    render();applyVal();
     knob.addEventListener('pointerdown',e=>{dragging=true;dragY=e.clientY;knob.setPointerCapture(e.pointerId)});
     knob.addEventListener('pointermove',e=>{
       if(!dragging)return;
       val=Math.max(0,Math.min(1,val+(dragY-e.clientY)/200));
-      dragY=e.clientY;render();
+      dragY=e.clientY;render();applyVal();
     });
     const stop=e=>{if(dragging){dragging=false;try{knob.releasePointerCapture(e.pointerId)}catch(_){}};};
     knob.addEventListener('pointerup',stop);
     knob.addEventListener('pointercancel',stop);
+    knob.addEventListener('dblclick',()=>{val=(kind==='trim')?0.33:0.5;render();applyVal();});
   });
-  // crossfader drives VU baseline
+  // Channel faders → real volume
+  ['A','B'].forEach(dId=>{
+    const f=document.getElementById(`vxFader${dId}`);
+    if(!f)return;
+    const apply=()=>{
+      const v=parseFloat(f.value)/100;
+      if(typeof decks!=='undefined'&&decks[dId]){decks[dId].volume=v;}
+      if(typeof applyCrossfader==='function')applyCrossfader();
+    };
+    f.addEventListener('input',apply);apply();
+  });
+  // Crossfader → real crossfader
   const xf=document.getElementById('vxXfader');
+  xf?.addEventListener('input',()=>{
+    const v=parseFloat(xf.value)/100;
+    if(typeof mixerState!=='undefined')mixerState.crossfader=v;
+    if(typeof applyCrossfader==='function')applyCrossfader();
+    const mainXf=document.getElementById('xfaderHandle');
+    if(mainXf)mainXf.style.left=`${v*100}%`;
+  });
+
+  // VU meters: draw from deck analysers if available; fallback to jitter
   const vuL=document.getElementById('vxVuL');
   const vuR=document.getElementById('vxVuR');
-  function paintVU(){
-    const x=xf?parseFloat(xf.value)/100:.5;
-    const jitter=()=>Math.random()*15;
-    if(vuL)vuL.style.height=Math.min(95,(1-x)*70+jitter())+'%';
-    if(vuR)vuR.style.height=Math.min(95,x*70+jitter())+'%';
+  function rmsFromAnalyser(an){
+    if(!an)return 0;
+    const buf=new Uint8Array(an.fftSize);an.getByteTimeDomainData(buf);
+    let sum=0;for(let i=0;i<buf.length;i++){const x=(buf[i]-128)/128;sum+=x*x;}
+    return Math.sqrt(sum/buf.length);
   }
-  setInterval(paintVU,120);
+  function paintVU(){
+    const dA=decks&&decks.A,dB=decks&&decks.B;
+    let lvlA=0,lvlB=0;
+    if(dA&&dA.analyser&&dA.playing)lvlA=rmsFromAnalyser(dA.analyser);
+    if(dB&&dB.analyser&&dB.playing)lvlB=rmsFromAnalyser(dB.analyser);
+    const xfv=xf?parseFloat(xf.value)/100:.5;
+    const hL=Math.min(98,(lvlA*220)*(1-xfv)+2);
+    const hR=Math.min(98,(lvlB*220)*xfv+2);
+    if(vuL)vuL.style.height=hL+'%';
+    if(vuR)vuR.style.height=hR+'%';
+  }
+  setInterval(paintVU,60);
 
   // Drag-and-drop: accept library tracks onto either turntable → routes to deck A/B
   document.querySelectorAll('.turntable').forEach(tt=>{
