@@ -12034,12 +12034,25 @@ function spInitAudio(){
   organBus.connect(organSidechain);
   mkStrip('ORGAN',organSidechain,mixBus);
   mkStrip('DRUMS',drumBus,mixBus);
-  // drive (waveshaper)
-  const drive=ctx.createWaveShaper();drive.curve=spMakeDriveCurve(0);drive.oversample='2x';
+  // drive (waveshaper, oversampled)
+  const drive=ctx.createWaveShaper();drive.curve=spMakeDriveCurve(0);drive.oversample='4x';
   mixBus.connect(drive);
+  // Pro master EQ — low shelf warmth, slight mid scoop, air shelf
+  const masterEqLow=ctx.createBiquadFilter();masterEqLow.type='lowshelf';
+  masterEqLow.frequency.value=110;masterEqLow.gain.value=2;
+  const masterEqMid=ctx.createBiquadFilter();masterEqMid.type='peaking';
+  masterEqMid.frequency.value=700;masterEqMid.Q.value=0.65;masterEqMid.gain.value=-1;
+  const masterEqHi=ctx.createBiquadFilter();masterEqHi.type='highshelf';
+  masterEqHi.frequency.value=9500;masterEqHi.gain.value=2;
+  drive.connect(masterEqLow);masterEqLow.connect(masterEqMid);masterEqMid.connect(masterEqHi);
+  // Glue bus compressor — medium ratio, soft knee, slow attack to preserve transients
+  const masterComp=ctx.createDynamicsCompressor();
+  masterComp.threshold.value=-14;masterComp.knee.value=10;masterComp.ratio.value=3;
+  masterComp.attack.value=0.015;masterComp.release.value=0.18;
+  masterEqHi.connect(masterComp);
   // master gain
   const master=ctx.createGain();master.gain.value=spVal('masterVol',SP.master.knobs.masterVol??.85);
-  drive.connect(master);
+  masterComp.connect(master);
   // chorus (stereo: two modulated delays panned hard L/R)
   const chorusIn=ctx.createGain();chorusIn.gain.value=1;
   const chorusLDelay=ctx.createDelay(0.05);chorusLDelay.delayTime.value=0.018;
@@ -12076,8 +12089,9 @@ function spInitAudio(){
   // master strip — separate gain so the MASTER fader is independent of the masterVol knob
   const masterStripGain=ctx.createGain();masterStripGain.gain.value=1;
   const masterAn=ctx.createAnalyser();masterAn.fftSize=512;
+  // Brickwall limiter — tight ratio for dance-music loudness
   const lim=ctx.createDynamicsCompressor();
-  lim.threshold.value=-3;lim.knee.value=2;lim.ratio.value=12;lim.attack.value=0.003;lim.release.value=0.12;
+  lim.threshold.value=-2;lim.knee.value=1;lim.ratio.value=20;lim.attack.value=0.001;lim.release.value=0.08;
   master.connect(masterStripGain);masterStripGain.connect(masterAn);masterAn.connect(lim);lim.connect(out);
   SP.mix.strips['MASTER']={gain:masterStripGain,pan:null,meter:masterAn,muted:false,solo:false,vol:1,panV:0,isMaster:true};
   // record destination
@@ -12087,7 +12101,7 @@ function spInitAudio(){
   const _riserNoise=ctx.createBuffer(1,ctx.sampleRate*2,ctx.sampleRate);
   {const d=_riserNoise.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;}
   SP._riserBuffer=_riserNoise;
-  SP.nodes={synthBus,drumBus,bassBus,organBus,bassSidechain,organSidechain,mixBus,drive,master,delay,delayFb,delayFilter,delayWet,reverb,reverbWet,chorusIn,chorusWet,chorusLDelay,chorusRDelay,synthAutoFilter,masterStripGain,limiter:lim,streamDest};
+  SP.nodes={synthBus,drumBus,bassBus,organBus,bassSidechain,organSidechain,mixBus,drive,masterEqLow,masterEqMid,masterEqHi,masterComp,master,delay,delayFb,delayFilter,delayWet,reverb,reverbWet,chorusIn,chorusWet,chorusLDelay,chorusRDelay,synthAutoFilter,masterStripGain,limiter:lim,streamDest};
   SP.rec.streamDest=streamDest;
   SP.ready=true;
 }
@@ -12409,85 +12423,223 @@ function spDrumHit(name,time,vel){
   spInitAudio();const ctx=audioCtx,v=vel||1;
   const bus=(SP.mix.drumVoiceIns&&SP.mix.drumVoiceIns[name])||SP.nodes.drumBus;
   const out=ctx.createGain();out.gain.value=v;out.connect(bus);
-  const g=ctx.createGain();g.gain.value=0;g.connect(out);
   const t=time;
-  const noise=()=>{const b=ctx.createBuffer(1,ctx.sampleRate*0.5,ctx.sampleRate);const d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;const s=ctx.createBufferSource();s.buffer=b;return s;};
+  const noise=()=>{const b=ctx.createBuffer(1,ctx.sampleRate*0.6,ctx.sampleRate);const d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;const s=ctx.createBufferSource();s.buffer=b;return s;};
+  // --- PRO KICK — sub sweep + body + transient click (saturated) ---
   if(name==='KICK'){
-    const o=ctx.createOscillator();o.type='sine';o.connect(g);
-    o.frequency.setValueAtTime(150,t);o.frequency.exponentialRampToValueAtTime(55,t+0.08);
-    g.gain.setValueAtTime(1.1,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.35);
-    o.start(t);o.stop(t+0.45);
-    // click
-    const cl=noise();const clg=ctx.createGain();clg.gain.setValueAtTime(0.35,t);clg.gain.exponentialRampToValueAtTime(0.001,t+0.006);cl.connect(clg);clg.connect(out);cl.start(t);cl.stop(t+0.015);
-    // Pro sidechain pulse — bass + organ duck on every kick
+    // Sub (40-150Hz sweep) — foundation
+    const sub=ctx.createOscillator();sub.type='sine';
+    sub.frequency.setValueAtTime(150,t);
+    sub.frequency.exponentialRampToValueAtTime(42,t+0.1);
+    const subG=ctx.createGain();
+    sub.connect(subG);subG.connect(out);
+    subG.gain.setValueAtTime(1.45,t);
+    subG.gain.exponentialRampToValueAtTime(0.0001,t+0.55);
+    sub.start(t);sub.stop(t+0.6);
+    // Mid body (80-280Hz) — thump
+    const body=ctx.createOscillator();body.type='triangle';
+    body.frequency.setValueAtTime(280,t);
+    body.frequency.exponentialRampToValueAtTime(80,t+0.04);
+    const bodyG=ctx.createGain();
+    body.connect(bodyG);bodyG.connect(out);
+    bodyG.gain.setValueAtTime(0.55,t);
+    bodyG.gain.exponentialRampToValueAtTime(0.0001,t+0.12);
+    body.start(t);body.stop(t+0.15);
+    // Transient click — attack
+    const cl=noise();
+    const clhp=ctx.createBiquadFilter();clhp.type='highpass';clhp.frequency.value=2800;
+    const cllp=ctx.createBiquadFilter();cllp.type='lowpass';cllp.frequency.value=7000;
+    const clg=ctx.createGain();
+    cl.connect(clhp);clhp.connect(cllp);cllp.connect(clg);clg.connect(out);
+    clg.gain.setValueAtTime(0.55,t);
+    clg.gain.exponentialRampToValueAtTime(0.0001,t+0.008);
+    cl.start(t);cl.stop(t+0.02);
+    // Sidechain — every kick ducks bass + organ briefly
     spSidechainDuck(t);
+  // --- PRO SNARE — pitched body + bandpass crack + hi-noise snap ---
   }else if(name==='SNARE'){
-    const o=ctx.createOscillator();o.type='triangle';o.frequency.value=190;o.connect(g);
-    g.gain.setValueAtTime(0.55,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.12);o.start(t);o.stop(t+0.15);
-    const nz=noise();const nf=ctx.createBiquadFilter();nf.type='highpass';nf.frequency.value=1500;const ng=ctx.createGain();
-    nz.connect(nf);nf.connect(ng);ng.connect(out);ng.gain.setValueAtTime(0.8,t);ng.gain.exponentialRampToValueAtTime(0.001,t+0.18);nz.start(t);nz.stop(t+0.2);
-  }else if(name==='CHH'){
-    const nz=noise();const f=ctx.createBiquadFilter();f.type='highpass';f.frequency.value=7000;f.Q.value=2;
-    const ng=ctx.createGain();nz.connect(f);f.connect(ng);ng.connect(out);
-    ng.gain.setValueAtTime(0.5,t);ng.gain.exponentialRampToValueAtTime(0.001,t+0.045);nz.start(t);nz.stop(t+0.06);
-  }else if(name==='OHH'){
-    const nz=noise();const f=ctx.createBiquadFilter();f.type='highpass';f.frequency.value=6500;f.Q.value=1.5;
-    const ng=ctx.createGain();nz.connect(f);f.connect(ng);ng.connect(out);
-    ng.gain.setValueAtTime(0.45,t);ng.gain.exponentialRampToValueAtTime(0.001,t+0.3);nz.start(t);nz.stop(t+0.35);
+    // Pitched body
+    const o=ctx.createOscillator();o.type='triangle';
+    o.frequency.setValueAtTime(220,t);
+    o.frequency.exponentialRampToValueAtTime(155,t+0.06);
+    const og=ctx.createGain();
+    o.connect(og);og.connect(out);
+    og.gain.setValueAtTime(0.55,t);
+    og.gain.exponentialRampToValueAtTime(0.0001,t+0.11);
+    o.start(t);o.stop(t+0.13);
+    // Mid bandpass noise — crack
+    const nz=noise();
+    const nf=ctx.createBiquadFilter();nf.type='bandpass';nf.frequency.value=3200;nf.Q.value=1.0;
+    const ng=ctx.createGain();
+    nz.connect(nf);nf.connect(ng);ng.connect(out);
+    ng.gain.setValueAtTime(0.9,t);
+    ng.gain.exponentialRampToValueAtTime(0.0001,t+0.17);
+    nz.start(t);nz.stop(t+0.2);
+    // High-noise snap (2-3kHz bandpass + highshelf)
+    const snap=noise();
+    const snf=ctx.createBiquadFilter();snf.type='highpass';snf.frequency.value=5500;
+    const sng=ctx.createGain();
+    snap.connect(snf);snf.connect(sng);sng.connect(out);
+    sng.gain.setValueAtTime(0.65,t);
+    sng.gain.exponentialRampToValueAtTime(0.0001,t+0.04);
+    snap.start(t);snap.stop(t+0.05);
+  // --- PRO CLAP — 4 stacked attacks + diffuse tail ---
   }else if(name==='CLAP'){
-    for(const off of [0,0.01,0.02,0.03]){
-      const nz=noise();const f=ctx.createBiquadFilter();f.type='bandpass';f.frequency.value=1500;f.Q.value=1.5;
-      const ng=ctx.createGain();nz.connect(f);f.connect(ng);ng.connect(out);
-      ng.gain.setValueAtTime(0,t+off);ng.gain.linearRampToValueAtTime(0.8,t+off+0.002);ng.gain.exponentialRampToValueAtTime(0.001,t+off+0.04);
-      nz.start(t+off);nz.stop(t+off+0.08);
-    }
+    const offsets=[0,0.009,0.019,0.028];
+    offsets.forEach((off,i)=>{
+      const nz=noise();
+      const f=ctx.createBiquadFilter();f.type='bandpass';
+      f.frequency.value=1500+i*220;f.Q.value=1.6;
+      const g=ctx.createGain();
+      nz.connect(f);f.connect(g);g.connect(out);
+      g.gain.setValueAtTime(0,t+off);
+      g.gain.linearRampToValueAtTime(1.1,t+off+0.002);
+      g.gain.exponentialRampToValueAtTime(0.0001,t+off+0.032);
+      nz.start(t+off);nz.stop(t+off+0.06);
+    });
+    // Diffuse airy tail
+    const tail=noise();
+    const tf=ctx.createBiquadFilter();tf.type='bandpass';tf.frequency.value=1900;tf.Q.value=0.8;
+    const tg=ctx.createGain();
+    tail.connect(tf);tf.connect(tg);tg.connect(out);
+    tg.gain.setValueAtTime(0.28,t+0.03);
+    tg.gain.exponentialRampToValueAtTime(0.0001,t+0.3);
+    tail.start(t+0.03);tail.stop(t+0.33);
+  // --- PRO CHH — 6-op metallic FM + 2 stacked bandpass filters ---
+  }else if(name==='CHH'){
+    const ratios=[1,1.504,1.944,2.414,2.946,3.534];
+    const mg=ctx.createGain();
+    const hp=ctx.createBiquadFilter();hp.type='highpass';hp.frequency.value=7200;hp.Q.value=0.6;
+    const bp=ctx.createBiquadFilter();bp.type='bandpass';bp.frequency.value=9500;bp.Q.value=0.9;
+    mg.connect(hp);hp.connect(bp);bp.connect(out);
+    ratios.forEach(r=>{
+      const o=ctx.createOscillator();o.type='square';
+      o.frequency.value=420*r;
+      o.connect(mg);o.start(t);o.stop(t+0.08);
+    });
+    mg.gain.setValueAtTime(0.25,t);
+    mg.gain.exponentialRampToValueAtTime(0.0001,t+0.048);
+  // --- PRO OHH — same FM recipe, longer tail, less HP ---
+  }else if(name==='OHH'){
+    const ratios=[1,1.504,1.944,2.414,2.946,3.534];
+    const mg=ctx.createGain();
+    const hp=ctx.createBiquadFilter();hp.type='highpass';hp.frequency.value=6800;hp.Q.value=0.6;
+    const bp=ctx.createBiquadFilter();bp.type='bandpass';bp.frequency.value=8800;bp.Q.value=0.7;
+    mg.connect(hp);hp.connect(bp);bp.connect(out);
+    ratios.forEach(r=>{
+      const o=ctx.createOscillator();o.type='square';
+      o.frequency.value=420*r;
+      o.connect(mg);o.start(t);o.stop(t+0.45);
+    });
+    mg.gain.setValueAtTime(0.22,t);
+    mg.gain.exponentialRampToValueAtTime(0.0001,t+0.38);
+  // --- PRO CRASH — bright airy noise with highpass sweep ---
   }else if(name==='CRASH'){
-    const nz=noise();const f=ctx.createBiquadFilter();f.type='highpass';f.frequency.value=5000;
-    const ng=ctx.createGain();nz.connect(f);f.connect(ng);ng.connect(out);
-    ng.gain.setValueAtTime(0.45,t);ng.gain.exponentialRampToValueAtTime(0.001,t+1.2);nz.start(t);nz.stop(t+1.3);
+    const nz=noise();
+    const hp=ctx.createBiquadFilter();hp.type='highpass';hp.frequency.value=4500;
+    const bp=ctx.createBiquadFilter();bp.type='bandpass';bp.frequency.value=8000;bp.Q.value=0.5;
+    const ng=ctx.createGain();
+    nz.connect(hp);hp.connect(bp);bp.connect(ng);ng.connect(out);
+    ng.gain.setValueAtTime(0.55,t);
+    ng.gain.exponentialRampToValueAtTime(0.0001,t+1.6);
+    nz.start(t);nz.stop(t+1.7);
+    // Metallic body
+    const ratios=[1,1.504,1.944,2.414];
+    const mg=ctx.createGain();
+    mg.connect(ng);
+    ratios.forEach(r=>{
+      const o=ctx.createOscillator();o.type='square';
+      o.frequency.value=320*r;
+      o.connect(mg);o.start(t);o.stop(t+1.4);
+    });
+    mg.gain.setValueAtTime(0.1,t);
+    mg.gain.exponentialRampToValueAtTime(0.0001,t+1.2);
+  // --- Toms: sine with pitch env + tiny noise click ---
   }else if(name==='LOWTOM'){
-    const o=ctx.createOscillator();o.type='sine';o.frequency.setValueAtTime(110,t);o.frequency.exponentialRampToValueAtTime(70,t+0.12);
-    o.connect(g);g.gain.setValueAtTime(0.8,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.25);o.start(t);o.stop(t+0.3);
+    const o=ctx.createOscillator();o.type='sine';
+    o.frequency.setValueAtTime(115,t);
+    o.frequency.exponentialRampToValueAtTime(68,t+0.14);
+    const og=ctx.createGain();
+    o.connect(og);og.connect(out);
+    og.gain.setValueAtTime(0.85,t);
+    og.gain.exponentialRampToValueAtTime(0.0001,t+0.3);
+    o.start(t);o.stop(t+0.35);
   }else if(name==='HITOM'){
-    const o=ctx.createOscillator();o.type='sine';o.frequency.setValueAtTime(200,t);o.frequency.exponentialRampToValueAtTime(140,t+0.1);
-    o.connect(g);g.gain.setValueAtTime(0.7,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.2);o.start(t);o.stop(t+0.25);
+    const o=ctx.createOscillator();o.type='sine';
+    o.frequency.setValueAtTime(210,t);
+    o.frequency.exponentialRampToValueAtTime(145,t+0.1);
+    const og=ctx.createGain();
+    o.connect(og);og.connect(out);
+    og.gain.setValueAtTime(0.75,t);
+    og.gain.exponentialRampToValueAtTime(0.0001,t+0.22);
+    o.start(t);o.stop(t+0.28);
+  // --- RIM — sharp bandpass click ---
   }else if(name==='RIM'){
     const o=ctx.createOscillator();o.type='square';o.frequency.value=1700;
     const f=ctx.createBiquadFilter();f.type='bandpass';f.frequency.value=2200;f.Q.value=3;
-    o.connect(f);f.connect(g);g.gain.setValueAtTime(0.3,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.03);
+    const og=ctx.createGain();
+    o.connect(f);f.connect(og);og.connect(out);
+    og.gain.setValueAtTime(0.35,t);
+    og.gain.exponentialRampToValueAtTime(0.0001,t+0.03);
     o.start(t);o.stop(t+0.04);
+  // --- PRO RIDE — FM metallic + high-shimmer noise ---
   }else if(name==='RIDE'){
-    // ride cymbal — metallic FM tone + airy noise tail
-    const o1=ctx.createOscillator();o1.type='square';o1.frequency.value=800;
-    const o2=ctx.createOscillator();o2.type='square';o2.frequency.value=540;
-    const bp=ctx.createBiquadFilter();bp.type='bandpass';bp.frequency.value=5200;bp.Q.value=2;
-    o1.connect(bp);o2.connect(bp);bp.connect(g);
-    g.gain.setValueAtTime(0.25,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.55);
-    o1.start(t);o1.stop(t+0.6);o2.start(t);o2.stop(t+0.6);
-    const nz=noise();const hp=ctx.createBiquadFilter();hp.type='highpass';hp.frequency.value=4500;
-    const ng=ctx.createGain();nz.connect(hp);hp.connect(ng);ng.connect(out);
-    ng.gain.setValueAtTime(0.12,t);ng.gain.exponentialRampToValueAtTime(0.001,t+0.5);nz.start(t);nz.stop(t+0.55);
+    const ratios=[1,1.618,2.414,3.01];
+    const mg=ctx.createGain();
+    const bp=ctx.createBiquadFilter();bp.type='bandpass';bp.frequency.value=5600;bp.Q.value=1.5;
+    mg.connect(bp);bp.connect(out);
+    ratios.forEach(r=>{
+      const o=ctx.createOscillator();o.type='square';
+      o.frequency.value=620*r;
+      o.connect(mg);o.start(t);o.stop(t+0.7);
+    });
+    mg.gain.setValueAtTime(0.2,t);
+    mg.gain.exponentialRampToValueAtTime(0.0001,t+0.6);
+    const nz=noise();
+    const hp=ctx.createBiquadFilter();hp.type='highpass';hp.frequency.value=5200;
+    const ng=ctx.createGain();
+    nz.connect(hp);hp.connect(ng);ng.connect(out);
+    ng.gain.setValueAtTime(0.1,t);
+    ng.gain.exponentialRampToValueAtTime(0.0001,t+0.55);
+    nz.start(t);nz.stop(t+0.6);
+  // --- PRO SHAKER — short bandpass noise with velocity-shaped attack ---
   }else if(name==='SHAKER'){
-    const nz=noise();const bp=ctx.createBiquadFilter();bp.type='bandpass';bp.frequency.value=6500;bp.Q.value=3;
-    const ng=ctx.createGain();nz.connect(bp);bp.connect(ng);ng.connect(out);
-    ng.gain.setValueAtTime(0,t);ng.gain.linearRampToValueAtTime(0.22,t+0.012);
-    ng.gain.exponentialRampToValueAtTime(0.001,t+0.09);nz.start(t);nz.stop(t+0.12);
+    const nz=noise();
+    const bp=ctx.createBiquadFilter();bp.type='bandpass';bp.frequency.value=7200;bp.Q.value=2.5;
+    const hp=ctx.createBiquadFilter();hp.type='highpass';hp.frequency.value=5000;
+    const ng=ctx.createGain();
+    nz.connect(hp);hp.connect(bp);bp.connect(ng);ng.connect(out);
+    ng.gain.setValueAtTime(0,t);
+    ng.gain.linearRampToValueAtTime(0.28,t+0.012);
+    ng.gain.exponentialRampToValueAtTime(0.0001,t+0.08);
+    nz.start(t);nz.stop(t+0.1);
+  // --- PRO PERC (conga-style) — sine thunk + bright bandpass attack ---
   }else if(name==='PERC'){
-    // conga-style
     const o=ctx.createOscillator();o.type='sine';
-    o.frequency.setValueAtTime(280,t);o.frequency.exponentialRampToValueAtTime(170,t+0.07);
-    o.connect(g);g.gain.setValueAtTime(0.65,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.16);
-    o.start(t);o.stop(t+0.2);
-    const nz=noise();const bp=ctx.createBiquadFilter();bp.type='bandpass';bp.frequency.value=2600;bp.Q.value=5;
-    const ng=ctx.createGain();nz.connect(bp);bp.connect(ng);ng.connect(out);
-    ng.gain.setValueAtTime(0.22,t);ng.gain.exponentialRampToValueAtTime(0.001,t+0.05);nz.start(t);nz.stop(t+0.06);
+    o.frequency.setValueAtTime(310,t);
+    o.frequency.exponentialRampToValueAtTime(155,t+0.08);
+    const og=ctx.createGain();
+    o.connect(og);og.connect(out);
+    og.gain.setValueAtTime(0.7,t);
+    og.gain.exponentialRampToValueAtTime(0.0001,t+0.18);
+    o.start(t);o.stop(t+0.22);
+    const nz=noise();
+    const bp=ctx.createBiquadFilter();bp.type='bandpass';bp.frequency.value=3200;bp.Q.value=4;
+    const ng=ctx.createGain();
+    nz.connect(bp);bp.connect(ng);ng.connect(out);
+    ng.gain.setValueAtTime(0.28,t);
+    ng.gain.exponentialRampToValueAtTime(0.0001,t+0.04);
+    nz.start(t);nz.stop(t+0.05);
+  // --- PRO COWBELL — two square oscillators + tight bandpass ---
   }else if(name==='COWBELL'){
     const o1=ctx.createOscillator();o1.type='square';o1.frequency.value=560;
-    const o2=ctx.createOscillator();o2.type='square';o2.frequency.value=840;
-    const bp=ctx.createBiquadFilter();bp.type='bandpass';bp.frequency.value=700;bp.Q.value=6;
-    o1.connect(bp);o2.connect(bp);bp.connect(g);
-    g.gain.setValueAtTime(0.35,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.35);
-    o1.start(t);o1.stop(t+0.4);o2.start(t);o2.stop(t+0.4);
+    const o2=ctx.createOscillator();o2.type='square';o2.frequency.value=838;
+    const mg=ctx.createGain();
+    const bp=ctx.createBiquadFilter();bp.type='bandpass';bp.frequency.value=720;bp.Q.value=6;
+    o1.connect(mg);o2.connect(mg);mg.connect(bp);bp.connect(out);
+    mg.gain.setValueAtTime(0.42,t);
+    mg.gain.exponentialRampToValueAtTime(0.0001,t+0.3);
+    o1.start(t);o1.stop(t+0.35);o2.start(t);o2.stop(t+0.35);
   }
 }
 
@@ -12811,11 +12963,29 @@ function spScheduleStep(step,time){
         spChordNoteOff();
         const chord=SP.chords.progression[SP.chords.index%SP.chords.progression.length];
         spChordNoteOn(chord);
+        SP.chords.current=chord;
         SP.chords.index=(SP.chords.index+1)%SP.chords.progression.length;
       },delay);
     }else if(step===15){
       const barMs=60/SP.transport.bpm/4*1000;
       addTimer(()=>{spChordNoteOff();},delay+barMs*0.85);
+    }
+    // Pro arpeggio on drop sections — chord tones on each 8th-note step
+    const isDrop=SP.song.enabled && SP.song.sections && SP.song.sections[SP.song.sectionIdx] &&
+      /drop/i.test(SP.song.sections[SP.song.sectionIdx].kind||'');
+    if(isDrop && step%2===0 && step!==0 && SP.chords.current){
+      const chord=SP.chords.current;
+      // arpeggio pattern — up-down-octave sequence through the chord tones
+      const pat=[2,3,2,3,2,3,2,3]; // index into chord[] over the 8 8th-notes in a bar (excl step 0)
+      // Actually step can be 2,4,6,8,10,12,14 — 7 values. Use modulo on pat.
+      const idx=(step/2-1)%chord.length;
+      const note=chord[idx]+12; // one octave up for melody
+      addTimer(()=>{
+        spSynthNoteOn(note);
+        // short release (quarter step length)
+        const relMs=60/SP.transport.bpm/4*1000*0.8;
+        setTimeout(()=>{spSynthNoteOff(note);},relMs);
+      },delay);
     }
   }else if(!synthOk && SP.chords && SP.chords.held && SP.chords.held.length){
     // silence chords when the section disables synth (e.g. intro / outro / break)
