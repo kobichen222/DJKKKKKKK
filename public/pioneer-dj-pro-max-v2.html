@@ -280,6 +280,20 @@ body.show-all .console.show-all{max-width:none;width:calc(100vw - 16px)}
 .cue-btn[data-color="8"]{--cue-color:#ff5a00}
 .jog-wrapper{display:flex;justify-content:center;align-items:center;margin:4px 0 8px}
 .jog-wheel{width:250px;height:250px;position:relative;border-radius:50%}
+/* SIMPLE 4 — bright green DSB button so it's impossible to miss */
+.dsb-btn.dsb-simple4{
+  background:linear-gradient(180deg,#00ff9a 0%,#00b86e 100%) !important;
+  color:#001a0c !important;
+  border:1px solid #00ff9a !important;
+  font-weight:900 !important;
+  box-shadow:0 0 14px rgba(0,255,154,.55),inset 0 1px 0 rgba(255,255,255,.35) !important;
+  text-shadow:0 1px 0 rgba(255,255,255,.25) !important;
+}
+.dsb-btn.dsb-simple4:hover{filter:brightness(1.1)}
+.dsb-btn.dsb-simple4.active{
+  background:linear-gradient(180deg,#fffcad 0%,#00ff9a 60%,#00a860 100%) !important;
+  box-shadow:0 0 22px rgba(0,255,154,.85),inset 0 1px 0 rgba(255,255,255,.5) !important;
+}
 /* SIMPLE 4 — jog replaced with big ± buttons for easy mouse use */
 .jog-simple{display:none}
 body.simple-four-mode .jog-wrapper{display:none !important}
@@ -7287,14 +7301,15 @@ body.theme-light .cdj .cue-btn{
 <body>
 <div class="header-bar">
 <div class="brand"><span class="max">DJ</span> <span>TITAN</span> — Professional DJ Studio</div>
+<!-- build: simple4-redo v2 -->
 <div class="deck-switch-bar header-dsb">
   <span class="dsb-label">DECK FOCUS</span>
+  <button class="dsb-btn dsb-simple4" data-pair="SIMPLE4" title="4 decks + mixer with big ± buttons instead of jog wheels">⊞ SIMPLE 4</button>
   <button class="dsb-btn" data-pair="AB">1 · 2</button>
   <button class="dsb-btn" data-pair="CD">3 · 4</button>
   <button class="dsb-btn dsb-split" data-pair="AC">1 · 3</button>
   <button class="dsb-btn dsb-split" data-pair="BD">2 · 4</button>
   <button class="dsb-btn dsb-all active" data-pair="ALL">ALL 4</button>
-  <button class="dsb-btn dsb-simple4" data-pair="SIMPLE4" title="4 decks + mixer — jog wheels replaced with big ± buttons for ease of use">⊞ SIMPLE 4</button>
   <button class="dsb-btn dsb-dj-focus" data-pair="DJAB" title="2 big decks (1·2) — internal mixer hidden, use your external DJ mixer">🎛 DJ FOCUS 1·2</button>
   <button class="dsb-btn dsb-dj-focus" data-pair="DJCD" title="2 big decks (3·4) — internal mixer hidden, use your external DJ mixer">🎛 DJ FOCUS 3·4</button>
   <button class="dsb-btn dsb-work" id="workModeBtn" title="Stage-ready performance view">🎆 WORK MODE</button>
