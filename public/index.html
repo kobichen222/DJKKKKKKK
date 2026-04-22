@@ -1116,6 +1116,77 @@ button:focus-visible{outline:2px solid var(--orange-glow);outline-offset:2px}
   .jog-platter.spinning,.jog-ring-light,.jog-platter.spinning .jog-platter-disc::before{animation:none !important}
 }
 
+/* ================================================================
+   JOG POINTER v2 — crisp, consistent across every deck and view mode
+   (all-4, DJ focus, work-mode, compact). The pointer is a filled
+   arrow that scales with the wheel (uses %) and is always clearly
+   visible regardless of the deck accent color.
+   ================================================================ */
+.cdj .jog-indicator,
+.jog-wheel .jog-indicator,
+.console.show-all .cdj .jog-indicator,
+body.work-mode .jog-indicator{
+  position:absolute !important;
+  top:2.4% !important;
+  left:50% !important;
+  width:18px !important;
+  height:22px !important;
+  transform:translateX(-50%) !important;
+  border:none !important;
+  border-radius:0 !important;
+  background:linear-gradient(180deg,#ffffff 0%,#ffffff 24%,var(--deck-accent,#ff7a00) 70%,var(--deck-accent,#ff7a00) 100%) !important;
+  clip-path:polygon(0 0,100% 0,100% 35%,62% 35%,50% 100%,38% 35%,0 35%) !important;
+  -webkit-clip-path:polygon(0 0,100% 0,100% 35%,62% 35%,50% 100%,38% 35%,0 35%) !important;
+  filter:drop-shadow(0 0 6px rgba(var(--deck-accent-rgb,255,122,0),.95))
+         drop-shadow(0 0 2px rgba(255,255,255,.85)) !important;
+  z-index:6 !important;
+  pointer-events:none !important;
+}
+/* Slightly larger on bigger wheels */
+@media(min-width:1400px){
+  .cdj .jog-indicator{width:20px !important;height:24px !important;top:2.2% !important}
+}
+@media(min-width:1920px){
+  .cdj .jog-indicator{width:22px !important;height:26px !important;top:2% !important}
+}
+.jog-wheel.playing .jog-indicator{
+  filter:drop-shadow(0 0 8px rgba(var(--deck-accent-rgb),1))
+         drop-shadow(0 0 3px rgba(255,255,255,.95)) !important;
+  animation:jogIndPulse 1.6s ease-in-out infinite;
+}
+@keyframes jogIndPulse{
+  0%,100%{opacity:1}
+  50%{opacity:.82}
+}
+
+/* Center screen — make the BPM / DECK text uniformly crisp across modes */
+.cdj .jog-center-screen{
+  background:
+    linear-gradient(180deg,rgba(var(--deck-accent-rgb),.18) 0%,transparent 42%),
+    radial-gradient(circle,#0a1318 0%,#020507 100%) !important;
+  border:2px solid rgba(var(--deck-accent-rgb),.55) !important;
+  box-shadow:
+    inset 0 0 22px rgba(var(--deck-accent-rgb),.2),
+    inset 0 2px 6px rgba(0,0,0,.95),
+    0 0 0 1px rgba(0,0,0,.8),
+    0 0 20px rgba(var(--deck-accent-rgb),.35),
+    0 4px 10px rgba(0,0,0,.7) !important;
+}
+.cdj .jog-center-screen .bpm-display{
+  color:var(--deck-accent) !important;
+  text-shadow:
+    0 0 12px rgba(var(--deck-accent-rgb),.9),
+    0 0 2px rgba(255,255,255,.5) !important;
+  font-weight:800 !important;
+  letter-spacing:.5px !important;
+}
+.cdj .jog-center-screen .bpm-sub,
+.cdj .jog-center-screen .deck-badge{
+  color:#fff !important;
+  opacity:.85 !important;
+  text-shadow:0 0 4px rgba(var(--deck-accent-rgb),.55) !important;
+}
+
 /* Work-mode jog wheels: clean, slow, crisp — no motion trails. */
 body.work-mode .jog-platter.spinning{animation-duration:4.8s}
 body.work-mode .jog-ring-light{animation-duration:6s;filter:none;opacity:.45;
