@@ -4336,7 +4336,10 @@ body.dj-focus-mode::before{
    ══════════════════════════════════════════════════════════════ */
 body.dj-focus-mode .cdj{
   display:grid;
-  grid-template-columns:minmax(210px,1fr) minmax(360px,1.7fr) minmax(210px,1fr);
+  /* Center column uses minmax(0,2fr) so the jog wheel can't push the
+     side columns (HOT CUES / PAD MODE / LOOP on the left, BEAT JUMP /
+     UTILS / TEMPO on the right) outside the chassis. */
+  grid-template-columns:minmax(190px,1fr) minmax(0,2fr) minmax(190px,1fr);
   grid-template-rows:auto auto auto auto auto 1fr auto;
   grid-template-areas:
     "hdr hdr hdr"
@@ -4377,6 +4380,16 @@ body.dj-focus-mode .cdj .transport     {grid-area:trn;margin-top:6px}
 body.dj-focus-mode .cdj .tempo-section {grid-area:tmp;align-self:stretch;display:flex;flex-direction:column}
 body.dj-focus-mode .cdj .tempo-section .tempo-btn-row{flex:1}
 body.dj-focus-mode .cdj .dj-focus-vol  {grid-area:vol;display:grid}
+
+/* Constrain the jog wrapper to its grid cell so the wheel cannot
+   overflow into the HOT CUES / PAD MODE columns. */
+body.dj-focus-mode .cdj .jog-wrapper{
+  grid-area:jog;
+  place-self:center;
+  min-width:0;max-width:100%;
+  width:100%;margin:0;
+  display:flex;align-items:center;justify-content:center;
+}
 
 /* ── Per-deck channel volume strip (DJ FOCUS only) ───────────── */
 .dj-focus-vol{display:none}
@@ -4516,13 +4529,14 @@ body.dj-focus-mode .time-row{margin-top:10px}
 body.dj-focus-mode .time-value{font-size:24px;letter-spacing:1px}
 body.dj-focus-mode .time-label{font-size:10px;letter-spacing:2.5px}
 
-/* ── Big jog wheel centered — the star of the deck ──────────── */
+/* ── Big jog wheel centered — fits the center column automatically ── */
 body.dj-focus-mode .jog-wheel{
-  width:min(26vw,420px);height:min(26vw,420px);
+  width:100%;max-width:420px;
+  height:auto;aspect-ratio:1;
   filter:drop-shadow(0 18px 40px rgba(0,0,0,.7));
 }
-body.dj-focus-mode .jog-center-screen{width:min(9vw,144px);height:min(9vw,144px)}
-body.dj-focus-mode .jog-center-screen .bpm-display{font-size:32px}
+body.dj-focus-mode .jog-center-screen{width:34%;height:34%;min-width:60px;min-height:60px;max-width:150px;max-height:150px}
+body.dj-focus-mode .jog-center-screen .bpm-display{font-size:clamp(16px,3vw,32px)}
 body.dj-focus-mode .jog-center-screen .deck-badge{font-size:10px;letter-spacing:3px;margin-top:5px}
 
 /* ── Hot cues — 4×2 grid, large tactile pads ────────────────── */
@@ -4580,9 +4594,7 @@ body.dj-focus-mode .step-btn{padding:8px 10px;font-size:11px}
 /* 4K / ultra-wide */
 @media(min-width:2100px){
   body.dj-focus-mode .cdj{padding:28px 24px 34px}
-  body.dj-focus-mode .jog-wheel{width:min(24vw,520px);height:min(24vw,520px)}
-  body.dj-focus-mode .jog-center-screen{width:min(9vw,170px);height:min(9vw,170px)}
-  body.dj-focus-mode .jog-center-screen .bpm-display{font-size:40px}
+  body.dj-focus-mode .jog-wheel{max-width:520px}
   body.dj-focus-mode .deck-number{font-size:44px;padding:5px 22px}
   body.dj-focus-mode .screen-bpm{font-size:44px}
   body.dj-focus-mode .track-title{font-size:22px}
@@ -4593,10 +4605,8 @@ body.dj-focus-mode .step-btn{padding:8px 10px;font-size:11px}
 
 /* Laptop 1400-1700 — fit jog & tighten columns */
 @media(max-width:1700px){
-  body.dj-focus-mode .cdj{grid-template-columns:minmax(180px,1fr) minmax(320px,1.6fr) minmax(180px,1fr);padding:18px 16px 24px;gap:10px 12px}
-  body.dj-focus-mode .jog-wheel{width:min(26vw,360px);height:min(26vw,360px)}
-  body.dj-focus-mode .jog-center-screen{width:min(9vw,120px);height:min(9vw,120px)}
-  body.dj-focus-mode .jog-center-screen .bpm-display{font-size:28px}
+  body.dj-focus-mode .cdj{grid-template-columns:minmax(170px,1fr) minmax(0,1.9fr) minmax(170px,1fr);padding:18px 16px 24px;gap:10px 12px}
+  body.dj-focus-mode .jog-wheel{max-width:380px}
   body.dj-focus-mode .screen-bpm{font-size:30px}
   body.dj-focus-mode .track-title{font-size:16px}
   body.dj-focus-mode .big-btn{padding:20px 12px;font-size:15px;min-height:66px}
@@ -4605,10 +4615,8 @@ body.dj-focus-mode .step-btn{padding:8px 10px;font-size:11px}
 
 /* Small laptop — still 3-col grid but compact */
 @media(max-width:1400px){
-  body.dj-focus-mode .cdj{grid-template-columns:minmax(160px,1fr) minmax(280px,1.5fr) minmax(160px,1fr);padding:14px 12px 22px;gap:8px 10px}
-  body.dj-focus-mode .jog-wheel{width:min(28vw,290px);height:min(28vw,290px)}
-  body.dj-focus-mode .jog-center-screen{width:min(10vw,100px);height:min(10vw,100px)}
-  body.dj-focus-mode .jog-center-screen .bpm-display{font-size:24px}
+  body.dj-focus-mode .cdj{grid-template-columns:minmax(150px,1fr) minmax(0,1.8fr) minmax(150px,1fr);padding:14px 12px 22px;gap:8px 10px}
+  body.dj-focus-mode .jog-wheel{max-width:310px}
   body.dj-focus-mode .screen-bpm{font-size:26px}
   body.dj-focus-mode .track-title{font-size:14px}
   body.dj-focus-mode .cue-btn{height:44px;font-size:12px}
@@ -4619,12 +4627,10 @@ body.dj-focus-mode .step-btn{padding:8px 10px;font-size:11px}
 /* Tablet landscape — collapse the side columns slightly */
 @media(max-width:1100px){
   body.dj-focus-mode .cdj{
-    grid-template-columns:minmax(130px,1fr) minmax(220px,1.4fr) minmax(130px,1fr);
+    grid-template-columns:minmax(120px,1fr) minmax(0,1.7fr) minmax(120px,1fr);
     padding:12px 10px 20px;gap:7px 8px;
   }
-  body.dj-focus-mode .jog-wheel{width:min(30vw,240px);height:min(30vw,240px)}
-  body.dj-focus-mode .jog-center-screen{width:min(10vw,80px);height:min(10vw,80px)}
-  body.dj-focus-mode .jog-center-screen .bpm-display{font-size:20px}
+  body.dj-focus-mode .jog-wheel{max-width:260px}
   body.dj-focus-mode .deck-number{font-size:26px;padding:3px 12px}
   body.dj-focus-mode .screen-bpm{font-size:22px}
   body.dj-focus-mode .cue-btn{height:40px;font-size:11px}
@@ -4651,8 +4657,8 @@ body.dj-focus-mode .step-btn{padding:8px 10px;font-size:11px}
   body.dj-focus-mode .cdj .beat-jump{order:8;grid-template-columns:repeat(4,1fr)}
   body.dj-focus-mode .cdj .deck-utils{order:9;grid-template-columns:repeat(5,1fr)}
   body.dj-focus-mode .cdj .tempo-section{order:10}
-  body.dj-focus-mode .jog-wheel{width:min(70vw,300px);height:min(70vw,300px)}
-  body.dj-focus-mode .jog-center-screen{width:80px;height:80px}
+  body.dj-focus-mode .cdj .jog-wrapper{width:auto;max-width:300px}
+  body.dj-focus-mode .jog-wheel{width:min(70vw,300px);max-width:300px}
   body.dj-focus-mode .jog-center-screen .bpm-display{font-size:20px}
   body.dj-focus-mode .big-btn{padding:16px 10px;font-size:14px;min-height:58px}
   body.dj-focus-mode .cue-btn{height:46px;font-size:12px}
@@ -4663,8 +4669,8 @@ body.dj-focus-mode .step-btn{padding:8px 10px;font-size:11px}
 @media(max-width:520px){
   body.dj-focus-mode::before{display:none}
   body.dj-focus-mode .cdj{padding:10px 8px 14px}
-  body.dj-focus-mode .jog-wheel{width:min(86vw,340px);height:min(86vw,340px)}
-  body.dj-focus-mode .jog-center-screen{width:72px;height:72px}
+  body.dj-focus-mode .cdj .jog-wrapper{max-width:340px}
+  body.dj-focus-mode .jog-wheel{width:min(86vw,340px);max-width:340px}
   body.dj-focus-mode .jog-center-screen .bpm-display{font-size:18px}
   body.dj-focus-mode .deck-number{font-size:22px;padding:3px 10px}
   body.dj-focus-mode .screen-bpm{font-size:22px}
