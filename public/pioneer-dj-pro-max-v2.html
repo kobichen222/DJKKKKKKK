@@ -7168,6 +7168,81 @@ body.theme-light .cdj .cue-btn{
   color:#3a342a !important;border:1px solid #c4bdab !important;
   box-shadow:inset 0 1px 0 rgba(255,255,255,1),inset 0 -2px 4px rgba(0,0,0,.06),0 2px 4px rgba(80,60,30,.1) !important;
 }
+
+/* ================================================================
+   VINYL PITCH FADER v2 — custom div slider (no rotation hack,
+   no native range). Identical behaviour every browser + touch.
+   ================================================================ */
+.tt-pitch-track.ttpv2{
+  position:relative !important;
+  width:56px !important;height:240px !important;padding:10px 0 !important;
+  background:linear-gradient(180deg,#0a0a0c 0%,#020305 100%) !important;
+  border:1px solid #1a1c22 !important;border-radius:6px !important;
+  box-shadow:
+    inset 0 3px 8px rgba(0,0,0,.95),
+    inset 0 0 14px rgba(var(--tt-accent-rgb),.05),
+    0 1px 0 rgba(255,255,255,.05) !important;
+  touch-action:none;user-select:none;-webkit-user-select:none;
+  display:block !important;flex:0 0 auto !important;cursor:pointer;
+}
+.tt-pitch-track.ttpv2::before,.tt-pitch-track.ttpv2::after{display:none !important;content:none !important}
+.ttpv2-scale{
+  position:absolute;left:4px;right:6px;top:10px;bottom:10px;
+  display:flex;flex-direction:column;justify-content:space-between;pointer-events:none;z-index:1;
+}
+.ttpv2-scale i{display:block;position:relative;height:1px;background:rgba(255,255,255,.25)}
+.ttpv2-scale i.major{background:rgba(255,255,255,.6);box-shadow:0 0 3px rgba(var(--tt-accent-rgb),.35)}
+.ttpv2-scale i em{
+  position:absolute;left:-2px;top:-6px;transform:translateX(-100%);
+  font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:.5px;
+  color:var(--tt-accent);text-shadow:0 0 4px rgba(var(--tt-accent-rgb),.55);font-style:normal;
+}
+.ttpv2-rail{
+  position:absolute;left:50%;top:12px;bottom:12px;width:3px;
+  transform:translateX(-50%);pointer-events:none;z-index:1;
+  background:linear-gradient(180deg,rgba(255,255,255,.2),rgba(255,255,255,.04) 45%,rgba(255,255,255,.04) 55%,rgba(255,255,255,.2));
+  border-radius:2px;box-shadow:inset 0 0 2px rgba(0,0,0,.8);
+}
+.ttpv2-zero{
+  position:absolute;left:50%;top:50%;width:26px;height:2px;
+  transform:translate(-50%,-50%);pointer-events:none;z-index:2;
+  background:var(--tt-accent);
+  box-shadow:0 0 10px rgba(var(--tt-accent-rgb),.95),0 0 2px rgba(255,255,255,.6);
+}
+.ttpv2-thumb{
+  position:absolute;left:50%;top:50%;
+  width:44px;height:22px;border-radius:5px;
+  transform:translate(-50%,-50%);
+  background:
+    linear-gradient(180deg,#fafafc 0%,#bebec3 18%,#6a6a70 55%,#2a2a30 100%),
+    repeating-linear-gradient(90deg,rgba(0,0,0,.4) 0 1px,transparent 1px 3px);
+  background-blend-mode:overlay;
+  border:1px solid #050507;
+  box-shadow:
+    inset 0 2px 2px rgba(255,255,255,.8),
+    inset 0 -2px 4px rgba(0,0,0,.85),
+    0 3px 6px rgba(0,0,0,.9),
+    0 0 12px rgba(var(--tt-accent-rgb),.35);
+  cursor:grab;z-index:3;transition:box-shadow .12s,filter .12s;
+}
+.ttpv2-thumb::before{
+  content:'';position:absolute;left:10%;right:10%;top:50%;height:1.5px;
+  transform:translateY(-50%);border-radius:1px;
+  background:linear-gradient(90deg,transparent,var(--tt-accent) 45%,var(--tt-accent) 55%,transparent);
+  box-shadow:0 0 6px rgba(var(--tt-accent-rgb),.65);opacity:.9;
+}
+.ttpv2-thumb:hover{filter:brightness(1.08);box-shadow:inset 0 2px 2px rgba(255,255,255,.85),inset 0 -2px 4px rgba(0,0,0,.85),0 3px 8px rgba(0,0,0,.95),0 0 16px rgba(var(--tt-accent-rgb),.5)}
+.ttpv2-thumb.dragging{cursor:grabbing;filter:brightness(1.15);box-shadow:inset 0 2px 2px rgba(255,255,255,.9),inset 0 -2px 4px rgba(0,0,0,.85),0 3px 10px rgba(0,0,0,1),0 0 22px rgba(var(--tt-accent-rgb),.75)}
+.ttpv2-thumb:focus-visible{outline:none;box-shadow:inset 0 2px 2px rgba(255,255,255,.85),inset 0 -2px 4px rgba(0,0,0,.85),0 0 0 2px rgba(var(--tt-accent-rgb),.9),0 0 20px rgba(var(--tt-accent-rgb),.6)}
+@media(max-width:720px){
+  .tt-pitch-track.ttpv2{width:44px !important;height:180px !important;padding:8px 0 !important}
+  .ttpv2-thumb{width:34px;height:18px}
+  .ttpv2-scale i em{font-size:7px}
+}
+
+/* Consistent widths for pad-modes + hot-cues across all 4 decks */
+.cdj .pad-modes,.cdj .hot-cues{width:100% !important;box-sizing:border-box !important}
+.cdj .pad-mode-btn,.cdj .cue-btn{min-width:0 !important;box-sizing:border-box !important}
 </style>
 </head>
 <body>
@@ -7466,14 +7541,16 @@ body.theme-light .cdj .cue-btn{
       <div class="tt-rightctl">
         <span class="tt-pitch-label">PITCH</span>
         <span class="tt-pitch-val" id="ttL-pitch-val">+0.00%</span>
-        <div class="tt-pitch-track">
-          <div class="tt-pitch-scale" aria-hidden="true">
-            <i class="major"></i><i></i><i></i><i></i>
-            <i class="major"></i>
-            <i></i><i></i><i></i><i class="major"></i>
+        <div class="tt-pitch-track ttpv2" data-tt-pitch="L">
+          <div class="ttpv2-scale" aria-hidden="true">
+            <i class="major"><em>+8</em></i><i></i><i></i><i></i>
+            <i class="major"><em>0</em></i>
+            <i></i><i></i><i></i><i class="major"><em>-8</em></i>
           </div>
-          <span class="tt-pitch-center-mark">0</span>
-          <input type="range" class="tt-pitch-input" id="ttL-pitch" min="-8" max="8" step="0.1" value="0"/>
+          <div class="ttpv2-rail" aria-hidden="true"></div>
+          <div class="ttpv2-zero" aria-hidden="true"></div>
+          <div class="ttpv2-thumb" id="ttL-pitch-thumb" tabindex="0" role="slider" aria-label="Pitch" aria-valuemin="-8" aria-valuemax="8" aria-valuenow="0"></div>
+          <input type="hidden" id="ttL-pitch" value="0"/>
         </div>
       </div>
     </div>
@@ -7589,14 +7666,16 @@ body.theme-light .cdj .cue-btn{
       <div class="tt-rightctl">
         <span class="tt-pitch-label">PITCH</span>
         <span class="tt-pitch-val" id="ttR-pitch-val">+0.00%</span>
-        <div class="tt-pitch-track">
-          <div class="tt-pitch-scale" aria-hidden="true">
-            <i class="major"></i><i></i><i></i><i></i>
-            <i class="major"></i>
-            <i></i><i></i><i></i><i class="major"></i>
+        <div class="tt-pitch-track ttpv2" data-tt-pitch="R">
+          <div class="ttpv2-scale" aria-hidden="true">
+            <i class="major"><em>+8</em></i><i></i><i></i><i></i>
+            <i class="major"><em>0</em></i>
+            <i></i><i></i><i></i><i class="major"><em>-8</em></i>
           </div>
-          <span class="tt-pitch-center-mark">0</span>
-          <input type="range" class="tt-pitch-input" id="ttR-pitch" min="-8" max="8" step="0.1" value="0"/>
+          <div class="ttpv2-rail" aria-hidden="true"></div>
+          <div class="ttpv2-zero" aria-hidden="true"></div>
+          <div class="ttpv2-thumb" id="ttR-pitch-thumb" tabindex="0" role="slider" aria-label="Pitch" aria-valuemin="-8" aria-valuemax="8" aria-valuenow="0"></div>
+          <input type="hidden" id="ttR-pitch" value="0"/>
         </div>
       </div>
     </div>
@@ -9688,8 +9767,25 @@ function triggerPad(deckId,padNum){
 
 function triggerHotCue(deckId,n){
   const dk=decks[deckId];
-  if(dk.hotCues[n]!==undefined)seekDeck(deckId,dk.hotCues[n]);
-  else{dk.hotCues[n]=getCurrentTime(deckId);const btn=document.querySelector(`.hot-cues[data-deck="${deckId}"] .cue-btn[data-cue="${n}"]`);if(btn)btn.classList.add('active');}
+  const btn=document.querySelector(`.hot-cues[data-deck="${deckId}"] .cue-btn[data-cue="${n}"]`);
+  if(dk.hotCues[n]!==undefined){
+    // Shift-click = remove the cue (clear). Same-spot click (already at
+    // the cue, not playing) also clears — matches the user mental model
+    // of 'click CUE again to cancel'.
+    const cur=getCurrentTime(deckId);
+    const atCue=Math.abs(cur-dk.hotCues[n])<0.12;
+    const forceClear=(window.event&&window.event.shiftKey)||(atCue&&!dk.playing);
+    if(forceClear){
+      delete dk.hotCues[n];
+      if(btn){btn.classList.remove('active');btn.classList.remove('armed')}
+      if(typeof toast==='function')toast(`Cleared hot cue ${n} · Deck ${deckId}`,'warn');
+      return;
+    }
+    seekDeck(deckId,dk.hotCues[n]);
+  }else{
+    dk.hotCues[n]=getCurrentTime(deckId);
+    if(btn)btn.classList.add('active');
+  }
   stats.cueCount++;const el=document.getElementById('statCueCount');if(el)el.textContent=stats.cueCount;
 }
 
@@ -12139,15 +12235,69 @@ function setupVinylTurntables(){
       if(typeof togglePlay==='function')togglePlay(dId);
       setTimeout(()=>{applySpin(side);startBtn.classList.toggle('playing',!!deck(side)?.playing)},30);
     });
-    // PITCH → real tempo
-    const pitch=document.getElementById(`tt${side}-pitch`);
-    const pitchVal=document.getElementById(`tt${side}-pitch-val`);
-    pitch?.addEventListener('input',()=>{
-      const v=parseFloat(pitch.value);
-      if(pitchVal)pitchVal.textContent=(v>=0?'+':'')+v.toFixed(2)+'%';
-      if(typeof setTempo==='function')setTempo(dId,v);
-      applySpin(side);
-    });
+    // PITCH → custom div slider (ttpv2), drives real tempo
+    (function setupPitch(){
+      const track=document.querySelector(`.ttpv2[data-tt-pitch="${side}"]`);
+      const thumb=document.getElementById(`tt${side}-pitch-thumb`);
+      const hidden=document.getElementById(`tt${side}-pitch`);
+      const valEl=document.getElementById(`tt${side}-pitch-val`);
+      if(!track||!thumb||!hidden)return;
+      const MIN=-8,MAX=8;
+      let dragging=false,trackY=0,trackH=0;
+      function setValue(v,updateDeck){
+        v=Math.max(MIN,Math.min(MAX,v));
+        v=Math.round(v*100)/100;
+        hidden.value=v;
+        const pct=(v-MIN)/(MAX-MIN);
+        thumb.style.top=((1-pct)*100)+'%';
+        if(valEl)valEl.textContent=(v>=0?'+':'')+v.toFixed(2)+'%';
+        thumb.setAttribute('aria-valuenow',v);
+        if(updateDeck!==false&&typeof setTempo==='function')setTempo(dId,v);
+        applySpin(side);
+      }
+      setValue(0,false);
+      function measure(){
+        const r=track.getBoundingClientRect();
+        trackY=r.top+12;trackH=Math.max(1,r.height-24);
+      }
+      function yToValue(y){
+        const pct=Math.max(0,Math.min(1,(y-trackY)/trackH));
+        return MAX-pct*(MAX-MIN); // top=MAX, bottom=MIN
+      }
+      function onDown(e){
+        e.preventDefault();dragging=true;measure();
+        thumb.classList.add('dragging');
+        try{track.setPointerCapture(e.pointerId)}catch(_){}
+        setValue(yToValue(e.clientY));
+      }
+      function onMove(e){
+        if(!dragging)return;
+        setValue(yToValue(e.clientY));
+      }
+      function onUp(e){
+        if(!dragging)return;dragging=false;
+        thumb.classList.remove('dragging');
+        try{track.releasePointerCapture(e.pointerId)}catch(_){}
+      }
+      track.addEventListener('pointerdown',onDown);
+      track.addEventListener('pointermove',onMove);
+      track.addEventListener('pointerup',onUp);
+      track.addEventListener('pointercancel',onUp);
+      // double-click to reset to 0
+      thumb.addEventListener('dblclick',e=>{e.stopPropagation();setValue(0)});
+      track.addEventListener('dblclick',e=>{if(e.target===track)setValue(0)});
+      // keyboard for accessibility
+      thumb.addEventListener('keydown',e=>{
+        const v=parseFloat(hidden.value)||0;
+        if(e.key==='ArrowUp'||e.key==='ArrowRight'){setValue(v+0.1);e.preventDefault();}
+        else if(e.key==='ArrowDown'||e.key==='ArrowLeft'){setValue(v-0.1);e.preventDefault();}
+        else if(e.key==='PageUp'){setValue(v+1);e.preventDefault();}
+        else if(e.key==='PageDown'){setValue(v-1);e.preventDefault();}
+        else if(e.key==='Home'){setValue(MAX);e.preventDefault();}
+        else if(e.key==='End'){setValue(MIN);e.preventDefault();}
+        else if(e.key===' '||e.key==='Enter'){setValue(0);e.preventDefault();}
+      });
+    })();
     // RPM (visual only)
     document.querySelectorAll(`#tt${side} .tt-rpm-btn`).forEach(btn=>{
       btn.addEventListener('click',()=>{
