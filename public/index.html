@@ -8073,6 +8073,16 @@ No MIDI devices. Press CONNECT.
 <button class="sp-preset-btn" data-sp-preset="church-organ">CHURCH ORGAN</button>
 <button class="sp-preset-btn" data-sp-preset="fm-bell">FM BELL</button>
 <button class="sp-preset-btn" data-sp-preset="tech-stab">TECH STAB</button>
+<button class="sp-preset-btn" data-sp-preset="hoover">HOOVER</button>
+<button class="sp-preset-btn" data-sp-preset="big-room">BIG ROOM LEAD</button>
+<button class="sp-preset-btn" data-sp-preset="saw-lead">SAW LEAD</button>
+<button class="sp-preset-btn" data-sp-preset="pluck-lead">PLUCK LEAD</button>
+<button class="sp-preset-btn" data-sp-preset="reese-bass">REESE BASS</button>
+<button class="sp-preset-btn" data-sp-preset="sub-bass">SUB BASS</button>
+<button class="sp-preset-btn" data-sp-preset="dark-bass">DARK BASS</button>
+<button class="sp-preset-btn" data-sp-preset="fm-bass">FM BASS</button>
+<button class="sp-preset-btn" data-sp-preset="dark-pad">DARK PAD</button>
+<button class="sp-preset-btn" data-sp-preset="vox-pad">VOX PAD</button>
 </div>
 </div>
 
@@ -8216,8 +8226,13 @@ No MIDI devices. Press CONNECT.
 <span class="sp-sub-label">PATTERN</span>
 <button class="sp-mini-btn" data-sp-bass-preset="classic-acid">CLASSIC ACID</button>
 <button class="sp-mini-btn" data-sp-bass-preset="trance-bass">TRANCE BASS</button>
+<button class="sp-mini-btn" data-sp-bass-preset="hoover-bass">HOOVER BASS</button>
+<button class="sp-mini-btn" data-sp-bass-preset="psytrance-bass">PSYTRANCE</button>
 <button class="sp-mini-btn" data-sp-bass-preset="tech-riff">TECH RIFF</button>
+<button class="sp-mini-btn" data-sp-bass-preset="rolling-bass">ROLLING</button>
+<button class="sp-mini-btn" data-sp-bass-preset="stab-bass">STAB</button>
 <button class="sp-mini-btn" data-sp-bass-preset="deep-bass">DEEP BASS</button>
+<button class="sp-mini-btn" data-sp-bass-preset="minimal-bass">MINIMAL</button>
 <button class="sp-mini-btn" data-sp-bass-preset="clear">CLEAR</button>
 </div>
 <div class="sp-bass-seq-row" id="spBassSeq"></div>
@@ -12644,6 +12659,45 @@ const SP_SYNTH_PRESETS={
   'tech-stab':{osc1Wave:'square',osc2Wave:'sawtooth',filterType:'bandpass',lfoTarget:'none',
     knobs:{osc2Detune:.55,oscMix:.5,filterCutoff:.55,filterRes:.4,filterEnv:.5,filterDecay:.2,
            ampA:.005,ampD:.15,ampS:.15,ampR:.15,drive:.3,delaySend:.4,reverbSend:.2}},
+  'hoover':{osc1Wave:'sawtooth',osc2Wave:'sawtooth',filterType:'lowpass',lfoTarget:'pitch',
+    knobs:{osc2Detune:.85,osc2Octave:.25,oscMix:.5,unison:.8,unisonDetune:.8,
+           filterCutoff:.55,filterRes:.35,filterEnv:.2,filterDecay:.4,
+           ampA:.08,ampD:.4,ampS:.8,ampR:.35,
+           lfoRate:.2,lfoDepth:.25,drive:.55,delaySend:.35,reverbSend:.55,chorusMix:.4}},
+  'big-room':{osc1Wave:'sawtooth',osc2Wave:'square',filterType:'lowpass',lfoTarget:'filter',
+    knobs:{osc2Detune:.55,osc2Octave:.75,oscMix:.55,unison:.7,unisonDetune:.65,
+           filterCutoff:.85,filterRes:.2,filterEnv:.15,filterDecay:.3,
+           ampA:.02,ampD:.3,ampS:.85,ampR:.4,
+           lfoRate:.15,lfoDepth:.2,drive:.5,delaySend:.3,reverbSend:.45,chorusMix:.35}},
+  'saw-lead':{osc1Wave:'sawtooth',osc2Wave:'square',filterType:'lowpass',lfoTarget:'none',
+    knobs:{oscMix:.45,unison:.3,unisonDetune:.35,filterCutoff:.75,filterRes:.15,
+           ampA:.02,ampD:.3,ampS:.7,ampR:.3,drive:.3,delaySend:.3,reverbSend:.35}},
+  'pluck-lead':{osc1Wave:'sawtooth',osc2Wave:'triangle',filterType:'lowpass',lfoTarget:'none',
+    knobs:{oscMix:.3,filterCutoff:.55,filterRes:.25,filterEnv:.7,filterDecay:.2,
+           ampA:.005,ampD:.25,ampS:.1,ampR:.2,delaySend:.35,reverbSend:.3}},
+  'reese-bass':{osc1Wave:'sawtooth',osc2Wave:'sawtooth',filterType:'lowpass',lfoTarget:'filter',
+    knobs:{osc2Detune:.7,osc2Octave:.45,oscMix:.5,subLevel:.35,unison:.7,unisonDetune:.6,
+           filterCutoff:.3,filterRes:.35,filterEnv:.1,filterDecay:.5,
+           ampA:.02,ampD:.4,ampS:.9,ampR:.35,lfoRate:.1,lfoDepth:.3,drive:.5}},
+  'sub-bass':{osc1Wave:'sine',osc2Wave:'sine',filterType:'lowpass',lfoTarget:'none',
+    knobs:{oscMix:0,subLevel:.75,filterCutoff:.15,filterRes:.05,
+           ampA:.02,ampD:.2,ampS:.95,ampR:.25,drive:.1}},
+  'dark-bass':{osc1Wave:'sawtooth',osc2Wave:'square',filterType:'lowpass',lfoTarget:'none',
+    knobs:{osc2Detune:.2,osc2Octave:.25,oscMix:.35,subLevel:.4,
+           filterCutoff:.2,filterRes:.15,filterEnv:.45,filterDecay:.3,
+           ampA:.005,ampD:.3,ampS:.7,ampR:.25,drive:.4}},
+  'fm-bass':{osc1Wave:'sine',osc2Wave:'square',filterType:'lowpass',lfoTarget:'pitch',
+    knobs:{osc2Detune:.9,osc2Octave:.25,oscMix:.6,subLevel:.3,
+           filterCutoff:.4,filterRes:.2,filterEnv:.3,filterDecay:.25,
+           ampA:.005,ampD:.3,ampS:.6,ampR:.25,lfoRate:.35,lfoDepth:.08,drive:.35}},
+  'dark-pad':{osc1Wave:'sawtooth',osc2Wave:'triangle',filterType:'lowpass',lfoTarget:'filter',
+    knobs:{oscMix:.5,subLevel:.2,unison:.4,unisonDetune:.45,
+           filterCutoff:.32,filterRes:.1,ampA:.7,ampD:.6,ampS:.85,ampR:.75,
+           lfoRate:.08,lfoDepth:.25,chorusMix:.4,reverbSend:.75}},
+  'vox-pad':{osc1Wave:'triangle',osc2Wave:'sine',filterType:'bandpass',lfoTarget:'filter',
+    knobs:{osc2Detune:.55,osc2Octave:.6,oscMix:.45,unison:.25,unisonDetune:.35,
+           filterCutoff:.55,filterRes:.3,ampA:.55,ampD:.5,ampS:.85,ampR:.65,
+           lfoRate:.12,lfoDepth:.3,chorusMix:.55,reverbSend:.7,delaySend:.25}},
 };
 function spSetKnob(name,v,scope){
   const root=scope?document.querySelector(scope):document;
@@ -12745,6 +12799,36 @@ const SP_BASS_PRESETS={
     {note:'A1'},null,null,{note:'C2'},
     {note:'E2'},null,null,null,
     {note:'D2'},null,{note:'A1',slide:true},null,
+  ]),
+  'hoover-bass':spBassPatternFrom([
+    {note:'A1',accent:true},{note:'A1'},{note:'A1'},null,
+    {note:'A1'},null,{note:'A1',slide:true},{note:'C2'},
+    {note:'A1',accent:true},{note:'A1'},{note:'A1'},null,
+    {note:'D2'},null,{note:'A1',slide:true},{note:'E2'},
+  ]),
+  'psytrance-bass':spBassPatternFrom([
+    null,{note:'A1',accent:true},{note:'A1'},{note:'A1'},
+    null,{note:'A1',accent:true},{note:'A1'},{note:'A1'},
+    null,{note:'A1',accent:true},{note:'A1'},{note:'A1'},
+    null,{note:'A1',accent:true},{note:'A1'},{note:'A1'},
+  ]),
+  'rolling-bass':spBassPatternFrom([
+    {note:'A1'},{note:'A1'},null,{note:'A2',slide:true},
+    {note:'A1'},null,{note:'C2'},{note:'A1'},
+    {note:'A1'},{note:'A1'},null,{note:'E2',slide:true},
+    {note:'A1'},null,{note:'G2'},{note:'A1'},
+  ]),
+  'minimal-bass':spBassPatternFrom([
+    {note:'A1'},null,null,null,
+    null,null,null,null,
+    {note:'E2'},null,null,null,
+    null,null,{note:'A1',slide:true},null,
+  ]),
+  'stab-bass':spBassPatternFrom([
+    {note:'A1',accent:true},null,null,{note:'A1'},
+    null,null,{note:'E2',accent:true},null,
+    null,{note:'A1'},null,null,
+    {note:'C3',accent:true},null,null,{note:'A1'},
   ]),
 };
 function spBuildBassSeq(){
