@@ -5670,78 +5670,64 @@ body.work-mode .automix-sync{
 .deck-header .deck-lib-btn .btn-icon{display:inline-flex;align-items:center;justify-content:center}
 
 /* ================================================================
-   TITAN CLOCK — premium header clock next to SIGN IN
+   TITAN CLOCK — digital LCD header clock (time only, fixed width)
+   Fixed-size chip so the header never reflows.
    ================================================================ */
 .titan-clock{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:5px 12px 5px 10px;border-radius:8px;
-  background:linear-gradient(180deg,rgba(10,10,12,.85) 0%,rgba(4,4,6,.9) 100%);
-  border:1px solid rgba(255,138,26,.3);
+  display:inline-flex;align-items:center;justify-content:center;
+  padding:6px 14px;border-radius:8px;
+  box-sizing:border-box;width:108px;height:32px;flex:0 0 auto;
+  background:linear-gradient(180deg,#020608 0%,#000305 100%);
+  border:1px solid rgba(46,224,255,.35);
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.06),
-    inset 0 -1px 0 rgba(0,0,0,.6),
-    inset 0 0 14px rgba(255,138,26,.08),
+    inset 0 1px 0 rgba(255,255,255,.05),
+    inset 0 0 14px rgba(46,224,255,.15),
+    inset 0 2px 6px rgba(0,0,0,.9),
     0 2px 6px rgba(0,0,0,.55),
-    0 0 14px rgba(255,138,26,.12);
-  position:relative;overflow:hidden;
+    0 0 14px rgba(46,224,255,.12);
+  position:relative;overflow:hidden;cursor:pointer;
+  transition:border-color .15s,box-shadow .15s;
 }
 .titan-clock::before{
-  content:'';position:absolute;left:0;top:0;bottom:0;width:2px;
-  background:linear-gradient(180deg,var(--orange-glow),var(--orange));
-  box-shadow:0 0 6px rgba(255,138,26,.65);
-}
-.titan-clock::after{
-  content:'';position:absolute;inset:0;pointer-events:none;border-radius:inherit;
-  background:repeating-linear-gradient(0deg,rgba(255,255,255,.03) 0 1px,transparent 1px 3px);
+  /* CRT scan lines so it reads as a proper LCD */
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(0deg,rgba(255,255,255,.05) 0 1px,transparent 1px 2px);
   mix-blend-mode:overlay;
 }
-.titan-clock .tc-dot{
-  width:7px;height:7px;border-radius:50%;flex:0 0 auto;
-  background:radial-gradient(circle at 30% 30%,#ffe8c0,var(--orange) 55%,#5a1c00 100%);
-  box-shadow:0 0 6px rgba(255,138,26,.9),inset 0 0 2px rgba(255,255,255,.5);
-  animation:tcTick 1s steps(2,start) infinite;
-}
-@keyframes tcTick{0%,49%{opacity:1}50%,100%{opacity:.35}}
-.titan-clock .tc-stack{display:flex;flex-direction:column;align-items:flex-start;line-height:1;gap:2px;min-width:66px}
-.titan-clock .tc-time{
-  font-family:'Orbitron',sans-serif;font-size:13px;font-weight:800;letter-spacing:1.2px;
-  color:var(--orange-glow);
-  text-shadow:0 0 8px rgba(255,138,26,.75),0 0 1px rgba(255,255,255,.4);
-  font-variant-numeric:tabular-nums;
-}
-.titan-clock .tc-date{
-  font-family:'Share Tech Mono',monospace;font-size:8.5px;letter-spacing:1.4px;
-  color:#7fd4ea;text-transform:uppercase;opacity:.9;
-  text-shadow:0 0 4px rgba(46,224,255,.45);
-}
 .titan-clock:hover{
-  border-color:rgba(255,138,26,.55);
+  border-color:rgba(46,224,255,.65);
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.08),
-    inset 0 -1px 0 rgba(0,0,0,.6),
-    inset 0 0 18px rgba(255,138,26,.14),
+    inset 0 0 20px rgba(46,224,255,.22),
+    inset 0 2px 6px rgba(0,0,0,.9),
     0 2px 8px rgba(0,0,0,.6),
-    0 0 20px rgba(255,138,26,.22);
+    0 0 22px rgba(46,224,255,.3);
+}
+.titan-clock .tc-time{
+  font-family:'Share Tech Mono',monospace;
+  font-size:16px;font-weight:700;letter-spacing:2px;line-height:1;
+  color:#2ee0ff;
+  text-shadow:0 0 8px rgba(46,224,255,.9),0 0 2px rgba(255,255,255,.5);
+  font-variant-numeric:tabular-nums;
+  white-space:nowrap;
 }
 
-/* Light-theme clock — dark chip on porcelain so the neon glow still pops */
+/* Light-theme — dark LCD chip on porcelain, neon stays bright */
 body.theme-light .titan-clock{
-  background:linear-gradient(180deg,#1a1814 0%,#0e0c08 100%) !important;
-  border:1px solid rgba(184,64,0,.5) !important;
+  background:linear-gradient(180deg,#02161c 0%,#000a10 100%) !important;
+  border:1px solid rgba(0,120,160,.5) !important;
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.08),
-    0 2px 4px rgba(80,60,30,.25),
+    inset 0 1px 0 rgba(255,255,255,.06),
+    inset 0 0 18px rgba(46,224,255,.2),
+    0 2px 5px rgba(80,60,30,.25),
     0 0 0 1px rgba(255,255,255,.85),
-    0 0 14px rgba(255,138,26,.2) !important;
+    0 0 16px rgba(46,224,255,.22) !important;
 }
-body.theme-light .titan-clock .tc-time{color:#ffb060 !important;text-shadow:0 0 10px rgba(255,138,26,.85) !important}
-body.theme-light .titan-clock .tc-date{color:#7fe8ff !important}
+body.theme-light .titan-clock .tc-time{color:#5fe8ff !important;text-shadow:0 0 10px rgba(46,224,255,.9) !important}
 
 @media(max-width:760px){
-  .titan-clock .tc-date{display:none}
-  .titan-clock .tc-stack{min-width:0}
-  .titan-clock{padding:4px 9px}
-  .titan-clock .tc-time{font-size:12px}
+  .titan-clock{width:96px;height:28px;padding:4px 10px}
+  .titan-clock .tc-time{font-size:14px;letter-spacing:1.8px}
 }
 
 /* ================================================================
@@ -6135,27 +6121,36 @@ body.theme-light .tab-more-menu .tab-btn:hover{background:rgba(255,138,26,.12) !
 }
 
 /* ================================================================
-   VINYL — center the PITCH fader properly in its track
-   Use a native vertical slider (appearance:slider-vertical +
-   writing-mode) instead of the rotated-range hack so the thumb
-   is perfectly on the track's center line.
+   VINYL — PITCH fader (rotated horizontal range for cross-browser drag)
+   The native vertical-slider approach (appearance:slider-vertical)
+   stopped dragging in newer Chrome. Back to the battle-tested rotated
+   horizontal range, centered inside its track via transform-origin.
    ================================================================ */
-.tt-pitch-track{position:relative;display:flex;align-items:center;justify-content:center}
+.tt-pitch-track{position:relative !important;display:block !important;padding:0 !important}
 .tt-pitch-input{
-  -webkit-appearance:slider-vertical !important;appearance:slider-vertical !important;
-  writing-mode:vertical-lr !important;direction:rtl !important;
-  position:static !important;transform:none !important;
-  width:40px !important;height:224px !important;
-  top:auto !important;left:auto !important;margin:0 auto !important;
-  background:transparent !important;cursor:grab;
+  -webkit-appearance:none !important;appearance:none !important;
+  writing-mode:horizontal-tb !important;direction:ltr !important;
+  position:absolute !important;
+  /* unrotated footprint matches the track's HEIGHT (so after -90deg it
+     spans the full vertical length) + a 28px thickness to capture pointer */
+  width:220px !important;height:28px !important;
+  top:50% !important;left:50% !important;
+  transform:translate(-50%,-50%) rotate(-90deg) !important;
+  transform-origin:center center !important;
+  margin:0 !important;padding:0 !important;
+  background:transparent !important;cursor:grab;touch-action:none;
 }
 .tt-pitch-input:active{cursor:grabbing}
+.tt-pitch-input::-webkit-slider-runnable-track{height:4px;background:transparent}
+.tt-pitch-input::-moz-range-track{height:4px;background:transparent}
 .tt-pitch-input::-webkit-slider-thumb{
   -webkit-appearance:none;appearance:none;
-  width:36px !important;height:22px !important;border-radius:4px !important;
+  /* after rotate(-90deg) a 22×36 thumb reads as 36 tall × 22 wide which
+     matches the original Technics fader look on the vertical track */
+  width:22px !important;height:36px !important;border-radius:4px !important;
   background:
     linear-gradient(180deg,#fafafc 0%,#bebec3 16%,#6a6a70 52%,#2a2a30 100%),
-    repeating-linear-gradient(90deg,rgba(0,0,0,.4) 0 1px,transparent 1px 3px) !important;
+    repeating-linear-gradient(90deg,rgba(0,0,0,.35) 0 1px,transparent 1px 3px) !important;
   background-blend-mode:overlay !important;
   border:1px solid #050507 !important;
   box-shadow:
@@ -6163,12 +6158,21 @@ body.theme-light .tab-more-menu .tab-btn:hover{background:rgba(255,138,26,.12) !
     inset 0 -2px 4px rgba(0,0,0,.85),
     0 3px 5px rgba(0,0,0,.85),
     0 0 12px rgba(var(--tt-accent-rgb),.25) !important;
+  margin-top:-12px;
 }
 .tt-pitch-input::-moz-range-thumb{
-  width:36px !important;height:22px !important;border-radius:4px !important;
+  width:22px !important;height:36px !important;border-radius:4px !important;
   background:linear-gradient(180deg,#fafafc,#6a6a70 60%,#2a2a30) !important;
   border:1px solid #050507 !important;
   box-shadow:inset 0 2px 2px rgba(255,255,255,.75),inset 0 -2px 4px rgba(0,0,0,.85),0 3px 5px rgba(0,0,0,.85) !important;
+}
+
+/* Ensure all top-nav tabs stay visible — wrap to a second row instead
+   of hiding behind horizontal scroll on laptop-width screens */
+.main-tabs{flex-wrap:wrap !important;overflow-x:visible !important;row-gap:4px !important}
+.main-tabs .tab-btn{
+  flex:1 1 auto !important;min-width:88px !important;
+  padding:8px 10px !important;font-size:10px !important;letter-spacing:1.6px !important;
 }
 
 /* ================================================================
@@ -6792,12 +6796,8 @@ body.theme-light .sup-card{background:linear-gradient(180deg,#fefcf6,#f1ebdc) !i
 <div class="header-right">
 <div class="power-led"></div><span>BPM</span>
 <span class="master-bpm" id="masterBpm">---.--</span>
-<div class="titan-clock" id="titanClock" title="Local time">
-  <span class="tc-dot" aria-hidden="true"></span>
-  <div class="tc-stack">
-    <span class="tc-time" id="tcTime">--:--:--</span>
-    <span class="tc-date" id="tcDate">— — —</span>
-  </div>
+<div class="titan-clock" id="titanClock" title="Local time (click to toggle 12/24h)">
+  <span class="tc-time" id="tcTime">--:--:--</span>
 </div>
 <button class="rec-btn" id="recBtn">REC</button>
 <button class="auth-btn" id="authBtn" title="Sign in / Sign up">👤 SIGN IN</button>
@@ -6806,32 +6806,23 @@ body.theme-light .sup-card{background:linear-gradient(180deg,#fefcf6,#f1ebdc) !i
 </div>
 
 <div class="main-tabs">
-<!-- Primary row — the most-used tabs always visible -->
 <button class="tab-btn active" data-tab="deck" data-t="tab_decks">◉ DECKS</button>
 <button class="tab-btn" data-tab="vinyl" data-t="tab_vinyl">💿 VINYL</button>
 <button class="tab-btn" data-tab="sampler" data-t="tab_sampler">▣ SAMPLER</button>
 <button class="tab-btn" data-tab="youtube" data-t="tab_music">🔎 MUSIC</button>
 <button class="tab-btn" data-tab="playlists" data-t="tab_playlists">≡ PLAYLISTS</button>
+<button class="tab-btn" data-tab="sessions" data-t="tab_sessions">💾 SESSIONS</button>
+<button class="tab-btn" data-tab="ai" data-t="tab_ai">🤖 AI DJ</button>
+<button class="tab-btn" data-tab="analytics" data-t="tab_analytics">📊 ANALYTICS</button>
+<button class="tab-btn" data-tab="midi" data-t="tab_midi">🎹 MIDI</button>
+<button class="tab-btn" data-tab="studio" data-t="tab_studio">🎚 STUDIO</button>
 <button class="tab-btn" data-tab="studiopro" data-t="tab_studiopro">🎹 TITAN LAB</button>
+<button class="tab-btn" data-tab="editor" data-t="tab_editor">✂ EDITOR</button>
+<button class="tab-btn admin-only" data-tab="admin" id="adminTabBtn" style="display:none">🛡 ADMIN</button>
 <button class="tab-btn" data-tab="settings" data-t="tab_settings">⚙ SETTINGS</button>
-
-<!-- MORE menu — everything else hides here to keep the bar clean -->
-<div class="tab-more" id="tabMore">
-  <button class="tab-btn tab-more-btn" type="button" aria-haspopup="menu" aria-expanded="false" id="tabMoreBtn">⋯ MORE</button>
-  <div class="tab-more-menu" role="menu" id="tabMoreMenu">
-    <button class="tab-btn" role="menuitem" data-tab="studio" data-t="tab_studio">🎚 STUDIO (Mastering)</button>
-    <button class="tab-btn" role="menuitem" data-tab="editor" data-t="tab_editor">✂ EDITOR</button>
-    <button class="tab-btn" role="menuitem" data-tab="sessions" data-t="tab_sessions">💾 SESSIONS</button>
-    <button class="tab-btn" role="menuitem" data-tab="ai" data-t="tab_ai">🤖 AI DJ</button>
-    <button class="tab-btn" role="menuitem" data-tab="analytics" data-t="tab_analytics">📊 ANALYTICS</button>
-    <button class="tab-btn" role="menuitem" data-tab="midi" data-t="tab_midi">🎹 MIDI</button>
-    <div class="tab-more-sep"></div>
-    <button class="tab-btn" role="menuitem" data-tab="support" data-t="tab_support">📧 SUPPORT</button>
-    <button class="tab-btn" role="menuitem" data-tab="guide" data-t="tab_guide">❓ GUIDE</button>
-    <button class="tab-btn" role="menuitem" data-tab="help" data-t="tab_help">⌨ SHORTCUTS</button>
-    <button class="tab-btn admin-only" role="menuitem" data-tab="admin" id="adminTabBtn" style="display:none">🛡 ADMIN</button>
-  </div>
-</div>
+<button class="tab-btn" data-tab="support" data-t="tab_support">📧 SUPPORT</button>
+<button class="tab-btn" data-tab="guide" data-t="tab_guide">❓ GUIDE</button>
+<button class="tab-btn" data-tab="help" data-t="tab_help">⌨ SHORTCUTS</button>
 </div>
 
 <div class="tab-content active" id="tab-deck">
@@ -11677,26 +11668,18 @@ function setupSupport(){
   });
 }
 
-/* TITAN CLOCK — header wall clock */
+/* TITAN CLOCK — header digital clock (time only, fixed width) */
 function setupTitanClock(){
   const timeEl=document.getElementById('tcTime');
-  const dateEl=document.getElementById('tcDate');
   const box=document.getElementById('titanClock');
-  if(!timeEl||!dateEl)return;
-  const DAYS=['SUN','MON','TUE','WED','THU','FRI','SAT'];
-  const MONTHS=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  if(!timeEl)return;
   let is24=localStorage.getItem('djtitan_clock_24h')!=='0';
   function tick(){
     const d=new Date();
     let h=d.getHours(),m=d.getMinutes(),s=d.getSeconds();
-    let suffix='';
-    if(!is24){
-      suffix=h>=12?' PM':' AM';
-      h=h%12;if(h===0)h=12;
-    }
+    if(!is24){h=h%12;if(h===0)h=12;}
     const hh=String(h).padStart(2,'0'),mm=String(m).padStart(2,'0'),ss=String(s).padStart(2,'0');
-    timeEl.textContent=`${hh}:${mm}:${ss}${suffix}`;
-    dateEl.textContent=`${DAYS[d.getDay()]} · ${String(d.getDate()).padStart(2,'0')} ${MONTHS[d.getMonth()]}`;
+    timeEl.textContent=`${hh}:${mm}:${ss}`;
   }
   tick();setInterval(tick,1000);
   box?.addEventListener('click',()=>{
@@ -11708,30 +11691,12 @@ function setupTitanClock(){
 
 /* TABS */
 function setupTabs(){
-  const moreWrap=document.getElementById('tabMore');
-  const moreBtn=document.getElementById('tabMoreBtn');
-  const moreMenu=document.getElementById('tabMoreMenu');
-  function closeMore(){moreWrap?.classList.remove('open');moreBtn?.setAttribute('aria-expanded','false')}
-  function toggleMore(){
-    const open=moreWrap?.classList.toggle('open');
-    moreBtn?.setAttribute('aria-expanded',open?'true':'false');
-  }
-  moreBtn?.addEventListener('click',e=>{e.stopPropagation();toggleMore();});
-  document.addEventListener('click',e=>{if(!moreWrap?.contains(e.target))closeMore()});
-  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMore()});
-
   document.querySelectorAll('.tab-btn').forEach(btn=>{
-    if(btn.id==='tabMoreBtn')return; // MORE is the toggle, not a tab
     btn.addEventListener('click',()=>{
       document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
       btn.classList.add('active');
       document.getElementById(`tab-${btn.dataset.tab}`)?.classList.add('active');
-      // If this tab lives under MORE, mirror 'active' on the MORE button so
-      // the user sees the group is selected
-      const inMore=!!btn.closest('.tab-more-menu');
-      if(moreBtn)moreBtn.classList.toggle('active',inMore);
-      closeMore();
     });
   });
 }
