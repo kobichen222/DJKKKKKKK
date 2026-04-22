@@ -6785,6 +6785,228 @@ body.theme-light .sup-card{background:linear-gradient(180deg,#fefcf6,#f1ebdc) !i
 .vx-xfader-track{height:28px !important}
 .vx-xfader{height:26px !important}
 .vx-xfader::-webkit-slider-thumb{width:30px !important;height:34px !important}
+
+/* ================================================================
+   MOBILE FINAL PASS — polish every tab for small screens (≤720px)
+   and tablets (≤980px). Last in the cascade so it dominates.
+   ================================================================ */
+
+/* ---------- Tablet (≤980px) ---------- */
+@media(max-width:980px){
+  body{padding:6px 4px !important;gap:6px !important}
+  .header-bar{padding:2px 6px;gap:6px}
+  .brand{font-size:15px !important;letter-spacing:2px !important}
+  .brand .max{font-size:9px !important;padding:1px 4px !important;margin-right:4px !important}
+  .header-right{gap:6px !important;font-size:10px;flex-wrap:wrap}
+  .master-bpm{padding:3px 8px !important;font-size:12px !important}
+  .rec-btn{padding:5px 10px !important;font-size:9px !important;letter-spacing:1.5px !important}
+  .auth-btn{padding:5px 10px !important;font-size:9px !important;letter-spacing:1.5px !important}
+  .titan-clock{width:92px !important;height:28px !important;padding:4px 10px !important}
+  .titan-clock .tc-time{font-size:13px !important;letter-spacing:1.5px !important}
+  /* DECKS → 2-column layout on tablet */
+  .console{grid-template-columns:1fr 1fr !important;grid-template-rows:auto auto auto !important;gap:8px !important}
+  .console > .cdj{grid-column:auto !important}
+  .console > .mixer{grid-column:1/-1 !important;order:3 !important}
+  /* Library / forms */
+  .library-actions{flex-wrap:wrap !important;gap:4px !important}
+  .search-wrap{flex:1 1 100% !important}
+}
+
+/* ---------- Phone (≤720px) ---------- */
+@media(max-width:720px){
+  html,body{font-size:14px !important}
+  body{padding:4px 2px !important;gap:4px !important}
+
+  /* Header — clock alongside brand, compact */
+  .header-bar{padding:2px 4px !important;flex-wrap:wrap;gap:4px}
+  .brand{font-size:13px !important;letter-spacing:1.4px !important;flex:1 1 100%;text-align:center}
+  .header-right{justify-content:center !important;gap:5px !important;width:100%;flex-wrap:wrap}
+  .deck-switch-bar.header-dsb{flex:1 1 100% !important;justify-content:center !important;padding:2px 4px !important}
+  .deck-switch-bar.header-dsb .dsb-btn{padding:3px 6px !important;font-size:8.5px !important;letter-spacing:.8px !important;min-height:22px !important}
+  .master-bpm{font-size:11px !important;padding:2px 6px !important}
+  .rec-btn{padding:4px 8px !important;font-size:8.5px !important;letter-spacing:1px !important}
+  .auth-btn{padding:4px 8px !important;font-size:8.5px !important;letter-spacing:1px !important;min-width:0 !important}
+  .auth-chip{font-size:9px !important;padding:3px 6px !important}
+  .titan-clock{width:82px !important;height:26px !important;padding:3px 8px !important}
+  .titan-clock .tc-time{font-size:12px !important;letter-spacing:1.4px !important}
+
+  /* Tabs — compact, still wrap */
+  .main-tabs{padding:2px !important;gap:2px !important;row-gap:2px !important}
+  .main-tabs .tab-btn{flex:1 1 28% !important;min-height:26px !important;font-size:8.5px !important;padding:5px 3px !important;letter-spacing:.6px !important}
+
+  /* DECKS → 1 column (stack all decks + mixer) */
+  .console{grid-template-columns:1fr !important;grid-template-rows:auto auto auto auto auto !important;gap:6px !important}
+  .console > .cdj,.console > .mixer,.console > .compact-deck{grid-column:1 !important}
+  .cdj{padding:6px !important;min-height:auto !important}
+  .cdj .deck-header{flex-wrap:wrap;gap:4px}
+  .deck-header .deck-lib-btn,.deck-header .deck-upload-btn{min-width:32px !important;padding:4px 6px !important}
+  .deck-number{font-size:18px !important;padding:2px 7px !important}
+  .screen{padding:5px !important;font-size:9px !important}
+  .screen .track-title{font-size:10px !important}
+  .screen .track-bpm,.screen .track-time{font-size:9px !important}
+  /* Transport buttons */
+  .big-btn{font-size:9px !important;letter-spacing:1.5px !important;padding:8px 4px !important}
+  .big-btn .icon{font-size:12px !important}
+  /* Loop/util buttons */
+  .loop-btn,.util-btn,.jump-btn,.beat-btn{font-size:8.5px !important;padding:5px 4px !important;letter-spacing:.6px !important}
+  /* Hot cues */
+  .cue-btn{font-size:8px !important;padding:5px 2px !important}
+  /* Tempo area */
+  .tempo-big{font-size:14px !important}
+  .tempo-row button{font-size:9px !important;padding:4px 6px !important}
+
+  /* MIXER — horizontal scroll if needed, smaller channel strips */
+  .mixer{padding:6px !important;overflow-x:auto !important}
+  .channel{padding:4px !important;min-width:56px !important}
+  .channel .fader-wrap,.channel .vu-meter{height:90px !important}
+  .channel .knob.small{width:28px !important;height:28px !important}
+  .channel .knob-label{font-size:7.5px !important}
+  .master-section,.color-fx-row,.color-fx-grid{padding:4px !important}
+
+  /* AUTO MIX toolbar → single column stack */
+  .mixer-toolbar{grid-template-columns:1fr !important;padding:6px !important;gap:5px !important}
+  .mixer-toolbar .mtb-section{padding:6px 8px !important;min-height:auto !important}
+  .mixer-toolbar .mtb-label{font-size:9px !important}
+  .mixer-toolbar .mtb-automix .automix-grid{grid-template-columns:repeat(3,1fr) !important;gap:3px !important}
+  .mixer-toolbar .mtb-hp .cue-hp-buttons{grid-template-columns:repeat(4,1fr) !important;gap:2px !important}
+  .mixer-toolbar .mtb-hp .cue-hp-btn{padding:4px 2px !important;font-size:8.5px !important;letter-spacing:.5px !important}
+
+  /* BEAT FX / SCENE FX panels */
+  .beat-fx-panel,.scene-fx-panel{grid-template-columns:1fr 1fr !important;padding:6px !important;gap:5px !important}
+  .beat-fx-label,.scene-fx-label{grid-column:1/-1 !important;text-align:center !important;font-size:10px !important;letter-spacing:1.5px !important}
+  .fx-onoff{padding:8px 10px !important;font-size:10px !important;letter-spacing:1.5px !important}
+  .fx-selector{min-width:60px !important;padding:4px 6px !important;font-size:10px !important}
+  .beat-buttons{grid-column:1/-1}
+  .beat-btn{padding:5px 2px !important;font-size:9px !important}
+
+  /* VINYL tab → 1 column (already done, just tighten) */
+  .vinyl-stage{padding:10px 6px 14px !important;gap:10px !important;grid-template-columns:1fr !important}
+  .turntable{padding:12px 10px 14px !important;min-height:auto !important}
+  .tt-deck{padding:10px !important;gap:10px !important;grid-template-columns:auto 1fr auto !important}
+  .tt-topbar{padding:5px 8px !important;margin-bottom:8px !important}
+  .tt-brand{font-size:9px !important;letter-spacing:1.5px !important}
+  .tt-screen{padding:3px 6px !important}
+  .tt-screen .tt-scr-title{font-size:9px !important}
+  .tt-screen .tt-scr-bpm{font-size:10px !important}
+  .tt-load-btn{padding:2px 6px !important;min-width:22px !important;height:20px !important;font-size:11px !important}
+  .tt-platter-wrap{max-width:260px !important}
+  .tt-platter{width:min(240px,100%) !important}
+  .tt-startstop{width:44px !important;height:44px !important}
+  .tt-startstop-label{font-size:7px !important;letter-spacing:1.2px !important}
+  .tt-rpm-btn{padding:3px 6px !important;font-size:9px !important;min-width:36px !important}
+  .tt-rightctl{min-width:56px !important}
+  .tt-pitch-track{width:42px !important;height:180px !important}
+  .tt-pitch-input{width:170px !important}
+  .tt-pitch-label{font-size:9px !important}
+  .tt-pitch-val{font-size:9px !important;padding:2px 4px !important;min-width:50px !important}
+  .tt-bottom .tt-btn{padding:7px 4px !important;font-size:9px !important;letter-spacing:1.2px !important}
+  .vx-mixer{padding:10px 8px !important;min-height:auto !important}
+  .vx-mixer .vx-vu-col{height:60px !important}
+  .vx-knob{width:28px !important;height:28px !important}
+  .vx-fader-wrap{min-height:90px !important}
+
+  /* SAMPLER — 4-column grid of pads on phones */
+  .sampler-panel{padding:8px !important}
+  .sampler-grid{grid-template-columns:repeat(4,1fr) !important;gap:4px !important}
+  .sample-pad .pad-num{font-size:16px !important}
+  .sample-pad .pad-name{font-size:7.5px !important;letter-spacing:.5px !important}
+  .bank-btn{padding:5px 10px !important;font-size:10px !important;min-width:32px !important}
+
+  /* LIBRARY / MUSIC / PLAYLISTS / DISCOVER */
+  .library,.youtube-panel,.playlists-panel,.sessions-panel,.ai-dj-panel,
+  .analytics-panel,.midi-panel,.sampler-panel,.editor-panel,.sp-panel,
+  .settings-panel,.support-panel{padding:8px !important;border-radius:8px !important}
+  .library-header{flex-direction:column !important;align-items:stretch !important;gap:6px !important;padding-bottom:6px !important}
+  .library-title{font-size:12px !important;letter-spacing:1.2px !important;text-align:center}
+  .library-actions{flex-wrap:wrap !important;justify-content:center !important;gap:3px !important}
+  .library-actions > *{font-size:9px !important;padding:5px 8px !important;letter-spacing:.8px !important}
+  .search-wrap{flex:1 1 100% !important;flex-wrap:wrap;gap:3px}
+  .search-input{flex:1 1 100% !important;font-size:11px !important;padding:6px 8px !important}
+  .sort-select,.filter-select{flex:1 1 48% !important;font-size:10px !important}
+  .track-list-header{font-size:9px !important;padding:4px !important}
+  .track-list-header .th-artist,.track-list-header .th-key{display:none !important}
+  .track-row{font-size:10px !important;padding:5px !important;gap:4px !important}
+  .track-row .track-artist,.track-row .track-key{display:none !important}
+  .url-input,.yt-input{font-size:11px !important;padding:6px 8px !important}
+
+  /* DISCOVER */
+  .discover-wrap{padding:8px !important}
+  .disc-topbar{flex-direction:column !important;align-items:stretch !important;gap:6px !important}
+  .disc-sources{width:100%;justify-content:center}
+  .disc-src-btn{padding:5px 10px !important;font-size:9px !important}
+  .disc-genre-btn{padding:5px 8px !important;font-size:8.5px !important;letter-spacing:.8px !important}
+  .disc-results{grid-template-columns:1fr !important;max-height:60vh !important}
+  .disc-row{grid-template-columns:38px 1fr auto auto !important;padding:5px 6px !important;gap:6px !important}
+  .disc-art{width:38px !important;height:38px !important}
+  .disc-title-txt{font-size:10px !important}
+  .disc-artist-txt{font-size:9px !important}
+  .disc-preview,.disc-add{padding:5px 7px !important;font-size:8.5px !important;min-width:32px !important}
+
+  /* SETTINGS */
+  .settings-section{padding:8px !important;margin-bottom:6px !important}
+  .settings-section h3{font-size:11px !important;letter-spacing:1.5px !important}
+  .settings-row{flex-direction:column !important;align-items:stretch !important;gap:6px !important;padding:5px 0 !important}
+  .settings-row > div:first-child{flex:1 1 auto}
+  .setting-label{font-size:11px !important}
+  .setting-desc{font-size:9.5px !important}
+  .toggle-switch{align-self:flex-start}
+  input[type=text],input[type=password],input[type=email],input[type=tel],input[type=number],input[type=search],select,textarea{font-size:12px !important;padding:6px 8px !important}
+
+  /* SUPPORT form */
+  .sup-grid{grid-template-columns:1fr !important;gap:10px !important}
+  .sup-mode-row{gap:3px}
+  .sup-mode-btn{padding:6px 8px !important;font-size:9px !important;letter-spacing:.8px !important}
+  .sup-row-2{grid-template-columns:1fr !important}
+  .sup-label{font-size:9px !important}
+  .sup-form{padding:10px !important}
+  .sup-form .url-input,.sup-form textarea{font-size:11px !important;padding:8px !important}
+  .sup-actions{flex-direction:column !important;align-items:stretch !important;gap:6px !important}
+  .sup-send,.sup-copy,.sup-mailto{width:100%;padding:10px !important;font-size:10px !important}
+  .sup-tiers{grid-template-columns:1fr !important}
+  .sup-card{padding:10px !important}
+
+  /* TITAN LAB / STUDIO PRO */
+  .coming-soon-card{padding:14px !important}
+  .cs-body h3{font-size:14px !important;letter-spacing:1.5px !important}
+  .cs-body p{font-size:11px !important;line-height:1.6 !important}
+  .cs-progress-row{grid-template-columns:1fr !important;gap:4px !important}
+  .cs-progress-row span:first-child{font-size:10px}
+  .cs-bar{height:6px}
+  .sp-panel{padding:8px !important}
+  .sp-block{padding:8px !important}
+  .sp-row{flex-wrap:wrap !important;gap:4px !important}
+  .sp-preset-row{flex-wrap:wrap !important}
+  .sp-preset-btn{padding:6px 10px !important;font-size:9px !important}
+  .sp-mini-btn{font-size:9px !important;padding:5px 8px !important}
+  .sp-knob{width:30px !important;height:30px !important}
+  .sp-knob-label,.sp-knob-val{font-size:8.5px !important}
+  .sp-seq-grid{grid-template-columns:60px repeat(8,1fr) !important;overflow-x:auto !important}
+
+  /* EDITOR */
+  .editor-panel{padding:8px !important}
+  .editor-waveform-wrap{height:120px !important}
+  .editor-grid{grid-template-columns:1fr !important;gap:6px !important}
+  .editor-block{padding:8px !important}
+  .editor-row{flex-direction:column !important;align-items:stretch !important;gap:4px !important}
+
+  /* AI DJ / ANALYTICS / MIDI / SESSIONS — generic panels */
+  .ai-config-item,.stat-card{padding:8px !important}
+  .stat-card h5{font-size:10px !important}
+  .stat-value{font-size:16px !important}
+
+  /* Any fixed-size knob-row things */
+  .knob{width:36px;height:36px}
+  .knob-label{font-size:8px}
+}
+
+/* ---------- Very small phones (≤400px) ---------- */
+@media(max-width:400px){
+  .brand{font-size:11px !important}
+  .main-tabs .tab-btn{flex:1 1 32% !important;font-size:8px !important;padding:4px 2px !important}
+  .sampler-grid{grid-template-columns:repeat(3,1fr) !important}
+  .tt-platter-wrap{max-width:220px !important}
+  .tt-platter{width:min(200px,100%) !important}
+}
 </style>
 </head>
 <body>
