@@ -4325,6 +4325,600 @@ body.work-mode .automix-sync{
   .automix-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:3px !important}
   .automix-btn{height:28px;min-height:28px;font-size:9.5px !important}
 }
+
+/* ================================================================
+   AUTO MIX — refined header, pro chip buttons, polished SYNC/CONT
+   ================================================================ */
+.mixer-toolbar .mtb-automix{
+  background:linear-gradient(180deg,#121217 0%,#07070a 100%);
+  border:1px solid #1d1d22;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04),inset 0 0 28px rgba(0,0,0,.55),0 4px 10px rgba(0,0,0,.35);
+}
+.mixer-toolbar .mtb-automix::before{
+  background:linear-gradient(90deg,transparent,rgba(255,138,26,.55) 50%,transparent) !important;
+  height:1px !important;
+}
+.mixer-toolbar .mtb-automix .mtb-head{
+  align-items:center;gap:8px;border-bottom:1px solid rgba(255,138,26,.12);
+  padding-bottom:6px;margin-bottom:8px;
+}
+.mixer-toolbar .mtb-automix .mtb-label{
+  display:inline-flex;align-items:center;gap:7px;
+  font-family:'Orbitron',sans-serif;font-weight:700;
+  font-size:10px !important;letter-spacing:2.2px !important;
+  color:#ffb675;text-shadow:none;text-transform:uppercase;
+}
+.mixer-toolbar .mtb-automix .mtb-led{
+  width:7px;height:7px;border-radius:50%;
+  background:radial-gradient(circle at 30% 30%,#ffd8a3 0%,var(--orange) 45%,#7a2a00 100%);
+  box-shadow:0 0 6px rgba(255,138,26,.7),inset 0 0 2px rgba(255,255,255,.4);
+  animation:amxLed 2.2s ease-in-out infinite;flex:0 0 auto;
+}
+@keyframes amxLed{0%,100%{opacity:.55;box-shadow:0 0 4px rgba(255,138,26,.4)}50%{opacity:1;box-shadow:0 0 9px rgba(255,138,26,.85)}}
+.mixer-toolbar .mtb-automix .mtb-dir{
+  font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1.4px;
+  color:#7ce8ff;padding:2px 8px;border-radius:3px;
+  background:rgba(46,224,255,.06);border:1px solid rgba(46,224,255,.18);
+}
+
+.mixer-toolbar .mtb-automix .automix-sub{
+  display:flex !important;align-items:center;gap:8px !important;
+  padding:7px 2px 2px !important;margin-top:4px;
+  border-top:1px solid rgba(255,255,255,.06);
+}
+.mixer-toolbar .mtb-automix .automix-sub > .automix-sub-label{
+  font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:1.8px;
+  color:#8a8a8f;font-weight:700;text-transform:uppercase;
+  padding:0 2px;flex:0 0 auto;
+}
+.mixer-toolbar .mtb-automix .automix-sub > .automix-sep{
+  width:1px;height:16px;flex:0 0 auto;padding:0;
+  background:linear-gradient(180deg,transparent,rgba(255,255,255,.12),transparent);
+  margin:0 2px;
+}
+
+/* SYNC + CONT — matched pro chips */
+.mixer-toolbar .mtb-automix .automix-sync{
+  height:var(--automix-h);min-height:var(--automix-h);
+  padding:0 12px !important;font-size:10px !important;letter-spacing:1.6px !important;
+  font-family:'Orbitron',sans-serif;font-weight:800;
+  border-radius:4px !important;flex:0 0 auto;
+  background:linear-gradient(180deg,#1e1e24 0%,#0c0c10 100%) !important;
+  border:1px solid rgba(255,138,26,.45) !important;color:#ffb675 !important;
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 1px 2px rgba(0,0,0,.5) !important;
+  transition:background .12s,border-color .12s,color .12s,box-shadow .12s,transform .08s;
+  transform:none !important;margin:0 !important;
+}
+.mixer-toolbar .mtb-automix .automix-sync:hover{
+  background:linear-gradient(180deg,#2a2a32 0%,#151519 100%) !important;
+  border-color:rgba(255,138,26,.85) !important;color:#ffd9a8 !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 0 10px rgba(255,138,26,.35) !important;
+}
+.mixer-toolbar .mtb-automix .automix-sync:active{transform:translateY(1px) !important}
+.mixer-toolbar .mtb-automix .automix-sync.active{
+  background:linear-gradient(180deg,#ffa040 0%,#c85a00 100%) !important;
+  color:#0a0a0a !important;border-color:#ffd9a8 !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 0 12px rgba(255,138,26,.55) !important;
+}
+.mixer-toolbar .mtb-automix .automix-sync .asy-txt{line-height:1}
+.mixer-toolbar .mtb-automix .automix-sync .asy-arrow{
+  width:10px;height:10px;position:relative;flex:0 0 auto;
+}
+.mixer-toolbar .mtb-automix .automix-sync .asy-arrow::before,
+.mixer-toolbar .mtb-automix .automix-sync .asy-arrow::after{
+  content:'';position:absolute;background:currentColor;border-radius:1px;
+}
+.mixer-toolbar .mtb-automix .automix-sync .asy-arrow::before{
+  left:1px;top:4px;width:7px;height:1.5px;
+}
+.mixer-toolbar .mtb-automix .automix-sync .asy-arrow::after{
+  right:1px;top:1.5px;width:5px;height:5px;
+  background:transparent;border-right:1.5px solid currentColor;border-top:1.5px solid currentColor;
+  transform:rotate(45deg);border-radius:0;
+}
+
+.mixer-toolbar .mtb-automix .automix-cont{
+  border-color:rgba(46,224,255,.4) !important;color:#7ce8ff !important;
+}
+.mixer-toolbar .mtb-automix .automix-cont:hover{
+  border-color:rgba(46,224,255,.85) !important;color:#b6f2ff !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 0 10px rgba(46,224,255,.35) !important;
+}
+.mixer-toolbar .mtb-automix .automix-cont.active{
+  background:linear-gradient(180deg,#2ee0ff 0%,#0088aa 100%) !important;
+  color:#06121a !important;border-color:#baf1ff !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 0 12px rgba(46,224,255,.55) !important;
+}
+
+/* Tighter sub-row on narrow screens */
+@media(max-width:820px){
+  .mixer-toolbar .mtb-automix .automix-sub{gap:6px !important}
+  .automix-sep{display:none}
+}
+
+/* ================================================================
+   VINYL TAB — realistic twin turntables + centered mixer core
+   ================================================================ */
+#tab-vinyl{padding:4px 0 28px}
+.vinyl-stage{
+  width:100%;max-width:1700px;margin:0 auto;position:relative;
+  padding:26px 20px 34px;border-radius:18px;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%,rgba(255,138,26,.08) 0%,transparent 60%),
+    radial-gradient(ellipse 70% 50% at 50% 100%,rgba(46,224,255,.05) 0%,transparent 60%),
+    linear-gradient(180deg,#111116 0%,#050507 100%);
+  border:1px solid #1f1f25;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05),inset 0 0 60px rgba(0,0,0,.6),0 30px 80px rgba(0,0,0,.7);
+  display:grid;grid-template-columns:minmax(0,1fr) 260px minmax(0,1fr);
+  gap:18px;align-items:stretch;
+  overflow:hidden;
+}
+.vinyl-stage::before{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:
+    repeating-linear-gradient(90deg,rgba(255,255,255,.015) 0 2px,transparent 2px 6px),
+    radial-gradient(circle at 50% 40%,rgba(200,0,255,.035) 0%,transparent 55%);
+}
+.vinyl-stage > *{position:relative;z-index:1}
+.vinyl-stage .vinyl-floor{
+  grid-column:1/-1;position:absolute;left:0;right:0;bottom:0;height:60%;
+  background:linear-gradient(180deg,transparent 0%,rgba(0,0,0,.6) 80%);
+  pointer-events:none;
+}
+
+/* ---------------- Turntable ---------------- */
+.turntable{
+  position:relative;border-radius:14px;padding:18px 18px 22px;
+  background:
+    linear-gradient(180deg,#c7c7cc 0%,#8a8a90 2%,#3a3a40 8%,#1c1c20 24%,#141418 100%);
+  border:1px solid #2a2a30;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.55),
+    inset 0 -1px 0 rgba(0,0,0,.8),
+    inset 0 0 50px rgba(0,0,0,.55),
+    0 20px 40px rgba(0,0,0,.7),
+    0 2px 0 rgba(255,255,255,.04);
+  min-height:460px;
+  isolation:isolate;overflow:hidden;
+}
+.turntable::before{
+  content:'';position:absolute;inset:0;pointer-events:none;border-radius:14px;
+  background:
+    repeating-linear-gradient(90deg,rgba(255,255,255,.025) 0 1px,transparent 1px 3px),
+    radial-gradient(ellipse at 50% -20%,rgba(255,255,255,.12),transparent 60%);
+  mix-blend-mode:screen;opacity:.5;
+}
+.turntable[data-tt="L"]{--tt-accent:#ff7a00;--tt-accent-rgb:255,122,0}
+.turntable[data-tt="R"]{--tt-accent:#2ee0ff;--tt-accent-rgb:46,224,255}
+
+/* top bezel row */
+.tt-topbar{
+  display:flex;justify-content:space-between;align-items:center;gap:10px;
+  padding:6px 10px;margin-bottom:10px;border-radius:8px;
+  background:linear-gradient(180deg,#0a0a0c 0%,#050507 100%);
+  border:1px solid #222227;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04),inset 0 0 12px rgba(0,0,0,.7);
+}
+.tt-brand{
+  font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:2.5px;
+  font-weight:800;color:#bfbfc4;
+}
+.tt-brand .brand-accent{color:var(--tt-accent);text-shadow:0 0 8px rgba(var(--tt-accent-rgb),.45)}
+.tt-screen{
+  flex:1;min-width:0;padding:4px 10px;border-radius:4px;
+  background:linear-gradient(180deg,#020a10 0%,#000507 100%);
+  border:1px solid #0b1a24;
+  box-shadow:inset 0 0 12px rgba(var(--tt-accent-rgb),.12);
+  display:flex;align-items:center;gap:8px;overflow:hidden;
+}
+.tt-screen .tt-scr-title{
+  flex:1;min-width:0;font-family:'Share Tech Mono',monospace;font-size:10px;
+  color:#9fd8ff;letter-spacing:1.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  text-shadow:0 0 6px rgba(46,224,255,.45);
+}
+.tt-screen .tt-scr-bpm{
+  font-family:'Orbitron',sans-serif;font-size:12px;font-weight:800;
+  color:var(--tt-accent);text-shadow:0 0 8px rgba(var(--tt-accent-rgb),.6);
+  letter-spacing:1.2px;white-space:nowrap;
+}
+.tt-power{
+  width:9px;height:9px;border-radius:50%;
+  background:radial-gradient(circle at 30% 30%,#ffd,var(--tt-accent) 45%,#3a1000 100%);
+  box-shadow:0 0 8px rgba(var(--tt-accent-rgb),.9),inset 0 0 2px rgba(255,255,255,.4);
+  animation:ttPower 1.8s ease-in-out infinite;flex:0 0 auto;
+}
+@keyframes ttPower{0%,100%{opacity:.6}50%{opacity:1}}
+
+/* main deck area */
+.tt-deck{
+  position:relative;
+  background:
+    radial-gradient(circle at 50% 50%,#1a1a1e 0%,#0b0b0d 58%,#050506 100%);
+  border-radius:10px;padding:14px;
+  border:1px solid #1a1a1e;
+  box-shadow:inset 0 0 40px rgba(0,0,0,.85),inset 0 1px 0 rgba(255,255,255,.03);
+  min-height:340px;
+  display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;
+}
+.turntable[data-tt="R"] .tt-deck{grid-template-columns:auto 1fr auto}
+
+/* Left controls column */
+.tt-leftctl{display:flex;flex-direction:column;gap:10px;align-items:center;min-width:58px}
+.tt-rpm{
+  display:flex;flex-direction:column;gap:4px;padding:6px;border-radius:6px;
+  background:linear-gradient(180deg,#18181c 0%,#0a0a0c 100%);
+  border:1px solid #26262c;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+}
+.tt-rpm-btn{
+  padding:5px 10px;font-family:'Orbitron',sans-serif;font-size:10px;font-weight:800;
+  letter-spacing:1.2px;color:#8a8a90;
+  background:linear-gradient(180deg,#1e1e22 0%,#101014 100%);
+  border:1px solid #2e2e34;border-radius:4px;cursor:pointer;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 1px 2px rgba(0,0,0,.5);
+  transition:all .12s;
+}
+.tt-rpm-btn:hover{color:var(--tt-accent);border-color:rgba(var(--tt-accent-rgb),.4)}
+.tt-rpm-btn.active{
+  background:linear-gradient(180deg,var(--tt-accent) 0%,#7a3500 100%);
+  color:#0a0a0a;border-color:rgba(var(--tt-accent-rgb),.9);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 0 10px rgba(var(--tt-accent-rgb),.5);
+}
+.turntable[data-tt="R"] .tt-rpm-btn.active{background:linear-gradient(180deg,var(--tt-accent) 0%,#005566 100%)}
+.tt-startstop{
+  position:relative;width:52px;height:52px;border-radius:50%;
+  background:
+    radial-gradient(circle at 35% 30%,#fafafa 0%,#aaa 35%,#606066 70%,#1a1a1e 100%);
+  border:1px solid #1a1a1e;
+  box-shadow:
+    inset 0 2px 2px rgba(255,255,255,.55),
+    inset 0 -3px 6px rgba(0,0,0,.75),
+    0 4px 10px rgba(0,0,0,.7),
+    0 0 0 4px #0a0a0c,
+    0 0 0 5px #26262c;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:transform .08s;
+}
+.tt-startstop:active{transform:scale(.96)}
+.tt-startstop::before{
+  content:'';width:12px;height:12px;border-radius:50%;
+  background:radial-gradient(circle at 30% 30%,#ffb080,var(--tt-accent) 55%,#4a1500 100%);
+  box-shadow:0 0 10px rgba(var(--tt-accent-rgb),.65);
+  opacity:.4;transition:opacity .2s;
+}
+.tt-startstop.playing::before{opacity:1;animation:ttPulse 1.1s ease-in-out infinite}
+@keyframes ttPulse{0%,100%{box-shadow:0 0 8px rgba(var(--tt-accent-rgb),.55)}50%{box-shadow:0 0 18px rgba(var(--tt-accent-rgb),.95)}}
+.tt-startstop-label{
+  font-family:'Orbitron',sans-serif;font-size:8px;letter-spacing:1.5px;
+  color:#9a9a9e;font-weight:800;
+}
+
+/* Platter + vinyl */
+.tt-platter-wrap{position:relative;display:flex;align-items:center;justify-content:center;min-width:0}
+.tt-platter{
+  position:relative;width:290px;height:290px;max-width:100%;
+  border-radius:50%;
+  background:
+    radial-gradient(circle at 50% 50%,#3a3a40 0%,#1c1c20 55%,#0a0a0c 100%);
+  box-shadow:
+    0 0 0 3px #0a0a0c,
+    0 0 0 4px #2a2a30,
+    0 0 0 5px #0a0a0c,
+    inset 0 2px 6px rgba(255,255,255,.08),
+    inset 0 -6px 18px rgba(0,0,0,.9),
+    0 14px 40px rgba(0,0,0,.7),
+    0 0 60px rgba(var(--tt-accent-rgb),.08);
+}
+.tt-platter::before{
+  /* strobe dots */
+  content:'';position:absolute;inset:6px;border-radius:50%;
+  background:
+    repeating-conic-gradient(from 0deg,rgba(255,255,255,.25) 0deg 1deg,transparent 1deg 6deg);
+  -webkit-mask:radial-gradient(circle,transparent 0 49%,#000 49% 51%,transparent 51%);
+  mask:radial-gradient(circle,transparent 0 49%,#000 49% 51%,transparent 51%);
+}
+.tt-platter::after{
+  /* rgb accent ring */
+  content:'';position:absolute;inset:-2px;border-radius:50%;pointer-events:none;
+  background:conic-gradient(from 0deg,transparent 0deg,var(--tt-accent) 10deg,transparent 50deg,transparent 340deg);
+  filter:blur(1px);opacity:.45;
+  animation:ttRing 3.5s linear infinite;animation-play-state:paused;
+}
+.tt-platter.spinning::after{animation-play-state:running}
+@keyframes ttRing{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+
+.tt-vinyl{
+  position:absolute;inset:18px;border-radius:50%;
+  background:
+    repeating-radial-gradient(circle,rgba(255,255,255,.035) 0 1px,transparent 1px 3px),
+    radial-gradient(circle at 48% 48%,#222 0%,#0c0c0e 75%,#000 100%);
+  box-shadow:
+    inset 0 1px 2px rgba(255,255,255,.08),
+    inset 0 -3px 8px rgba(0,0,0,.9),
+    0 0 0 1px #000;
+  display:flex;align-items:center;justify-content:center;
+  cursor:grab;transform:rotate(0deg);
+  transition:transform .05s linear;
+}
+.tt-vinyl:active{cursor:grabbing}
+.tt-vinyl.spinning{animation:ttVinyl var(--tt-spin,1.8s) linear infinite}
+@keyframes ttVinyl{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.tt-vinyl::before{
+  /* light reflection streak */
+  content:'';position:absolute;inset:0;border-radius:50%;
+  background:conic-gradient(from 200deg,transparent 0deg,rgba(255,255,255,.06) 18deg,transparent 38deg,transparent 360deg);
+  pointer-events:none;
+}
+.tt-label{
+  position:relative;width:38%;height:38%;border-radius:50%;
+  background:
+    radial-gradient(circle at 35% 30%,#fff2,transparent 40%),
+    linear-gradient(145deg,var(--tt-accent) 0%,#7a2e00 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  color:#fff;font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:1.5px;
+  text-align:center;padding:6px;
+  box-shadow:inset 0 0 10px rgba(0,0,0,.4),0 0 0 1px rgba(0,0,0,.4);
+  text-shadow:0 1px 2px rgba(0,0,0,.5);
+}
+.turntable[data-tt="R"] .tt-label{background:radial-gradient(circle at 35% 30%,#fff2,transparent 40%),linear-gradient(145deg,var(--tt-accent) 0%,#005566 100%)}
+.tt-label::after{
+  content:'';position:absolute;width:6px;height:6px;border-radius:50%;
+  background:#0a0a0a;box-shadow:0 0 0 2px rgba(255,255,255,.5),inset 0 0 2px #000;
+}
+.tt-label .lbl-title{font-size:10px;font-weight:900;line-height:1.1;margin-top:-6px}
+.tt-label .lbl-sub{font-size:7px;letter-spacing:2px;opacity:.9;margin-top:3px}
+
+/* Tonearm */
+.tt-tonearm{
+  position:absolute;top:14px;right:14px;width:140px;height:180px;pointer-events:none;
+  transform-origin:85% 12%;transform:rotate(-22deg);
+  transition:transform .6s cubic-bezier(.6,.02,.3,1);
+}
+.tt-tonearm.dropped{transform:rotate(-8deg)}
+.tt-tonearm svg{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 4px 6px rgba(0,0,0,.55))}
+.tt-tonearm .ta-pivot{
+  position:absolute;right:10px;top:4px;width:28px;height:28px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#f5f5f7 0%,#9a9aa0 40%,#2a2a30 100%);
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.6),0 2px 4px rgba(0,0,0,.7),0 0 0 2px #0a0a0c;
+}
+.tt-tonearm .ta-cw{
+  position:absolute;right:-6px;top:-4px;width:22px;height:22px;border-radius:50%;
+  background:radial-gradient(circle at 30% 30%,#cfcfd4 0%,#6a6a70 55%,#1a1a1e 100%);
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.5),0 2px 4px rgba(0,0,0,.7);
+}
+
+/* Right controls column (pitch fader) */
+.tt-rightctl{display:flex;flex-direction:column;gap:6px;align-items:center;min-width:46px}
+.tt-pitch-label{
+  font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:1.5px;
+  color:#8a8a90;font-weight:800;
+}
+.tt-pitch-val{
+  font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;
+  color:var(--tt-accent);text-shadow:0 0 6px rgba(var(--tt-accent-rgb),.5);
+  background:#05080c;padding:2px 6px;border-radius:3px;min-width:48px;text-align:center;
+  border:1px solid #1a1a1e;
+}
+.tt-pitch-track{
+  position:relative;width:34px;height:180px;border-radius:6px;
+  background:linear-gradient(180deg,#0a0a0c 0%,#030304 100%);
+  border:1px solid #1a1a1e;
+  box-shadow:inset 0 2px 4px rgba(0,0,0,.9),inset 0 0 10px rgba(var(--tt-accent-rgb),.05);
+  display:flex;align-items:center;justify-content:center;
+}
+.tt-pitch-track::before{
+  content:'';position:absolute;left:50%;top:6px;bottom:6px;width:2px;
+  background:linear-gradient(180deg,rgba(255,255,255,.2),rgba(255,255,255,.08));
+  transform:translateX(-50%);border-radius:1px;
+}
+.tt-pitch-track::after{
+  content:'';position:absolute;left:50%;top:50%;width:14px;height:1px;
+  background:var(--tt-accent);transform:translate(-50%,-50%);
+  box-shadow:0 0 6px rgba(var(--tt-accent-rgb),.7);
+}
+.tt-pitch-input{
+  -webkit-appearance:none;appearance:none;position:absolute;
+  width:170px;height:30px;background:transparent;cursor:pointer;
+  transform:rotate(-90deg);top:calc(50% - 15px);left:calc(50% - 85px);
+}
+.tt-pitch-input::-webkit-slider-runnable-track{height:4px;background:transparent}
+.tt-pitch-input::-moz-range-track{height:4px;background:transparent}
+.tt-pitch-input::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;width:30px;height:20px;border-radius:3px;
+  background:linear-gradient(90deg,#dadade 0%,#8a8a90 50%,#3a3a40 100%);
+  border:1px solid #0a0a0c;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 2px 4px rgba(0,0,0,.7),0 0 8px rgba(var(--tt-accent-rgb),.3);
+  cursor:grab;
+}
+.tt-pitch-input::-moz-range-thumb{
+  width:30px;height:20px;border-radius:3px;
+  background:linear-gradient(90deg,#dadade 0%,#8a8a90 50%,#3a3a40 100%);
+  border:1px solid #0a0a0c;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 2px 4px rgba(0,0,0,.7);cursor:grab;
+}
+
+/* bottom row: cue + sync + fx */
+.tt-bottom{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px;
+}
+.tt-btn{
+  padding:8px 6px;font-family:'Orbitron',sans-serif;font-size:10px;font-weight:800;
+  letter-spacing:1.3px;color:#b0b0b6;
+  background:linear-gradient(180deg,#1c1c20 0%,#0a0a0c 100%);
+  border:1px solid #26262c;border-radius:5px;cursor:pointer;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 1px 2px rgba(0,0,0,.6);
+  transition:all .12s;
+}
+.tt-btn:hover{color:var(--tt-accent);border-color:rgba(var(--tt-accent-rgb),.5);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 0 10px rgba(var(--tt-accent-rgb),.3)}
+.tt-btn.cue{color:#ffaa66}
+.tt-btn.cue.armed{background:linear-gradient(180deg,#ff7a00 0%,#6a2a00 100%);color:#0a0a0a;border-color:#ffd9a8;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 0 10px rgba(255,122,0,.55)}
+.tt-btn.sync.active{background:linear-gradient(180deg,#2ee0ff 0%,#006680 100%);color:#05131a;border-color:#baf1ff;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 0 10px rgba(46,224,255,.55)}
+
+/* ---------------- Mixer core (between decks) ---------------- */
+.vx-mixer{
+  position:relative;border-radius:14px;padding:16px 14px 18px;
+  background:
+    linear-gradient(180deg,#1a1a1e 0%,#0b0b0d 100%);
+  border:1px solid #2a2a30;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.08),
+    inset 0 -1px 0 rgba(0,0,0,.8),
+    inset 0 0 40px rgba(0,0,0,.6),
+    0 20px 40px rgba(0,0,0,.7);
+  display:flex;flex-direction:column;gap:12px;align-items:stretch;
+  min-height:460px;
+}
+.vx-mixer::before{
+  content:'';position:absolute;top:0;left:10%;right:10%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,138,26,.55),rgba(46,224,255,.55),transparent);
+}
+.vx-brand{
+  font-family:'Orbitron',sans-serif;font-size:10px;font-weight:900;letter-spacing:2.5px;
+  color:#bfbfc4;text-align:center;padding-bottom:2px;
+}
+.vx-brand b{color:var(--orange)}
+.vx-vu{
+  display:flex;justify-content:center;gap:4px;padding:6px;border-radius:6px;
+  background:#050507;border:1px solid #1a1a1e;
+  box-shadow:inset 0 0 10px rgba(0,0,0,.8);
+}
+.vx-vu-col{width:10px;height:56px;border-radius:2px;position:relative;overflow:hidden;background:#0a0a0c;border:1px solid #151518}
+.vx-vu-fill{
+  position:absolute;left:0;right:0;bottom:0;height:65%;
+  background:linear-gradient(180deg,#ff2e2e 0%,#ffd400 25%,#00ff7a 55%,#008844 100%);
+  box-shadow:inset 0 0 4px rgba(255,255,255,.2);
+}
+.vx-vu-fill::after{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(180deg,rgba(0,0,0,.45) 0 2px,transparent 2px 4px);
+}
+
+.vx-channels{display:grid;grid-template-columns:1fr 1fr;gap:10px;flex:1;min-height:0}
+.vx-ch{
+  display:flex;flex-direction:column;gap:6px;padding:8px;border-radius:8px;
+  background:linear-gradient(180deg,#101014 0%,#060608 100%);
+  border:1px solid #1d1d22;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04),inset 0 0 18px rgba(0,0,0,.6);
+}
+.vx-ch-head{
+  font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:2px;font-weight:800;
+  text-align:center;padding:3px 0;border-radius:3px;
+}
+.vx-ch[data-ch="A"] .vx-ch-head{color:#ff7a00;background:rgba(255,122,0,.08);border:1px solid rgba(255,122,0,.25)}
+.vx-ch[data-ch="B"] .vx-ch-head{color:#2ee0ff;background:rgba(46,224,255,.08);border:1px solid rgba(46,224,255,.25)}
+.vx-eq{display:flex;flex-direction:column;gap:6px;align-items:center}
+.vx-knob{
+  width:32px;height:32px;border-radius:50%;
+  background:
+    radial-gradient(circle at 35% 30%,#f5f5f7 0%,#8a8a90 35%,#26262c 85%,#050507 100%);
+  border:1px solid #050507;position:relative;cursor:pointer;
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.5),0 2px 5px rgba(0,0,0,.7),0 0 0 2px #0a0a0c;
+}
+.vx-knob::after{
+  content:'';position:absolute;left:50%;top:4px;width:2px;height:10px;border-radius:1px;
+  background:var(--vx-ind,#ff7a00);transform:translateX(-50%);
+  box-shadow:0 0 4px var(--vx-ind,#ff7a00);
+}
+.vx-ch[data-ch="B"] .vx-knob{--vx-ind:#2ee0ff}
+.vx-knob-lbl{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:1.2px;color:#8a8a90;text-align:center}
+.vx-fader-wrap{
+  position:relative;flex:1;min-height:110px;border-radius:4px;
+  background:#030305;border:1px solid #151518;
+  box-shadow:inset 0 0 8px rgba(0,0,0,.9);
+  display:flex;align-items:flex-end;justify-content:center;padding:4px 0;
+}
+.vx-fader-wrap::before{
+  content:'';position:absolute;left:50%;top:8px;bottom:8px;width:2px;
+  background:linear-gradient(180deg,rgba(255,255,255,.15),rgba(255,255,255,.04));
+  transform:translateX(-50%);
+}
+.vx-fader{
+  -webkit-appearance:none;appearance:none;position:absolute;
+  width:90px;height:22px;background:transparent;transform:rotate(-90deg);
+  top:calc(50% - 11px);left:calc(50% - 45px);cursor:pointer;
+}
+.vx-fader::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;width:22px;height:28px;border-radius:3px;
+  background:linear-gradient(90deg,#e4e4e8 0%,#8a8a90 50%,#3a3a40 100%);
+  border:1px solid #050507;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 2px 4px rgba(0,0,0,.7);
+}
+.vx-fader::-moz-range-thumb{
+  width:22px;height:28px;border-radius:3px;
+  background:linear-gradient(90deg,#e4e4e8 0%,#8a8a90 50%,#3a3a40 100%);
+  border:1px solid #050507;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 2px 4px rgba(0,0,0,.7);
+}
+.vx-cue{
+  padding:6px;font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:1.5px;
+  font-weight:800;color:#8a8a90;
+  background:linear-gradient(180deg,#1a1a1e 0%,#0a0a0c 100%);
+  border:1px solid #26262c;border-radius:4px;cursor:pointer;
+  transition:all .12s;
+}
+.vx-cue:hover{color:#ffd700;border-color:rgba(255,215,0,.4)}
+.vx-cue.active{background:linear-gradient(180deg,#ffd700,#8a6a00);color:#1a1410;border-color:#fff3a0;box-shadow:0 0 10px rgba(255,215,0,.5)}
+
+/* Crossfader */
+.vx-xfader-wrap{
+  padding:10px 8px;border-radius:8px;
+  background:linear-gradient(180deg,#07070a 0%,#03030505 100%);
+  background:linear-gradient(180deg,#07070a 0%,#030305 100%);
+  border:1px solid #1d1d22;box-shadow:inset 0 0 12px rgba(0,0,0,.8);
+}
+.vx-xfader-head{
+  display:flex;justify-content:space-between;font-family:'Orbitron',sans-serif;
+  font-size:9px;letter-spacing:1.5px;font-weight:800;margin-bottom:4px;
+}
+.vx-xfader-head .xf-a{color:#ff7a00}
+.vx-xfader-head .xf-b{color:#2ee0ff}
+.vx-xfader-track{
+  position:relative;height:24px;border-radius:3px;
+  background:linear-gradient(180deg,#050507,#101014);
+  border:1px solid #1a1a1e;box-shadow:inset 0 2px 4px rgba(0,0,0,.9);
+  display:flex;align-items:center;padding:0 4px;
+}
+.vx-xfader-track::before{
+  content:'';position:absolute;left:8px;right:8px;top:50%;height:2px;
+  background:linear-gradient(90deg,#ff7a00,#8a8a90 50%,#2ee0ff);transform:translateY(-50%);
+  border-radius:1px;opacity:.5;
+}
+.vx-xfader{
+  -webkit-appearance:none;appearance:none;width:100%;height:22px;
+  background:transparent;cursor:pointer;
+}
+.vx-xfader::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;width:22px;height:28px;border-radius:3px;
+  background:linear-gradient(180deg,#e4e4e8 0%,#8a8a90 55%,#3a3a40 100%);
+  border:1px solid #050507;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 2px 5px rgba(0,0,0,.7);
+}
+.vx-xfader::-moz-range-thumb{
+  width:22px;height:28px;border-radius:3px;
+  background:linear-gradient(180deg,#e4e4e8 0%,#8a8a90 55%,#3a3a40 100%);
+  border:1px solid #050507;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 2px 5px rgba(0,0,0,.7);
+}
+
+/* Responsive */
+@media(max-width:1100px){
+  .vinyl-stage{grid-template-columns:1fr;gap:14px}
+  .vx-mixer{min-height:auto}
+  .turntable{min-height:auto}
+  .tt-platter{width:260px;height:260px}
+}
+@media(max-width:600px){
+  .vinyl-stage{padding:14px 10px}
+  .tt-platter{width:220px;height:220px}
+  .tt-deck{grid-template-columns:auto 1fr;padding:10px;min-height:auto}
+  .tt-rightctl{grid-column:1/-1;flex-direction:row;width:100%;min-width:0;justify-content:center;margin-top:6px}
+  .tt-pitch-track{width:60%;height:28px}
+  .tt-pitch-input{transform:rotate(0);width:100%;top:-4px;left:0}
+  .tt-pitch-track::before{left:6px;right:6px;top:50%;bottom:auto;width:auto;height:2px}
+  .tt-pitch-track::after{top:50%;left:50%;width:1px;height:14px}
+  .tt-bottom{grid-template-columns:repeat(2,1fr)}
+}
 </style>
 </head>
 <body>
@@ -4355,6 +4949,7 @@ body.work-mode .automix-sync{
 
 <div class="main-tabs">
 <button class="tab-btn active" data-tab="deck" data-t="tab_decks">◉ DECKS</button>
+<button class="tab-btn" data-tab="vinyl" data-t="tab_vinyl">💿 VINYL</button>
 <button class="tab-btn" data-tab="sampler" data-t="tab_sampler">▣ SAMPLER</button>
 <button class="tab-btn" data-tab="youtube" data-t="tab_music">🔎 MUSIC</button>
 <button class="tab-btn" data-tab="playlists" data-t="tab_playlists">≡ PLAYLISTS</button>
@@ -4521,6 +5116,182 @@ body.work-mode .automix-sync{
 </div>
 <div class="track-list-header"><span>#</span><span>TITLE</span><span class="th-artist">ARTIST</span><span class="th-bpm">BPM</span><span class="th-key">KEY</span><span class="th-rating">RATING</span><span class="th-actions">ACTIONS</span></div>
 <div class="track-list" id="trackList"></div>
+</div>
+</div>
+
+<div class="tab-content" id="tab-vinyl">
+<div class="vinyl-stage">
+  <div class="vinyl-floor"></div>
+
+  <div class="turntable" data-tt="L" id="ttL">
+    <div class="tt-topbar">
+      <span class="tt-brand">TECHN<span class="brand-accent">I</span>CS · SL-MAX</span>
+      <div class="tt-screen">
+        <span class="tt-scr-title" id="ttL-title">— NO TRACK —</span>
+        <span class="tt-scr-bpm" id="ttL-bpm">128.0</span>
+      </div>
+      <span class="tt-power" title="Power"></span>
+    </div>
+    <div class="tt-deck">
+      <div class="tt-leftctl">
+        <div class="tt-rpm">
+          <button class="tt-rpm-btn active" data-rpm="33">33⅓</button>
+          <button class="tt-rpm-btn" data-rpm="45">45</button>
+        </div>
+        <button class="tt-startstop" id="ttL-startstop" title="Start / Stop"></button>
+        <span class="tt-startstop-label">START/STOP</span>
+      </div>
+      <div class="tt-platter-wrap">
+        <div class="tt-platter" id="ttL-platter">
+          <div class="tt-vinyl" id="ttL-vinyl">
+            <div class="tt-label">
+              <span class="lbl-title">DJ MAX</span>
+              <span class="lbl-sub">SIDE&nbsp;A · 33⅓</span>
+            </div>
+          </div>
+        </div>
+        <div class="tt-tonearm" id="ttL-tonearm">
+          <svg viewBox="0 0 140 180">
+            <defs>
+              <linearGradient id="ttarmL" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#f0f0f4"/>
+                <stop offset="50%" stop-color="#8a8a90"/>
+                <stop offset="100%" stop-color="#2a2a30"/>
+              </linearGradient>
+            </defs>
+            <path d="M 118 20 C 110 60 92 80 74 96 C 58 110 44 122 30 136" stroke="url(#ttarmL)" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+            <path d="M 30 136 L 20 152 L 34 156 Z" fill="#2a2a30" stroke="#0a0a0c" stroke-width="1"/>
+            <circle cx="22" cy="154" r="2.4" fill="#ff3c3c"/>
+          </svg>
+          <div class="ta-pivot"></div>
+          <div class="ta-cw"></div>
+        </div>
+      </div>
+      <div class="tt-rightctl">
+        <span class="tt-pitch-label">PITCH</span>
+        <span class="tt-pitch-val" id="ttL-pitch-val">+0.00%</span>
+        <div class="tt-pitch-track">
+          <input type="range" class="tt-pitch-input" id="ttL-pitch" min="-8" max="8" step="0.1" value="0"/>
+        </div>
+      </div>
+    </div>
+    <div class="tt-bottom">
+      <button class="tt-btn cue" data-tt-btn="cue">CUE</button>
+      <button class="tt-btn" data-tt-btn="loop">LOOP</button>
+      <button class="tt-btn sync" data-tt-btn="sync">SYNC</button>
+      <button class="tt-btn" data-tt-btn="fx">FX</button>
+    </div>
+  </div>
+
+  <div class="vx-mixer">
+    <div class="vx-brand">DJM-<b>MAX</b> · CORE</div>
+    <div class="vx-vu">
+      <div class="vx-vu-col"><div class="vx-vu-fill" id="vxVuL" style="height:60%"></div></div>
+      <div class="vx-vu-col"><div class="vx-vu-fill" id="vxVuR" style="height:55%"></div></div>
+    </div>
+    <div class="vx-channels">
+      <div class="vx-ch" data-ch="A">
+        <div class="vx-ch-head">CH A</div>
+        <div class="vx-eq">
+          <div class="vx-knob" data-vxknob="trimA"></div>
+          <span class="vx-knob-lbl">TRIM</span>
+          <div class="vx-knob" data-vxknob="hiA"></div>
+          <span class="vx-knob-lbl">HI</span>
+          <div class="vx-knob" data-vxknob="midA"></div>
+          <span class="vx-knob-lbl">MID</span>
+          <div class="vx-knob" data-vxknob="lowA"></div>
+          <span class="vx-knob-lbl">LOW</span>
+        </div>
+        <div class="vx-fader-wrap">
+          <input type="range" class="vx-fader" id="vxFaderA" min="0" max="100" value="85"/>
+        </div>
+        <button class="vx-cue" data-vx-cue="A">CUE</button>
+      </div>
+      <div class="vx-ch" data-ch="B">
+        <div class="vx-ch-head">CH B</div>
+        <div class="vx-eq">
+          <div class="vx-knob" data-vxknob="trimB"></div>
+          <span class="vx-knob-lbl">TRIM</span>
+          <div class="vx-knob" data-vxknob="hiB"></div>
+          <span class="vx-knob-lbl">HI</span>
+          <div class="vx-knob" data-vxknob="midB"></div>
+          <span class="vx-knob-lbl">MID</span>
+          <div class="vx-knob" data-vxknob="lowB"></div>
+          <span class="vx-knob-lbl">LOW</span>
+        </div>
+        <div class="vx-fader-wrap">
+          <input type="range" class="vx-fader" id="vxFaderB" min="0" max="100" value="85"/>
+        </div>
+        <button class="vx-cue" data-vx-cue="B">CUE</button>
+      </div>
+    </div>
+    <div class="vx-xfader-wrap">
+      <div class="vx-xfader-head"><span class="xf-a">A</span><span>CROSSFADER</span><span class="xf-b">B</span></div>
+      <div class="vx-xfader-track">
+        <input type="range" class="vx-xfader" id="vxXfader" min="0" max="100" value="50"/>
+      </div>
+    </div>
+  </div>
+
+  <div class="turntable" data-tt="R" id="ttR">
+    <div class="tt-topbar">
+      <span class="tt-brand">TECHN<span class="brand-accent">I</span>CS · SL-MAX</span>
+      <div class="tt-screen">
+        <span class="tt-scr-title" id="ttR-title">— NO TRACK —</span>
+        <span class="tt-scr-bpm" id="ttR-bpm">128.0</span>
+      </div>
+      <span class="tt-power" title="Power"></span>
+    </div>
+    <div class="tt-deck">
+      <div class="tt-leftctl">
+        <div class="tt-rpm">
+          <button class="tt-rpm-btn active" data-rpm="33">33⅓</button>
+          <button class="tt-rpm-btn" data-rpm="45">45</button>
+        </div>
+        <button class="tt-startstop" id="ttR-startstop" title="Start / Stop"></button>
+        <span class="tt-startstop-label">START/STOP</span>
+      </div>
+      <div class="tt-platter-wrap">
+        <div class="tt-platter" id="ttR-platter">
+          <div class="tt-vinyl" id="ttR-vinyl">
+            <div class="tt-label">
+              <span class="lbl-title">DJ MAX</span>
+              <span class="lbl-sub">SIDE&nbsp;B · 33⅓</span>
+            </div>
+          </div>
+        </div>
+        <div class="tt-tonearm" id="ttR-tonearm">
+          <svg viewBox="0 0 140 180">
+            <defs>
+              <linearGradient id="ttarmR" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#f0f0f4"/>
+                <stop offset="50%" stop-color="#8a8a90"/>
+                <stop offset="100%" stop-color="#2a2a30"/>
+              </linearGradient>
+            </defs>
+            <path d="M 118 20 C 110 60 92 80 74 96 C 58 110 44 122 30 136" stroke="url(#ttarmR)" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+            <path d="M 30 136 L 20 152 L 34 156 Z" fill="#2a2a30" stroke="#0a0a0c" stroke-width="1"/>
+            <circle cx="22" cy="154" r="2.4" fill="#ff3c3c"/>
+          </svg>
+          <div class="ta-pivot"></div>
+          <div class="ta-cw"></div>
+        </div>
+      </div>
+      <div class="tt-rightctl">
+        <span class="tt-pitch-label">PITCH</span>
+        <span class="tt-pitch-val" id="ttR-pitch-val">+0.00%</span>
+        <div class="tt-pitch-track">
+          <input type="range" class="tt-pitch-input" id="ttR-pitch" min="-8" max="8" step="0.1" value="0"/>
+        </div>
+      </div>
+    </div>
+    <div class="tt-bottom">
+      <button class="tt-btn cue" data-tt-btn="cue">CUE</button>
+      <button class="tt-btn" data-tt-btn="loop">LOOP</button>
+      <button class="tt-btn sync" data-tt-btn="sync">SYNC</button>
+      <button class="tt-btn" data-tt-btn="fx">FX</button>
+    </div>
+  </div>
 </div>
 </div>
 
@@ -5380,7 +6151,10 @@ function buildDeckHTML(d){
 
 function buildMixerToolbarHTML(){
   return `<div class="mtb-section mtb-automix">
-    <div class="mtb-head"><span class="mtb-label">⚡ AUTO MIX</span><span class="mtb-dir" id="automixDir">A→B</span></div>
+    <div class="mtb-head">
+      <span class="mtb-label"><span class="mtb-led" aria-hidden="true"></span>AUTO&nbsp;MIX</span>
+      <span class="mtb-dir" id="automixDir">A→B</span>
+    </div>
     <div class="mtb-body">
       <div class="automix-grid">
         <button class="automix-btn" data-mix="smooth" title="Long bass-swap blend">SMOOTH</button>
@@ -5390,13 +6164,15 @@ function buildMixerToolbarHTML(){
         <button class="automix-btn echo" data-mix="echo" title="Echo tail on outgoing">ECHO</button>
         <button class="automix-btn pick" id="automixPickBtn" title="Load smart next track">PICK</button>
       </div>
-      <div class="automix-sub"><span>BARS</span>
+      <div class="automix-sub">
+        <span class="automix-sub-label">BARS</span>
         <select class="fx-selector automix-bars" id="automixBars">
           <option value="4">4</option><option value="8">8</option><option value="16" selected>16</option>
           <option value="32">32</option><option value="64">64</option>
         </select>
-        <button class="automix-sync" id="automixSync" title="Sync incoming deck">SYNC →</button>
-        <button class="automix-sync" id="automixContBtn" title="Auto-chain transitions forever" style="margin-left:4px">CONT</button>
+        <span class="automix-sep" aria-hidden="true"></span>
+        <button class="automix-sync" id="automixSync" title="Sync incoming deck"><span class="asy-txt">SYNC</span><span class="asy-arrow" aria-hidden="true"></span></button>
+        <button class="automix-sync automix-cont" id="automixContBtn" title="Auto-chain transitions forever">CONT</button>
       </div>
     </div>
   </div>
@@ -7679,6 +8455,153 @@ function setupTabs(){
   });
 }
 
+/* VINYL view — realistic twin turntables + mixer */
+function setupVinylTurntables(){
+  const state={
+    L:{playing:false,pitch:0,rpm:33,cue:false,sync:false},
+    R:{playing:false,pitch:0,rpm:33,cue:false,sync:false},
+    xfader:50,vuL:60,vuR:55
+  };
+  const baseBpm={L:128.0,R:128.0};
+
+  function applySpin(side){
+    const s=state[side];
+    const vinyl=document.getElementById(`tt${side}-vinyl`);
+    const platter=document.getElementById(`tt${side}-platter`);
+    const tonearm=document.getElementById(`tt${side}-tonearm`);
+    if(!vinyl||!platter||!tonearm)return;
+    if(s.playing){
+      const rpm=s.rpm*(1+s.pitch/100);
+      const dur=(60/rpm).toFixed(3);
+      vinyl.style.setProperty('--tt-spin',dur+'s');
+      vinyl.classList.add('spinning');
+      platter.classList.add('spinning');
+      tonearm.classList.add('dropped');
+    }else{
+      vinyl.classList.remove('spinning');
+      platter.classList.remove('spinning');
+      tonearm.classList.remove('dropped');
+    }
+    const bpmEl=document.getElementById(`tt${side}-bpm`);
+    if(bpmEl){
+      const bpm=(baseBpm[side]*(1+s.pitch/100)).toFixed(1);
+      bpmEl.textContent=bpm;
+    }
+  }
+
+  ['L','R'].forEach(side=>{
+    const startBtn=document.getElementById(`tt${side}-startstop`);
+    startBtn?.addEventListener('click',()=>{
+      state[side].playing=!state[side].playing;
+      startBtn.classList.toggle('playing',state[side].playing);
+      applySpin(side);
+    });
+    const pitch=document.getElementById(`tt${side}-pitch`);
+    const pitchVal=document.getElementById(`tt${side}-pitch-val`);
+    pitch?.addEventListener('input',()=>{
+      const v=parseFloat(pitch.value);
+      state[side].pitch=v;
+      if(pitchVal)pitchVal.textContent=(v>=0?'+':'')+v.toFixed(2)+'%';
+      applySpin(side);
+    });
+    document.querySelectorAll(`#tt${side} .tt-rpm-btn`).forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        document.querySelectorAll(`#tt${side} .tt-rpm-btn`).forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        state[side].rpm=parseInt(btn.dataset.rpm,10);
+        applySpin(side);
+      });
+    });
+    document.querySelectorAll(`#tt${side} .tt-bottom .tt-btn`).forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const k=btn.dataset.ttBtn;
+        if(k==='cue')btn.classList.toggle('armed');
+        else if(k==='sync')btn.classList.toggle('active');
+        else btn.classList.toggle('active');
+      });
+    });
+    // drag-to-scratch on vinyl
+    const vinyl=document.getElementById(`tt${side}-vinyl`);
+    if(vinyl){
+      let dragging=false,lastAngle=0,manualAngle=0;
+      const centerOf=()=>{const r=vinyl.getBoundingClientRect();return{cx:r.left+r.width/2,cy:r.top+r.height/2}};
+      const getAngle=(x,y,c)=>Math.atan2(y-c.cy,x-c.cx)*180/Math.PI;
+      vinyl.addEventListener('pointerdown',e=>{
+        dragging=true;vinyl.setPointerCapture(e.pointerId);
+        lastAngle=getAngle(e.clientX,e.clientY,centerOf());
+        vinyl.classList.remove('spinning');
+      });
+      vinyl.addEventListener('pointermove',e=>{
+        if(!dragging)return;
+        const c=centerOf();const a=getAngle(e.clientX,e.clientY,c);
+        manualAngle+=(a-lastAngle);lastAngle=a;
+        vinyl.style.transform=`rotate(${manualAngle}deg)`;
+      });
+      const release=()=>{
+        if(!dragging)return;dragging=false;
+        vinyl.style.transform='';
+        if(state[side].playing){vinyl.classList.add('spinning')}
+      };
+      vinyl.addEventListener('pointerup',release);
+      vinyl.addEventListener('pointercancel',release);
+      vinyl.addEventListener('pointerleave',release);
+    }
+  });
+
+  // mixer cue buttons
+  document.querySelectorAll('.vx-cue').forEach(btn=>{
+    btn.addEventListener('click',()=>btn.classList.toggle('active'));
+  });
+  // mixer knobs — rotate indicator on drag
+  document.querySelectorAll('.vx-knob').forEach(knob=>{
+    let val=0.5,dragY=0,dragging=false;
+    const render=()=>{const deg=-135+val*270;knob.style.transform=`rotate(${deg}deg)`};
+    render();
+    knob.addEventListener('pointerdown',e=>{dragging=true;dragY=e.clientY;knob.setPointerCapture(e.pointerId)});
+    knob.addEventListener('pointermove',e=>{
+      if(!dragging)return;
+      val=Math.max(0,Math.min(1,val+(dragY-e.clientY)/200));
+      dragY=e.clientY;render();
+    });
+    const stop=e=>{if(dragging){dragging=false;try{knob.releasePointerCapture(e.pointerId)}catch(_){}};};
+    knob.addEventListener('pointerup',stop);
+    knob.addEventListener('pointercancel',stop);
+  });
+  // crossfader drives VU baseline
+  const xf=document.getElementById('vxXfader');
+  const vuL=document.getElementById('vxVuL');
+  const vuR=document.getElementById('vxVuR');
+  function paintVU(){
+    const x=xf?parseFloat(xf.value)/100:.5;
+    const jitter=()=>Math.random()*15;
+    if(vuL)vuL.style.height=Math.min(95,(1-x)*70+jitter())+'%';
+    if(vuR)vuR.style.height=Math.min(95,x*70+jitter())+'%';
+  }
+  setInterval(paintVU,120);
+
+  // Auto-fill title/bpm from decks if available
+  function syncFromDeck(){
+    try{
+      const dA=(typeof decks!=='undefined')?decks.A:null;
+      const dB=(typeof decks!=='undefined')?decks.B:null;
+      if(dA&&dA.track){
+        const t=document.getElementById('ttL-title');
+        if(t)t.textContent=`${dA.track.title||'UNTITLED'} — ${dA.track.artist||'—'}`.toUpperCase();
+        if(dA.track.bpm)baseBpm.L=+dA.track.bpm||baseBpm.L;
+      }
+      if(dB&&dB.track){
+        const t=document.getElementById('ttR-title');
+        if(t)t.textContent=`${dB.track.title||'UNTITLED'} — ${dB.track.artist||'—'}`.toUpperCase();
+        if(dB.track.bpm)baseBpm.R=+dB.track.bpm||baseBpm.R;
+      }
+    }catch(_){}
+    applySpin('L');applySpin('R');
+  }
+  const vinylTabBtn=document.querySelector('.tab-btn[data-tab="vinyl"]');
+  vinylTabBtn?.addEventListener('click',()=>setTimeout(syncFromDeck,50));
+  syncFromDeck();
+}
+
 /* ============ ADVANCED FEATURES ============ */
 let midiLearnMode=false,midiLearnTarget=null,midiMappings={};
 let sessions=[];
@@ -7861,7 +8784,7 @@ function init(){
   const mtb=document.getElementById('mixer-toolbar');if(mtb)mtb.innerHTML=buildMixerToolbarHTML();
   setupVU('vu-A',20);setupVU('vu-B',20);setupVU('vu-C',20);setupVU('vu-D',20);
   setupVU('masterHVuL',20);setupVU('masterHVuR',20);
-  attachKnobs();attachEvents();setupBeatFxUI();setupSceneFx();setupKeyboard();setupTabs();setupSettings();
+  attachKnobs();attachEvents();setupBeatFxUI();setupSceneFx();setupKeyboard();setupTabs();setupSettings();setupVinylTurntables();
   setupWaveformInteraction();setupAdvancedFeatures();renderSessions();
   renderSampler();renderPlaylists();
 
