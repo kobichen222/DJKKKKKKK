@@ -4283,112 +4283,397 @@ body.work-mode .dsb-wmexit{display:inline-flex;background:linear-gradient(180deg
   box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 0 22px rgba(255,138,26,.8) !important;
 }
 
+/* ── Clear the stage — only the two decks on screen in DJ FOCUS ── */
 body.dj-focus-mode #mixer-container,
 body.dj-focus-mode .mixer-toolbar,
-body.dj-focus-mode .compact-decks{
-  display:none !important;
-}
-
-body.dj-focus-mode .console{
-  grid-template-columns:1fr 1fr !important;
-  gap:14px;
-  max-width:none;
-  width:calc(100vw - 16px);
-  padding:6px;
-}
-@media(min-width:1920px){
-  body.dj-focus-mode .console{width:calc(100vw - 24px);gap:20px}
-}
-
-body.dj-focus-mode .header-bar,
-body.dj-focus-mode .main-tabs,
-body.dj-focus-mode .deck-switch-bar,
+body.dj-focus-mode .compact-decks,
 body.dj-focus-mode .beat-fx-panel,
 body.dj-focus-mode .scene-fx-panel,
 body.dj-focus-mode .library,
 body.dj-focus-mode .rgb-ambient{
+  display:none !important;
+}
+
+/* Edge-to-edge two-column layout, no max-width cap */
+body.dj-focus-mode body,body.dj-focus-mode{padding:0;gap:0}
+body.dj-focus-mode .console{
+  grid-template-columns:1fr 1fr !important;
+  gap:14px;
+  max-width:none !important;
+  width:calc(100vw - 16px);
+  padding:4px;
+  align-items:stretch;
+}
+@media(min-width:1920px){
+  body.dj-focus-mode .console{width:calc(100vw - 24px);gap:20px}
+}
+body.dj-focus-mode .header-bar,
+body.dj-focus-mode .main-tabs,
+body.dj-focus-mode .deck-switch-bar{
   max-width:none;width:calc(100vw - 16px);
 }
 
+/* Floating mode badge */
 body.dj-focus-mode::before{
-  content:'🎛 DJ DECK FOCUS — EXTERNAL MIXER MODE';
+  content:'🎛 DJ DECK FOCUS · EXTERNAL MIXER MODE';
   position:fixed;top:6px;left:50%;transform:translateX(-50%);
   font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:3px;
-  color:var(--orange);background:rgba(10,10,14,.8);
-  padding:4px 14px;border:1px solid rgba(255,138,26,.4);border-radius:20px;
-  box-shadow:0 4px 14px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.06);
-  z-index:10;pointer-events:none;backdrop-filter:blur(8px);
+  color:var(--orange);background:rgba(10,10,14,.88);
+  padding:5px 16px;border:1px solid rgba(255,138,26,.45);border-radius:20px;
+  box-shadow:0 4px 14px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.08);
+  z-index:50;pointer-events:none;backdrop-filter:blur(10px);
 }
 
-body.dj-focus-mode .cdj{padding:18px 16px;border-radius:20px}
-body.dj-focus-mode .deck-number{font-size:32px;padding:4px 14px;letter-spacing:2px}
+/* ══════════════════════════════════════════════════════════════
+   CDJ-3000-INSPIRED LAYOUT — chassis + grid areas
+   Each deck is laid out with a proper 3-column grid:
+     row 1 : deck header (brand + deck #)
+     row 2 : full-width screen (title / BPM / waveform / times)
+     row 3 : pad mode chooser │ BIG JOG WHEEL │ beat-jump
+     row 4 : hot cues          │ BIG JOG WHEEL │ deck utils
+     row 5 : loop controls     │ BIG JOG WHEEL │ tempo section
+     row 6 : TRANSPORT (CUE · PLAY) spans cols 1-2 │ tempo section
+   ══════════════════════════════════════════════════════════════ */
+body.dj-focus-mode .cdj{
+  display:grid;
+  grid-template-columns:minmax(210px,1fr) minmax(360px,1.7fr) minmax(210px,1fr);
+  grid-template-rows:auto auto auto auto auto 1fr auto;
+  grid-template-areas:
+    "hdr hdr hdr"
+    "scr scr scr"
+    "pmd jog bjp"
+    "cue jog utl"
+    "lop jog tmp"
+    "trn trn tmp"
+    "vol vol vol";
+  gap:12px 16px;
+  padding:22px 20px 28px;
+  border-radius:22px;
+  border:2px solid #0a0a0d;
+  background:
+    linear-gradient(180deg,
+      #32323a 0%,#23232a 22%,
+      #16161b 55%,#0f0f13 100%);
+  box-shadow:
+    0 0 0 1px rgba(var(--deck-accent-rgb),.18),
+    0 0 70px rgba(var(--deck-accent-rgb),.12),
+    0 30px 90px rgba(0,0,0,.85),
+    inset 0 1px 0 rgba(255,255,255,.13),
+    inset 0 -1px 0 rgba(0,0,0,.75);
+  position:relative;
+  overflow:visible;
+  align-content:start;
+}
+/* Grid assignments for each deck child */
+body.dj-focus-mode .cdj .deck-header   {grid-area:hdr}
+body.dj-focus-mode .cdj .screen        {grid-area:scr}
+body.dj-focus-mode .cdj .pad-mode-row  {grid-area:pmd}
+body.dj-focus-mode .cdj .hot-cues      {grid-area:cue;align-content:center}
+body.dj-focus-mode .cdj .loop-section  {grid-area:lop}
+body.dj-focus-mode .cdj .beat-jump     {grid-area:bjp}
+body.dj-focus-mode .cdj .deck-utils    {grid-area:utl}
+body.dj-focus-mode .cdj .jog-wrapper   {grid-area:jog;place-self:center;margin:0}
+body.dj-focus-mode .cdj .transport     {grid-area:trn;margin-top:6px}
+body.dj-focus-mode .cdj .tempo-section {grid-area:tmp;align-self:stretch;display:flex;flex-direction:column}
+body.dj-focus-mode .cdj .tempo-section .tempo-btn-row{flex:1}
+body.dj-focus-mode .cdj .dj-focus-vol  {grid-area:vol;display:grid}
+
+/* ── Per-deck channel volume strip (DJ FOCUS only) ───────────── */
+.dj-focus-vol{display:none}
+body.dj-focus-mode .dj-focus-vol{
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  grid-template-rows:auto auto;
+  gap:6px 10px;
+  padding:10px 14px;
+  margin-top:6px;
+  border-radius:10px;
+  background:linear-gradient(180deg,#141418 0%,#08080b 100%);
+  border:1px solid rgba(var(--deck-accent-rgb),.22);
+  box-shadow:inset 0 0 20px rgba(0,0,0,.6),0 2px 8px rgba(0,0,0,.5);
+  align-items:center;
+}
+.dj-focus-vol .djfv-head{
+  grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;
+  font-family:'Orbitron',sans-serif;letter-spacing:2.5px;
+}
+.dj-focus-vol .djfv-label{
+  font-size:11px;font-weight:800;color:var(--deck-accent);
+  text-shadow:0 0 8px rgba(var(--deck-accent-rgb),.5);
+}
+.dj-focus-vol .djfv-mute{
+  padding:6px 14px;font-size:10px;letter-spacing:2px;font-weight:800;
+  background:linear-gradient(180deg,#2a2a2e 0%,#141418 100%);
+  border:1px solid #3a3a42;color:var(--text-dim);border-radius:5px;cursor:pointer;
+  transition:all .15s;font-family:'Orbitron',sans-serif;
+}
+.dj-focus-vol .djfv-mute:hover{border-color:var(--red);color:var(--red)}
+.dj-focus-vol .djfv-mute.active{
+  background:linear-gradient(180deg,#ff4040 0%,#aa1010 100%);
+  color:#fff;border-color:#ff8080;box-shadow:0 0 14px rgba(255,60,60,.6);
+}
+.dj-focus-vol .djfv-body{
+  grid-column:1/-1;display:grid;grid-template-columns:auto 1fr auto 60px;
+  gap:10px;align-items:center;
+}
+.dj-focus-vol .djfv-btn{
+  width:42px;height:42px;border-radius:8px;
+  background:linear-gradient(180deg,#3a3a42 0%,#16161a 100%);
+  border:1px solid #4a4a52;color:var(--deck-accent);
+  font-family:'Orbitron',sans-serif;font-size:22px;font-weight:900;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 2px 6px rgba(0,0,0,.5);
+  transition:all .1s;
+}
+.dj-focus-vol .djfv-btn:hover{border-color:var(--deck-accent);box-shadow:0 0 14px rgba(var(--deck-accent-rgb),.6)}
+.dj-focus-vol .djfv-btn:active{transform:translateY(1px);box-shadow:inset 0 2px 4px rgba(0,0,0,.6)}
+.dj-focus-vol .djfv-slider{
+  -webkit-appearance:none;appearance:none;
+  width:100%;height:10px;border-radius:5px;
+  background:linear-gradient(90deg,
+    #141418 0%,
+    rgba(var(--deck-accent-rgb),.6) var(--djfv-pct,80%),
+    #0a0a0d var(--djfv-pct,80%),
+    #0a0a0d 100%);
+  outline:none;cursor:pointer;
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.8);
+  border:1px solid #2a2a2e;
+}
+.dj-focus-vol .djfv-slider::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:6px;
+  background:linear-gradient(180deg,#f0f0f2 0%,#9a9a9e 100%);
+  border:2px solid var(--deck-accent);cursor:grab;
+  box-shadow:0 3px 10px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.7),
+    0 0 12px rgba(var(--deck-accent-rgb),.5);
+}
+.dj-focus-vol .djfv-slider::-moz-range-thumb{
+  width:26px;height:26px;border-radius:6px;
+  background:linear-gradient(180deg,#f0f0f2 0%,#9a9a9e 100%);
+  border:2px solid var(--deck-accent);cursor:grab;
+  box-shadow:0 3px 10px rgba(0,0,0,.8),0 0 12px rgba(var(--deck-accent-rgb),.5);
+}
+.dj-focus-vol .djfv-value{
+  font-family:'Orbitron',sans-serif;font-size:18px;font-weight:800;
+  color:var(--deck-accent);text-align:center;min-width:54px;
+  padding:7px 4px;border-radius:6px;
+  background:#020608;border:1px solid rgba(var(--deck-accent-rgb),.35);
+  text-shadow:0 0 10px rgba(var(--deck-accent-rgb),.6);
+  letter-spacing:1px;
+}
+.dj-focus-vol.muted .djfv-slider,
+.dj-focus-vol.muted .djfv-value,
+.dj-focus-vol.muted .djfv-btn{opacity:.45}
+.dj-focus-vol.muted .djfv-value{color:var(--red);border-color:var(--red)}
+
+/* Pioneer-style brand badge at the bottom of each chassis (replaces the
+   original ::after radial glow) */
+body.dj-focus-mode .cdj::after{
+  content:'Pioneer CDJ-3000 · NEXUS PRO';
+  position:absolute;left:0;right:0;bottom:8px;top:auto;
+  width:auto;height:auto;background:none;
+  font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:4px;
+  color:rgba(255,255,255,.16);text-align:center;pointer-events:none;z-index:1;
+}
+body.dj-focus-mode .cdj[data-deck]::before{
+  /* Keep the subtle accent top strip from the base CDJ look */
+  z-index:2;
+}
+
+/* ── Deck header — Pioneer-inspired brand bar ───────────────── */
+body.dj-focus-mode .deck-header{
+  padding:6px 14px 10px;
+  border-bottom:1px solid rgba(var(--deck-accent-rgb),.22);
+  align-items:center;
+}
 body.dj-focus-mode .deck-label{font-size:13px;letter-spacing:3px}
-body.dj-focus-mode .screen{padding:12px}
-body.dj-focus-mode .track-title{font-size:15px;letter-spacing:1.5px}
-body.dj-focus-mode .track-artist{font-size:12px}
-body.dj-focus-mode .screen-bpm{font-size:30px}
-body.dj-focus-mode .time-value{font-size:22px;letter-spacing:1px}
-body.dj-focus-mode .waveform{height:66px}
-body.dj-focus-mode .jog-wrapper{margin:10px 0}
-body.dj-focus-mode .jog-wheel{width:min(36vw,360px);height:min(36vw,360px)}
-body.dj-focus-mode .jog-center-screen{width:min(11vw,120px);height:min(11vw,120px)}
-body.dj-focus-mode .jog-center-screen .bpm-display{font-size:28px}
-body.dj-focus-mode .hot-cues{gap:6px;margin-bottom:10px}
-body.dj-focus-mode .cue-btn{font-size:14px;padding:0;height:50px;letter-spacing:1px}
-body.dj-focus-mode .loop-btn,body.dj-focus-mode .jump-btn{font-size:12px;padding:11px 4px;letter-spacing:1.5px}
-body.dj-focus-mode .util-btn{font-size:11px;padding:11px 3px;letter-spacing:1.2px}
-body.dj-focus-mode .pad-mode-btn{font-size:10px;padding:10px 2px;letter-spacing:1.2px}
-body.dj-focus-mode .big-btn{padding:20px 16px;font-size:16px;letter-spacing:3px}
-body.dj-focus-mode .big-btn .icon{font-size:22px}
-body.dj-focus-mode .tempo-btn{padding:14px 4px;font-size:18px}
+body.dj-focus-mode .deck-label .model{color:var(--deck-accent)}
+body.dj-focus-mode .deck-number{
+  font-size:36px;padding:4px 18px;letter-spacing:2px;
+  background:linear-gradient(180deg,var(--deck-accent) 0%,#000 250%);
+  color:#fff;border-radius:8px;
+  box-shadow:0 0 18px rgba(var(--deck-accent-rgb),.45),inset 0 1px 0 rgba(255,255,255,.4);
+  text-shadow:0 1px 0 rgba(0,0,0,.35);
+}
+body.dj-focus-mode .deck-upload-btn,
+body.dj-focus-mode .deck-lib-btn{padding:8px 12px;font-size:11px}
+
+/* ── Screen — oversized, high-contrast, Pioneer-like ────────── */
+body.dj-focus-mode .screen{
+  padding:14px 16px;
+  border-radius:12px;
+  background:radial-gradient(ellipse at top,rgba(var(--deck-accent-rgb),.12),#020608 65%);
+  border:1px solid rgba(var(--deck-accent-rgb),.35);
+  box-shadow:inset 0 0 24px rgba(var(--deck-accent-rgb),.08),0 2px 10px rgba(0,0,0,.6);
+}
+body.dj-focus-mode .screen-top{gap:14px}
+body.dj-focus-mode .track-title{font-size:18px;letter-spacing:1.5px;font-weight:800}
+body.dj-focus-mode .track-artist{font-size:13px;letter-spacing:1px;opacity:.85}
+body.dj-focus-mode .screen-bpm{font-size:36px;line-height:1;text-shadow:0 0 14px rgba(var(--deck-accent-rgb),.8)}
+body.dj-focus-mode .screen-bpm-label{font-size:10px;letter-spacing:2px}
+body.dj-focus-mode .screen-key{font-size:16px;padding:3px 8px}
+body.dj-focus-mode .waveform{height:78px;margin-top:10px}
+body.dj-focus-mode .time-row{margin-top:10px}
+body.dj-focus-mode .time-value{font-size:24px;letter-spacing:1px}
+body.dj-focus-mode .time-label{font-size:10px;letter-spacing:2.5px}
+
+/* ── Big jog wheel centered — the star of the deck ──────────── */
+body.dj-focus-mode .jog-wheel{
+  width:min(26vw,420px);height:min(26vw,420px);
+  filter:drop-shadow(0 18px 40px rgba(0,0,0,.7));
+}
+body.dj-focus-mode .jog-center-screen{width:min(9vw,144px);height:min(9vw,144px)}
+body.dj-focus-mode .jog-center-screen .bpm-display{font-size:32px}
+body.dj-focus-mode .jog-center-screen .deck-badge{font-size:10px;letter-spacing:3px;margin-top:5px}
+
+/* ── Hot cues — 4×2 grid, large tactile pads ────────────────── */
+body.dj-focus-mode .hot-cues{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:8px;
+  padding:10px;border-radius:10px;
+  background:linear-gradient(180deg,#0e0e12 0%,#050507 100%);
+  border:1px solid #1a1a1f;
+  box-shadow:inset 0 0 22px rgba(0,0,0,.6);
+}
+body.dj-focus-mode .cue-btn{
+  font-size:16px;height:56px;letter-spacing:1px;padding:0;
+  border-radius:7px;font-weight:800;
+}
+
+/* ── Pad-mode chooser — 3×2, high-contrast ──────────────────── */
+body.dj-focus-mode .pad-mode-row{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:4px;
+  padding:6px;border-radius:8px;background:#0a0a0d;border:1px solid #1a1a1f;
+}
+body.dj-focus-mode .pad-mode-btn{font-size:11px;padding:12px 3px;letter-spacing:1.4px}
+
+/* ── Loop / beat-jump / deck-utils ──────────────────────────── */
+body.dj-focus-mode .loop-section{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+body.dj-focus-mode .loop-section > [data-autoloop]{grid-column:1/-1}
+body.dj-focus-mode .beat-jump{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+body.dj-focus-mode .deck-utils{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+body.dj-focus-mode .loop-btn,
+body.dj-focus-mode .jump-btn{font-size:12px;padding:13px 4px;letter-spacing:1.5px;min-height:44px}
+body.dj-focus-mode .util-btn{font-size:11px;padding:13px 3px;letter-spacing:1.2px;min-height:42px}
+
+/* ── Transport — huge CUE / PLAY under the jog wheel ────────── */
+body.dj-focus-mode .transport{
+  display:grid;grid-template-columns:1fr 1.4fr;gap:12px;
+  padding:10px 8px 6px;
+}
+body.dj-focus-mode .big-btn{
+  padding:24px 14px;font-size:17px;letter-spacing:3px;
+  border-radius:10px;min-height:74px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 6px 18px rgba(0,0,0,.6);
+}
+body.dj-focus-mode .big-btn .icon{font-size:26px}
+body.dj-focus-mode .big-btn.play.active{box-shadow:0 0 30px rgba(0,255,122,.55),inset 0 1px 0 rgba(255,255,255,.3)}
+
+/* ── Tempo section — right column fills vertically ──────────── */
+body.dj-focus-mode .tempo-section{padding:10px}
+body.dj-focus-mode .tempo-header{font-size:12px;letter-spacing:2px}
+body.dj-focus-mode .tempo-display-big{font-size:28px;padding:12px}
+body.dj-focus-mode .tempo-btn{padding:14px 4px;font-size:18px;min-height:48px}
 body.dj-focus-mode .tempo-btn.reset{font-size:13px}
 body.dj-focus-mode .step-btn{padding:8px 10px;font-size:11px}
-body.dj-focus-mode .tempo-display-big{font-size:28px;padding:10px}
 
-@media(min-width:1920px){
-  body.dj-focus-mode .jog-wheel{width:min(34vw,440px);height:min(34vw,440px)}
-  body.dj-focus-mode .jog-center-screen{width:min(11vw,140px);height:min(11vw,140px)}
-  body.dj-focus-mode .jog-center-screen .bpm-display{font-size:34px}
-  body.dj-focus-mode .deck-number{font-size:40px;padding:5px 20px}
-  body.dj-focus-mode .big-btn{padding:26px 20px;font-size:19px}
-  body.dj-focus-mode .cue-btn{height:58px;font-size:15px}
+/* ─────────────────── RESPONSIVE BREAKPOINTS ─────────────────── */
+
+/* 4K / ultra-wide */
+@media(min-width:2100px){
+  body.dj-focus-mode .cdj{padding:28px 24px 34px}
+  body.dj-focus-mode .jog-wheel{width:min(24vw,520px);height:min(24vw,520px)}
+  body.dj-focus-mode .jog-center-screen{width:min(9vw,170px);height:min(9vw,170px)}
+  body.dj-focus-mode .jog-center-screen .bpm-display{font-size:40px}
+  body.dj-focus-mode .deck-number{font-size:44px;padding:5px 22px}
+  body.dj-focus-mode .screen-bpm{font-size:44px}
+  body.dj-focus-mode .track-title{font-size:22px}
+  body.dj-focus-mode .time-value{font-size:30px}
+  body.dj-focus-mode .big-btn{padding:30px 18px;font-size:20px;min-height:88px}
+  body.dj-focus-mode .cue-btn{height:66px;font-size:18px}
 }
 
+/* Laptop 1400-1700 — fit jog & tighten columns */
+@media(max-width:1700px){
+  body.dj-focus-mode .cdj{grid-template-columns:minmax(180px,1fr) minmax(320px,1.6fr) minmax(180px,1fr);padding:18px 16px 24px;gap:10px 12px}
+  body.dj-focus-mode .jog-wheel{width:min(26vw,360px);height:min(26vw,360px)}
+  body.dj-focus-mode .jog-center-screen{width:min(9vw,120px);height:min(9vw,120px)}
+  body.dj-focus-mode .jog-center-screen .bpm-display{font-size:28px}
+  body.dj-focus-mode .screen-bpm{font-size:30px}
+  body.dj-focus-mode .track-title{font-size:16px}
+  body.dj-focus-mode .big-btn{padding:20px 12px;font-size:15px;min-height:66px}
+  body.dj-focus-mode .cue-btn{height:50px;font-size:14px}
+}
+
+/* Small laptop — still 3-col grid but compact */
 @media(max-width:1400px){
-  body.dj-focus-mode .jog-wheel{width:min(38vw,300px);height:min(38vw,300px)}
-  body.dj-focus-mode .jog-center-screen{width:min(12vw,100px);height:min(12vw,100px)}
+  body.dj-focus-mode .cdj{grid-template-columns:minmax(160px,1fr) minmax(280px,1.5fr) minmax(160px,1fr);padding:14px 12px 22px;gap:8px 10px}
+  body.dj-focus-mode .jog-wheel{width:min(28vw,290px);height:min(28vw,290px)}
+  body.dj-focus-mode .jog-center-screen{width:min(10vw,100px);height:min(10vw,100px)}
   body.dj-focus-mode .jog-center-screen .bpm-display{font-size:24px}
-}
-
-@media(max-width:1100px){
-  body.dj-focus-mode .console{grid-template-columns:1fr 1fr !important;gap:10px}
-  body.dj-focus-mode .cdj{padding:12px 10px}
-  body.dj-focus-mode .jog-wheel{width:min(40vw,240px);height:min(40vw,240px)}
-  body.dj-focus-mode .jog-center-screen{width:min(13vw,80px);height:min(13vw,80px)}
-  body.dj-focus-mode .jog-center-screen .bpm-display{font-size:20px}
-  body.dj-focus-mode .deck-number{font-size:24px}
-  body.dj-focus-mode .big-btn{padding:16px 10px;font-size:14px}
-  body.dj-focus-mode .cue-btn{height:46px;font-size:12px}
+  body.dj-focus-mode .screen-bpm{font-size:26px}
+  body.dj-focus-mode .track-title{font-size:14px}
+  body.dj-focus-mode .cue-btn{height:44px;font-size:12px}
+  body.dj-focus-mode .big-btn{padding:16px 10px;font-size:14px;min-height:58px}
   body.dj-focus-mode .tempo-display-big{font-size:22px}
 }
 
+/* Tablet landscape — collapse the side columns slightly */
+@media(max-width:1100px){
+  body.dj-focus-mode .cdj{
+    grid-template-columns:minmax(130px,1fr) minmax(220px,1.4fr) minmax(130px,1fr);
+    padding:12px 10px 20px;gap:7px 8px;
+  }
+  body.dj-focus-mode .jog-wheel{width:min(30vw,240px);height:min(30vw,240px)}
+  body.dj-focus-mode .jog-center-screen{width:min(10vw,80px);height:min(10vw,80px)}
+  body.dj-focus-mode .jog-center-screen .bpm-display{font-size:20px}
+  body.dj-focus-mode .deck-number{font-size:26px;padding:3px 12px}
+  body.dj-focus-mode .screen-bpm{font-size:22px}
+  body.dj-focus-mode .cue-btn{height:40px;font-size:11px}
+  body.dj-focus-mode .big-btn{padding:14px 8px;font-size:13px;min-height:54px}
+  body.dj-focus-mode .tempo-display-big{font-size:18px}
+}
+
+/* Tablet portrait — ditch the 3-col grid, revert to natural vertical flow */
 @media(max-width:820px){
-  body.dj-focus-mode .console{grid-template-columns:1fr !important;gap:10px}
+  body.dj-focus-mode .console{grid-template-columns:1fr !important;gap:12px}
   body.dj-focus-mode::before{font-size:8px;letter-spacing:2px;padding:3px 10px;top:4px}
-  body.dj-focus-mode .jog-wheel{width:min(70vw,280px);height:min(70vw,280px)}
-  body.dj-focus-mode .jog-center-screen{width:72px;height:72px}
-  body.dj-focus-mode .jog-center-screen .bpm-display{font-size:18px}
-  body.dj-focus-mode .cdj{padding:10px 8px}
+  body.dj-focus-mode .cdj{
+    display:flex;flex-direction:column;gap:8px;
+    padding:14px 12px 18px;
+    grid-template-areas:none;
+  }
+  body.dj-focus-mode .cdj .jog-wrapper{order:6;align-self:center;margin:8px 0}
+  body.dj-focus-mode .cdj .deck-header{order:1}
+  body.dj-focus-mode .cdj .screen{order:2}
+  body.dj-focus-mode .cdj .pad-mode-row{order:3}
+  body.dj-focus-mode .cdj .hot-cues{order:4}
+  body.dj-focus-mode .cdj .loop-section{order:5;display:grid;grid-template-columns:repeat(3,1fr) auto}
+  body.dj-focus-mode .cdj .transport{order:7;grid-template-columns:1fr 1.4fr}
+  body.dj-focus-mode .cdj .beat-jump{order:8;grid-template-columns:repeat(4,1fr)}
+  body.dj-focus-mode .cdj .deck-utils{order:9;grid-template-columns:repeat(5,1fr)}
+  body.dj-focus-mode .cdj .tempo-section{order:10}
+  body.dj-focus-mode .jog-wheel{width:min(70vw,300px);height:min(70vw,300px)}
+  body.dj-focus-mode .jog-center-screen{width:80px;height:80px}
+  body.dj-focus-mode .jog-center-screen .bpm-display{font-size:20px}
+  body.dj-focus-mode .big-btn{padding:16px 10px;font-size:14px;min-height:58px}
+  body.dj-focus-mode .cue-btn{height:46px;font-size:12px}
+  body.dj-focus-mode .screen-bpm{font-size:26px}
+  body.dj-focus-mode .tempo-display-big{font-size:22px}
 }
 
 @media(max-width:520px){
   body.dj-focus-mode::before{display:none}
-  body.dj-focus-mode .jog-wheel{width:min(84vw,320px);height:min(84vw,320px)}
-  body.dj-focus-mode .jog-center-screen{width:64px;height:64px}
-  body.dj-focus-mode .jog-center-screen .bpm-display{font-size:16px}
-  body.dj-focus-mode .big-btn{padding:14px 8px;font-size:13px;letter-spacing:2px}
+  body.dj-focus-mode .cdj{padding:10px 8px 14px}
+  body.dj-focus-mode .jog-wheel{width:min(86vw,340px);height:min(86vw,340px)}
+  body.dj-focus-mode .jog-center-screen{width:72px;height:72px}
+  body.dj-focus-mode .jog-center-screen .bpm-display{font-size:18px}
+  body.dj-focus-mode .deck-number{font-size:22px;padding:3px 10px}
+  body.dj-focus-mode .screen-bpm{font-size:22px}
+  body.dj-focus-mode .track-title{font-size:13px}
+  body.dj-focus-mode .big-btn{padding:14px 8px;font-size:13px;letter-spacing:2px;min-height:52px}
   body.dj-focus-mode .cue-btn{height:42px;font-size:11px}
-  body.dj-focus-mode .pad-mode-btn{font-size:9px;padding:7px 1px}
+  body.dj-focus-mode .pad-mode-btn{font-size:9px;padding:9px 1px}
+  body.dj-focus-mode .cdj .beat-jump{grid-template-columns:repeat(4,1fr)}
+  body.dj-focus-mode .cdj .deck-utils{grid-template-columns:repeat(5,1fr)}
 }
 
 /* ================================================================
@@ -5426,7 +5711,19 @@ function buildDeckHTML(d){
       <button class="step-btn" data-tempo-step="0.5" data-deck="${d}">0.5</button>
       <button class="step-btn" data-tempo-step="1" data-deck="${d}">1.0</button>
     </div>
-  </div></div>`;
+  </div></div>
+  <div class="dj-focus-vol" data-deck="${d}">
+    <div class="djfv-head">
+      <span class="djfv-label">CH ${d} · VOLUME</span>
+      <button class="djfv-mute" data-djfv-mute="${d}" title="Mute channel ${d}">MUTE</button>
+    </div>
+    <div class="djfv-body">
+      <button class="djfv-btn" data-djfv-step="${d}" data-djfv-dir="-1" title="Volume down">−</button>
+      <input type="range" class="djfv-slider" min="0" max="100" value="80" step="1" data-djfv-slider="${d}" aria-label="Volume deck ${d}"/>
+      <button class="djfv-btn" data-djfv-step="${d}" data-djfv-dir="1" title="Volume up">+</button>
+      <div class="djfv-value" data-djfv-value="${d}">80</div>
+    </div>
+  </div>`;
 }
 
 function buildMixerToolbarHTML(){
@@ -8171,6 +8468,9 @@ function applyDeckPair(pair){
   if(djFocus)document.body.classList.remove('work-mode');
   renderMixerCompactDecks();
   updateDsbMonitor();
+  if(djFocus){
+    ['A','B','C','D'].forEach(d=>typeof refreshDjFocusVolumeUI==='function'&&refreshDjFocusVolumeUI(d));
+  }
 }
 function renderMixerCompactDecks(){
   const container=document.getElementById('mixerCompactDecks');
@@ -8231,6 +8531,77 @@ document.addEventListener('DOMContentLoaded',()=>{
   },200);
 });
 window.applyDeckPair=applyDeckPair;
+
+/* ========================================================
+   DJ FOCUS — per-deck channel volume (slider / −/+ / mute)
+   Visible only when body.dj-focus-mode is active; mirrors
+   decks[d].volume + volumeGain and syncs with the main fader.
+   ======================================================== */
+function setDjFocusVolume(d,v){
+  v=Math.max(0,Math.min(1,v));
+  if(!decks[d])return;
+  decks[d].volume=v;
+  if(decks[d].volumeGain&&typeof audioCtx!=='undefined'&&audioCtx){
+    try{decks[d].volumeGain.gain.setTargetAtTime(v,audioCtx.currentTime,0.015);}
+    catch(e){decks[d].volumeGain.gain.value=v;}
+  }
+  refreshDjFocusVolumeUI(d);
+  const fader=document.getElementById('fader-'+d);
+  if(fader)fader.style.bottom=(v*90)+'%';
+  try{if(typeof applyCrossfader==='function')applyCrossfader();}catch(e){}
+}
+function refreshDjFocusVolumeUI(d){
+  const strip=document.querySelector(`.dj-focus-vol[data-deck="${d}"]`);
+  if(!strip)return;
+  const v=decks[d]?.volume??0.8;
+  const pct=Math.round(v*100);
+  const sl=strip.querySelector('[data-djfv-slider]');
+  if(sl&&document.activeElement!==sl)sl.value=pct;
+  if(sl)sl.style.setProperty('--djfv-pct',pct+'%');
+  const val=strip.querySelector('[data-djfv-value]');
+  if(val)val.textContent=pct;
+  const mute=strip.querySelector('[data-djfv-mute]');
+  const muted=pct===0;
+  strip.classList.toggle('muted',muted&&!!decks[d]?._djfvPrevVol);
+  if(mute)mute.classList.toggle('active',muted&&!!decks[d]?._djfvPrevVol);
+}
+document.addEventListener('input',e=>{
+  const sl=e.target.closest&&e.target.closest('[data-djfv-slider]');
+  if(!sl)return;
+  const d=sl.dataset.djfvSlider;
+  const v=parseInt(sl.value)/100;
+  if(decks[d])decks[d]._djfvPrevVol=0;
+  setDjFocusVolume(d,v);
+});
+document.addEventListener('click',e=>{
+  const step=e.target.closest&&e.target.closest('[data-djfv-step]');
+  if(step){
+    const d=step.dataset.djfvStep;
+    const dir=parseInt(step.dataset.djfvDir)||0;
+    const cur=decks[d]?.volume??0.8;
+    if(decks[d])decks[d]._djfvPrevVol=0;
+    setDjFocusVolume(d,cur+dir*0.05);
+    return;
+  }
+  const mute=e.target.closest&&e.target.closest('[data-djfv-mute]');
+  if(mute){
+    const d=mute.dataset.djfvMute;
+    if(!decks[d])return;
+    if(decks[d].volume>0){
+      decks[d]._djfvPrevVol=decks[d].volume;
+      setDjFocusVolume(d,0);
+    }else{
+      const prev=decks[d]._djfvPrevVol||0.8;
+      decks[d]._djfvPrevVol=0;
+      setDjFocusVolume(d,prev);
+    }
+  }
+});
+document.addEventListener('DOMContentLoaded',()=>{
+  setTimeout(()=>['A','B','C','D'].forEach(refreshDjFocusVolumeUI),400);
+});
+window.setDjFocusVolume=setDjFocusVolume;
+window.refreshDjFocusVolumeUI=refreshDjFocusVolumeUI;
 
 /* I18N removed — app is English-only */
 const currentLang='en';
