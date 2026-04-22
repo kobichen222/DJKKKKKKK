@@ -11916,6 +11916,7 @@ function spWireKnobs(targetStore,scopeSel){
     const disp=document.querySelector(`.sp-knob-val[data-sp-val="${name}"]`);
     function render(){const deg=-135+v*270;if(ind)ind.style.transform=`rotate(${deg}deg)`;if(disp)disp.textContent=spFmt(name,v);spApplyKnob(name,v);}
     render();
+    knob._spSet=(nv)=>{v=Math.max(0,Math.min(1,nv));store[name]=v;render();};
     let dragging=false,startY=0,startV=0;
     knob.addEventListener('pointerdown',e=>{dragging=true;startY=e.clientY;startV=v;try{knob.setPointerCapture(e.pointerId)}catch(_){}});
     knob.addEventListener('pointermove',e=>{if(!dragging)return;v=Math.max(0,Math.min(1,startV+(startY-e.clientY)/200));store[name]=v;render();});
@@ -12381,12 +12382,258 @@ function spScheduleStep(step,time){
 }
 
 /* ====================================================================
+   TITAN LAB — synth / organ / bass presets
+   ==================================================================== */
+const SP_SYNTH_PRESETS={
+  'house-piano':{osc1Wave:'triangle',osc2Wave:'sine',filterType:'lowpass',lfoTarget:'none',
+    knobs:{oscMix:.3,subLevel:.2,filterCutoff:.85,filterRes:.1,ampA:.05,ampD:.3,ampS:.35,ampR:.35,reverbSend:.3,chorusMix:.3}},
+  'trance-supersaw':{osc1Wave:'sawtooth',osc2Wave:'sawtooth',filterType:'lowpass',lfoTarget:'none',
+    knobs:{osc2Detune:.55,oscMix:.5,unison:.9,unisonDetune:.75,filterCutoff:.92,filterRes:.12,
+           ampA:.25,ampD:.4,ampS:.9,ampR:.5,delaySend:.25,reverbSend:.45,chorusMix:.45}},
+  'techno-reese':{osc1Wave:'sawtooth',osc2Wave:'sawtooth',filterType:'lowpass',lfoTarget:'filter',
+    knobs:{osc2Detune:.35,osc2Octave:.25,oscMix:.55,subLevel:.3,unison:.5,unisonDetune:.55,
+           filterCutoff:.45,filterRes:.3,filterEnv:.25,filterDecay:.4,
+           ampA:.02,ampD:.5,ampS:.85,ampR:.3,lfoRate:.15,lfoDepth:.4,drive:.4}},
+  'deep-pluck':{osc1Wave:'triangle',osc2Wave:'square',filterType:'lowpass',lfoTarget:'none',
+    knobs:{oscMix:.35,filterCutoff:.6,filterRes:.2,filterEnv:.65,filterDecay:.35,
+           ampA:.01,ampD:.35,ampS:.2,ampR:.25,delaySend:.3,reverbSend:.3}},
+  'warm-pad':{osc1Wave:'sawtooth',osc2Wave:'triangle',filterType:'lowpass',lfoTarget:'filter',
+    knobs:{oscMix:.45,subLevel:.15,unison:.35,unisonDetune:.4,filterCutoff:.5,filterRes:.08,
+           ampA:.55,ampD:.5,ampS:.9,ampR:.6,lfoRate:.1,lfoDepth:.3,chorusMix:.4,reverbSend:.6}},
+  'acid-303':{osc1Wave:'sawtooth',osc2Wave:'sine',filterType:'lowpass',lfoTarget:'none',
+    knobs:{oscMix:0,subLevel:0,filterCutoff:.35,filterRes:.55,filterEnv:.8,filterDecay:.3,
+           ampA:.02,ampD:.25,ampS:.4,ampR:.2,drive:.55}},
+  'hammond':{osc1Wave:'sine',osc2Wave:'sine',filterType:'highpass',lfoTarget:'amp',
+    knobs:{oscMix:.5,filterCutoff:.2,filterRes:.05,ampA:.03,ampD:.2,ampS:.9,ampR:.2,
+           lfoRate:.55,lfoDepth:.35,drive:.2,reverbSend:.25}},
+  'church-organ':{osc1Wave:'sine',osc2Wave:'sine',filterType:'lowpass',lfoTarget:'none',
+    knobs:{oscMix:.5,subLevel:.5,osc2Octave:.75,filterCutoff:.75,filterRes:.05,
+           ampA:.1,ampD:.3,ampS:.95,ampR:.55,reverbSend:.75}},
+  'fm-bell':{osc1Wave:'sine',osc2Wave:'sine',filterType:'highpass',lfoTarget:'pitch',
+    knobs:{osc2Detune:.75,osc2Octave:.9,oscMix:.4,filterCutoff:.7,filterRes:.05,
+           ampA:.005,ampD:.5,ampS:.3,ampR:.45,lfoRate:.4,lfoDepth:.15,delaySend:.3,reverbSend:.45}},
+  'tech-stab':{osc1Wave:'square',osc2Wave:'sawtooth',filterType:'bandpass',lfoTarget:'none',
+    knobs:{osc2Detune:.55,oscMix:.5,filterCutoff:.55,filterRes:.4,filterEnv:.5,filterDecay:.2,
+           ampA:.005,ampD:.15,ampS:.15,ampR:.15,drive:.3,delaySend:.4,reverbSend:.2}},
+};
+function spSetKnob(name,v,scope){
+  const root=scope?document.querySelector(scope):document;
+  const knob=root?.querySelector(`.sp-knob[data-sp-knob="${name}"]`);
+  if(knob&&knob._spSet)knob._spSet(v);
+}
+/* Piano keyboard renderer — 2 octaves, white + black keys, data-sp-midi */
+function spBuildPiano(){
+  const piano=document.getElementById('spPiano');
+  if(!piano)return;
+  piano.innerHTML='';
+  const OCTAVES=2;
+  const whiteCount=7*OCTAVES;
+  const whiteIdxInOctave=[0,2,4,5,7,9,11];     // C D E F G A B
+  const blackIdxInOctave=[1,3,-1,6,8,10,-1];   // offset after each white; -1 = no black
+  const blackLabels={1:'C#',3:'D#',6:'F#',8:'G#',10:'A#'};
+  const whiteLabels={0:'C',2:'D',4:'E',5:'F',7:'G',9:'A',11:'B'};
+  const baseMidi=(SP.octave+1)*12; // C of selected octave
+  const base=SP.activeInst==='bass'?baseMidi-24:baseMidi; // bass shifted 2 oct down for useful range
+  for(let o=0;o<OCTAVES;o++){
+    for(let wi=0;wi<7;wi++){
+      const midi=base+o*12+whiteIdxInOctave[wi];
+      const w=document.createElement('div');
+      w.className='sp-key sp-key-white';
+      w.dataset.spMidi=midi;
+      w.style.left=((o*7+wi)/whiteCount*100)+'%';
+      w.style.width=(100/whiteCount)+'%';
+      if(wi===0){const lab=document.createElement('span');lab.className='sp-key-label';lab.textContent=whiteLabels[whiteIdxInOctave[wi]]+(SP.octave+o);w.appendChild(lab);}
+      piano.appendChild(w);
+    }
+  }
+  for(let o=0;o<OCTAVES;o++){
+    for(let wi=0;wi<7;wi++){
+      const bIdx=blackIdxInOctave[wi];
+      if(bIdx<0)continue;
+      const midi=base+o*12+bIdx;
+      const k=document.createElement('div');
+      k.className='sp-key sp-key-black';
+      k.dataset.spMidi=midi;
+      const leftPct=((o*7+wi+1)/whiteCount*100);
+      const w=(100/whiteCount)*0.62;
+      k.style.left=(leftPct-w/2)+'%';
+      k.style.width=w+'%';
+      piano.appendChild(k);
+    }
+  }
+  // pointer events
+  piano.querySelectorAll('.sp-key').forEach(k=>{
+    const midi=+k.dataset.spMidi;
+    const on=()=>{k.classList.add('active');
+      if(SP.activeInst==='synth')spSynthNoteOn(midi);
+      else if(SP.activeInst==='organ')spOrganNoteOn(midi);
+      else if(SP.activeInst==='bass')spBassNoteOn(midi,false,false);
+    };
+    const off=()=>{k.classList.remove('active');
+      if(SP.activeInst==='synth')spSynthNoteOff(midi);
+      else if(SP.activeInst==='organ')spOrganNoteOff(midi);
+      else if(SP.activeInst==='bass'){if(SP.bass.currentMidi===midi)spBassNoteOff(false);}
+    };
+    k.addEventListener('pointerdown',e=>{e.preventDefault();try{k.setPointerCapture(e.pointerId)}catch(_){}on();});
+    k.addEventListener('pointerup',off);
+    k.addEventListener('pointercancel',off);
+    k.addEventListener('pointerleave',e=>{if(e.buttons)off();});
+  });
+}
+function spApplySynthPreset(key){
+  const p=SP_SYNTH_PRESETS[key];if(!p)return;
+  SP.synth.osc1Wave=p.osc1Wave;SP.synth.osc2Wave=p.osc2Wave;
+  SP.synth.filterType=p.filterType;SP.synth.lfoTarget=p.lfoTarget;
+  // reflect wave / filter / lfo selections
+  document.querySelectorAll('.sp-osc-wave[data-sp-osc="1"] [data-sp-wave]').forEach(b=>b.classList.toggle('active',b.dataset.spWave===p.osc1Wave));
+  document.querySelectorAll('.sp-osc-wave[data-sp-osc="2"] [data-sp-wave]').forEach(b=>b.classList.toggle('active',b.dataset.spWave===p.osc2Wave));
+  document.querySelectorAll('[data-sp-filter-type] [data-sp-filter]').forEach(b=>b.classList.toggle('active',b.dataset.spFilter===p.filterType));
+  document.querySelectorAll('[data-sp-lfo-target] [data-sp-lfo]').forEach(b=>b.classList.toggle('active',b.dataset.spLfo===p.lfoTarget));
+  // reset every synth knob to default, then apply preset overrides
+  for(const k in SP_P){
+    if(!(k in SP.synth.knobs) && ['osc2Detune','osc2Octave','oscMix','subLevel','unison','unisonDetune',
+      'filterCutoff','filterRes','filterEnv','filterDecay','drive',
+      'ampA','ampD','ampS','ampR','glide','lfoRate','lfoDepth','chorusMix','delaySend','reverbSend'].indexOf(k)<0)continue;
+  }
+  ['osc2Detune','osc2Octave','oscMix','subLevel','unison','unisonDetune',
+   'filterCutoff','filterRes','filterEnv','filterDecay','drive',
+   'ampA','ampD','ampS','ampR','glide','lfoRate','lfoDepth','chorusMix','delaySend','reverbSend'].forEach(k=>{
+    const v=(p.knobs&&k in p.knobs)?p.knobs[k]:SP_P[k][2];
+    spSetKnob(k,v,'#spInstSynth');
+  });
+}
+
+/* ====================================================================
    TITAN LAB — UI wiring
    ==================================================================== */
 function setupStudioPro(){
   // default drum pattern
   if(!SP.drum.pattern)SP.drum.pattern=spDrumPresetCopy('house');
   spBuildDrumGrid();
+
+  // init knob stores with defaults
+  ['synth','organ','bass','master'].forEach(s=>{if(!SP[s].knobs)SP[s].knobs={};});
+
+  // wire all knobs per scope
+  spWireKnobs(SP.synth.knobs,'#spInstSynth');
+  spWireKnobs(SP.organ.knobs,'#spInstOrgan');
+  spWireKnobs(SP.bass.knobs,'#spInstBass');
+  spWireKnobs(SP.master.knobs,'.sp-master');
+
+  // inst tabs
+  document.querySelectorAll('[data-sp-inst]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const inst=btn.dataset.spInst;
+      SP.activeInst=inst;
+      document.querySelectorAll('[data-sp-inst]').forEach(b=>b.classList.toggle('active',b===btn));
+      const synth=document.getElementById('spInstSynth'),organ=document.getElementById('spInstOrgan'),bass=document.getElementById('spInstBass');
+      if(synth)synth.style.display=(inst==='synth')?'':'none';
+      if(organ)organ.style.display=(inst==='organ')?'':'none';
+      if(bass)bass.style.display=(inst==='bass')?'':'none';
+    });
+  });
+
+  // osc wave buttons (scoped per OSC 1 / 2)
+  document.querySelectorAll('.sp-osc-wave[data-sp-osc]').forEach(wrap=>{
+    const whichOsc=wrap.dataset.spOsc;
+    wrap.querySelectorAll('[data-sp-wave]').forEach(b=>{
+      b.addEventListener('click',()=>{
+        wrap.querySelectorAll('[data-sp-wave]').forEach(x=>x.classList.remove('active'));
+        b.classList.add('active');
+        const w=b.dataset.spWave;
+        if(whichOsc==='1')SP.synth.osc1Wave=w;else SP.synth.osc2Wave=w;
+      });
+    });
+  });
+
+  // filter type buttons
+  document.querySelectorAll('[data-sp-filter-type] [data-sp-filter]').forEach(b=>{
+    b.addEventListener('click',()=>{
+      const wrap=b.closest('[data-sp-filter-type]');
+      wrap.querySelectorAll('[data-sp-filter]').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      SP.synth.filterType=b.dataset.spFilter;
+    });
+  });
+
+  // LFO target
+  document.querySelectorAll('[data-sp-lfo-target] [data-sp-lfo]').forEach(b=>{
+    b.addEventListener('click',()=>{
+      const wrap=b.closest('[data-sp-lfo-target]');
+      wrap.querySelectorAll('[data-sp-lfo]').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      SP.synth.lfoTarget=b.dataset.spLfo;
+    });
+  });
+
+  // synth preset buttons
+  document.querySelectorAll('[data-sp-preset]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const key=btn.dataset.spPreset;
+      document.querySelectorAll('[data-sp-preset]').forEach(b=>b.classList.toggle('active',b===btn));
+      spApplySynthPreset(key);
+      // auto-switch to the relevant inst tab for organ / bass presets
+      if(key==='hammond'||key==='church-organ')document.querySelector('[data-sp-inst="organ"]')?.click();
+      else if(key==='acid-303')document.querySelector('[data-sp-inst="bass"]')?.click();
+      else document.querySelector('[data-sp-inst="synth"]')?.click();
+    });
+  });
+
+  // --- Piano keyboard ---
+  spBuildPiano();
+
+  // octave controls
+  document.getElementById('spOctaveDown')?.addEventListener('click',()=>{SP.octave=Math.max(1,SP.octave-1);const v=document.getElementById('spOctaveVal');if(v)v.textContent=SP.octave;spBuildPiano();});
+  document.getElementById('spOctaveUp')?.addEventListener('click',()=>{SP.octave=Math.min(7,SP.octave+1);const v=document.getElementById('spOctaveVal');if(v)v.textContent=SP.octave;spBuildPiano();});
+
+  // Keyboard bindings — active only when TITAN LAB tab is open
+  const KEYMAP={
+    // lower octave (SP.octave)
+    'z':{o:0,i:0},'s':{o:0,i:1},'x':{o:0,i:2},'d':{o:0,i:3},'c':{o:0,i:4},
+    'v':{o:0,i:5},'g':{o:0,i:6},'b':{o:0,i:7},'h':{o:0,i:8},'n':{o:0,i:9},
+    'j':{o:0,i:10},'m':{o:0,i:11},
+    // upper octave
+    'q':{o:1,i:0},'2':{o:1,i:1},'w':{o:1,i:2},'3':{o:1,i:3},'e':{o:1,i:4},
+    'r':{o:1,i:5},'5':{o:1,i:6},'t':{o:1,i:7},'6':{o:1,i:8},'y':{o:1,i:9},
+    '7':{o:1,i:10},'u':{o:1,i:11},
+  };
+  const held=new Set();
+  const isLabActive=()=>document.getElementById('tab-studiopro')?.classList.contains('active');
+  const pianoNoteOn=(midi)=>{
+    if(SP.activeInst==='synth')spSynthNoteOn(midi);
+    else if(SP.activeInst==='organ')spOrganNoteOn(midi);
+    else if(SP.activeInst==='bass')spBassNoteOn(midi,false,false);
+  };
+  const pianoNoteOff=(midi)=>{
+    if(SP.activeInst==='synth')spSynthNoteOff(midi);
+    else if(SP.activeInst==='organ')spOrganNoteOff(midi);
+    else if(SP.activeInst==='bass'){if(SP.bass.currentMidi===midi)spBassNoteOff(false);}
+  };
+  document.addEventListener('keydown',e=>{
+    if(!isLabActive())return;
+    if(['INPUT','SELECT','TEXTAREA'].includes(e.target.tagName))return;
+    if(e.ctrlKey||e.metaKey||e.altKey)return;
+    const k=e.key.toLowerCase();
+    const m=KEYMAP[k];if(!m)return;
+    e.preventDefault();e.stopPropagation();
+    if(held.has(k))return;
+    held.add(k);
+    const midi=(SP.octave+1+m.o)*12+m.i;
+    pianoNoteOn(midi);
+    document.querySelector(`.sp-key[data-sp-midi="${midi}"]`)?.classList.add('active');
+  },true);
+  document.addEventListener('keyup',e=>{
+    if(!isLabActive())return;
+    const k=e.key.toLowerCase();const m=KEYMAP[k];if(!m)return;
+    held.delete(k);
+    const midi=(SP.octave+1+m.o)*12+m.i;
+    pianoNoteOff(midi);
+    document.querySelector(`.sp-key[data-sp-midi="${midi}"]`)?.classList.remove('active');
+  },true);
+
+  // Apply the first synth preset by default so knobs are in a musical spot
+  spApplySynthPreset('trance-supersaw');
+  document.querySelector('[data-sp-preset="trance-supersaw"]')?.classList.add('active');
 
   // transport
   const playBtn=document.getElementById('spPlayBtn');
