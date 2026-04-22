@@ -4901,6 +4901,45 @@ body.work-mode .automix-sync{
   box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 2px 5px rgba(0,0,0,.7);
 }
 
+/* Load buttons in the turntable topbar */
+.tt-load-btn{
+  padding:3px 8px;min-width:26px;height:22px;
+  font-size:12px;line-height:1;
+  background:linear-gradient(180deg,#1e1e22 0%,#0c0c10 100%);
+  border:1px solid rgba(var(--tt-accent-rgb),.45);color:var(--tt-accent);
+  border-radius:4px;cursor:pointer;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 1px 2px rgba(0,0,0,.5);
+  transition:background .12s,border-color .12s,color .12s,box-shadow .12s,transform .08s;
+  flex:0 0 auto;
+}
+.tt-load-btn:hover{
+  background:linear-gradient(180deg,#2a2a32 0%,#141418 100%);
+  color:#fff;border-color:rgba(var(--tt-accent-rgb),.9);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 0 10px rgba(var(--tt-accent-rgb),.35);
+}
+.tt-load-btn:active{transform:translateY(1px)}
+.tt-load-btn.lib{color:#8aff9f;border-color:rgba(28,255,143,.45)}
+.tt-load-btn.lib:hover{color:#fff;border-color:rgba(28,255,143,.9);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 0 10px rgba(28,255,143,.4)}
+
+/* Drag-and-drop target state */
+.turntable.drop-target{
+  border-color:rgba(var(--tt-accent-rgb),.9);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.55),
+    inset 0 0 60px rgba(var(--tt-accent-rgb),.25),
+    0 0 40px rgba(var(--tt-accent-rgb),.6),
+    0 20px 40px rgba(0,0,0,.7);
+}
+.turntable.drop-target::after{
+  content:'DROP TO LOAD';
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  padding:10px 18px;border-radius:8px;
+  font-family:'Orbitron',sans-serif;font-size:14px;font-weight:900;letter-spacing:3px;
+  color:#fff;background:rgba(var(--tt-accent-rgb),.85);
+  box-shadow:0 0 24px rgba(var(--tt-accent-rgb),.7);
+  z-index:5;pointer-events:none;
+}
+
 /* Responsive */
 @media(max-width:1100px){
   .vinyl-stage{grid-template-columns:1fr;gap:14px}
@@ -5123,13 +5162,15 @@ body.work-mode .automix-sync{
 <div class="vinyl-stage">
   <div class="vinyl-floor"></div>
 
-  <div class="turntable" data-tt="L" id="ttL">
+  <div class="turntable" data-tt="L" id="ttL" data-tt-deck="A">
     <div class="tt-topbar">
       <span class="tt-brand">TECHN<span class="brand-accent">I</span>CS · SL-MAX</span>
       <div class="tt-screen">
         <span class="tt-scr-title" id="ttL-title">— NO TRACK —</span>
         <span class="tt-scr-bpm" id="ttL-bpm">128.0</span>
       </div>
+      <button class="tt-load-btn" data-deck-upload="A" title="Upload audio → Deck A">⬆</button>
+      <button class="tt-load-btn lib" data-deck-lib="A" title="Browse library → Deck A">📚</button>
       <span class="tt-power" title="Power"></span>
     </div>
     <div class="tt-deck">
@@ -5233,13 +5274,15 @@ body.work-mode .automix-sync{
     </div>
   </div>
 
-  <div class="turntable" data-tt="R" id="ttR">
+  <div class="turntable" data-tt="R" id="ttR" data-tt-deck="B">
     <div class="tt-topbar">
       <span class="tt-brand">TECHN<span class="brand-accent">I</span>CS · SL-MAX</span>
       <div class="tt-screen">
         <span class="tt-scr-title" id="ttR-title">— NO TRACK —</span>
         <span class="tt-scr-bpm" id="ttR-bpm">128.0</span>
       </div>
+      <button class="tt-load-btn" data-deck-upload="B" title="Upload audio → Deck B">⬆</button>
+      <button class="tt-load-btn lib" data-deck-lib="B" title="Browse library → Deck B">📚</button>
       <span class="tt-power" title="Power"></span>
     </div>
     <div class="tt-deck">
@@ -8579,26 +8622,75 @@ function setupVinylTurntables(){
   }
   setInterval(paintVU,120);
 
-  // Auto-fill title/bpm from decks if available
+  // Drag-and-drop: accept library tracks onto either turntable → routes to deck A/B
+  document.querySelectorAll('.turntable').forEach(tt=>{
+    const deckId=tt.dataset.ttDeck;
+    tt.addEventListener('dragover',e=>{e.preventDefault();tt.classList.add('drop-target')});
+    tt.addEventListener('dragleave',e=>{
+      if(!tt.contains(e.relatedTarget))tt.classList.remove('drop-target');
+    });
+    tt.addEventListener('drop',async e=>{
+      e.preventDefault();tt.classList.remove('drop-target');
+      const tid=e.dataTransfer.getData('text/plain');
+      if(tid&&typeof library!=='undefined'){
+        const t=library.find(x=>x.id===tid);
+        if(t&&typeof loadTrackToDeck==='function'){
+          await loadTrackToDeck(deckId,t);
+          toast&&toast(`Loaded "${t.title}" → Deck ${deckId}`,'success');
+          syncFromDeck();
+        }
+      }else if(e.dataTransfer.files&&e.dataTransfer.files.length&&typeof loadAudioFile==='function'){
+        for(const f of e.dataTransfer.files){
+          try{
+            const t=await loadAudioFile(f);
+            if(t){await loadTrackToDeck(deckId,t);toast&&toast(`Loaded "${t.title}" → Deck ${deckId}`,'success');break;}
+          }catch(err){console.warn('drop load fail',err);toast&&toast(`Failed "${f.name}"`,'error')}
+        }
+        syncFromDeck();
+      }
+    });
+  });
+
+  // Auto-fill title/bpm/label from decks
   function syncFromDeck(){
     try{
-      const dA=(typeof decks!=='undefined')?decks.A:null;
-      const dB=(typeof decks!=='undefined')?decks.B:null;
-      if(dA&&dA.track){
-        const t=document.getElementById('ttL-title');
-        if(t)t.textContent=`${dA.track.title||'UNTITLED'} — ${dA.track.artist||'—'}`.toUpperCase();
-        if(dA.track.bpm)baseBpm.L=+dA.track.bpm||baseBpm.L;
-      }
-      if(dB&&dB.track){
-        const t=document.getElementById('ttR-title');
-        if(t)t.textContent=`${dB.track.title||'UNTITLED'} — ${dB.track.artist||'—'}`.toUpperCase();
-        if(dB.track.bpm)baseBpm.R=+dB.track.bpm||baseBpm.R;
-      }
+      const pairs=[['L','A','ttL-title','ttL-bpm'],['R','B','ttR-title','ttR-bpm']];
+      pairs.forEach(([side,dId,titleId,bpmId])=>{
+        const d=(typeof decks!=='undefined')?decks[dId]:null;
+        const titleEl=document.getElementById(titleId);
+        const bpmEl=document.getElementById(bpmId);
+        const lblTitle=document.querySelector(`#tt${side} .tt-label .lbl-title`);
+        const lblSub=document.querySelector(`#tt${side} .tt-label .lbl-sub`);
+        if(d&&d.track){
+          const t=d.track;
+          if(titleEl)titleEl.textContent=`${(t.title||'UNTITLED').toUpperCase()} — ${(t.artist||'—').toUpperCase()}`;
+          if(t.bpm)baseBpm[side]=+t.bpm||baseBpm[side];
+          if(lblTitle)lblTitle.textContent=(t.title||'UNTITLED').slice(0,18).toUpperCase();
+          if(lblSub)lblSub.textContent=`${t.key?t.key+' · ':''}${t.bpm?t.bpm.toFixed(1)+' BPM':'33⅓'}`;
+          // mirror play/pitch from the actual deck, so UI matches audio
+          state[side].playing=!!d.playing;
+          const sb=document.getElementById(`tt${side}-startstop`);
+          if(sb)sb.classList.toggle('playing',state[side].playing);
+        }else{
+          if(titleEl)titleEl.textContent='— NO TRACK —';
+          if(lblTitle)lblTitle.textContent='DJ MAX';
+          if(lblSub)lblSub.textContent=side==='L'?'SIDE A · 33⅓':'SIDE B · 33⅓';
+        }
+      });
     }catch(_){}
     applySpin('L');applySpin('R');
   }
+
   const vinylTabBtn=document.querySelector('.tab-btn[data-tab="vinyl"]');
-  vinylTabBtn?.addEventListener('click',()=>setTimeout(syncFromDeck,50));
+  let pollId=null;
+  vinylTabBtn?.addEventListener('click',()=>{
+    setTimeout(syncFromDeck,50);
+    if(pollId)clearInterval(pollId);
+    pollId=setInterval(syncFromDeck,500);
+  });
+  document.querySelectorAll('.tab-btn:not([data-tab="vinyl"])').forEach(b=>{
+    b.addEventListener('click',()=>{if(pollId){clearInterval(pollId);pollId=null}});
+  });
   syncFromDeck();
 }
 
