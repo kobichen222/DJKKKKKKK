@@ -6149,13 +6149,16 @@ body.theme-light ::-webkit-scrollbar-thumb{
   transition:all .12s;
 }
 .sup-send:hover{filter:brightness(1.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 4px 16px rgba(28,255,143,.55)}
-.sup-copy{
+.sup-copy,.sup-mailto{
   padding:12px 18px;border-radius:6px;cursor:pointer;
   background:linear-gradient(180deg,#2a2a30,#141418);color:#9fd8ff;
   border:1px solid rgba(46,224,255,.35);
   font-family:'Orbitron',sans-serif;font-size:10px;font-weight:800;letter-spacing:2px;
 }
-.sup-copy:hover{border-color:#2ee0ff;color:#fff;box-shadow:0 0 12px rgba(46,224,255,.3)}
+.sup-copy:hover,.sup-mailto:hover{border-color:#2ee0ff;color:#fff;box-shadow:0 0 12px rgba(46,224,255,.3)}
+.sup-mailto{color:#ffc9a0;border-color:rgba(255,138,26,.45)}
+.sup-mailto:hover{border-color:var(--orange);color:#fff;box-shadow:0 0 12px rgba(255,138,26,.35)}
+.sup-send:disabled{opacity:.55;cursor:wait;filter:grayscale(.3)}
 .sup-status{
   font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:.8px;
   padding:0 4px;min-height:14px;color:var(--text-dim);
@@ -7828,13 +7831,16 @@ Two options — both work completely offline:<br/>
           <textarea id="supMessage" rows="7" class="url-input" placeholder="Describe your question, feedback or request in detail. Include steps to reproduce if reporting a bug."></textarea>
         </div>
 
+        <!-- honeypot (kept empty by real users, bots will fill it) -->
+        <input type="text" id="supHoney" name="_honey" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0"/>
         <div class="sup-row sup-actions">
-          <button class="sup-send" id="supSend">📧 SEND via EMAIL</button>
-          <button class="sup-copy" id="supCopy">📋 COPY MESSAGE</button>
+          <button class="sup-send" id="supSend">📧 SEND MESSAGE</button>
+          <button class="sup-copy" id="supCopy">📋 COPY</button>
+          <button class="sup-mailto" id="supMailto" title="Open your email app instead">✉ OPEN IN EMAIL APP</button>
           <span class="sup-status" id="supStatus"></span>
         </div>
         <div class="sup-note">
-          Sending opens your system email app pre-filled with the message. The destination is always <b>kobi@media-deal.co.il</b>. Copy to clipboard if you prefer WhatsApp / Telegram / in-app chat.
+          <b>SEND</b> delivers the message straight to <b>kobi@media-deal.co.il</b> — no email app required. If you'd rather send it yourself, use <b>OPEN IN EMAIL APP</b> or <b>COPY</b> for WhatsApp / Telegram.
         </div>
       </div>
     </div>
@@ -11282,18 +11288,17 @@ function spDrumHit(name,time,vel){
 /* SUPPORT — contact / purchase form, routes everything to kobi@media-deal.co.il */
 function setupSupport(){
   const SUPPORT_EMAIL='kobi@media-deal.co.il';
+  const FORM_ENDPOINT='https://formsubmit.co/ajax/'+encodeURIComponent(SUPPORT_EMAIL);
   const modes={
-    support:{label:'🛟 SUPPORT / BUG',subject:'DJ TITAN — Support request'},
-    feature:{label:'💡 FEATURE REQUEST',subject:'DJ TITAN — Feature request'},
-    purchase:{label:'💳 PURCHASE REQUEST',subject:'DJ TITAN — Purchase request'},
-    general:{label:'✉ GENERAL',subject:'DJ TITAN — General inquiry'},
+    support:{label:'SUPPORT / BUG',emoji:'🛟',subject:'DJ TITAN — Support request'},
+    feature:{label:'FEATURE REQUEST',emoji:'💡',subject:'DJ TITAN — Feature request'},
+    purchase:{label:'PURCHASE REQUEST',emoji:'💳',subject:'DJ TITAN — Purchase / Lead'},
+    general:{label:'GENERAL',emoji:'✉',subject:'DJ TITAN — General inquiry'},
   };
   let mode='support';
-  const subjEl=document.getElementById('supSubject');
-  const purchaseBox=document.getElementById('supPurchaseFields');
-  const statusEl=document.getElementById('supStatus');
-  const sendBtn=document.getElementById('supSend');
-  const copyBtn=document.getElementById('supCopy');
+  const $=(id)=>document.getElementById(id);
+  const subjEl=$('supSubject'),honey=$('supHoney'),purchaseBox=$('supPurchaseFields');
+  const statusEl=$('supStatus'),sendBtn=$('supSend'),copyBtn=$('supCopy'),mailBtn=$('supMailto');
   if(!subjEl||!sendBtn)return;
 
   document.querySelectorAll('.sup-mode-btn').forEach(btn=>{
@@ -11302,60 +11307,111 @@ function setupSupport(){
       btn.classList.add('active');
       mode=btn.dataset.supMode;
       if(purchaseBox)purchaseBox.style.display=(mode==='purchase')?'grid':'none';
-      // Only replace subject if user hasn't typed a custom one
       if(!subjEl.dataset.userTyped)subjEl.value=modes[mode].subject;
-      sendBtn.textContent=mode==='purchase'?'💳 SEND PURCHASE REQUEST':'📧 SEND via EMAIL';
+      sendBtn.textContent=mode==='purchase'?'💳 SEND PURCHASE REQUEST':'📧 SEND MESSAGE';
     });
   });
   subjEl.addEventListener('input',()=>{subjEl.dataset.userTyped='1'});
-  // Prime default subject
   subjEl.value=modes[mode].subject;
 
-  function build(){
-    const name=document.getElementById('supName').value.trim();
-    const email=document.getElementById('supEmail').value.trim();
-    const phone=document.getElementById('supPhone').value.trim();
-    const subject=(subjEl.value.trim()||modes[mode].subject);
-    const message=document.getElementById('supMessage').value.trim();
-    const tier=document.querySelector('input[name="supTier"]:checked')?.value||'';
+  function values(){
+    return {
+      name:($('supName').value||'').trim(),
+      email:($('supEmail').value||'').trim(),
+      phone:($('supPhone').value||'').trim(),
+      subject:(subjEl.value||'').trim()||modes[mode].subject,
+      message:($('supMessage').value||'').trim(),
+      tier:document.querySelector('input[name="supTier"]:checked')?.value||'',
+      category:modes[mode].label,
+      emoji:modes[mode].emoji,
+      honey:(honey?.value||'').trim(),
+    };
+  }
+  function textBody(v){
     const lines=[];
-    lines.push(`Category: ${modes[mode].label.replace(/^\S+\s/,'')}`);
-    if(name)lines.push(`Name: ${name}`);
-    if(email)lines.push(`Email: ${email}`);
-    if(phone)lines.push(`Phone: ${phone}`);
-    if(mode==='purchase'&&tier)lines.push(`License tier requested: ${tier}`);
+    lines.push(`Category: ${v.emoji} ${v.category}`);
+    if(v.name)lines.push(`Name: ${v.name}`);
+    if(v.email)lines.push(`Email: ${v.email}`);
+    if(v.phone)lines.push(`Phone: ${v.phone}`);
+    if(mode==='purchase'&&v.tier)lines.push(`License tier requested: ${v.tier}`);
     lines.push('');
-    lines.push(message||'(no message)');
+    lines.push(v.message||'(no message)');
     lines.push('');
     lines.push('— Sent from DJ TITAN Professional DJ Studio');
     lines.push(`App URL: ${location.href}`);
     lines.push(`User-Agent: ${navigator.userAgent}`);
-    return {subject,body:lines.join('\n'),name,email,message};
+    lines.push(`Sent at: ${new Date().toISOString()}`);
+    return lines.join('\n');
+  }
+  function setStatus(t,cls){statusEl.textContent=t||'';statusEl.className='sup-status'+(cls?' '+cls:'')}
+  function validEmail(e){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)}
+
+  async function send(){
+    const v=values();
+    if(v.honey){setStatus('✓ Message received','ok');return;} // spam honeypot
+    if(!v.message){setStatus('Please write a message first','err');return;}
+    if(!validEmail(v.email)){setStatus('Please enter a valid email so we can reply','err');return;}
+
+    sendBtn.disabled=true;sendBtn.textContent='⏳ SENDING…';setStatus('Sending…','');
+    const payload={
+      _subject:`[${v.category}] ${v.subject}`,
+      _template:'table',
+      _captcha:'false',
+      _replyto:v.email,
+      Category:`${v.emoji} ${v.category}`,
+      Name:v.name||'(not provided)',
+      Email:v.email,
+      Phone:v.phone||'(not provided)',
+      Subject:v.subject,
+      Message:v.message,
+      LicenseTier:mode==='purchase'?(v.tier||'(not selected)'):'—',
+      AppURL:location.href,
+      UserAgent:navigator.userAgent,
+      SentAt:new Date().toISOString(),
+    };
+    try{
+      const r=await fetch(FORM_ENDPOINT,{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Accept':'application/json'},
+        body:JSON.stringify(payload),
+      });
+      let data=null;try{data=await r.json()}catch(_){}
+      if(!r.ok||(data&&String(data.success)==='false')){
+        throw new Error((data&&(data.message||data.error))||('HTTP '+r.status));
+      }
+      setStatus('✓ Message sent — reply within 24h','ok');
+      if(typeof toast==='function')toast('Message sent to DJ TITAN support','success');
+      $('supMessage').value='';
+      sendBtn.textContent='✓ SENT';
+      setTimeout(()=>{sendBtn.disabled=false;sendBtn.textContent=mode==='purchase'?'💳 SEND PURCHASE REQUEST':'📧 SEND MESSAGE';setStatus('')},3800);
+    }catch(err){
+      console.warn('formsubmit failed',err);
+      setStatus('Direct send blocked — opening your email app instead','err');
+      const href=`mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(v.subject)}&body=${encodeURIComponent(textBody(v))}`;
+      setTimeout(()=>{window.location.href=href;sendBtn.disabled=false;sendBtn.textContent=mode==='purchase'?'💳 SEND PURCHASE REQUEST':'📧 SEND MESSAGE';},700);
+    }
   }
 
-  function setStatus(t,cls){statusEl.textContent=t||'';statusEl.className='sup-status'+(cls?' '+cls:'')}
+  sendBtn.addEventListener('click',send);
 
-  sendBtn.addEventListener('click',()=>{
-    const {subject,body,message}=build();
-    if(!message){setStatus('Please write a message first','err');return;}
-    const href=`mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    // Open system email client
+  mailBtn?.addEventListener('click',()=>{
+    const v=values();
+    if(!v.message){setStatus('Please write a message first','err');return;}
+    const href=`mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(v.subject)}&body=${encodeURIComponent(textBody(v))}`;
     window.location.href=href;
-    setStatus('Email app opening… Click Send there to deliver the message.','ok');
-    setTimeout(()=>setStatus(''),7000);
+    setStatus('Email app opening…','ok');setTimeout(()=>setStatus(''),5000);
   });
 
   copyBtn.addEventListener('click',async()=>{
-    const {subject,body}=build();
-    const text=`To: ${SUPPORT_EMAIL}\nSubject: ${subject}\n\n${body}`;
+    const v=values();
+    const text=`To: ${SUPPORT_EMAIL}\nSubject: ${v.subject}\n\n${textBody(v)}`;
     try{
       await navigator.clipboard.writeText(text);
-      setStatus('Copied to clipboard — paste into WhatsApp / email / chat','ok');
+      setStatus('Copied — paste into WhatsApp / email / chat','ok');
       if(typeof toast==='function')toast('Message copied','success');
     }catch(e){
-      // Fallback: create a textarea, select, copy
       const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();
-      try{document.execCommand('copy');setStatus('Copied to clipboard','ok');}
+      try{document.execCommand('copy');setStatus('Copied','ok');}
       catch(_){setStatus('Copy failed — select the text manually','err');}
       ta.remove();
     }
