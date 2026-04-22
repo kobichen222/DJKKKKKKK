@@ -5294,6 +5294,41 @@ body.work-mode .automix-sync{
 }
 
 /* ================================================================
+   JOG — keep BPM screen and top pointer STATIC (outside platter)
+   The platter spins; the center screen and the top pointer are now
+   siblings of the platter so they never rotate — BPM always readable.
+   ================================================================ */
+.jog-wheel > .jog-center-screen,
+.cdj .jog-wheel > .jog-center-screen{
+  position:absolute !important;
+  top:50% !important;left:50% !important;
+  transform:translate(-50%,-50%) !important;
+  z-index:5 !important;
+  margin:0 !important;
+  width:32% !important;height:32% !important;   /* scales with wheel size */
+  max-width:100px;max-height:100px;
+  min-width:54px;min-height:54px;
+}
+.jog-wheel > .jog-indicator,
+.cdj .jog-wheel > .jog-indicator{
+  z-index:6 !important;
+}
+/* Make sure the BPM text is always upright and sharp */
+.jog-wheel > .jog-center-screen .bpm-display,
+.cdj .jog-wheel > .jog-center-screen .bpm-display{
+  transform:none !important;
+  font-variant-numeric:tabular-nums !important;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+.jog-wheel > .jog-center-screen .bpm-sub,
+.cdj .jog-wheel > .jog-center-screen .bpm-sub{
+  transform:none !important;
+  font-size:9px !important;
+  letter-spacing:2.4px !important;
+}
+
+/* ================================================================
    DISCOVER — world music catalog search (iTunes + Deezer) + genres
    ================================================================ */
 .disc-btn{
@@ -6855,7 +6890,7 @@ function buildDeckHTML(d){
     <button class="pad-mode-btn" data-pad-mode="pitch" data-deck="${d}">PITCH</button>
   </div>
   <div class="hot-cues" data-deck="${d}">${[1,2,3,4,5,6,7,8].map(n=>`<button class="cue-btn" data-color="${n}" data-cue="${n}">${n}</button>`).join('')}</div>
-  <div class="jog-wrapper"><div class="jog-wheel" id="jog-${d}"><div class="jog-outer"></div><div class="jog-ring"><div class="jog-ring-light"></div></div><div class="jog-markers"></div><div class="jog-platter" id="platter-${d}"><div class="jog-platter-disc"></div><div class="jog-indicator"></div><div class="jog-center-screen"><div class="bpm-display" id="centerBpm-${d}">---.-</div><div class="bpm-sub">BPM</div></div></div></div></div>
+  <div class="jog-wrapper"><div class="jog-wheel" id="jog-${d}"><div class="jog-outer"></div><div class="jog-ring"><div class="jog-ring-light"></div></div><div class="jog-markers"></div><div class="jog-platter" id="platter-${d}"><div class="jog-platter-disc"></div></div><div class="jog-indicator"></div><div class="jog-center-screen"><div class="bpm-display" id="centerBpm-${d}">---.-</div><div class="bpm-sub">BPM</div></div></div></div>
   <div class="transport">
     <button class="big-btn cue" data-deck="${d}" data-action="cue"><span class="icon">◄◄</span><span class="lbl">CUE</span></button>
     <button class="big-btn play" data-deck="${d}" data-action="play"><span class="icon" id="playIcon-${d}">▶</span><span class="lbl" id="playLabel-${d}">PLAY</span></button>
