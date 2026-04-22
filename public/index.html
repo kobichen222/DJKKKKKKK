@@ -4643,6 +4643,17 @@ body.work-mode .automix-sync{
 }
 .tt-vinyl:active{cursor:grabbing}
 .tt-vinyl.spinning{animation:ttVinyl var(--tt-spin,1.8s) linear infinite}
+.tt-vinyl.scratching{
+  cursor:grabbing;
+  box-shadow:
+    inset 0 0 0 1px rgba(var(--tt-accent-rgb),.9),
+    inset 0 2px 4px rgba(255,255,255,.08),
+    inset 0 -4px 10px rgba(0,0,0,.95),
+    0 0 22px rgba(var(--tt-accent-rgb),.55),
+    0 0 0 1px #000;
+  transition:box-shadow .08s;
+}
+.tt-vinyl{touch-action:none;user-select:none;-webkit-user-select:none}
 @keyframes ttVinyl{from{transform:rotate(0)}to{transform:rotate(360deg)}}
 .tt-vinyl::before{
   /* light reflection streak */
@@ -8769,6 +8780,12 @@ function setupVinylTurntables(){
   const SIDE2DECK={L:'A',R:'B'};
   const baseBpm={L:128.0,R:128.0};
 
+  // Make the Quick Library overlay a top-level child so it shows on any tab
+  const qlOv=document.getElementById('quickLibOverlay');
+  if(qlOv&&qlOv.parentElement&&qlOv.parentElement.id==='tab-deck'){
+    document.body.appendChild(qlOv);
+  }
+
   function deck(side){return (typeof decks!=='undefined')?decks[SIDE2DECK[side]]:null}
 
   function applySpin(side){
@@ -8851,28 +8868,55 @@ function setupVinylTurntables(){
         }
       });
     });
-    // Drag-to-scratch on the vinyl — visual only (scrubbing the real audio
-    // would need sample-accurate seek which is out of scope here)
+    // Drag-to-scratch on the vinyl — real audible scratch via playbackRate
     const vinyl=document.getElementById(`tt${side}-vinyl`);
     if(vinyl){
-      let dragging=false,lastAngle=0,manualAngle=0;
+      let dragging=false,lastAngleRad=0,manualDeg=0,lastT=0,vel=0;
+      let wasPlaying=false,bending=false;
       const centerOf=()=>{const r=vinyl.getBoundingClientRect();return{cx:r.left+r.width/2,cy:r.top+r.height/2}};
-      const getAngle=(x,y,c)=>Math.atan2(y-c.cy,x-c.cx)*180/Math.PI;
+      const getRad=(x,y,c)=>Math.atan2(y-c.cy,x-c.cx);
       vinyl.addEventListener('pointerdown',e=>{
+        e.preventDefault();
         dragging=true;vinyl.setPointerCapture(e.pointerId);
-        lastAngle=getAngle(e.clientX,e.clientY,centerOf());
+        lastAngleRad=getRad(e.clientX,e.clientY,centerOf());
+        lastT=performance.now();
         vinyl.classList.remove('spinning');
+        vinyl.classList.add('scratching');
+        const d=deck(side);
+        wasPlaying=!!(d&&d.playing);
+        bending=!!(d&&d.source);
       });
       vinyl.addEventListener('pointermove',e=>{
         if(!dragging)return;
-        const c=centerOf();const a=getAngle(e.clientX,e.clientY,c);
-        manualAngle+=(a-lastAngle);lastAngle=a;
-        vinyl.style.transform=`rotate(${manualAngle}deg)`;
+        const c=centerOf();const a=getRad(e.clientX,e.clientY,c);
+        let delta=a-lastAngleRad;
+        if(delta>Math.PI)delta-=2*Math.PI;
+        if(delta<-Math.PI)delta+=2*Math.PI;
+        lastAngleRad=a;
+        const now=performance.now();
+        const dt=Math.max(1,now-lastT);lastT=now;
+        vel=delta/dt;                                     // rad/ms
+        manualDeg+=delta*180/Math.PI;
+        vinyl.style.transform=`rotate(${manualDeg}deg)`;
+        const d=deck(side);
+        if(bending&&d&&d.source&&typeof audioCtx!=='undefined'&&audioCtx){
+          const orig=1+((d.tempo||0)/100);
+          const bend=1+(vel*160);                         // scale velocity to rate
+          const clamped=Math.max(-2.5,Math.min(2.5,bend))*orig;
+          try{d.source.playbackRate.setTargetAtTime(Math.abs(clamped)<0.02?0.02:clamped,audioCtx.currentTime,0.008);}catch(_){}
+        }
       });
       const release=()=>{
         if(!dragging)return;dragging=false;
         vinyl.style.transform='';
-        if(deck(side)?.playing)vinyl.classList.add('spinning');
+        vinyl.classList.remove('scratching');
+        const d=deck(side);
+        if(bending&&d&&d.source&&typeof audioCtx!=='undefined'&&audioCtx){
+          const orig=1+((d.tempo||0)/100);
+          try{d.source.playbackRate.setTargetAtTime(orig,audioCtx.currentTime,0.04);}catch(_){}
+        }
+        bending=false;
+        if(d?.playing)vinyl.classList.add('spinning');
       };
       vinyl.addEventListener('pointerup',release);
       vinyl.addEventListener('pointercancel',release);
