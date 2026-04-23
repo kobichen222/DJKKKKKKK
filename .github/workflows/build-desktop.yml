@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version to publish (e.g. 1.0.1). Leave blank to use package.json version.'
+        description: 'Version to publish (e.g. 1.0.2). Leave blank to use package.json version.'
         required: false
         default: ''
   # Automatic on tag push matching v*
@@ -27,16 +27,24 @@ jobs:
   build:
     name: ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+    # Windows is the flagship target — must succeed. macOS and Linux are
+    # marked optional so a signing or runner issue there cannot block the
+    # Windows release from publishing.
+    continue-on-error: ${{ matrix.optional }}
     strategy:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-latest
-            platform: linux
           - os: windows-latest
             platform: win
+            optional: false
+          - os: ubuntu-latest
+            platform: linux
+            optional: true
           - os: macos-latest
             platform: mac
+            optional: true
+
     steps:
       - uses: actions/checkout@v4
 
@@ -46,7 +54,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install --no-audit --no-fund
+        run: npm ci --no-audit --no-fund || npm install --no-audit --no-fund
 
       - name: Derive version from tag or input
         shell: bash
@@ -67,4 +75,23 @@ jobs:
       - name: Build + publish Electron app (${{ matrix.platform }})
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Skip macOS code-signing (no certs in repo) — still produces an
+          # installable unsigned DMG / ZIP.
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
         run: npm run electron:${{ matrix.platform }} -- --publish always
+
+      # Safety net: keep the raw installer as a workflow artifact so a human
+      # can grab it from the Actions run even if the publish step ever has
+      # trouble attaching it to the GitHub Release.
+      - name: Upload installer as workflow artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: installer-${{ matrix.platform }}
+          path: |
+            dist-electron/*.exe
+            dist-electron/*.dmg
+            dist-electron/*.zip
+            dist-electron/*.AppImage
+          if-no-files-found: ignore
+          retention-days: 30
