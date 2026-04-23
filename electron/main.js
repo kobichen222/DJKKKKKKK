@@ -4,17 +4,30 @@
    Updates are downloaded silently and installed on quit. */
 const { app, BrowserWindow, Menu, dialog, shell } = require('electron');
 const path = require('path');
+const fs = require('fs');
 
 let autoUpdater = null;
 try { autoUpdater = require('electron-updater').autoUpdater; } catch (_) { /* optional in dev */ }
 
 let mainWindow = null;
 
-function resolveAppPath(...parts) {
-  // In a packaged build __dirname points inside app.asar; use getAppPath so
-  // we also resolve correctly when running `electron .` from a checkout.
+function findAssetPath(relPath) {
+  // Try every layout the public asset could live in — dev checkout, inside
+  // app.asar, asar.unpacked sibling (electron-builder's asarUnpack output),
+  // and an absolute process.resourcesPath fallback — and return the first
+  // path that actually exists on disk.  This is what v1.0.5/1.0.6 was missing
+  // and what caused the black screen on Windows.
   const base = typeof app.getAppPath === 'function' ? app.getAppPath() : path.join(__dirname, '..');
-  return path.join(base, ...parts);
+  const candidates = [
+    path.join(__dirname, '..', relPath),
+    path.join(base, relPath),
+    path.join(base.replace(/app\.asar$/i, 'app.asar.unpacked'), relPath),
+    path.join(process.resourcesPath || '', 'app.asar.unpacked', relPath),
+  ];
+  for (const p of candidates) {
+    try { if (p && fs.existsSync(p)) return p; } catch (_) {}
+  }
+  return candidates[0]; // concrete path for the error dialog if nothing exists
 }
 
 function createWindow() {
@@ -32,7 +45,7 @@ function createWindow() {
     backgroundColor: '#0a0a0a',
     title: 'DJ TITAN — Professional DJ Studio',
     autoHideMenuBar: true,
-    icon: resolveAppPath('public', 'icon.svg'),
+    icon: findAssetPath(path.join('public', 'icon.svg')),
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
@@ -91,17 +104,19 @@ function createWindow() {
     return { action: 'allow' };
   });
 
-  const htmlPath = resolveAppPath('public', 'pioneer-dj-pro-max-v2.html');
+  const htmlPath = findAssetPath(path.join('public', 'pioneer-dj-pro-max-v2.html'));
 
   // Diagnostics: if the renderer fails to load for any reason (bad path,
   // missing asset, CSP) the user used to just see a black window forever.
   // Now we show a real error dialog + drop into DevTools so the next bug
   // report ships with an actual error message.
   mainWindow.webContents.on('did-fail-load', (_e, code, desc, url) => {
+    // -3 = ERR_ABORTED (fires on normal in-page navigation) — ignore.
+    if (code === -3) return;
     console.error('[DJ TITAN] Failed to load renderer:', code, desc, url);
     try { mainWindow.webContents.openDevTools({ mode: 'detach' }); } catch (_) {}
     dialog.showErrorBox('DJ TITAN — load failure',
-      `Could not load the UI.\n\nCode: ${code}\n${desc}\n\nURL: ${url}\n\nIf this keeps happening, report the error text above.`);
+      `Could not load the UI.\n\nCode: ${code}\n${desc}\n\nURL: ${url}\n\nTried: ${htmlPath}`);
   });
   mainWindow.loadFile(htmlPath).catch((err) => {
     console.error('[DJ TITAN] loadFile threw:', err && err.message);
