@@ -12,6 +12,13 @@ on:
   push:
     tags:
       - 'v*'
+    # Also auto-build when the version or build config changes on main
+    branches:
+      - main
+    paths:
+      - 'package.json'
+      - 'electron/**'
+      - '.github/workflows/build-desktop.yml'
 
 permissions:
   contents: write
