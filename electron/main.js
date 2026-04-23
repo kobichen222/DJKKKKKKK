@@ -2,7 +2,7 @@
    Loads public/pioneer-dj-pro-max-v2.html in a native BrowserWindow and
    checks the GitHub Releases feed for updates on launch + every 4 hours.
    Updates are downloaded silently and installed on quit. */
-const { app, BrowserWindow, Menu, dialog, shell } = require('electron');
+const { app, BrowserWindow, Menu, dialog, shell, ipcMain } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
@@ -56,6 +56,10 @@ function createWindow() {
       nodeIntegration: false,
       sandbox: true,
       webSecurity: true,
+      // Preload bridges auto-update lifecycle events to window.djtitan in the
+      // renderer.  Resolved via __dirname so it works inside app.asar too —
+      // Electron reads preload scripts through its own asar-aware loader.
+      preload: path.join(__dirname, 'preload.js'),
     },
   });
 
@@ -143,31 +147,30 @@ function initAutoUpdates() {
     console.warn('[updater] error:', err && err.message ? err.message : err);
   });
 
-  autoUpdater.on('update-available', (info) => {
+  const sendStatus = (payload) => {
     if (mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.webContents.send('djmax:update-status', {
-        state: 'available',
-        version: info && info.version,
-      });
+      mainWindow.webContents.send('djtitan:update-status', payload);
     }
+  };
+
+  ipcMain.on('djtitan:check-updates', () => {
+    try { autoUpdater.checkForUpdatesAndNotify(); } catch (_) {}
+  });
+
+  autoUpdater.on('update-available', (info) => {
+    sendStatus({ state: 'available', version: info && info.version });
   });
 
   autoUpdater.on('update-not-available', () => {
-    if (mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.webContents.send('djmax:update-status', { state: 'none' });
-    }
+    sendStatus({ state: 'none' });
   });
 
   autoUpdater.on('download-progress', (p) => {
-    if (mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.webContents.send('djmax:update-status', {
-        state: 'downloading',
-        percent: p && p.percent,
-      });
-    }
+    sendStatus({ state: 'downloading', percent: p && p.percent });
   });
 
   autoUpdater.on('update-downloaded', (info) => {
+    sendStatus({ state: 'downloaded', version: info && info.version });
     dialog.showMessageBox(mainWindow, {
       type: 'info',
       title: 'Update ready',
