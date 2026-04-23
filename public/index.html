@@ -231,8 +231,7 @@ body.show-all .console.show-all{max-width:none;width:calc(100vw - 16px)}
 .screen-right{text-align:left;direction:ltr}
 .screen-bpm{font-family:'Orbitron',sans-serif;font-size:18px;font-weight:700;color:var(--orange-glow);text-shadow:0 0 10px rgba(255,122,0,.6);line-height:1}
 .screen-bpm-label{font-size:9px;color:var(--text-dim);letter-spacing:2px}
-.screen-key{font-size:11px;color:var(--play-green);text-shadow:0 0 2px rgba(0,0,0,.9);margin-top:2px;transition:color .2s,text-shadow .2s}
-.screen-key.harmonic-match{color:var(--screen-glow);text-shadow:0 0 6px var(--screen-glow),0 0 12px rgba(0,212,255,.7),0 1px 0 rgba(0,0,0,.9)}
+.screen-key{font-size:11px;color:var(--play-green);text-shadow:0 0 2px rgba(0,0,0,.9);margin-top:2px}
 .waveform{height:48px;background:#020608;border-radius:3px;margin:6px 0;position:relative;overflow:hidden;border:1px solid rgba(0,212,255,.1)}
 .waveform-canvas{width:100%;height:100%;display:block}
 .playhead{position:absolute;top:0;left:50%;width:2px;height:100%;background:#fff;box-shadow:0 0 8px rgba(255,255,255,.9);z-index:3}
@@ -8923,14 +8922,6 @@ Two options — both work completely offline:<br/>
   3. Authentication → Providers → enable <strong>Google</strong> + <strong>Phone (WhatsApp via Twilio)</strong><br/>
   4. Settings → API → copy URL + anon key here → SAVE & CONNECT
 </div>
-<div class="settings-row" style="margin-top:10px;padding-top:10px;border-top:1px dashed rgba(255,255,255,.08);flex-direction:column;align-items:stretch;gap:8px">
-  <div class="setting-label">☁ Cloud Library Sync <span class="setting-desc" id="cloudSyncStatus">(sign in first)</span></div>
-  <div style="display:flex;gap:8px;flex-wrap:wrap">
-    <button class="tool-btn" id="cloudPushBtn" style="color:var(--play-green);border-color:var(--play-green)">⬆ PUSH LIBRARY</button>
-    <button class="tool-btn" id="cloudPullBtn" style="color:var(--screen-glow);border-color:var(--screen-glow)">⬇ PULL LIBRARY</button>
-  </div>
-  <div class="setting-desc" style="font-size:10.5px;line-height:1.5">Stores your library metadata (titles, BPM, keys, tags, playlists) in <code>user_sessions</code> so any signed-in device pulls the same crate. Audio files are never uploaded.</div>
-</div>
 </div>
 
 <div class="settings-section"><h3>🎵 MUSIC SERVICES</h3>
@@ -9293,48 +9284,6 @@ let settings={theme:'dark',rgbAmbient:true,phraseMarkers:true,limiter:true,autoG
 let aiDJ={active:false,style:'smooth',transLen:16,bpmTol:6,order:'energy-flow',transitionTimer:null};
 
 function createDeck(id){return{id,track:null,playing:false,startTime:0,offset:0,tempo:0,playbackRate:1,tempoRange:8,cuePoint:0,hotCues:{},savedLoops:{},loop:{active:false,start:null,end:null,loopInSet:false},keylock:false,quantize:false,slip:false,slipReturn:null,reverse:false,sync:false,source:null,volumeGain:null,trimGain:null,channelGain:null,eqLow:null,eqLoMid:null,eqHiMid:null,eqHigh:null,killLow:false,killMid:false,killHi:false,compressor:null,saturation:null,colorFilter:null,buffer:null,volume:0.8,eq:{low:0,loMid:0,hiMid:0,high:0},trim:1,analyser:null,padMode:'cue',waveZoom:1,energy:0,beatgrid:null,phraseOffset:0};}
-
-/* Camelot wheel — musical-key → Camelot code lookup + harmonic matches.
- * Rules: same number A↔B (relative), ±1 same letter, parallel (A↔B). */
-const CAMELOT_MAP={
-  'B':'1B','G#m':'1A','Abm':'1A',
-  'F#':'2B','Gb':'2B','D#m':'2A','Ebm':'2A',
-  'Db':'3B','C#':'3B','A#m':'3A','Bbm':'3A',
-  'Ab':'4B','G#':'4B','Fm':'4A',
-  'Eb':'5B','D#':'5B','Cm':'5A',
-  'Bb':'6B','A#':'6B','Gm':'6A',
-  'F':'7B','Dm':'7A',
-  'C':'8B','Am':'8A',
-  'G':'9B','Em':'9A',
-  'D':'10B','Bm':'10A',
-  'A':'11B','F#m':'11A','Gbm':'11A',
-  'E':'12B','C#m':'12A','Dbm':'12A',
-};
-function toCamelot(k){if(!k)return null;return CAMELOT_MAP[(k+'').replace(/\s/g,'')]||null;}
-function harmonicMatches(c){
-  if(!c)return[];
-  const n=parseInt(c,10),l=c.slice(-1);
-  const wrap=x=>((x-1+12)%12)+1;
-  return [`${n}${l==='A'?'B':'A'}`,`${wrap(n-1)}${l}`,`${wrap(n+1)}${l}`];
-}
-/* Green glow on the key display whenever its track is harmonically
- * compatible with any other deck currently playing. */
-function updateHarmonicGlow(){
-  const active=[];
-  ['A','B','C','D'].forEach(id=>{
-    const dk=decks?.[id];if(!dk||!dk.track||!dk.playing)return;
-    const c=toCamelot(dk.track.key);if(c)active.push({id,c});
-  });
-  ['A','B','C','D'].forEach(id=>{
-    const el=document.getElementById(`key-${id}`);if(!el)return;
-    el.classList.remove('harmonic-match');
-    const dk=decks?.[id];if(!dk||!dk.track)return;
-    const mine=toCamelot(dk.track.key);if(!mine)return;
-    const matches=harmonicMatches(mine);
-    const hit=active.some(o=>o.id!==id&&(o.c===mine||matches.includes(o.c)));
-    if(hit)el.classList.add('harmonic-match');
-  });
-}
 const decks={A:createDeck('A'),B:createDeck('B'),C:createDeck('C'),D:createDeck('D')};
 const mixerState={crossfader:0.5,xfaderCurve:'smooth',master:0.9,booth:0.7,balance:0,hpMix:0.5,hpVol:0.7,hpCue:{A:false,B:false,C:false,D:false},micOn:false,micVol:0,micHi:0,micLow:0,fx:{type:'delay',channel:'master',beat:1,level:0.5,on:false},colorFx:{type:'filter',A:0,B:0,C:0,D:0},xfaderAssign:{A:'A',B:'B',C:'THRU',D:'THRU'},isRecording:false,sceneFx:{type:null,depth:0.5,xpadX:0.5,xpadY:0.5,xpadActive:false},isolator:{low:0,mid:0,hi:0}};
 
@@ -9977,15 +9926,7 @@ async function loadTrackToDeck(deckId,track){
   setText(`title-${deckId}`,track.title.toUpperCase());
   setText(`artist-${deckId}`,track.artist.toUpperCase());
   setText(`bpm-${deckId}`,track.bpm.toFixed(2));
-  const keyEl=document.getElementById(`key-${deckId}`);
-  if(keyEl){
-    const cam=toCamelot(track.key);
-    if(cam){
-      keyEl.textContent=`${track.key} · ${cam}`;
-      keyEl.title=`${track.key} (Camelot ${cam})\nHarmonic matches: ${harmonicMatches(cam).join(' · ')}`;
-    }else{keyEl.textContent=track.key||'--';keyEl.title='';}
-  }
-  updateHarmonicGlow();
+  setText(`key-${deckId}`,track.key);
   setText(`centerBpm-${deckId}`,track.bpm.toFixed(1));
   setText(`cdTitle-${deckId}`,track.title.toUpperCase());
   setText(`cdBpm-${deckId}`,track.bpm.toFixed(1)+' BPM');
@@ -10212,7 +10153,7 @@ function playDeck(deckId){
   d.source=audioCtx.createBufferSource();
   d.source.buffer=d.buffer;d.source.playbackRate.value=d.playbackRate;
   d.source.connect(d.trimGain);
-  d.source.start(0,d.offset);d.startTime=audioCtx.currentTime;d.playing=true;try{updateHarmonicGlow();}catch(_){}
+  d.source.start(0,d.offset);d.startTime=audioCtx.currentTime;d.playing=true;
   if(d.volumeGain){
     const target=d.volume!==undefined?d.volume:0.8;
     const now=audioCtx.currentTime;
@@ -10266,7 +10207,7 @@ function pauseDeck(deckId){
     try{d.source.stop();}catch(e){}
     d.source.disconnect();
   }
-  d.source=null;d.playing=false;try{updateHarmonicGlow();}catch(_){}
+  d.source=null;d.playing=false;
   if(deckId==='A'||deckId==='B'){
     document.getElementById(`jog-${deckId}`)?.classList.remove('playing');
     document.getElementById(`platter-${deckId}`)?.classList.remove('spinning');
@@ -10285,7 +10226,6 @@ function togglePlay(deckId){
   const d=decks[deckId];if(!d.track)return;
   if(d.playing)pauseDeck(deckId);
   else{playDeck(deckId);logMix(`Play Deck ${deckId}`);}
-  try{updateHarmonicGlow();}catch(_){}
 }
 function cueDeck(deckId){
   const d=decks[deckId];if(!d.track)return;
@@ -11884,23 +11824,9 @@ function tick(){
 }
 
 /* KEYBOARD */
-function showShortcutHelp(){
-  if(typeof showModal!=='function')return;
-  const g=(t,rows)=>`<div style="margin:10px 0 4px;font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:2px;color:var(--orange)">${t}</div><div style="display:grid;grid-template-columns:1fr 2fr;gap:4px 10px;font-size:12px">${rows.map(([k,d])=>`<code style="font-family:'Share Tech Mono',monospace;color:var(--screen-glow)">${k}</code><span style="color:var(--text-dim)">${d}</span>`).join('')}</div>`;
-  const body=
-    g('TRANSPORT',[['Q','Cue A'],['W','Play/Pause A'],['O','Cue B'],['P','Play/Pause B'],['Space','Play/Pause A + B']])+
-    g('NAVIGATION',[['A / S','Beat-jump deck A -1/+1'],['K / L','Beat-jump deck B -1/+1'],['↑ / ↓','Tempo nudge A ±0.05%']])+
-    g('MIXER',[[',','Xfader left  10%'],['.','Xfader right 10%'],['/','Xfader centre'],['F','Beat FX on/off'],['T','Tap tempo'],['G / H','Headphone cue A / B']])+
-    g('PADS',[['1–8','Hot cue deck A (hold Shift = deck B)'],['Z X C V B N M ,','Sampler pads 9–16']])+
-    g('GLOBAL',[['Ctrl+A','AI DJ start'],['Ctrl+R','Toggle recording'],['Ctrl+1…9','Switch main tabs'],['Esc','Close overlay'],['? / Shift+/','Shortcut help (this)']]);
-  showModal('Keyboard Shortcuts',body,()=>{});
-}
 function setupKeyboard(){
   document.addEventListener('keydown',e=>{
     if(['INPUT','SELECT','TEXTAREA'].includes(e.target.tagName))return;
-    // ? (Shift+/) opens shortcut help — must be before e.repeat guard so it
-    // still works even if the user holds the key.
-    if(e.key==='?'||(e.shiftKey&&e.key==='/')){e.preventDefault();showShortcutHelp();return;}
     // Ignore OS-level key repeat (holding a key) — sampler pads and hot cues
     // must not retrigger as fast as the keyboard repeat rate.
     if(e.repeat)return;
@@ -15826,7 +15752,6 @@ function init(){
   setupVU('vu-A',20);setupVU('vu-B',20);setupVU('vu-C',20);setupVU('vu-D',20);
   setupVU('masterHVuL',20);setupVU('masterHVuR',20);
   attachKnobs();attachEvents();setupBeatFxUI();setupSceneFx();setupKeyboard();setupTabs();setupSettings();setupVinylTurntables();setupOfflineDownload();setupDesktopDownloads();setupDiscover();setupTitanClock();setupSupport();setupStudioPro();
-  try{updateCloudSyncStatus();}catch(_){}
   // Restart-tour button + first-run auto-tour
   document.getElementById('restartTourBtn')?.addEventListener('click',()=>spStartTour(true));
   setTimeout(()=>{try{spStartTour(false);}catch(e){console.warn('tour failed',e);}},1100);
@@ -16616,73 +16541,11 @@ async function onSupaSession(session){
     try{await _supa.from('profiles').update({last_login:new Date().toISOString()}).eq('id',_supaUser.id);}catch(_){}
   }catch(e){_supaProfile={id:_supaUser.id,email:_supaUser.email,role:'user'};}
   updateAuthUI();
-  updateCloudSyncStatus();
   if(_supaProfile.role==='admin')loadAdminUsers();
 }
-/* ============================================================
- * CLOUD LIBRARY SYNC — push/pull library metadata (no audio) to
- * Supabase user_sessions so any signed-in device pulls the same crate.
- * ============================================================ */
-const CLOUD_SYNC_NAME='titan-library-sync-v1';
-function updateCloudSyncStatus(){
-  const s=document.getElementById('cloudSyncStatus');if(!s)return;
-  const push=document.getElementById('cloudPushBtn'),pull=document.getElementById('cloudPullBtn');
-  if(!_supaUser){s.textContent='(sign in first)';if(push)push.disabled=true;if(pull)pull.disabled=true;return;}
-  s.textContent=`· signed in as ${_supaUser.email||_supaUser.phone||'user'}`;
-  if(push)push.disabled=false;if(pull)pull.disabled=false;
-}
-async function cloudPushLibrary(){
-  if(!_supa||!_supaUser){toast('Sign in first','error');return;}
-  try{
-    const payload={
-      library:(library||[]).map(t=>({...t,buffer:undefined})),
-      playlists:playlists||[],
-      stats:stats||null,
-      exportedAt:Date.now(),
-      ua:navigator.userAgent.slice(0,120),
-    };
-    const{error}=await _supa.from('user_sessions').upsert({
-      id:undefined,user_id:_supaUser.id,name:CLOUD_SYNC_NAME,payload,
-    },{onConflict:'user_id,name'});
-    // upsert needs a unique constraint; fall back to manual delete+insert if not configured.
-    if(error){
-      await _supa.from('user_sessions').delete().eq('user_id',_supaUser.id).eq('name',CLOUD_SYNC_NAME);
-      const{error:e2}=await _supa.from('user_sessions').insert({user_id:_supaUser.id,name:CLOUD_SYNC_NAME,payload});
-      if(e2)throw e2;
-    }
-    toast(`Library pushed (${payload.library.length} tracks)`,'success');
-  }catch(e){toast('Push failed: '+(e?.message||e),'error');}
-}
-async function cloudPullLibrary(){
-  if(!_supa||!_supaUser){toast('Sign in first','error');return;}
-  if(!confirm('Replace local library with the cloud copy?'))return;
-  try{
-    const{data,error}=await _supa.from('user_sessions').select('payload,created_at')
-      .eq('user_id',_supaUser.id).eq('name',CLOUD_SYNC_NAME)
-      .order('created_at',{ascending:false}).limit(1).maybeSingle();
-    if(error)throw error;
-    if(!data?.payload){toast('No cloud library yet — push first','warn');return;}
-    const p=data.payload;
-    if(Array.isArray(p.library)){
-      library=p.library.filter(t=>t.source==='yt').concat(
-        p.library.filter(t=>t.source!=='yt').map(t=>({...t,buffer:null}))
-      );
-    }
-    if(Array.isArray(p.playlists))playlists=p.playlists;
-    saveToDB();
-    if(typeof renderLibrary==='function')renderLibrary();
-    if(typeof renderPlaylists==='function')renderPlaylists();
-    toast(`Pulled (${library.length} tracks) — reload for full effect`,'success');
-  }catch(e){toast('Pull failed: '+(e?.message||e),'error');}
-}
-document.addEventListener('click',e=>{
-  if(e.target?.id==='cloudPushBtn'){e.preventDefault();cloudPushLibrary();}
-  else if(e.target?.id==='cloudPullBtn'){e.preventDefault();cloudPullLibrary();}
-});
 function onSupaSignOut(){
   _supaUser=null;_supaProfile=null;
   updateAuthUI();
-  updateCloudSyncStatus();
 }
 function updateAuthUI(){
   const btn=document.getElementById('authBtn');
