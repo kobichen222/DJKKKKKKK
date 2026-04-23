@@ -1,6 +1,8 @@
 /* DJ TITAN — Electron wrapper with GitHub-backed auto-updates
-   Loads public/index.html in a native BrowserWindow and
+   Loads public/studio.html (the DJ app itself) in a native BrowserWindow and
    checks the GitHub Releases feed for updates on launch + every 4 hours.
+   public/index.html on the web is a marketing landing page — irrelevant to
+   desktop users, who've already installed and just want the studio.
    Updates are downloaded silently and installed on quit. */
 const { app, BrowserWindow, Menu, dialog, shell, ipcMain } = require('electron');
 const path = require('path');
@@ -113,7 +115,7 @@ function createWindow() {
     return { action: 'allow' };
   });
 
-  const htmlPath = findAssetPath(path.join('public', 'index.html'));
+  const htmlPath = findAssetPath(path.join('public', 'studio.html'));
 
   // Diagnostics: if the renderer fails to load for any reason (bad path,
   // missing asset, CSP) the user used to just see a black window forever.
