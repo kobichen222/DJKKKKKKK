@@ -8738,14 +8738,6 @@ Two options — both work completely offline:<br/>
   <div class="setting-desc" style="margin-bottom:8px;font-size:10px;line-height:1.5">
     If no assets appear on the Release page, an admin must trigger the <b>Build Desktop App</b> workflow in the repo's Actions tab (or push a <code>v*</code> tag).
   </div>
-
-  <div class="setting-label" style="color:var(--play-green);margin:14px 0 8px">📄 STANDALONE HTML</div>
-  <div class="setting-desc" style="margin-bottom:8px;line-height:1.6">
-    Single-file fallback — no install, just open in any browser.
-  </div>
-  <div style="display:flex;gap:10px;flex-wrap:wrap">
-    <button class="tool-btn" id="offlineHtmlDl" style="color:var(--play-green);border-color:var(--play-green);font-weight:800">⬇ DOWNLOAD HTML</button>
-  </div>
 </div>
 </div>
 <div class="settings-section"><h3>🔐 AUTHENTICATION (Supabase)</h3>
@@ -11722,7 +11714,6 @@ function setupOfflineDownload(){
   const err=document.getElementById('offlineCodeErr');
   const status=document.getElementById('offlineStatus');
   const panel=document.getElementById('offlineUnlocked');
-  const htmlDl=document.getElementById('offlineHtmlDl');
   if(!btn||!box)return;
   const ADMIN_CODE='2100';
 
@@ -11751,35 +11742,6 @@ function setupOfflineDownload(){
     status.textContent='';
   }
 
-  async function doHtmlDownload(){
-    try{
-      status.textContent='Preparing…';status.style.color='var(--orange)';
-      let html='';
-      try{
-        const res=await fetch('./pioneer-dj-pro-max-v2.html',{cache:'no-cache'});
-        if(res.ok)html=await res.text();
-      }catch(_){}
-      if(!html){html='<!DOCTYPE html>\n'+document.documentElement.outerHTML;}
-      const stamp=new Date().toISOString().replace(/[:.]/g,'-');
-      if(!html.startsWith('<!--')){
-        html=`<!-- DJ MAX — Offline Standalone Build · exported ${stamp} -->\n`+html;
-      }
-      const blob=new Blob([html],{type:'text/html;charset=utf-8'});
-      const url=URL.createObjectURL(blob);
-      const a=document.createElement('a');
-      a.href=url;a.download=`DJ-MAX-Offline-${stamp}.html`;
-      document.body.appendChild(a);a.click();
-      setTimeout(()=>{URL.revokeObjectURL(url);a.remove()},500);
-      status.textContent='✓ Downloaded';status.style.color='var(--play-green)';
-      if(typeof toast==='function')toast('Offline HTML downloaded','success');
-      setTimeout(()=>{status.textContent=''},4000);
-    }catch(e){
-      status.textContent='Failed';status.style.color='var(--red)';
-      console.warn('offline download failed',e);
-      if(typeof toast==='function')toast('Download failed: '+(e.message||e),'error');
-    }
-  }
-
   ok.addEventListener('click',()=>{
     const code=(inp.value||'').trim();
     if(code!==ADMIN_CODE){
@@ -11793,7 +11755,6 @@ function setupOfflineDownload(){
     if(typeof toast==='function')toast('Downloads unlocked','success');
   });
 
-  htmlDl?.addEventListener('click',()=>{if(isUnlocked())doHtmlDownload()});
 }
 
 /* ====================================================================
