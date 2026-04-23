@@ -8923,14 +8923,6 @@ Two options — both work completely offline:<br/>
   3. Authentication → Providers → enable <strong>Google</strong> + <strong>Phone (WhatsApp via Twilio)</strong><br/>
   4. Settings → API → copy URL + anon key here → SAVE & CONNECT
 </div>
-<div class="settings-row" style="margin-top:10px;padding-top:10px;border-top:1px dashed rgba(255,255,255,.08);flex-direction:column;align-items:stretch;gap:8px">
-  <div class="setting-label">☁ Cloud Library Sync <span class="setting-desc" id="cloudSyncStatus">(sign in first)</span></div>
-  <div style="display:flex;gap:8px;flex-wrap:wrap">
-    <button class="tool-btn" id="cloudPushBtn" style="color:var(--play-green);border-color:var(--play-green)">⬆ PUSH LIBRARY</button>
-    <button class="tool-btn" id="cloudPullBtn" style="color:var(--screen-glow);border-color:var(--screen-glow)">⬇ PULL LIBRARY</button>
-  </div>
-  <div class="setting-desc" style="font-size:10.5px;line-height:1.5">Stores your library metadata (titles, BPM, keys, tags, playlists) in <code>user_sessions</code> so any signed-in device pulls the same crate. Audio files are never uploaded.</div>
-</div>
 </div>
 
 <div class="settings-section"><h3>🎵 MUSIC SERVICES</h3>
@@ -15826,7 +15818,6 @@ function init(){
   setupVU('vu-A',20);setupVU('vu-B',20);setupVU('vu-C',20);setupVU('vu-D',20);
   setupVU('masterHVuL',20);setupVU('masterHVuR',20);
   attachKnobs();attachEvents();setupBeatFxUI();setupSceneFx();setupKeyboard();setupTabs();setupSettings();setupVinylTurntables();setupOfflineDownload();setupDesktopDownloads();setupDiscover();setupTitanClock();setupSupport();setupStudioPro();
-  try{updateCloudSyncStatus();}catch(_){}
   // Restart-tour button + first-run auto-tour
   document.getElementById('restartTourBtn')?.addEventListener('click',()=>spStartTour(true));
   setTimeout(()=>{try{spStartTour(false);}catch(e){console.warn('tour failed',e);}},1100);
@@ -16616,73 +16607,11 @@ async function onSupaSession(session){
     try{await _supa.from('profiles').update({last_login:new Date().toISOString()}).eq('id',_supaUser.id);}catch(_){}
   }catch(e){_supaProfile={id:_supaUser.id,email:_supaUser.email,role:'user'};}
   updateAuthUI();
-  updateCloudSyncStatus();
   if(_supaProfile.role==='admin')loadAdminUsers();
 }
-/* ============================================================
- * CLOUD LIBRARY SYNC — push/pull library metadata (no audio) to
- * Supabase user_sessions so any signed-in device pulls the same crate.
- * ============================================================ */
-const CLOUD_SYNC_NAME='titan-library-sync-v1';
-function updateCloudSyncStatus(){
-  const s=document.getElementById('cloudSyncStatus');if(!s)return;
-  const push=document.getElementById('cloudPushBtn'),pull=document.getElementById('cloudPullBtn');
-  if(!_supaUser){s.textContent='(sign in first)';if(push)push.disabled=true;if(pull)pull.disabled=true;return;}
-  s.textContent=`· signed in as ${_supaUser.email||_supaUser.phone||'user'}`;
-  if(push)push.disabled=false;if(pull)pull.disabled=false;
-}
-async function cloudPushLibrary(){
-  if(!_supa||!_supaUser){toast('Sign in first','error');return;}
-  try{
-    const payload={
-      library:(library||[]).map(t=>({...t,buffer:undefined})),
-      playlists:playlists||[],
-      stats:stats||null,
-      exportedAt:Date.now(),
-      ua:navigator.userAgent.slice(0,120),
-    };
-    const{error}=await _supa.from('user_sessions').upsert({
-      id:undefined,user_id:_supaUser.id,name:CLOUD_SYNC_NAME,payload,
-    },{onConflict:'user_id,name'});
-    // upsert needs a unique constraint; fall back to manual delete+insert if not configured.
-    if(error){
-      await _supa.from('user_sessions').delete().eq('user_id',_supaUser.id).eq('name',CLOUD_SYNC_NAME);
-      const{error:e2}=await _supa.from('user_sessions').insert({user_id:_supaUser.id,name:CLOUD_SYNC_NAME,payload});
-      if(e2)throw e2;
-    }
-    toast(`Library pushed (${payload.library.length} tracks)`,'success');
-  }catch(e){toast('Push failed: '+(e?.message||e),'error');}
-}
-async function cloudPullLibrary(){
-  if(!_supa||!_supaUser){toast('Sign in first','error');return;}
-  if(!confirm('Replace local library with the cloud copy?'))return;
-  try{
-    const{data,error}=await _supa.from('user_sessions').select('payload,created_at')
-      .eq('user_id',_supaUser.id).eq('name',CLOUD_SYNC_NAME)
-      .order('created_at',{ascending:false}).limit(1).maybeSingle();
-    if(error)throw error;
-    if(!data?.payload){toast('No cloud library yet — push first','warn');return;}
-    const p=data.payload;
-    if(Array.isArray(p.library)){
-      library=p.library.filter(t=>t.source==='yt').concat(
-        p.library.filter(t=>t.source!=='yt').map(t=>({...t,buffer:null}))
-      );
-    }
-    if(Array.isArray(p.playlists))playlists=p.playlists;
-    saveToDB();
-    if(typeof renderLibrary==='function')renderLibrary();
-    if(typeof renderPlaylists==='function')renderPlaylists();
-    toast(`Pulled (${library.length} tracks) — reload for full effect`,'success');
-  }catch(e){toast('Pull failed: '+(e?.message||e),'error');}
-}
-document.addEventListener('click',e=>{
-  if(e.target?.id==='cloudPushBtn'){e.preventDefault();cloudPushLibrary();}
-  else if(e.target?.id==='cloudPullBtn'){e.preventDefault();cloudPullLibrary();}
-});
 function onSupaSignOut(){
   _supaUser=null;_supaProfile=null;
   updateAuthUI();
-  updateCloudSyncStatus();
 }
 function updateAuthUI(){
   const btn=document.getElementById('authBtn');
