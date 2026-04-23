@@ -6073,41 +6073,45 @@ body.work-mode .automix-sync{
    ================================================================ */
 .titan-clock{
   display:inline-flex;align-items:center;justify-content:center;
-  padding:6px 14px;border-radius:8px;
-  box-sizing:border-box;width:108px;height:32px;flex:0 0 auto;
+  padding:6px 14px;border-radius:6px;
+  box-sizing:border-box;width:112px;height:32px;flex:0 0 auto;
   background:linear-gradient(180deg,#020608 0%,#000305 100%);
-  border:1px solid rgba(46,224,255,.35);
+  border:1px solid rgba(46,224,255,.4);
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.05),
-    inset 0 0 14px rgba(46,224,255,.15),
-    inset 0 2px 6px rgba(0,0,0,.9),
-    0 2px 6px rgba(0,0,0,.55),
-    0 0 14px rgba(46,224,255,.12);
+    inset 0 1px 0 rgba(255,255,255,.06),
+    inset 0 0 10px rgba(46,224,255,.18),
+    inset 0 2px 4px rgba(0,0,0,.9),
+    0 1px 0 rgba(255,255,255,.04),
+    0 2px 6px rgba(0,0,0,.6),
+    0 0 10px rgba(46,224,255,.15);
   position:relative;overflow:hidden;cursor:pointer;
   transition:border-color .15s,box-shadow .15s;
 }
 .titan-clock::before{
-  /* CRT scan lines so it reads as a proper LCD */
+  /* faint CRT scan lines on the chip background only */
   content:'';position:absolute;inset:0;pointer-events:none;
-  background:repeating-linear-gradient(0deg,rgba(255,255,255,.05) 0 1px,transparent 1px 2px);
-  mix-blend-mode:overlay;
+  background:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 3px);
 }
 .titan-clock:hover{
-  border-color:rgba(46,224,255,.65);
+  border-color:rgba(46,224,255,.7);
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.08),
-    inset 0 0 20px rgba(46,224,255,.22),
-    inset 0 2px 6px rgba(0,0,0,.9),
+    inset 0 0 14px rgba(46,224,255,.26),
+    inset 0 2px 4px rgba(0,0,0,.9),
     0 2px 8px rgba(0,0,0,.6),
-    0 0 22px rgba(46,224,255,.3);
+    0 0 18px rgba(46,224,255,.32);
 }
 .titan-clock .tc-time{
   font-family:'Share Tech Mono',monospace;
-  font-size:16px;font-weight:700;letter-spacing:2px;line-height:1;
-  color:#2ee0ff;
-  text-shadow:0 0 8px rgba(46,224,255,.9),0 0 2px rgba(255,255,255,.5);
+  font-size:17px;font-weight:700;letter-spacing:2.5px;line-height:1;
+  color:#7ff4ff;
+  text-shadow:
+    0 0 1px #2ee0ff,
+    0 1px 0 rgba(0,0,0,.95),
+    0 0 3px rgba(46,224,255,.55);
   font-variant-numeric:tabular-nums;
   white-space:nowrap;
+  position:relative;z-index:1;
 }
 
 /* Light-theme — dark LCD chip on porcelain, neon stays bright */
@@ -6121,7 +6125,9 @@ body.theme-light .titan-clock{
     0 0 0 1px rgba(255,255,255,.85),
     0 0 16px rgba(46,224,255,.22) !important;
 }
-body.theme-light .titan-clock .tc-time{color:#5fe8ff !important;text-shadow:0 0 10px rgba(46,224,255,.9) !important}
+body.theme-light .titan-clock .tc-time{color:#7ff4ff !important;text-shadow:0 0 1px #2ee0ff,0 1px 0 rgba(0,0,0,.95),0 0 3px rgba(46,224,255,.55) !important}
+body.theme-blade .titan-clock{border-color:rgba(0,240,255,.5);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),inset 0 0 12px rgba(0,240,255,.22),inset 0 2px 4px rgba(0,0,0,.9),0 2px 6px rgba(0,0,0,.6),0 0 14px rgba(0,240,255,.25)}
+body.theme-blade .titan-clock .tc-time{color:#d0fbff;text-shadow:0 0 1px #00f0ff,0 1px 0 rgba(0,0,0,.95),0 0 3px rgba(0,240,255,.7)}
 
 @media(max-width:760px){
   .titan-clock{width:96px;height:28px;padding:4px 10px}
