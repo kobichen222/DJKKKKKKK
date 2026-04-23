@@ -8,6 +8,7 @@ on:
     paths:
       - 'package.json'
       - 'electron/**'
+      - 'public/**'
       - '.github/workflows/build-desktop.yml'
 
 permissions:
@@ -48,12 +49,24 @@ jobs:
           ls node_modules/.bin/electron-builder* 2>&1 || true
           npx --no-install electron-builder --version
 
-      - name: Derive version (from input or package.json)
+      - name: Derive version (auto-bump to next unused tag)
         id: ver
         shell: bash
+        # UI-only commits land in public/** without bumping package.json. If we
+        # used that version as-is, the softprops release step would collide with
+        # the existing tag and fail (or return a frozen immutable release).
+        # Instead, walk patch numbers forward until we find one GitHub hasn't
+        # tagged yet, and rewrite package.json in the runner workspace so
+        # electron-builder stamps the same version into the .exe + latest.yml.
+        # The bump isn't committed back — next build re-derives from current
+        # package.json + live remote tags.
         run: |
           V="${{ github.event.inputs.version }}"
           if [ -z "$V" ]; then V="$(node -p "require('./package.json').version")"; fi
+          while git ls-remote --exit-code --tags origin "refs/tags/v$V" >/dev/null 2>&1; do
+            V="$(node -p "const v='$V'.split('.');v[2]=String(Number(v[2])+1);v.join('.')")"
+          done
+          node -e "const fs=require('fs');const p=require('./package.json');p.version='$V';fs.writeFileSync('./package.json',JSON.stringify(p,null,2)+'\n')"
           echo "version=$V" >> "$GITHUB_OUTPUT"
           echo "tag=v$V"    >> "$GITHUB_OUTPUT"
           echo "Building version $V (tag v$V)"
