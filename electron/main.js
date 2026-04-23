@@ -23,7 +23,12 @@ function createWindow() {
     height: 1000,
     minWidth: 1100,
     minHeight: 720,
-    show: false,            // wait for did-finish-load so users never see a black flash
+    // show:true — always render the window immediately so the user sees at
+    // minimum the chassis background while the UI finishes loading.  The
+    // previous `show:false + ready-to-show` gate could leave the window
+    // permanently hidden if any early paint failed, giving the false
+    // appearance of a black screen.
+    show: true,
     backgroundColor: '#0a0a0a',
     title: 'DJ TITAN — Professional DJ Studio',
     autoHideMenuBar: true,
@@ -98,8 +103,6 @@ function createWindow() {
     dialog.showErrorBox('DJ TITAN — load failure',
       `Could not load the UI.\n\nCode: ${code}\n${desc}\n\nURL: ${url}\n\nIf this keeps happening, report the error text above.`);
   });
-  mainWindow.once('ready-to-show', () => mainWindow.show());
-
   mainWindow.loadFile(htmlPath).catch((err) => {
     console.error('[DJ TITAN] loadFile threw:', err && err.message);
     dialog.showErrorBox('DJ TITAN — cannot open UI file',
