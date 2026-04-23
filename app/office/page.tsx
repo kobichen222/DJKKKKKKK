@@ -7,6 +7,12 @@ import "./office.css";
 const OFFICE_CODE = "KOBI2100";
 const UNLOCK_KEY = "titan_office_unlocked_v1";
 const SUPA_KEY = "djmaxai_supa_v1";
+// Must stay in sync with SUPA_DEFAULT in public/index.html so the office
+// panel and the main app read the same backend when localStorage is empty.
+const SUPA_DEFAULT = {
+  url: "https://eliimbfzegwcepbljdwp.supabase.co",
+  anon: "sb_publishable_jBlBlUNP74IDyUYP8eldBg_elQu0-og",
+};
 // Ed25519 public key (32 bytes, hex) — must match SP_LICENSE_PUBKEY_HEX in
 // public/index.html.  The matching private key lives only on the operator's
 // machine (tools/titan-private.pem); licenses are signed offline via
@@ -39,11 +45,12 @@ function readSupaCfg(): { url: string; anon: string } | null {
   if (typeof window === "undefined") return null;
   try {
     const raw = localStorage.getItem(SUPA_KEY);
-    if (!raw) return null;
-    const cfg = JSON.parse(raw);
-    if (cfg?.url && cfg?.anon) return { url: cfg.url, anon: cfg.anon };
+    if (raw) {
+      const cfg = JSON.parse(raw);
+      if (cfg?.url && cfg?.anon) return { url: cfg.url, anon: cfg.anon };
+    }
   } catch {}
-  return null;
+  return SUPA_DEFAULT;
 }
 
 /* ---------- Ed25519 verify (paired with tools/gen-license.js) ---------- */

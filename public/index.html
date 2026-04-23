@@ -16588,9 +16588,15 @@ window.addEventListener('keydown',e=>{
    Admin panel uses the profiles table created by auth.sql.
    ======================================================== */
 const SUPA_CFG_KEY='djmaxai_supa_v1';
+// Defaults point at the project-owned Supabase instance so the app works
+// out-of-the-box for buyers. The publishable key is the new-style anon key
+// (safe to ship client-side — RLS policies gate every table). Users can
+// override via Settings → Authentication if they want to point at their own
+// backend; the localStorage value wins over these defaults.
+const SUPA_DEFAULT={url:'https://eliimbfzegwcepbljdwp.supabase.co',anon:'sb_publishable_jBlBlUNP74IDyUYP8eldBg_elQu0-og'};
 let _supa=null;let _supaUser=null;let _supaProfile=null;
-let supaCfg={url:'',anon:''};
-try{const raw=localStorage.getItem(SUPA_CFG_KEY);if(raw)supaCfg={...supaCfg,...JSON.parse(raw)};}catch(e){}
+let supaCfg={...SUPA_DEFAULT};
+try{const raw=localStorage.getItem(SUPA_CFG_KEY);if(raw){const saved=JSON.parse(raw);if(saved&&saved.url&&saved.anon)supaCfg={...supaCfg,...saved};}}catch(e){}
 
 function loadSupabaseLib(){
   return new Promise((resolve,reject)=>{
