@@ -10202,7 +10202,7 @@ function pauseDeck(deckId){
     d.volumeGain.gain.cancelScheduledValues(now);
     d.volumeGain.gain.setValueAtTime(cur,now);
     d.volumeGain.gain.linearRampToValueAtTime(0,now+0.006);
-    setTimeout(()=>{try{src.stop();src.disconnect();}catch(e){}d.volumeGain.gain.setValueAtTime(d.volume!==undefined?d.volume:0.8,audioCtx.currentTime);},12);
+    setTimeout(()=>{try{src.stop();src.disconnect();}catch(e){}if(d.source===src)d.source=null;d.volumeGain.gain.setValueAtTime(d.volume!==undefined?d.volume:0.8,audioCtx.currentTime);},12);
   }else{
     try{d.source.stop();}catch(e){}
     d.source.disconnect();
@@ -10312,7 +10312,7 @@ function updateMasterBpm(){
 
 function syncDeck(deckId){
   const d=decks[deckId];
-  if(!d.track){toast('No track loaded','error');return;}
+  if(!d.track){toast('No track loaded','error');return false;}
   // Find best source: any playing deck other than this one, or first loaded
   let o=null;
   for(const id of ['A','B','C','D']){
@@ -10325,12 +10325,13 @@ function syncDeck(deckId){
       if(decks[id].track){o=decks[id];break;}
     }
   }
-  if(!o){toast('No other deck with track','error');return;}
+  if(!o){toast('No other deck with track','error');return false;}
   const tb=o.track.bpm*(1+o.tempo/100);
   const pct=((tb/d.track.bpm)-1)*100;
-  if(Math.abs(pct)>(d.tempoRange||8)){toast(`Out of range (${pct.toFixed(1)}%)`,'error');return;}
+  if(Math.abs(pct)>(d.tempoRange||8)){toast(`Out of range (${pct.toFixed(1)}%)`,'error');return false;}
   setTempo(deckId,pct);
   toast(`Synced ${deckId} → ${tb.toFixed(2)} BPM`,'success');
+  return true;
 }
 
 /* LOOP */
@@ -10404,8 +10405,13 @@ function releaseBeatRoll(deckId){
   const properPos=beatRollState[deckId].returnPos+elapsed*dk.playbackRate;
   if(dk.slip)seekDeck(deckId,Math.min(properPos,dk.buffer.duration-0.5));
   delete beatRollState[deckId];
+  // Always clear the roll highlight, then re-add .active only for pads that
+  // still have a saved hot-cue. Previously a saved cue at a rolled pad would
+  // keep it lit across mode switches.
   document.querySelectorAll(`.hot-cues[data-deck="${deckId}"] .cue-btn`).forEach(b=>{
-    const n=parseInt(b.dataset.cue);if(dk.hotCues[n]===undefined)b.classList.remove('active');
+    b.classList.remove('active');
+    const n=parseInt(b.dataset.cue);
+    if(dk.hotCues[n]!==undefined&&dk.padMode==='hotcue')b.classList.add('active');
   });
 }
 
@@ -10418,7 +10424,11 @@ function triggerSlicer(deckId,n){
   const targetPos=phraseStart+(n-1)*bd;
   seekDeck(deckId,targetPos);
   const btn=document.querySelector(`.hot-cues[data-deck="${deckId}"] .cue-btn[data-cue="${n}"]`);
-  if(btn){btn.classList.add('active');setTimeout(()=>btn.classList.remove('active'),200);}
+  if(btn){
+    clearTimeout(btn._slicerTimer);
+    btn.classList.add('active');
+    btn._slicerTimer=setTimeout(()=>btn.classList.remove('active'),200);
+  }
 }
 
 function triggerLoopPad(deckId,n){
@@ -10609,8 +10619,8 @@ function triggerSample(idx,velocity=1){
   }
   last.connect(panner);
   if(p.delay>0){
-    const dly=audioCtx.createDelay(2);dly.delayTime.value=p.delay/1000;
-    const fb=audioCtx.createGain();fb.gain.value=p.feedback;
+    const dly=audioCtx.createDelay(2);dly.delayTime.value=Math.max(0,Math.min(2,(p.delay||0)/1000));
+    const fb=audioCtx.createGain();fb.gain.value=Math.max(0,Math.min(0.95,Number(p.feedback)||0));
     const wet=audioCtx.createGain();wet.gain.value=.6;
     panner.connect(dly);dly.connect(fb);fb.connect(dly);dly.connect(wet);wet.connect(masterGain);
   }
@@ -10626,7 +10636,13 @@ function triggerSample(idx,velocity=1){
     gNode.gain.linearRampToValueAtTime(0,stop);
   }
   const padEl=document.querySelector(`.sample-pad[data-pad="${idx}"]`);
-  if(padEl){padEl.classList.add('playing');setTimeout(()=>padEl.classList.remove('playing'),Math.min(600,buf.duration*1000));}
+  if(padEl){
+    padEl.classList.add('playing');
+    // Clear on real end of playback (including ramp-out), with a safety ceiling.
+    const clear=()=>padEl.classList.remove('playing');
+    try{src.addEventListener('ended',clear,{once:true});}catch(_){}
+    setTimeout(clear,Math.max(200,Math.min(buf.duration*1000+p.fadeOut,15000)));
+  }
 }
 function clearSample(idx){
   const bank=getCurBank();bank[idx]=null;
@@ -11165,7 +11181,8 @@ function applySceneFx(){
     sceneFxWet.gain.value=0;sceneFxDry.gain.value=1;return;
   }
   const wet=sf.depth;
-  const bpm=parseFloat(document.getElementById('masterBpm').textContent)||128;
+  const bpmRaw=parseFloat(document.getElementById('masterBpm').textContent);
+  const bpm=Number.isFinite(bpmRaw)&&bpmRaw>0?bpmRaw:128;
   const beatSec=60/bpm;
   if(sf.type==='dubspiral'){
     sceneFxDelay.delayTime.value=Math.min(2,beatSec*(0.25+sf.xpadX*1.75));
@@ -11237,10 +11254,13 @@ function setupSceneFx(){
     mixerState.sceneFx.xpadActive=true;pad.classList.add('active');setFromEvent(e);
   });
   pad.addEventListener('pointermove',e=>{if(active)setFromEvent(e);});
-  pad.addEventListener('pointerup',e=>{
-    pad.releasePointerCapture(e.pointerId);active=false;
-    mixerState.sceneFx.xpadActive=false;pad.classList.remove('active');
-  });
+  const endXpad=e=>{
+    try{pad.releasePointerCapture(e.pointerId);}catch(_){}
+    active=false;mixerState.sceneFx.xpadActive=false;pad.classList.remove('active');
+  };
+  pad.addEventListener('pointerup',endXpad);
+  pad.addEventListener('pointercancel',endXpad);
+  pad.addEventListener('pointerleave',e=>{if(active)endXpad(e);});
 }
 
 /* CROSSFADER */
@@ -11294,7 +11314,7 @@ function attachEvents(){
   document.querySelectorAll('.util-btn').forEach(btn=>{
     btn.addEventListener('click',()=>{
       const d=btn.dataset.deck,u=btn.dataset.util,dk=decks[d];
-      if(u==='sync'){btn.classList.toggle('active');if(btn.classList.contains('active'))syncDeck(d);}
+      if(u==='sync'){const wasActive=btn.classList.contains('active');if(wasActive){btn.classList.remove('active');}else if(syncDeck(d)!==false){btn.classList.add('active');}}
       else{dk[u]=!dk[u];btn.classList.toggle('active');}
     });
   });
@@ -11345,9 +11365,12 @@ function attachEvents(){
   });
   const xf=document.getElementById('xfader'),xh=document.getElementById('xfaderHandle');let xd=false;
   function setX(cx){const r=xf.getBoundingClientRect();let x=(cx-r.left)/r.width;x=Math.max(0,Math.min(1,x));mixerState.crossfader=x;xh.style.left=`${x*100}%`;applyCrossfader();}
+  const endXf=e=>{try{xf.releasePointerCapture(e.pointerId);}catch(_){}xd=false;};
   xf.addEventListener('pointerdown',e=>{xf.setPointerCapture(e.pointerId);xd=true;setX(e.clientX);});
   xf.addEventListener('pointermove',e=>{if(xd)setX(e.clientX);});
-  xf.addEventListener('pointerup',e=>{xf.releasePointerCapture(e.pointerId);xd=false;});
+  xf.addEventListener('pointerup',endXf);
+  xf.addEventListener('pointercancel',endXf);
+  window.addEventListener('blur',()=>{xd=false;});
   document.querySelectorAll('#xfaderCurve .curve-btn').forEach(btn=>{
     btn.addEventListener('click',()=>{
       document.querySelectorAll('#xfaderCurve .curve-btn').forEach(b=>b.classList.remove('active'));
@@ -11442,7 +11465,7 @@ function applyBeatFx(){
     sceneFxWet.gain.setTargetAtTime(0,t0,0.08);
     return;
   }
-  const bpm=parseFloat(document.getElementById('masterBpm').textContent)||128;
+  const bpmRaw=parseFloat(document.getElementById('masterBpm').textContent);const bpm=Number.isFinite(bpmRaw)&&bpmRaw>0?bpmRaw:128;
   const beatSec=60/bpm;
   const time=Math.max(0.005,beatSec*(f.beat||1));
   const level=Math.max(0,Math.min(1,f.level!=null?f.level:0.6));
@@ -11787,6 +11810,9 @@ function tick(){
 function setupKeyboard(){
   document.addEventListener('keydown',e=>{
     if(['INPUT','SELECT','TEXTAREA'].includes(e.target.tagName))return;
+    // Ignore OS-level key repeat (holding a key) — sampler pads and hot cues
+    // must not retrigger as fast as the keyboard repeat rate.
+    if(e.repeat)return;
     const k=e.key.toLowerCase();
     // ── Ctrl / Cmd combos ──
     if(e.ctrlKey||e.metaKey){
