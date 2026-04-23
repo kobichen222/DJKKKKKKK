@@ -816,6 +816,24 @@ button:active:not(:disabled),.big-btn:active,.loop-btn:active,.jump-btn:active,
   box-shadow:0 0 6px rgba(255,180,100,.7),0 0 2px rgba(255,255,255,.9);
 }
 .knob-wrap:hover .knob{filter:brightness(1.08)}
+/* +/- stepper — mobile / narrow viewport replaces the rotary knob so
+   touch users can nudge values precisely instead of fighting a tiny dial. */
+.knob-steppers{display:none;align-items:center;gap:3px;user-select:none}
+.knob-step{width:22px;height:22px;padding:0;border-radius:5px;border:1px solid #2a2a30;background:linear-gradient(180deg,#3a3a3e 0%,#1a1a1c 100%);color:var(--text);font-family:'Orbitron',sans-serif;font-size:14px;font-weight:800;line-height:1;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;touch-action:manipulation;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 1px 2px rgba(0,0,0,.5);transition:background .12s,border-color .12s,color .12s,box-shadow .12s;flex:0 0 auto}
+.knob-step:active{background:linear-gradient(180deg,var(--orange) 0%,#c85a00 100%);color:#000;box-shadow:inset 0 1px 3px rgba(0,0,0,.4),0 0 10px rgba(255,138,26,.55);border-color:#c85a00}
+.knob-step.plus{color:var(--play-green);border-color:rgba(0,255,122,.35)}
+.knob-step.minus{color:var(--cue-orange);border-color:rgba(255,90,0,.35)}
+.knob-step-val{flex:1;min-width:26px;text-align:center;font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:700;color:var(--screen-glow);letter-spacing:.5px;cursor:pointer;padding:3px 0;border-radius:3px;text-shadow:0 0 6px rgba(0,212,255,.5);background:#050a0c;border:1px solid #1a1a1c}
+/* SIMPLE view = mobile / narrow viewport — replace rotary knobs with stepper */
+@media(max-width:760px){
+  .channel .knob,.color-fx-channel .knob,.master-section .knob,
+  .isolator-panel .knob,.headphone-section .knob,.mic-section .knob,
+  .mixer-toolbar .knob,.mixer .knob{display:none !important}
+  .channel .knob-steppers,.color-fx-channel .knob-steppers,.master-section .knob-steppers,
+  .isolator-panel .knob-steppers,.headphone-section .knob-steppers,.mic-section .knob-steppers,
+  .mixer-toolbar .knob-steppers,.mixer .knob-steppers{display:inline-flex}
+  .channel .knob-wrap,.color-fx-channel{gap:3px}
+}
 
 /* BIG BUTTONS — pronounced tactile feel */
 .big-btn{
@@ -11109,9 +11127,54 @@ function attachKnobs(){
     let startY=0,startRot=0,drag=false;
     const ind=knob.querySelector('.knob-indicator');
     knob.addEventListener('pointerdown',e=>{knob.setPointerCapture(e.pointerId);startY=e.clientY;startRot=knob._rot;drag=true;knob.style.cursor='grabbing';});
-    knob.addEventListener('pointermove',e=>{if(!drag)return;const dy=startY-e.clientY;knob._rot=Math.max(-135,Math.min(135,startRot+dy));if(ind)ind.style.transform=`rotate(${knob._rot}deg)`;applyKnob(knob.dataset.knob,knob._rot/135);});
+    knob.addEventListener('pointermove',e=>{if(!drag)return;const dy=startY-e.clientY;knob._rot=Math.max(-135,Math.min(135,startRot+dy));if(ind)ind.style.transform=`rotate(${knob._rot}deg)`;applyKnob(knob.dataset.knob,knob._rot/135);if(knob._onStepperUpdate)knob._onStepperUpdate();});
     knob.addEventListener('pointerup',e=>{knob.releasePointerCapture(e.pointerId);drag=false;knob.style.cursor='grab';});
-    knob.addEventListener('dblclick',()=>{knob._rot=0;if(ind)ind.style.transform='rotate(0deg)';applyKnob(knob.dataset.knob,0);});
+    knob.addEventListener('dblclick',()=>{knob._rot=0;if(ind)ind.style.transform='rotate(0deg)';applyKnob(knob.dataset.knob,0);if(knob._onStepperUpdate)knob._onStepperUpdate();});
+
+    // Inject +/- stepper UI.  Hidden by default via CSS; surfaces only in
+    // SIMPLE 4 mode (body.show-all) so touch users can nudge values precisely
+    // without fighting a tiny rotary knob.
+    const host=knob.parentElement;
+    if(host&&!host.querySelector('.knob-steppers')){
+      const st=document.createElement('div');
+      st.className='knob-steppers';
+      st.innerHTML='<button type="button" class="knob-step minus" aria-label="decrease">−</button><span class="knob-step-val">0</span><button type="button" class="knob-step plus" aria-label="increase">+</button>';
+      host.insertBefore(st,knob.nextSibling);
+      const valEl=st.querySelector('.knob-step-val');
+      const update=()=>{
+        const pct=Math.round((knob._rot/135)*100);
+        valEl.textContent=pct>0?`+${pct}`:`${pct}`;
+      };
+      knob._onStepperUpdate=update;
+      update();
+      const nudge=(sign,step)=>{
+        knob._rot=Math.max(-135,Math.min(135,(knob._rot||0)+sign*step));
+        if(ind)ind.style.transform=`rotate(${knob._rot}deg)`;
+        applyKnob(knob.dataset.knob,knob._rot/135);
+        update();
+      };
+      st.querySelectorAll('.knob-step').forEach(btn=>{
+        const sign=btn.classList.contains('plus')?1:-1;
+        let holdTimer=null,repeatTimer=null;
+        const startHold=()=>{
+          holdTimer=setTimeout(()=>{
+            repeatTimer=setInterval(()=>nudge(sign,5),70);
+          },320);
+        };
+        const stopHold=()=>{
+          clearTimeout(holdTimer);holdTimer=null;
+          clearInterval(repeatTimer);repeatTimer=null;
+        };
+        btn.addEventListener('pointerdown',e=>{e.stopPropagation();startHold();});
+        btn.addEventListener('pointerup',e=>{e.stopPropagation();stopHold();});
+        btn.addEventListener('pointerleave',stopHold);
+        btn.addEventListener('pointercancel',stopHold);
+        btn.addEventListener('click',e=>{e.stopPropagation();nudge(sign,15);});
+        btn.addEventListener('dblclick',e=>{e.stopPropagation();});
+      });
+      // Double-click the value readout to reset that knob to 0.
+      valEl.addEventListener('dblclick',e=>{e.stopPropagation();knob._rot=0;if(ind)ind.style.transform='rotate(0deg)';applyKnob(knob.dataset.knob,0);update();});
+    }
   });
 }
 
