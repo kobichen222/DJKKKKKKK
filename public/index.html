@@ -7665,6 +7665,319 @@ body.theme-light .cdj .cue-btn{
 /* Consistent widths for pad-modes + hot-cues across all 4 decks */
 .cdj .pad-modes,.cdj .hot-cues{width:100% !important;box-sizing:border-box !important}
 .cdj .pad-mode-btn,.cdj .cue-btn{min-width:0 !important;box-sizing:border-box !important}
+
+/* ============================================================
+   PROFESSIONAL TURNTABLE / CDJ LOOK
+   Realistic Pioneer-style hardware: matte black + brushed
+   metal, single white tracking light, amber/green LEDs only
+   when active. No rainbow per-deck accents.
+   ============================================================ */
+
+/* Unify deck chassis — remove per-deck accents; restore neutral metal */
+.cdj,
+.cdj[data-deck="A"],
+.cdj[data-deck="B"],
+.cdj[data-deck="C"],
+.cdj[data-deck="D"]{
+  --deck-accent:#d8d8dc;
+  --deck-accent-rgb:216,216,220;
+  background:linear-gradient(180deg,#262629 0%,#1a1a1d 55%,#0e0e10 100%);
+  border:1px solid #2a2a2e;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.06),
+    inset 0 -1px 0 rgba(0,0,0,.55),
+    0 22px 60px rgba(0,0,0,.7);
+}
+.cdj::before{
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.18) 50%,transparent);
+  box-shadow:none;
+  height:1px;
+  opacity:.6;
+}
+.cdj::after{display:none}
+.cdj:hover{
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.08),
+    inset 0 -1px 0 rgba(0,0,0,.55),
+    0 24px 70px rgba(0,0,0,.8);
+}
+.cdj.drop-target{
+  border-color:#e0a040;
+  box-shadow:0 0 22px rgba(224,160,64,.45),inset 0 0 18px rgba(224,160,64,.1);
+}
+.cdj .deck-number{
+  color:#e8e8ea;
+  background:linear-gradient(180deg,#3a3a3e 0%,#1e1e22 100%);
+  -webkit-text-fill-color:#e8e8ea;
+  border:1px solid #4a4a4e;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),inset 0 -1px 0 rgba(0,0,0,.5);
+  text-shadow:0 1px 0 rgba(0,0,0,.6);
+}
+
+/* ───── JOG WHEEL: brushed-metal platter, single white tracking light ───── */
+.jog-outer{
+  background:
+    radial-gradient(circle at 30% 28%, #6e6e72 0%, #3a3a3e 38%, #1c1c1e 72%, #050506 100%);
+  box-shadow:
+    0 0 0 2px #0a0a0b,
+    0 0 0 4px #2a2a2e,
+    0 0 0 5px #050506,
+    inset 0 2px 8px rgba(255,255,255,.08),
+    inset 0 -8px 16px rgba(0,0,0,.85),
+    0 12px 32px rgba(0,0,0,.75);
+}
+.jog-ring{
+  background:#000;
+  box-shadow:inset 0 0 16px rgba(0,0,0,.95),inset 0 0 0 1px #1a1a1c;
+}
+/* Single neutral position light (like real CDJ tracking dot) */
+.cdj .jog-ring-light,
+.jog-ring-light{
+  background:conic-gradient(from 0deg,
+    transparent 0deg,
+    rgba(255,255,255,.22) 2deg,
+    rgba(255,255,255,.85) 5deg,
+    rgba(255,255,255,.45) 9deg,
+    transparent 16deg);
+  filter:blur(.6px) drop-shadow(0 0 3px rgba(255,255,255,.4));
+}
+.jog-platter{
+  background:
+    radial-gradient(circle at 35% 35%, #2c2c30 0%, #141416 60%, #050506 100%);
+  box-shadow:
+    inset 0 2px 8px rgba(255,255,255,.06),
+    inset 0 -4px 12px rgba(0,0,0,.95),
+    inset 0 0 0 1px #0a0a0b;
+}
+.jog-platter-disc{
+  background:
+    repeating-radial-gradient(circle, rgba(255,255,255,.025) 0 1px, transparent 1px 3px),
+    radial-gradient(circle, #1a1a1c 0%, #07070a 100%);
+}
+.jog-center-screen,
+.cdj .jog-center-screen{
+  background:linear-gradient(180deg,#0a0a0c 0%,#020203 100%);
+  border:1px solid #1a1a1e;
+  box-shadow:
+    inset 0 0 20px rgba(0,0,0,.95),
+    inset 0 1px 0 rgba(255,255,255,.04),
+    0 0 0 1px #050506;
+}
+.cdj .jog-center-screen .bpm-display,
+.jog-center-screen .bpm-display{
+  color:#e0a040;
+  text-shadow:0 0 6px rgba(224,160,64,.5);
+}
+.jog-center-screen .bpm-sub{color:#7a7a80;letter-spacing:2.5px}
+.jog-center-screen .deck-badge{color:#9a9a9e}
+.cdj .jog-indicator,
+.jog-indicator{
+  background:#f0f0f2;
+  box-shadow:0 0 4px rgba(255,255,255,.7);
+  width:2px;
+  height:12px;
+}
+.jog-markers::before{
+  background:repeating-conic-gradient(from 0deg,
+    rgba(255,255,255,.12) 0deg 1deg,
+    transparent 1deg 9deg);
+}
+
+/* ───── TRANSPORT BUTTONS: real CDJ LED-style (CUE = amber, PLAY = green) ───── */
+.big-btn{
+  background:linear-gradient(180deg,#3c3c40 0%,#222226 45%,#0e0e10 100%);
+  color:#cfcfd2;
+  text-shadow:none;
+  border:1px solid #1a1a1c;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.12),
+    inset 0 -2px 4px rgba(0,0,0,.7),
+    0 3px 8px rgba(0,0,0,.55);
+}
+.big-btn:hover{
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.18),
+    inset 0 -2px 4px rgba(0,0,0,.7),
+    0 5px 12px rgba(0,0,0,.7);
+}
+.big-btn .icon{opacity:.85}
+.big-btn .lbl{opacity:.95;letter-spacing:3px}
+
+/* CUE — small amber LED indicator strip on top of the button face */
+.big-btn.cue{
+  color:#e8e8ea;
+  text-shadow:none;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.12),
+    inset 0 -2px 4px rgba(0,0,0,.7),
+    0 3px 8px rgba(0,0,0,.55);
+}
+.big-btn.cue::before{
+  content:'';
+  position:absolute;
+  top:4px;left:50%;transform:translateX(-50%);
+  width:34%;height:3px;border-radius:2px;
+  background:#3a2a18;
+  box-shadow:inset 0 0 1px rgba(0,0,0,.6);
+  transition:background .12s,box-shadow .12s;
+}
+.big-btn.cue:hover::before{background:#5a3818}
+.big-btn.cue.active{
+  background:linear-gradient(180deg,#3c3c40 0%,#222226 45%,#0e0e10 100%);
+  color:#ffb060;
+  text-shadow:0 0 4px rgba(224,160,64,.4);
+  animation:none;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.14),
+    inset 0 -2px 4px rgba(0,0,0,.7),
+    0 0 14px rgba(224,160,64,.35),
+    0 3px 8px rgba(0,0,0,.55);
+}
+.big-btn.cue.active::before{
+  background:#ffb050;
+  box-shadow:0 0 10px rgba(255,176,80,.9),0 0 2px rgba(255,255,255,.6);
+}
+
+/* PLAY — green LED indicator strip; no pulsing animation */
+.big-btn.play{
+  color:#e8e8ea;
+  text-shadow:none;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.12),
+    inset 0 -2px 4px rgba(0,0,0,.7),
+    0 3px 8px rgba(0,0,0,.55);
+}
+.big-btn.play::before{
+  content:'';
+  position:absolute;
+  top:4px;left:50%;transform:translateX(-50%);
+  width:34%;height:3px;border-radius:2px;
+  background:#163018;
+  box-shadow:inset 0 0 1px rgba(0,0,0,.6);
+  transition:background .12s,box-shadow .12s;
+}
+.big-btn.play:hover::before{background:#1f4a22}
+.big-btn.play.active{
+  background:linear-gradient(180deg,#3c3c40 0%,#222226 45%,#0e0e10 100%);
+  color:#5cf0a0;
+  text-shadow:0 0 4px rgba(92,240,160,.4);
+  animation:none;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.14),
+    inset 0 -2px 4px rgba(0,0,0,.7),
+    0 0 14px rgba(92,240,160,.35),
+    0 3px 8px rgba(0,0,0,.55);
+}
+.big-btn.play.active::before{
+  background:#3cf590;
+  box-shadow:0 0 10px rgba(60,245,144,.9),0 0 2px rgba(255,255,255,.6);
+}
+
+/* ───── HOT CUES: uniform charcoal pads, single amber LED on activation ───── */
+.cue-btn{
+  background:linear-gradient(180deg,#2e2e32 0%,#1c1c20 50%,#0c0c0f 100%);
+  border:1px solid #1a1a1c;
+  color:#8a8a8e;
+}
+.cue-btn:hover{
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.14),
+    inset 0 -2px 4px rgba(0,0,0,.7),
+    0 3px 6px rgba(0,0,0,.55);
+}
+/* All 8 cues use the same warm amber when active (real-hardware feel) */
+.cue-btn[data-color="1"],
+.cue-btn[data-color="2"],
+.cue-btn[data-color="3"],
+.cue-btn[data-color="4"],
+.cue-btn[data-color="5"],
+.cue-btn[data-color="6"],
+.cue-btn[data-color="7"],
+.cue-btn[data-color="8"]{--cue-color:#e8a340}
+.cue-btn.active{
+  background:linear-gradient(180deg,#3a2a18 0%,#1f1610 100%);
+  color:#ffd28a;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.18),
+    inset 0 -1px 2px rgba(0,0,0,.5),
+    0 0 10px rgba(232,163,64,.55),
+    0 0 2px rgba(255,255,255,.4);
+}
+.cue-btn.armed{
+  background:linear-gradient(180deg,#2a2418 0%,#161210 100%);
+  color:#d8a060;
+}
+
+/* ───── DECK UTILITY ROWS: muted neutral palette ───── */
+.loop-btn,.jump-btn,.util-btn{
+  background:linear-gradient(180deg,#26262a 0%,#0c0c0f 100%);
+  border:1px solid #1a1a1c;
+  color:#9a9a9e;
+}
+.loop-btn{color:#a8b8c0}
+.loop-btn.active{
+  background:linear-gradient(180deg,#1a3a48 0%,#0a1a22 100%);
+  color:#7fd0ff;
+  box-shadow:0 0 8px rgba(127,208,255,.35),inset 0 1px 0 rgba(255,255,255,.1);
+}
+.jump-btn{color:#b0a8c0}
+.jump-btn:hover{color:#d8c8f0}
+.util-btn{color:#8a8a8e}
+.util-btn.sync.active,
+.util-btn.keylock.active,
+.util-btn.quantize.active,
+.util-btn.slip.active,
+.util-btn.reverse.active{
+  background:linear-gradient(180deg,#3a2a18 0%,#1f1610 100%);
+  color:#ffd28a;
+  box-shadow:0 0 8px rgba(232,163,64,.4),inset 0 1px 0 rgba(255,255,255,.1);
+}
+.util-btn.reverse.active{
+  background:linear-gradient(180deg,#3a1818 0%,#1f0e0e 100%);
+  color:#ff9090;
+  box-shadow:0 0 8px rgba(255,90,90,.4),inset 0 1px 0 rgba(255,255,255,.1);
+}
+
+/* ───── PAD MODES: uniform amber-on-charcoal ───── */
+.pad-mode-btn{
+  background:linear-gradient(180deg,#26262a 0%,#0c0c0f 100%);
+  border:1px solid #1a1a1c;
+  color:#8a8a8e;
+}
+.pad-mode-btn.active,
+.pad-mode-btn[data-pad-mode="cue"].active,
+.pad-mode-btn[data-pad-mode="roll"].active,
+.pad-mode-btn[data-pad-mode="slicer"].active,
+.pad-mode-btn[data-pad-mode="sampler"].active,
+.pad-mode-btn[data-pad-mode="loop"].active,
+.pad-mode-btn[data-pad-mode="pitch"].active{
+  background:linear-gradient(180deg,#3a2a18 0%,#1f1610 100%);
+  color:#ffd28a;
+  box-shadow:0 0 8px rgba(232,163,64,.4),inset 0 1px 0 rgba(255,255,255,.1);
+}
+
+/* ───── TEMPO CONTROLS: monochrome with amber readout ───── */
+.tempo-value{color:#e8a340}
+.tempo-handle::before{
+  background:#f0f0f2;
+  box-shadow:0 0 3px rgba(255,255,255,.7);
+}
+.tempo-btn{color:#cfcfd2;border-color:#2a2a2e}
+.tempo-btn:active{
+  background:#e8a340;
+  color:#0a0a0a;
+  box-shadow:0 0 10px rgba(232,163,64,.5);
+}
+.tempo-btn.reset{color:#a8d8b0}
+.tempo-btn.reset:active{background:#5cf0a0;color:#0a0a0a}
+.tempo-display-big{
+  color:#e8a340;
+  text-shadow:0 0 6px rgba(232,163,64,.5);
+}
+
+/* Deck label model strip — neutralize bright orange */
+.deck-label .model{color:#cfcfd2}
+.deck-label .suffix{color:#7a7a80}
 </style>
 </head>
 <body>
@@ -11345,12 +11658,29 @@ function attachEvents(){
   document.querySelectorAll('.big-btn').forEach(btn=>{
     const d=btn.dataset.deck,a=btn.dataset.action;
     if(a==='cue'){
+      let touchActive=false;
       btn.addEventListener('mousedown',(e)=>{e.preventDefault();cuePressDown(d);});
       btn.addEventListener('mouseup',()=>cuePressUp(d));
       btn.addEventListener('mouseleave',()=>cuePressUp(d));
-      btn.addEventListener('touchstart',(e)=>{e.preventDefault();cuePressDown(d);},{passive:false});
-      btn.addEventListener('touchend',(e)=>{e.preventDefault();cuePressUp(d);});
-      btn.addEventListener('click',()=>cueDeck(d));
+      btn.addEventListener('touchstart',(e)=>{
+        e.preventDefault();
+        touchActive=true;
+        cuePressDown(d);
+      },{passive:false});
+      btn.addEventListener('touchend',(e)=>{
+        e.preventDefault();
+        const wasPreview=!!decks[d]._cuePreview;
+        cuePressUp(d);
+        // Touch suppresses click on most browsers — deliver tap behavior here
+        if(!wasPreview)cueDeck(d);
+        // Reset shortly after, so any synthetic click is ignored
+        setTimeout(()=>{touchActive=false;},400);
+      });
+      btn.addEventListener('touchcancel',()=>{cuePressUp(d);touchActive=false;});
+      btn.addEventListener('click',()=>{
+        if(touchActive)return; // already handled by touchend
+        cueDeck(d);
+      });
     }else{
       btn.addEventListener('click',()=>{if(a==='play')togglePlay(d);});
     }
