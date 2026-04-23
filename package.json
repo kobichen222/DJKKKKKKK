@@ -1,6 +1,6 @@
 {
   "name": "pioneer-dj-pro-max",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "DJ TITAN — Professional DJ Studio",
   "author": "DJ TITAN",
@@ -48,7 +48,7 @@
       {
         "provider": "github",
         "owner": "kobichen222",
-        "repo": "DJKKKKKKK",
+        "repo": "titan",
         "releaseType": "release"
       }
     ],
