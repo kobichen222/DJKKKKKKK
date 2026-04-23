@@ -3525,6 +3525,32 @@ body.theme-euphonia .bank-btn.active{color:#140a04;background:linear-gradient(18
 body.theme-euphonia .seq-step{background:linear-gradient(180deg,#14141a,#06060a);color:rgba(234,234,236,.25);border:1px solid #24242a}
 body.theme-euphonia .seq-step.on{color:#140a04;background:linear-gradient(180deg,#e8a778,#c77848);box-shadow:0 0 10px rgba(199,120,72,.7)}
 
+/* ============================================================
+   PULSE / NEON THEME — interactive states.
+   Mirrors ONYX button logic (hover transition + active glow)
+   but with magenta/cyan/green neon palette.
+   ============================================================ */
+body.theme-neon .big-btn:hover,body.theme-neon .loop-btn:hover,body.theme-neon .jump-btn:hover,
+body.theme-neon .util-btn:hover,body.theme-neon .beat-btn:hover,body.theme-neon .scene-btn:hover,
+body.theme-neon .pad-mode-btn:hover,body.theme-neon .fx-onoff:hover,body.theme-neon .tempo-btn:hover,
+body.theme-neon .dsb-btn:hover,body.theme-neon .mic-btn:hover{filter:brightness(1.18);border-color:rgba(255,0,255,.6)}
+body.theme-neon .big-btn.cue.active{background:linear-gradient(180deg,#ff9cff 0%,#ff00ff 55%,#8a008a 100%);color:#14001a;border-color:#ff00ff;box-shadow:0 0 22px rgba(255,0,255,.85),inset 0 1px 0 rgba(255,255,255,.3)}
+body.theme-neon .big-btn.play.active{background:linear-gradient(180deg,#9cff9c 0%,#00ff00 55%,#008a00 100%);color:#001a00;border-color:#00ff00;box-shadow:0 0 22px rgba(0,255,0,.85),inset 0 1px 0 rgba(255,255,255,.3)}
+body.theme-neon .loop-btn.active{background:linear-gradient(180deg,#9cffff 0%,#00ffff 55%,#008a8a 100%);color:#001a1a;border-color:#00ffff;box-shadow:0 0 16px rgba(0,255,255,.8)}
+body.theme-neon .beat-btn.active{background:linear-gradient(180deg,#9cffff 0%,#00ffff 55%,#008a8a 100%);color:#001a1a;box-shadow:0 0 14px rgba(0,255,255,.75)}
+body.theme-neon .scene-btn.active{background:linear-gradient(180deg,#ff9cff 0%,#ff00ff 55%,#8a008a 100%);color:#fff;box-shadow:0 0 14px rgba(255,0,255,.75)}
+body.theme-neon .fx-onoff.active{background:linear-gradient(180deg,#ff9cff 0%,#ff00ff 55%,#8a008a 100%);color:#14001a;border-color:#ff00ff;box-shadow:0 0 18px rgba(255,0,255,.85)}
+body.theme-neon .util-btn.sync.active{background:linear-gradient(180deg,#ff9cff,#ff00ff);color:#14001a;box-shadow:0 0 14px rgba(255,0,255,.75)}
+body.theme-neon .pad-mode-btn.active{background:linear-gradient(180deg,#ff9cff 0%,#ff00ff 55%,#8a008a 100%);color:#14001a;box-shadow:0 0 12px rgba(255,0,255,.7)}
+body.theme-neon .toggle-switch.on{background:linear-gradient(180deg,#ff9cff,#ff00ff);border-color:#ff00ff;box-shadow:0 0 12px rgba(255,0,255,.7)}
+body.theme-neon .dsb-btn.active{background:linear-gradient(180deg,#ff9cff 0%,#ff00ff 55%,#8a008a 100%);color:#14001a;border-color:#ff00ff;box-shadow:0 0 14px rgba(255,0,255,.75)}
+body.theme-neon .bank-btn.active{color:#14001a;background:linear-gradient(180deg,#ff9cff,#ff00ff);box-shadow:0 0 10px rgba(255,0,255,.6)}
+body.theme-neon .seq-step.on{color:#001a1a;background:linear-gradient(180deg,#9cffff,#00ffff);box-shadow:0 0 10px rgba(0,255,255,.7)}
+body.theme-neon .rec-btn.recording{background:linear-gradient(180deg,#ff6060,#ff0040);color:#fff;box-shadow:0 0 14px rgba(255,0,64,.8)}
+body.theme-neon .tab-btn.active{background:linear-gradient(180deg,#ff9cff 0%,#ff00ff 50%,#8a008a 100%);color:#14001a;box-shadow:0 0 16px rgba(255,0,255,.7);text-shadow:0 1px 0 rgba(255,255,255,.25)}
+body.theme-neon .tempo-btn.active{background:linear-gradient(180deg,#ff9cff,#ff00ff);color:#14001a;box-shadow:0 0 12px rgba(255,0,255,.7)}
+body.theme-neon .mic-btn.active{background:linear-gradient(180deg,#9cffff,#00ffff);color:#001a1a;box-shadow:0 0 12px rgba(0,255,255,.7)}
+
 body.work-mode .library{display:block !important}
 body.work-mode .tab-content#tab-deck{display:flex !important;flex-direction:column;align-items:center;gap:12px}
 body.work-mode .rgb-ambient{display:block;height:3px;opacity:.85;max-width:1700px;margin:0 auto}
