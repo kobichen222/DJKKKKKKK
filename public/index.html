@@ -11916,10 +11916,10 @@ function setupOfflineDownload(){
   const status=document.getElementById('offlineStatus');
   const panel=document.getElementById('offlineUnlocked');
   if(!btn||!box)return;
-  const ADMIN_CODE='2100';
+  const ADMIN_CODE='KOBI2100';
 
   // Persist unlock during the session
-  const isUnlocked=()=>sessionStorage.getItem('djmax_offline_unlocked')==='1';
+  const isUnlocked=()=>sessionStorage.getItem('titan_installer_unlocked_kobi')==='1';
   if(isUnlocked())unlock();
 
   btn.addEventListener('click',()=>{
@@ -11937,7 +11937,7 @@ function setupOfflineDownload(){
   inp.addEventListener('keydown',e=>{if(e.key==='Enter')ok.click()});
 
   function unlock(){
-    sessionStorage.setItem('djmax_offline_unlocked','1');
+    sessionStorage.setItem('titan_installer_unlocked_kobi','1');
     if(panel)panel.style.display='block';
     if(btn){btn.textContent='🔓 DOWNLOADS UNLOCKED — SHOW OPTIONS';btn.style.opacity='.9'}
     status.textContent='';
