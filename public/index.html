@@ -11,6 +11,7 @@
 body.theme-light{--deck-bg:#e5e5e7;--deck-panel:#f5f5f7;--deck-border:#b0b0b2;--text:#1a1a1c;--text-dim:#5a5a5e;--bg:#f0f0f2}
 body.theme-neon{--orange:#ff00ff;--screen-glow:#00ffff;--play-green:#00ff00}
 body.theme-gold{--orange:#e8c463;--orange-glow:#fff0a8;--cue-orange:#ffcf40;--play-green:#f5d76e;--screen-glow:#ffd97a;--yellow:#f4c430;--red:#c83c3c;--purple:#c7a856;--pink:#e6b25a;--text:#f3e3b0;--text-dim:#c9a85a;--bg:#0a0806;--deck-bg:#1a1410;--deck-panel:#221a12;--deck-border:#6b4f1e}
+body.theme-euphonia{--orange:#c77848;--orange-glow:#e8a778;--cue-orange:#ffb347;--play-green:#7fffa3;--screen-glow:#9ee5ff;--yellow:#ffd966;--red:#ff5050;--purple:#b087e8;--pink:#ff8ab3;--text:#eaeaec;--text-dim:#8a8a90;--bg:#050507;--deck-bg:#0d0d0f;--deck-panel:#141416;--deck-border:#2a2a2e}
 html,body{background:radial-gradient(ellipse at center,#222 0%,var(--bg) 70%);min-height:100vh;font-family:'Barlow Condensed',sans-serif;color:var(--text)}
 body{padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:10px}
 ::-webkit-scrollbar{width:6px;height:6px}
@@ -3367,6 +3368,109 @@ body.theme-pioneer .bank-btn{color:#8a8a92}
 body.theme-pioneer .bank-btn.active{color:#1a0800;background:linear-gradient(180deg,#ffc080,#ff9020)}
 body.theme-pioneer .seq-step{background:linear-gradient(180deg,#1a1a20,#08080c);color:rgba(230,230,234,.25);border:1px solid #2a2a30}
 body.theme-pioneer .seq-step.on{color:#1a0800;background:linear-gradient(180deg,#ffc080,#ff9020);box-shadow:0 0 10px rgba(255,144,32,.7)}
+
+/* ============================================================
+   EUPHONIA THEME — Pioneer DJM-A9 / Euphonia inspired.
+   Matte jet-black body, copper/rose-gold knobs, amber SEND
+   glow, clean white labels, subtle cyan meter accents.
+   ============================================================ */
+body.theme-euphonia,body.theme-euphonia html{background:radial-gradient(ellipse at 20% 0%,rgba(199,120,72,.035) 0%,transparent 40%),radial-gradient(ellipse at center,#0a0a0c 0%,#020203 85%)}
+body.theme-euphonia::after{background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.7) 100%)}
+body.theme-euphonia ::-webkit-scrollbar-track{background:#08080a}
+body.theme-euphonia ::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#3a3a40,#16161a);border:1px solid #24242a}
+body.theme-euphonia .header-bar{color:#eaeaec}
+body.theme-euphonia .brand{color:#f2f2f4;text-shadow:0 1px 0 rgba(0,0,0,.95),0 0 18px rgba(199,120,72,.25)}
+body.theme-euphonia .brand .max{background:linear-gradient(180deg,#e8a778 0%,#c77848 50%,#7a3f1f 100%);color:#140a04;box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 1px 2px rgba(0,0,0,.6),0 0 14px rgba(199,120,72,.45)}
+body.theme-euphonia .header-right{color:#8a8a90}
+body.theme-euphonia .power-led{background:radial-gradient(circle,#ffd199,#c77848);box-shadow:0 0 10px rgba(199,120,72,.85)}
+body.theme-euphonia .cdj,body.theme-euphonia .mixer,body.theme-euphonia .library,
+body.theme-euphonia .sampler-panel,body.theme-euphonia .youtube-panel,body.theme-euphonia .playlists-panel,
+body.theme-euphonia .ai-dj-panel,body.theme-euphonia .analytics-panel,body.theme-euphonia .midi-panel,
+body.theme-euphonia .settings-panel,body.theme-euphonia .beat-fx-panel,body.theme-euphonia .scene-fx-panel,
+body.theme-euphonia .deck-switch-bar,body.theme-euphonia .mixer-toolbar{
+  background:linear-gradient(180deg,rgba(255,255,255,.04) 0%,transparent 5%,transparent calc(100% - 2px),rgba(0,0,0,.6) 100%),linear-gradient(180deg,#16161a 0%,#0b0b0d 55%,#050507 100%);
+  border:1px solid #24242a;border-top-color:rgba(255,255,255,.08);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05),inset 0 -1px 0 rgba(0,0,0,.6),0 2px 0 rgba(0,0,0,.6),0 18px 40px -10px rgba(0,0,0,.9)
+}
+body.theme-euphonia .main-tabs{background:linear-gradient(180deg,#18181c 0%,#0a0a0d 100%);border:1px solid #24242a;box-shadow:inset 0 2px 6px rgba(0,0,0,.75)}
+body.theme-euphonia .tab-btn{color:#8a8a90}
+body.theme-euphonia .tab-btn:hover{color:#eaeaec}
+body.theme-euphonia .tab-btn.active{background:linear-gradient(180deg,#e8a778 0%,#c77848 48%,#7a3f1f 100%);color:#140a04;box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 0 16px rgba(199,120,72,.5);text-shadow:0 1px 0 rgba(255,255,255,.18)}
+body.theme-euphonia .screen{background:linear-gradient(180deg,#030308 0%,#000 100%);border:2px solid #0a0a0e;box-shadow:inset 0 0 14px rgba(0,0,0,.95),0 0 0 1px rgba(255,255,255,.06),0 0 10px rgba(158,229,255,.08)}
+body.theme-euphonia .jog-center-screen{background:radial-gradient(circle,#06060a 0%,#000 100%);border:2px solid #0a0a0e;box-shadow:inset 0 0 22px rgba(0,0,0,.95),0 0 0 1px rgba(255,255,255,.05)}
+body.theme-euphonia .track-title{color:#fff;text-shadow:0 0 8px rgba(255,255,255,.4)}
+body.theme-euphonia .screen-bpm{color:#9ee5ff;text-shadow:0 0 12px rgba(158,229,255,.85)}
+body.theme-euphonia .screen-key{color:#e8a778}
+body.theme-euphonia .master-bpm{background:#000;border:1px solid #24242a;color:#9ee5ff;text-shadow:0 0 10px rgba(158,229,255,.8)}
+body.theme-euphonia .jog-center-screen .bpm-display{color:#9ee5ff;text-shadow:0 0 10px rgba(158,229,255,.8)}
+body.theme-euphonia .jog-center-screen .bpm-sub,body.theme-euphonia .jog-center-screen .deck-badge{color:#eaeaec}
+body.theme-euphonia .deck-number{background:linear-gradient(180deg,rgba(255,255,255,.4) 0%,transparent 14%,transparent 55%,rgba(0,0,0,.5) 100%),linear-gradient(180deg,#d4a788 0%,#c77848 40%,#7a3f1f 72%,#2a1608 100%);color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.55),0 -1px 0 rgba(255,255,255,.22);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -1px 0 rgba(0,0,0,.6),0 2px 6px rgba(0,0,0,.7)}
+body.theme-euphonia .deck-label{color:#eaeaec}
+body.theme-euphonia .deck-label .model{color:#e8a778;text-shadow:0 0 8px rgba(199,120,72,.35)}
+body.theme-euphonia .jog-outer{background:radial-gradient(circle at 50% 5%,rgba(255,255,255,.5) 0%,transparent 22%),radial-gradient(circle at 50% 95%,rgba(0,0,0,.8) 0%,transparent 30%),conic-gradient(from 0deg,#4a4a50 0deg,#7a7a82 28deg,#b4b4ba 58deg,#d4d4da 88deg,#a8a8ae 118deg,#6a6a70 150deg,#8a8a90 190deg,#4a4a50 220deg,#88888e 260deg,#b8b8be 300deg,#6a6a70 340deg,#4a4a50 360deg);border:3px solid #04040a;box-shadow:inset 0 0 0 1px rgba(255,255,255,.45),inset 0 0 0 2px rgba(0,0,0,.8),inset 0 2px 12px rgba(0,0,0,.75),0 4px 18px rgba(0,0,0,.92),0 0 0 1px rgba(255,255,255,.08)}
+body.theme-euphonia .jog-platter{background:radial-gradient(circle at 50% 20%,rgba(255,255,255,.18) 0%,transparent 30%),radial-gradient(circle at 50% 92%,rgba(0,0,0,.85) 0%,transparent 30%),radial-gradient(circle,#101014 0%,#06060a 70%,#000 100%);box-shadow:inset 0 0 44px rgba(0,0,0,.97),inset 0 2px 6px rgba(255,255,255,.1)}
+body.theme-euphonia .jog-platter-disc{background:repeating-conic-gradient(from 0deg at 50% 50%,rgba(255,255,255,.03) 0deg,transparent 3deg,transparent 6deg),radial-gradient(circle at 50% 35%,rgba(199,120,72,.5) 0%,transparent 14%),radial-gradient(circle at 50% 55%,rgba(158,229,255,.35) 0%,transparent 14%),radial-gradient(circle,#0e0e12 0%,#04040a 72%,#000 100%)}
+body.theme-euphonia .jog-indicator{background:linear-gradient(180deg,#fff 0%,#e8a778 35%,#c77848 70%,#7a3f1f 100%);box-shadow:0 0 8px rgba(0,0,0,.88),0 0 20px rgba(199,120,72,.95),0 0 4px rgba(255,255,255,.85)}
+body.theme-euphonia .knob{background:radial-gradient(ellipse 55% 28% at 45% 18%,rgba(255,255,255,.55) 0%,rgba(255,255,255,.18) 30%,transparent 58%),radial-gradient(circle at 50% 108%,rgba(0,0,0,.88) 0%,transparent 48%),radial-gradient(circle at 40% 35%,#e4a880 0%,#c77848 35%,#7a3f1f 72%,#3a1c0c 100%);border:1px solid #2a140a;box-shadow:inset 0 2px 1px rgba(255,235,220,.45),inset 0 -3px 6px rgba(0,0,0,.85),0 3px 7px rgba(0,0,0,.85),0 0 0 1px rgba(255,255,255,.05)}
+body.theme-euphonia .knob-indicator{background:linear-gradient(180deg,#fff 0%,#fff0e0 50%,#e8a778 100%);box-shadow:0 0 4px rgba(0,0,0,.85),0 0 10px rgba(255,240,224,.9)}
+body.theme-euphonia .knob-label{color:#9a9aa0;font-weight:700;letter-spacing:1.8px;text-shadow:0 1px 0 rgba(0,0,0,.85)}
+body.theme-euphonia .vu-meter{background:#000;border:1px solid #24242a;box-shadow:inset 0 0 6px rgba(0,0,0,.95)}
+body.theme-euphonia .vu-led{background:#0a0a0e}
+body.theme-euphonia .fader-wrap,body.theme-euphonia .crossfader-track,body.theme-euphonia .tempo-slider{background:linear-gradient(180deg,#06060a 0%,#000 100%);border:1px solid #24242a;box-shadow:inset 0 2px 6px rgba(0,0,0,.95)}
+body.theme-euphonia .fader-handle,body.theme-euphonia .tempo-handle,body.theme-euphonia .crossfader-handle{background:linear-gradient(180deg,#3a3a42 0%,#1a1a20 50%,#0a0a0e 100%);border:1px solid #050508;box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 2px 4px rgba(0,0,0,.85)}
+body.theme-euphonia .big-btn,body.theme-euphonia .loop-btn,body.theme-euphonia .jump-btn,body.theme-euphonia .util-btn,
+body.theme-euphonia .beat-btn,body.theme-euphonia .scene-btn,body.theme-euphonia .pad-mode-btn,
+body.theme-euphonia .tempo-btn,body.theme-euphonia .step-btn,body.theme-euphonia .mic-btn,
+body.theme-euphonia .cue-btn,body.theme-euphonia .compact-btn,body.theme-euphonia .cue-hp-btn,
+body.theme-euphonia .automix-btn,body.theme-euphonia .dsb-btn,body.theme-euphonia .search-src-btn,
+body.theme-euphonia .studio-preset-btn,body.theme-euphonia .tool-btn,body.theme-euphonia .assign-btn,
+body.theme-euphonia .curve-btn,body.theme-euphonia .ai-dj-btn{background:linear-gradient(180deg,#1a1a1e 0%,#0a0a0d 100%);border:1px solid #24242a;color:#eaeaec;box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 2px 4px rgba(0,0,0,.7)}
+body.theme-euphonia .big-btn:hover,body.theme-euphonia .loop-btn:hover,body.theme-euphonia .jump-btn:hover,
+body.theme-euphonia .util-btn:hover,body.theme-euphonia .beat-btn:hover,body.theme-euphonia .scene-btn:hover,
+body.theme-euphonia .pad-mode-btn:hover{border-color:rgba(199,120,72,.55);filter:brightness(1.05)}
+body.theme-euphonia .big-btn.cue.active{background:linear-gradient(180deg,#ffd199 0%,#ffb347 55%,#8a4a0c 100%);color:#1a0a00;border-color:#ffb347;text-shadow:0 1px 0 rgba(255,255,255,.3);box-shadow:0 0 16px rgba(255,179,71,.7)}
+body.theme-euphonia .big-btn.play.active{background:linear-gradient(180deg,#b4ffc8 0%,#7fffa3 55%,#1e7a3a 100%);color:#021a08;border-color:#7fffa3;text-shadow:0 1px 0 rgba(255,255,255,.3);box-shadow:0 0 16px rgba(127,255,163,.6)}
+body.theme-euphonia .loop-btn.active{background:linear-gradient(180deg,#caf0ff 0%,#9ee5ff 55%,#1a6880 100%);color:#021018;border-color:#9ee5ff}
+body.theme-euphonia .beat-btn.active{background:linear-gradient(180deg,#caf0ff 0%,#9ee5ff 55%,#1a6880 100%);color:#021018}
+body.theme-euphonia .scene-btn.active{background:linear-gradient(180deg,#ffc0d4 0%,#ff8ab3 55%,#7a1a40 100%);color:#fff}
+body.theme-euphonia .fx-onoff{background:linear-gradient(180deg,#1a1a1e 0%,#0a0a0d 100%);border:2px solid #3a3a42;color:#eaeaec}
+body.theme-euphonia .fx-onoff.active{background:linear-gradient(180deg,#e8a778 0%,#c77848 55%,#7a3f1f 100%);color:#140a04;border-color:#e8a778;box-shadow:0 0 14px rgba(199,120,72,.65)}
+body.theme-euphonia .util-btn.sync.active{background:linear-gradient(180deg,#e8a778,#c77848);color:#140a04}
+body.theme-euphonia .rec-btn{background:linear-gradient(180deg,#1a1a1e,#0a0a0d);border-color:#ff5050;color:#ff8a8a}
+body.theme-euphonia .rec-btn.recording{background:linear-gradient(180deg,#ff6060,#c82020);color:#fff}
+body.theme-euphonia .sample-pad{background:linear-gradient(180deg,#18181c 0%,#0a0a0d 100%);border:1px solid #24242a;color:#eaeaec;box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 2px 4px rgba(0,0,0,.7)}
+body.theme-euphonia .sample-pad .pad-num{color:#eaeaec}
+body.theme-euphonia .sample-pad .pad-name{color:#8a8a90}
+body.theme-euphonia input,body.theme-euphonia select,body.theme-euphonia textarea{background:#0a0a0d;color:#eaeaec;border:1px solid #24242a}
+body.theme-euphonia input:focus,body.theme-euphonia select:focus{border-color:#c77848;outline:none;box-shadow:0 0 0 3px rgba(199,120,72,.25)}
+body.theme-euphonia .url-input,body.theme-euphonia .search-input,body.theme-euphonia .yt-input{background:#0a0a0d;color:#eaeaec}
+body.theme-euphonia .track-row{background:#0e0e12;border:1px solid transparent;color:#eaeaec}
+body.theme-euphonia .track-row:hover{background:#16161a;border-color:#c77848;box-shadow:0 4px 10px rgba(0,0,0,.6),0 0 14px rgba(199,120,72,.22)}
+body.theme-euphonia .track-row .t-title{color:#fff}
+body.theme-euphonia .track-row .t-artist{color:#8a8a90}
+body.theme-euphonia .track-list-header{color:#e8a778;border-bottom:1px solid rgba(199,120,72,.32)}
+body.theme-euphonia .toast{background:linear-gradient(180deg,#16161a 0%,#0a0a0d 100%);color:#eaeaec;border:1px solid #c77848;box-shadow:0 12px 30px rgba(0,0,0,.75),0 0 22px rgba(199,120,72,.25)}
+body.theme-euphonia .modal-box{background:linear-gradient(180deg,#16161a 0%,#0a0a0d 100%);color:#eaeaec;border:1px solid #24242a;box-shadow:0 40px 80px rgba(0,0,0,.9)}
+body.theme-euphonia .modal-overlay{background:rgba(3,3,5,.88)}
+body.theme-euphonia .channel-label{color:#e8a778}
+body.theme-euphonia .compact-decks{background:#0a0a0d;border-color:#24242a}
+body.theme-euphonia .compact-deck{background:#12121a;border-color:#24242a}
+body.theme-euphonia .compact-deck-title{background:#000;color:#9ee5ff;border-color:#24242a}
+body.theme-euphonia .isolator-panel{background:#10101a;border-color:rgba(199,120,72,.28)}
+body.theme-euphonia .master-section,body.theme-euphonia .color-fx-row,body.theme-euphonia .color-fx-grid,
+body.theme-euphonia .crossfader-section,body.theme-euphonia .headphone-section,body.theme-euphonia .mic-section,
+body.theme-euphonia .automix-panel{background:#0b0b10;border:1px solid #24242a}
+body.theme-euphonia .dsb-btn.active{background:linear-gradient(180deg,#e8a778 0%,#c77848 55%,#7a3f1f 100%);color:#140a04;border-color:#e8a778;box-shadow:0 0 14px rgba(199,120,72,.7)}
+body.theme-euphonia .auth-btn{background:linear-gradient(180deg,#16161a,#0a0a0d);border:1px solid #c77848;color:#e8a778}
+body.theme-euphonia .toggle-switch{background:#10101a;border:1px solid #24242a}
+body.theme-euphonia .toggle-switch.on{background:linear-gradient(180deg,#e8a778,#c77848);border-color:#e8a778;box-shadow:0 0 10px rgba(199,120,72,.6)}
+body.theme-euphonia .master-meters{background:#000;border-color:#24242a;box-shadow:inset 0 2px 6px rgba(0,0,0,.96)}
+body.theme-euphonia .cdj[data-deck]{--deck-accent:#c77848;--deck-accent-rgb:199,120,72}
+body.theme-euphonia .rgb-ambient{background:linear-gradient(90deg,#7a3f1f 0%,#c77848 30%,#ffd199 50%,#c77848 70%,#7a3f1f 100%);box-shadow:0 0 20px rgba(199,120,72,.55)}
+body.theme-euphonia .bank-btn{color:#8a8a90}
+body.theme-euphonia .bank-btn.active{color:#140a04;background:linear-gradient(180deg,#e8a778,#c77848)}
+body.theme-euphonia .seq-step{background:linear-gradient(180deg,#14141a,#06060a);color:rgba(234,234,236,.25);border:1px solid #24242a}
+body.theme-euphonia .seq-step.on{color:#140a04;background:linear-gradient(180deg,#e8a778,#c77848);box-shadow:0 0 10px rgba(199,120,72,.7)}
 
 body.work-mode .library{display:block !important}
 body.work-mode .tab-content#tab-deck{display:flex !important;flex-direction:column;align-items:center;gap:12px}
@@ -8554,9 +8658,12 @@ No MIDI devices. Press CONNECT.
 <div class="settings-row">
 <div><div class="setting-label">Theme</div><div class="setting-desc">Visual theme</div></div>
 <select class="fx-selector" id="settingTheme">
-<option value="dark">Dark</option><option value="neon">Neon</option>
-<option value="pioneer">Pioneer (CDJ-3000)</option>
-<option value="gold">Gold</option><option value="light">Light</option>
+<option value="dark">TITAN ONYX</option>
+<option value="neon">TITAN PULSE</option>
+<option value="pioneer">TITAN-3K PRO</option>
+<option value="euphonia">TITAN COPPER</option>
+<option value="gold">TITAN GOLD</option>
+<option value="light">TITAN PORCELAIN</option>
 </select></div>
 <div class="settings-row">
 <div><div class="setting-label">RGB Ambient Light</div><div class="setting-desc">Color strip above</div></div>
@@ -11418,7 +11525,7 @@ function loadFromDB(){
 
 /* SETTINGS */
 function applyTheme(name){
-  document.body.classList.remove('theme-light','theme-neon','theme-gold','theme-pioneer');
+  document.body.classList.remove('theme-light','theme-neon','theme-gold','theme-pioneer','theme-euphonia');
   if(name!=='dark')document.body.classList.add(`theme-${name}`);
   settings.theme=name;saveToDB();
 }
