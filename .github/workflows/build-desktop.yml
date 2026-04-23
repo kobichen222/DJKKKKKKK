@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version to publish (e.g. 1.0.2). Leave blank to use package.json version.'
+        description: 'Version to publish (e.g. 1.0.3). Leave blank to use package.json version.'
         required: false
         default: ''
   # Automatic on tag push matching v*
@@ -24,12 +24,15 @@ permissions:
   contents: write
 
 jobs:
+  # ---------------------------------------------------------------
+  # 1. BUILD — one matrix leg per platform. Each builds the installer
+  #    locally (no publishing) and uploads it as a workflow artifact.
+  #    Windows is mandatory; macOS + Linux are optional so signing /
+  #    runner flakes there never block the Windows release.
+  # ---------------------------------------------------------------
   build:
-    name: ${{ matrix.os }}
+    name: build-${{ matrix.platform }}
     runs-on: ${{ matrix.os }}
-    # Windows is the flagship target — must succeed. macOS and Linux are
-    # marked optional so a signing or runner issue there cannot block the
-    # Windows release from publishing.
     continue-on-error: ${{ matrix.optional }}
     strategy:
       fail-fast: false
@@ -67,23 +70,20 @@ jobs:
           fi
           if [ -n "$V" ]; then
             node -e "const fs=require('fs');const p=require('./package.json');p.version='$V';fs.writeFileSync('package.json',JSON.stringify(p,null,2)+'\n');"
-            echo "Version set to $V"
+            echo "APP_VERSION=$V" >> "$GITHUB_ENV"
           else
-            echo "Using package.json version: $(node -p "require('./package.json').version")"
+            APP_V="$(node -p "require('./package.json').version")"
+            echo "APP_VERSION=$APP_V" >> "$GITHUB_ENV"
           fi
+          echo "Building version: $APP_VERSION"
 
-      - name: Build + publish Electron app (${{ matrix.platform }})
+      - name: Build Electron app (${{ matrix.platform }}) — no publish
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # Skip macOS code-signing (no certs in repo) — still produces an
-          # installable unsigned DMG / ZIP.
+          # Skip macOS code-signing cleanly (no certs).
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
-        run: npm run electron:${{ matrix.platform }} -- --publish always
+        run: npm run electron:${{ matrix.platform }} -- --publish never
 
-      # Safety net: keep the raw installer as a workflow artifact so a human
-      # can grab it from the Actions run even if the publish step ever has
-      # trouble attaching it to the GitHub Release.
-      - name: Upload installer as workflow artifact
+      - name: Upload installer artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -93,5 +93,67 @@ jobs:
             dist-electron/*.dmg
             dist-electron/*.zip
             dist-electron/*.AppImage
-          if-no-files-found: ignore
+            dist-electron/*.blockmap
+            dist-electron/latest*.yml
+          if-no-files-found: warn
           retention-days: 30
+
+  # ---------------------------------------------------------------
+  # 2. PUBLISH — single job that waits for all builds, downloads every
+  #    artifact, and creates ONE GitHub Release with all files attached
+  #    in a single atomic step. This sidesteps the race condition and
+  #    the "immutable release" freeze that blocks later assets when
+  #    each matrix leg tries to publish individually.
+  # ---------------------------------------------------------------
+  publish:
+    name: publish-release
+    needs: build
+    if: always() && needs.build.result != 'cancelled'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Derive version
+        id: ver
+        shell: bash
+        run: |
+          V=""
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            V="${{ github.event.inputs.version }}"
+          elif [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            V="${GITHUB_REF_NAME#v}"
+          else
+            V="$(node -p "require('./package.json').version")"
+          fi
+          echo "version=$V" >> "$GITHUB_OUTPUT"
+          echo "tag=v$V" >> "$GITHUB_OUTPUT"
+
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          pattern: installer-*
+          merge-multiple: true
+
+      - name: Inspect downloaded files
+        run: |
+          ls -la artifacts/ || true
+          echo "---"
+          find artifacts -type f -printf '%p  %s bytes\n' || true
+
+      - name: Create / update GitHub Release with all installers
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.ver.outputs.tag }}
+          name: ${{ steps.ver.outputs.version }}
+          draft: false
+          prerelease: false
+          fail_on_unmatched_files: false
+          generate_release_notes: true
+          files: |
+            artifacts/*.exe
+            artifacts/*.dmg
+            artifacts/*.zip
+            artifacts/*.AppImage
+            artifacts/*.blockmap
+            artifacts/latest*.yml
