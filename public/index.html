@@ -3498,6 +3498,18 @@ body.theme-neon .tab-btn.active{background:linear-gradient(180deg,#ff9cff 0%,#ff
 body.theme-neon .tempo-btn.active{background:linear-gradient(180deg,#ff9cff,#ff00ff);color:#14001a;box-shadow:0 0 12px rgba(255,0,255,.7)}
 body.theme-neon .mic-btn.active{background:linear-gradient(180deg,#9cffff,#00ffff);color:#001a1a;box-shadow:0 0 12px rgba(0,255,255,.7)}
 
+/* ============================================================
+   HEADPHONES cue-hp-btn.active — fix for every non-ONYX theme.
+   Theme group-selectors (light/gold/pioneer/euphonia) override
+   the base background with higher specificity, killing the
+   .active glow. These rules restore it per-palette.
+   ============================================================ */
+body.theme-neon .cue-hp-btn.active{background:linear-gradient(180deg,#9cffff 0%,#00ffff 60%,#008a8a 100%);color:#001a1a;border-color:#00ffff;box-shadow:0 0 14px rgba(0,255,255,.85),inset 0 1px 0 rgba(255,255,255,.35)}
+body.theme-pioneer .cue-hp-btn.active{background:linear-gradient(180deg,#9cf0ff 0%,#2ed5ff 55%,#0a6a88 100%);color:#001018;border-color:#2ed5ff;box-shadow:0 0 14px rgba(46,213,255,.85),inset 0 1px 0 rgba(255,255,255,.35)}
+body.theme-euphonia .cue-hp-btn.active{background:linear-gradient(180deg,#e0f5ff 0%,#9ee5ff 55%,#1a6880 100%);color:#021018;border-color:#9ee5ff;box-shadow:0 0 14px rgba(158,229,255,.8),inset 0 1px 0 rgba(255,255,255,.4)}
+body.theme-gold .cue-hp-btn.active{background:linear-gradient(180deg,#fff0b8 0%,#ffd97a 55%,#a6801a 100%);color:#1a1208;border-color:#ffd97a;box-shadow:0 0 14px rgba(255,217,122,.85),inset 0 1px 0 rgba(255,255,255,.45)}
+body.theme-light .cue-hp-btn.active{background:linear-gradient(180deg,#ffb366 0%,var(--orange) 55%,#c85a00 100%);color:#fff;border-color:#c85a00;box-shadow:0 0 12px rgba(255,138,26,.6),inset 0 1px 0 rgba(255,255,255,.35)}
+
 body.work-mode .library{display:block !important}
 body.work-mode .tab-content#tab-deck{display:flex !important;flex-direction:column;align-items:center;gap:12px}
 body.work-mode .rgb-ambient{display:block;height:3px;opacity:.85;max-width:1700px;margin:0 auto}
