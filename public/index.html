@@ -9417,6 +9417,52 @@ body.theme-gold .jog-center-screen .bpm-display{color:#ffcf40 !important;text-sh
 /* Theme-blade: cyan number on the same dark dial */
 body.theme-blade .cdj .jog-center-screen .bpm-display,
 body.theme-blade .jog-center-screen .bpm-display{color:#2ee0ff !important;text-shadow:0 0 6px rgba(46,224,255,.5) !important}
+
+/* ═══ ALL 4 mode + responsive resizing of the unified jog centre ═══
+   In ALL 4 the 4 decks share the row, so each deck's jog wheel shrinks
+   from 250 px down to 190-260 px depending on the viewport.  The main
+   rule above locks the centre to 120 px which is too big for a 190 px
+   wheel — it crushes the dial and steals space from the track-name
+   screen above. These overrides restore a sensible ratio (~40% of the
+   wheel) for every ALL-4 width bucket + mobile. */
+.console.show-all .cdj .jog-center-screen,
+body.show-all .cdj .jog-center-screen{
+  width:78px !important;height:78px !important;
+}
+.console.show-all .cdj .jog-center-screen .bpm-display,
+body.show-all .cdj .jog-center-screen .bpm-display{
+  font-size:16px !important;
+}
+.console.show-all .cdj .jog-center-screen .bpm-sub,
+body.show-all .cdj .jog-center-screen .bpm-sub{
+  font-size:6px !important;letter-spacing:2.5px !important;margin-top:2px !important;
+}
+@media(min-width:1920px){
+  .console.show-all .cdj .jog-center-screen,
+  body.show-all .cdj .jog-center-screen{width:90px !important;height:90px !important}
+  .console.show-all .cdj .jog-center-screen .bpm-display,
+  body.show-all .cdj .jog-center-screen .bpm-display{font-size:18px !important}
+}
+@media(min-width:2560px){
+  .console.show-all .cdj .jog-center-screen,
+  body.show-all .cdj .jog-center-screen{width:108px !important;height:108px !important}
+  .console.show-all .cdj .jog-center-screen .bpm-display,
+  body.show-all .cdj .jog-center-screen .bpm-display{font-size:22px !important}
+}
+@media(max-width:1200px){
+  .console.show-all .cdj .jog-center-screen,
+  body.show-all .cdj .jog-center-screen{width:66px !important;height:66px !important}
+  .console.show-all .cdj .jog-center-screen .bpm-display,
+  body.show-all .cdj .jog-center-screen .bpm-display{font-size:14px !important;letter-spacing:-.3px !important}
+  .console.show-all .cdj .jog-center-screen .bpm-sub,
+  body.show-all .cdj .jog-center-screen .bpm-sub{font-size:5px !important;letter-spacing:2px !important}
+}
+@media(max-width:820px){
+  .cdj .jog-center-screen,
+  .jog-center-screen{width:96px !important;height:96px !important}
+  .cdj .jog-center-screen .bpm-display,
+  .jog-center-screen .bpm-display{font-size:20px !important}
+}
 </style>
 </head>
 <body>
