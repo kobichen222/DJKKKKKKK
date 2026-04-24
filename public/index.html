@@ -9571,19 +9571,8 @@ Two options — both work completely offline:<br/>
       Continue with Google
     </button>
     <button class="tool-btn" id="offlineEmailBtn" style="padding:8px 14px">📧 EMAIL / PHONE</button>
-    <button class="tool-btn" id="offlineAdminToggleBtn" style="padding:8px 12px;font-size:10px;color:var(--text-dim);border-color:#333" title="Admin override">🔑 Admin</button>
   </div>
   <div id="offlineLoginErr" class="setting-desc" style="color:var(--red);min-height:14px"></div>
-</div>
-<div id="offlineCodeBox" class="settings-row" style="display:none;flex-direction:column;align-items:stretch;gap:6px;padding:10px;border:1px solid rgba(255,138,26,.35);border-radius:8px;background:rgba(255,138,26,.04)">
-  <div class="setting-label" style="color:var(--orange)">🔒 Admin code required</div>
-  <div class="setting-desc">Enter the admin code to unlock desktop / offline downloads.</div>
-  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-    <input type="password" id="offlineAdminCode" class="url-input" placeholder="Admin code" autocomplete="off" style="padding:8px 12px;letter-spacing:4px;font-family:'Share Tech Mono',monospace;max-width:200px" />
-    <button class="tool-btn" id="offlineCodeConfirm" style="color:var(--play-green);border-color:var(--play-green)">UNLOCK</button>
-    <button class="tool-btn" id="offlineCodeCancel">CANCEL</button>
-  </div>
-  <div id="offlineCodeErr" class="setting-desc" style="color:var(--red);min-height:14px"></div>
 </div>
 
 <div id="offlineUnlocked" style="display:none;margin-top:10px">
@@ -10525,8 +10514,55 @@ async function detectBPM(buf){
 }
 
 /* LIBRARY */
+// ─── Library state + virtualization ─────────────────────────────────
+// At large sizes (5000+ tracks) rendering every row was a multi-hundred-ms
+// reflow that locked the main thread on every keystroke in the search box.
+// We now keep a filtered "view" array and only mount the rows that fit in
+// the visible scroll window, plus a small buffer above/below.
+const _libView={tracks:[],rowH:38,overscan:6};
+function _libRowHTML(tr,idx){
+  const stars=Array.from({length:5},(_,i)=>`<span class="star ${i<(tr.rating||0)?'filled':''}" data-rating="${i+1}">★</span>`).join('');
+  const isYt=tr.source==='yt';
+  return `<div class="track-row${isYt?' yt-track':''}" draggable="true" data-track-id="${tr.id}" data-idx="${idx}">
+    <span class="t-num">${String(idx+1).padStart(2,'0')}</span>
+    <span class="t-title">${escapeHtml(tr.title)}${isYt?' 📺':''}</span>
+    <span class="t-artist">${escapeHtml(tr.artist)}</span>
+    <span class="t-bpm">${(tr.bpm||0).toFixed(1)}</span>
+    <span class="t-key">${tr.key}</span>
+    <span class="rating" data-track="${tr.id}">${stars}</span>
+    <div class="actions" style="display:flex;gap:4px;justify-content:flex-end;flex-wrap:wrap;">
+      ${!isYt?`<button class="preview tl-btn" data-preview="${tr.id}" style="padding:5px 8px;background:linear-gradient(180deg,#2a2a2e,#151518);border:1px solid rgba(255,212,0,.35);color:var(--yellow);font-family:Orbitron,sans-serif;font-size:10px;font-weight:800;letter-spacing:1.5px;border-radius:3px;cursor:pointer;">▶ PREV</button>`:''}
+      <button class="tl-btn tl-a" data-load="A" data-track="${tr.id}" style="padding:5px 10px;background:linear-gradient(180deg,#2a2a2e,#151518);border:1px solid rgba(46,224,255,.45);color:#2ee0ff;font-family:Orbitron,sans-serif;font-size:10px;font-weight:900;letter-spacing:1.5px;border-radius:3px;cursor:pointer;min-width:42px;">→ A</button>
+      <button class="tl-btn tl-b" data-load="B" data-track="${tr.id}" style="padding:5px 10px;background:linear-gradient(180deg,#2a2a2e,#151518);border:1px solid rgba(255,60,120,.45);color:#ff3c78;font-family:Orbitron,sans-serif;font-size:10px;font-weight:900;letter-spacing:1.5px;border-radius:3px;cursor:pointer;min-width:42px;">→ B</button>
+      ${!isYt?`<button class="tl-btn tl-c" data-load="C" data-track="${tr.id}" style="padding:5px 10px;background:linear-gradient(180deg,#2a2a2e,#151518);border:1px solid rgba(255,212,0,.45);color:#ffd400;font-family:Orbitron,sans-serif;font-size:10px;font-weight:900;letter-spacing:1.5px;border-radius:3px;cursor:pointer;min-width:42px;">→ C</button>`:''}
+      ${!isYt?`<button class="tl-btn tl-d" data-load="D" data-track="${tr.id}" style="padding:5px 10px;background:linear-gradient(180deg,#2a2a2e,#151518);border:1px solid rgba(200,0,255,.45);color:#c800ff;font-family:Orbitron,sans-serif;font-size:10px;font-weight:900;letter-spacing:1.5px;border-radius:3px;cursor:pointer;min-width:42px;">→ D</button>`:''}
+      <button class="remove tl-btn" data-remove="${tr.id}" style="padding:5px 8px;background:linear-gradient(180deg,#2a2a2e,#151518);border:1px solid rgba(255,46,46,.35);color:var(--red);font-family:Orbitron,sans-serif;font-size:12px;font-weight:900;border-radius:3px;cursor:pointer;">✕</button>
+    </div>
+  </div>`;
+}
+
+function _libRenderWindow(){
+  const list=document.getElementById('trackList');
+  if(!list||!list._virt)return;
+  const {tracks,rowH,overscan}=_libView;
+  const viewport=list.clientHeight||280;
+  const total=tracks.length*rowH;
+  const scroll=list.scrollTop;
+  const first=Math.max(0,Math.floor(scroll/rowH)-overscan);
+  const last=Math.min(tracks.length,Math.ceil((scroll+viewport)/rowH)+overscan);
+  const before=first*rowH;
+  const after=Math.max(0,total-last*rowH);
+  let html='';
+  for(let i=first;i<last;i++)html+=_libRowHTML(tracks[i],i);
+  list._virt.innerHTML=
+    `<div style="height:${before}px" aria-hidden="true"></div>`+
+    html+
+    `<div style="height:${after}px" aria-hidden="true"></div>`;
+}
+
 function renderLibrary(){
   const list=document.getElementById('trackList');
+  if(!list)return;
   const search=document.getElementById('searchInput').value.toLowerCase();
   const sort=document.getElementById('sortSelect').value;
   const filter=document.getElementById('filterSource').value;
@@ -10542,37 +10578,19 @@ function renderLibrary(){
     if(sort==='rating')return(b.rating||0)-(a.rating||0);
     return b.addedAt-a.addedAt;
   });
-  list.innerHTML='';
-  tracks.forEach((tr,idx)=>{
-    const row=document.createElement('div');
-    row.className='track-row'+(tr.source==='yt'?' yt-track':'');
-    row.draggable=true;row.dataset.trackId=tr.id;
-    const stars=Array.from({length:5},(_,i)=>`<span class="star ${i<(tr.rating||0)?'filled':''}" data-rating="${i+1}">★</span>`).join('');
-    const isYt=tr.source==='yt';
-    row.innerHTML=`<span class="t-num">${String(idx+1).padStart(2,'0')}</span>
-      <span class="t-title">${escapeHtml(tr.title)}${isYt?' 📺':''}</span>
-      <span class="t-artist">${escapeHtml(tr.artist)}</span>
-      <span class="t-bpm">${tr.bpm.toFixed(1)}</span>
-      <span class="t-key">${tr.key}</span>
-      <span class="rating" data-track="${tr.id}">${stars}</span>
-      <div class="actions" style="display:flex;gap:4px;justify-content:flex-end;flex-wrap:wrap;">
-        ${!isYt?`<button class="preview tl-btn" data-preview="${tr.id}" style="padding:5px 8px;background:linear-gradient(180deg,#2a2a2e,#151518);border:1px solid rgba(255,212,0,.35);color:var(--yellow);font-family:Orbitron,sans-serif;font-size:10px;font-weight:800;letter-spacing:1.5px;border-radius:3px;cursor:pointer;">▶ PREV</button>`:''}
-        <button class="tl-btn tl-a" data-load="A" data-track="${tr.id}" style="padding:5px 10px;background:linear-gradient(180deg,#2a2a2e,#151518);border:1px solid rgba(46,224,255,.45);color:#2ee0ff;font-family:Orbitron,sans-serif;font-size:10px;font-weight:900;letter-spacing:1.5px;border-radius:3px;cursor:pointer;min-width:42px;">→ A</button>
-        <button class="tl-btn tl-b" data-load="B" data-track="${tr.id}" style="padding:5px 10px;background:linear-gradient(180deg,#2a2a2e,#151518);border:1px solid rgba(255,60,120,.45);color:#ff3c78;font-family:Orbitron,sans-serif;font-size:10px;font-weight:900;letter-spacing:1.5px;border-radius:3px;cursor:pointer;min-width:42px;">→ B</button>
-        ${!isYt?`<button class="tl-btn tl-c" data-load="C" data-track="${tr.id}" style="padding:5px 10px;background:linear-gradient(180deg,#2a2a2e,#151518);border:1px solid rgba(255,212,0,.45);color:#ffd400;font-family:Orbitron,sans-serif;font-size:10px;font-weight:900;letter-spacing:1.5px;border-radius:3px;cursor:pointer;min-width:42px;">→ C</button>`:''}
-        ${!isYt?`<button class="tl-btn tl-d" data-load="D" data-track="${tr.id}" style="padding:5px 10px;background:linear-gradient(180deg,#2a2a2e,#151518);border:1px solid rgba(200,0,255,.45);color:#c800ff;font-family:Orbitron,sans-serif;font-size:10px;font-weight:900;letter-spacing:1.5px;border-radius:3px;cursor:pointer;min-width:42px;">→ D</button>`:''}
-        <button class="remove tl-btn" data-remove="${tr.id}" style="padding:5px 8px;background:linear-gradient(180deg,#2a2a2e,#151518);border:1px solid rgba(255,46,46,.35);color:var(--red);font-family:Orbitron,sans-serif;font-size:12px;font-weight:900;border-radius:3px;cursor:pointer;">✕</button>
-      </div>`;
-    row.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/plain',tr.id);row.classList.add('dragging');});
-    row.addEventListener('dragend',()=>row.classList.remove('dragging'));
-    list.appendChild(row);
-  });
-  document.getElementById('trackCount').textContent=`${library.length} TRACKS`;
-  document.getElementById('statLibSize').textContent=library.length;
-  // Event delegation — one listener for the whole list instead of 4 per row × N rows.
-  // Attached once; `renderLibrary` can then be called unlimited times without leaking.
-  if(!list._delegated){
-    list._delegated=true;
+  _libView.tracks=tracks;
+  // First call: set up the inner wrapper + bind scroll/click/drag delegation
+  if(!list._virt){
+    list.innerHTML='';
+    const inner=document.createElement('div');
+    inner.style.minHeight='100%';
+    list.appendChild(inner);
+    list._virt=inner;
+    list.addEventListener('scroll',()=>{
+      if(list._raf)return;
+      list._raf=requestAnimationFrame(()=>{list._raf=0;_libRenderWindow();});
+    },{passive:true});
+    // Delegated click — works for virtualized rows since listener is on parent
     list.addEventListener('click',(e)=>{
       const loadBtn=e.target.closest('[data-load]');
       if(loadBtn){
@@ -10598,7 +10616,20 @@ function renderLibrary(){
         if(t){t.rating=r;renderLibrary();saveToDB();}
       }
     });
+    list.addEventListener('dragstart',e=>{
+      const row=e.target.closest('.track-row');
+      if(!row)return;
+      e.dataTransfer.setData('text/plain',row.dataset.trackId);
+      row.classList.add('dragging');
+    });
+    list.addEventListener('dragend',e=>{
+      const row=e.target.closest('.track-row');
+      if(row)row.classList.remove('dragging');
+    });
   }
+  _libRenderWindow();
+  const c=document.getElementById('trackCount');if(c)c.textContent=`${library.length} TRACKS`;
+  const s=document.getElementById('statLibSize');if(s)s.textContent=library.length;
 }
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 
@@ -12730,17 +12761,14 @@ function nudgeTempo(d,pct){
 }
 
 /* ====================================================================
-   OFFLINE DOWNLOAD — gated by Google / email customer login
-   (legacy admin-code KOBI2100 still works as an override for the owner)
+   OFFLINE DOWNLOAD — gated by Supabase customer login.
+   Registered customers (any role, not banned) get the installer;
+   admin users are identified server-side by profiles.role='admin'.
+   No hardcoded admin code — that was a security liability in client code.
    ==================================================================== */
 function setupOfflineDownload(){
   const btn=document.getElementById('offlineDownloadBtn');
-  const box=document.getElementById('offlineCodeBox');
   const loginPrompt=document.getElementById('offlineLoginPrompt');
-  const inp=document.getElementById('offlineAdminCode');
-  const ok=document.getElementById('offlineCodeConfirm');
-  const cancel=document.getElementById('offlineCodeCancel');
-  const err=document.getElementById('offlineCodeErr');
   const loginErr=document.getElementById('offlineLoginErr');
   const status=document.getElementById('offlineStatus');
   const panel=document.getElementById('offlineUnlocked');
@@ -12749,69 +12777,43 @@ function setupOfflineDownload(){
   const signOutBtn=document.getElementById('offlineSignOutBtn');
   const googleBtn=document.getElementById('offlineGoogleBtn');
   const emailBtn=document.getElementById('offlineEmailBtn');
-  const adminToggleBtn=document.getElementById('offlineAdminToggleBtn');
   if(!btn||!loginPrompt)return;
-  const ADMIN_CODE='KOBI2100';
 
-  // Unlock can come from EITHER:
-  //  a) signed-in customer (Supabase user, not banned)  — primary path
-  //  b) admin override code KOBI2100                    — fallback
-  const isAdminOverride=()=>sessionStorage.getItem('titan_installer_unlocked_kobi')==='1';
   const isCustomer=()=>!!_supaUser&&_supaProfile&&!_supaProfile.banned;
-  const isUnlocked=()=>isCustomer()||isAdminOverride();
+  const isAdmin=()=>isCustomer()&&_supaProfile.role==='admin';
 
   // Public hook — auth code calls this when the session changes
   window.refreshOfflineDownloadGate=refresh;
 
   function refresh(){
-    if(isUnlocked()){
-      // Hide the login prompt and admin code box, show downloads
+    if(isCustomer()){
       if(loginPrompt)loginPrompt.style.display='none';
-      if(box)box.style.display='none';
       if(panel)panel.style.display='block';
-      if(isCustomer()){
-        const nm=_supaProfile?.name||_supaUser?.email||_supaUser?.phone||'Customer';
-        if(userChip){userChip.style.display='inline-flex';}
-        if(userName)userName.textContent=nm;
-        if(btn){btn.textContent='✓ DOWNLOADS OPEN';btn.style.opacity='.85';}
-      }else{
-        // admin override only (no Supabase user)
-        if(userChip)userChip.style.display='none';
-        if(btn){btn.textContent='🔓 ADMIN OVERRIDE — DOWNLOADS OPEN';btn.style.opacity='.85';}
-      }
+      const nm=_supaProfile?.name||_supaUser?.email||_supaUser?.phone||'Customer';
+      if(userChip)userChip.style.display='inline-flex';
+      if(userName)userName.textContent=nm+(isAdmin()?' · ADMIN':'');
+      if(btn){btn.textContent=isAdmin()?'✓ ADMIN · DOWNLOADS OPEN':'✓ DOWNLOADS OPEN';btn.style.opacity='.85';}
       if(status)status.textContent='';
     }else{
-      // Locked
       if(panel)panel.style.display='none';
       if(userChip)userChip.style.display='none';
       if(btn){btn.textContent='🔐 SIGN IN TO DOWNLOAD';btn.style.opacity='1';}
+      if(_supaUser&&_supaProfile&&_supaProfile.banned){
+        if(status)status.textContent='Account suspended';
+      }
     }
   }
   refresh();
 
   btn.addEventListener('click',()=>{
-    if(isUnlocked()){
-      // Already unlocked — scroll to the downloads panel
-      panel?.scrollIntoView({behavior:'smooth',block:'nearest'});
-      return;
-    }
-    // Not signed in — show the login prompt
-    if(box)box.style.display='none';
-    if(loginPrompt){
-      loginPrompt.style.display='flex';
-      loginPrompt.scrollIntoView({behavior:'smooth',block:'nearest'});
-    }
+    if(isCustomer()){panel?.scrollIntoView({behavior:'smooth',block:'nearest'});return;}
+    if(loginPrompt){loginPrompt.style.display='flex';loginPrompt.scrollIntoView({behavior:'smooth',block:'nearest'});}
     if(loginErr)loginErr.textContent='';
   });
 
-  // Google sign-in directly from the download panel
   googleBtn?.addEventListener('click',async()=>{
     if(loginErr)loginErr.textContent='';
-    if(!_supa){
-      // Supabase not configured yet — guide owner to settings
-      loginErr.textContent='Sign-in not configured yet. Owner must add Supabase URL + Anon Key in SETTINGS → SUPABASE.';
-      return;
-    }
+    if(!_supa){loginErr.textContent='Sign-in not configured yet. Owner must add Supabase URL + Anon Key in SETTINGS → SUPABASE.';return;}
     loginErr.textContent='Redirecting to Google…';
     try{
       const{error}=await _supa.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.href}});
@@ -12819,45 +12821,14 @@ function setupOfflineDownload(){
     }catch(e){loginErr.textContent='Error: '+(e.message||e);}
   });
 
-  // Email / phone — open the existing top-right SIGN IN modal
   emailBtn?.addEventListener('click',()=>{
-    if(!_supa){
-      loginErr.textContent='Sign-in not configured yet. Owner must add Supabase URL + Anon Key in SETTINGS → SUPABASE.';
-      return;
-    }
+    if(!_supa){loginErr.textContent='Sign-in not configured yet. Owner must add Supabase URL + Anon Key in SETTINGS → SUPABASE.';return;}
     document.getElementById('authModal')?.classList.add('open');
   });
 
-  // Sign out from the chip
   signOutBtn?.addEventListener('click',async()=>{
     if(_supa){await _supa.auth.signOut();toast&&toast('Signed out','success');}
     refresh();
-  });
-
-  // Admin override toggle — shows the legacy code box
-  adminToggleBtn?.addEventListener('click',()=>{
-    if(box){
-      box.style.display=box.style.display==='flex'?'none':'flex';
-      if(box.style.display==='flex'){
-        err.textContent='';inp.value='';
-        setTimeout(()=>inp.focus(),60);
-      }
-    }
-  });
-  cancel?.addEventListener('click',()=>{box.style.display='none';err.textContent=''});
-  inp?.addEventListener('keydown',e=>{if(e.key==='Enter')ok.click()});
-
-  ok?.addEventListener('click',()=>{
-    const code=(inp.value||'').trim();
-    if(code!==ADMIN_CODE){
-      err.textContent='✗ Wrong code';
-      inp.value='';inp.focus();
-      return;
-    }
-    err.textContent='';
-    sessionStorage.setItem('titan_installer_unlocked_kobi','1');
-    refresh();
-    toast&&toast('Admin override — downloads open','success');
   });
 }
 

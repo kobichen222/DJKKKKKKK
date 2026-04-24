@@ -1,23 +1,20 @@
-node_modules
-.next
-out
+# Dependencies
+node_modules/
+# Next.js
+.next/
+out/
+# Electron
+dist-electron/
+dist/
+# Test / build
+coverage/
+.vitest/
+# Environment
+.env
+.env.local
+# OS
 .DS_Store
-*.log
-.env*.local
-.vercel
-next-env.d.ts
-dist-electron
-*.exe
-*.dmg
-*.AppImage
-*.deb
-*.zip
-
-*.tsbuildinfo
-
-# Ed25519 license signing keys — private keys must NEVER be committed.
-# Only the public key goes in the client (embedded as SP_LICENSE_PUBKEY_HEX).
-*.pem
-*.key
-titan-private.*
-keys/
+Thumbs.db
+# Editor
+.vscode/
+.idea/

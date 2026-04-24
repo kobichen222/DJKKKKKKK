@@ -13,7 +13,9 @@
     "electron:build": "electron-builder",
     "electron:win": "electron-builder --win",
     "electron:mac": "electron-builder --mac",
-    "electron:linux": "electron-builder --linux"
+    "electron:linux": "electron-builder --linux",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "electron-updater": "^6.3.0",
@@ -27,7 +29,8 @@
     "@types/react-dom": "^19.0.0",
     "electron": "^32.0.0",
     "electron-builder": "^25.0.0",
-    "typescript": "^5.7.0"
+    "typescript": "^5.7.0",
+    "vitest": "^2.1.9"
   },
   "build": {
     "appId": "com.djtitan.studio",
@@ -57,7 +60,12 @@
     ],
     "win": {
       "target": [
-        { "target": "nsis", "arch": ["x64"] }
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
       ]
     },
     "nsis": {
@@ -72,14 +80,31 @@
     },
     "mac": {
       "target": [
-        { "target": "dmg", "arch": ["x64", "arm64"] },
-        { "target": "zip", "arch": ["x64", "arm64"] }
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
       ],
       "category": "public.app-category.music"
     },
     "linux": {
       "target": [
-        { "target": "AppImage", "arch": ["x64"] }
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        }
       ],
       "category": "AudioVideo"
     }
