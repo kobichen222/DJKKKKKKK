@@ -10214,17 +10214,36 @@ function renderLibrary(){
   });
   document.getElementById('trackCount').textContent=`${library.length} TRACKS`;
   document.getElementById('statLibSize').textContent=library.length;
-  list.querySelectorAll('[data-load]').forEach(btn=>{
-    btn.addEventListener('click',()=>{const t=library.find(x=>x.id===btn.dataset.track);if(t)loadTrackToDeck(btn.dataset.load,t);});
-  });
-  list.querySelectorAll('[data-preview]').forEach(btn=>btn.addEventListener('click',()=>previewTrack(btn.dataset.preview)));
-  list.querySelectorAll('[data-remove]').forEach(btn=>btn.addEventListener('click',()=>{const tid=btn.dataset.remove;idbDelAudio(tid);library=library.filter(t=>t.id!==tid);renderLibrary();saveToDB();}));
-  list.querySelectorAll('.star').forEach(star=>{
-    star.addEventListener('click',()=>{
-      const r=parseInt(star.dataset.rating),tid=star.closest('.rating').dataset.track;
-      const t=library.find(x=>x.id===tid);if(t){t.rating=r;renderLibrary();saveToDB();}
+  // Event delegation — one listener for the whole list instead of 4 per row × N rows.
+  // Attached once; `renderLibrary` can then be called unlimited times without leaking.
+  if(!list._delegated){
+    list._delegated=true;
+    list.addEventListener('click',(e)=>{
+      const loadBtn=e.target.closest('[data-load]');
+      if(loadBtn){
+        const t=library.find(x=>x.id===loadBtn.dataset.track);
+        if(t)loadTrackToDeck(loadBtn.dataset.load,t);
+        return;
+      }
+      const prevBtn=e.target.closest('[data-preview]');
+      if(prevBtn){previewTrack(prevBtn.dataset.preview);return;}
+      const remBtn=e.target.closest('[data-remove]');
+      if(remBtn){
+        const tid=remBtn.dataset.remove;
+        idbDelAudio(tid);library=library.filter(t=>t.id!==tid);
+        renderLibrary();saveToDB();
+        return;
+      }
+      const star=e.target.closest('.star');
+      if(star){
+        const r=parseInt(star.dataset.rating);
+        const rating=star.closest('.rating');
+        const tid=rating?.dataset.track;
+        const t=library.find(x=>x.id===tid);
+        if(t){t.rating=r;renderLibrary();saveToDB();}
+      }
     });
-  });
+  }
 }
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 
@@ -10679,10 +10698,14 @@ function syncDeck(deckId){
 }
 
 /* LOOP */
-function setLoopIn(d){const dk=decks[d];if(!dk.track)return;dk.loop.start=getCurrentTime(d);dk.loop.loopInSet=true;dk.loop.active=false;toast(`Loop IN: ${fmtTime(dk.loop.start)}`);}
-function setLoopOut(d){const dk=decks[d];if(!dk.loop.loopInSet)return;dk.loop.end=getCurrentTime(d);if(dk.loop.end<=dk.loop.start)return;dk.loop.active=true;document.querySelector(`.loop-btn[data-action="reloop"][data-deck="${d}"]`).classList.add('active');toast(`Loop: ${fmtTime(dk.loop.start)}→${fmtTime(dk.loop.end)}`);}
-function toggleReloop(d){const dk=decks[d];if(!dk.loop.start||!dk.loop.end)return;dk.loop.active=!dk.loop.active;document.querySelector(`.loop-btn[data-action="reloop"][data-deck="${d}"]`).classList.toggle('active',dk.loop.active);if(dk.loop.active)seekDeck(d,dk.loop.start);}
-function setAutoLoop(d,beats){const dk=decks[d];if(!dk.track)return;const bd=60/(dk.track.bpm*(1+dk.tempo/100)),pos=getCurrentTime(d);dk.loop.start=pos;dk.loop.end=pos+beats*bd;dk.loop.active=true;dk.loop.loopInSet=true;document.querySelector(`.loop-btn[data-action="reloop"][data-deck="${d}"]`).classList.add('active');toast(`Auto loop: ${beats} beats`);}
+function _setReloopBtn(d,active){
+  const b=document.querySelector(`.loop-btn[data-action="reloop"][data-deck="${d}"]`);
+  if(b)b.classList.toggle('active',!!active);
+}
+function setLoopIn(d){const dk=decks[d];if(!dk.track)return;dk.loop.start=getCurrentTime(d);dk.loop.loopInSet=true;dk.loop.active=false;_setReloopBtn(d,false);toast(`Loop IN: ${fmtTime(dk.loop.start)}`);}
+function setLoopOut(d){const dk=decks[d];if(!dk.loop.loopInSet)return;dk.loop.end=getCurrentTime(d);if(dk.loop.end<=dk.loop.start)return;dk.loop.active=true;_setReloopBtn(d,true);toast(`Loop: ${fmtTime(dk.loop.start)}→${fmtTime(dk.loop.end)}`);}
+function toggleReloop(d){const dk=decks[d];if(!dk.loop.start||!dk.loop.end)return;dk.loop.active=!dk.loop.active;_setReloopBtn(d,dk.loop.active);if(dk.loop.active)seekDeck(d,dk.loop.start);}
+function setAutoLoop(d,beats){const dk=decks[d];if(!dk.track)return;const bd=60/(dk.track.bpm*(1+dk.tempo/100)),pos=getCurrentTime(d);dk.loop.start=pos;dk.loop.end=pos+beats*bd;dk.loop.active=true;dk.loop.loopInSet=true;_setReloopBtn(d,true);toast(`Auto loop: ${beats} beats`);}
 function beatJump(d,beats){const dk=decks[d];if(!dk.track)return;const bd=60/(dk.track.bpm*(1+dk.tempo/100));seekDeck(d,getCurrentTime(d)+beats*bd);}
 
 /* ============ PAD MODES ============ */
@@ -11720,26 +11743,34 @@ function attachEvents(){
   document.querySelectorAll('.util-btn').forEach(btn=>{
     btn.addEventListener('click',()=>{
       const d=btn.dataset.deck,u=btn.dataset.util,dk=decks[d];
-      if(u==='sync'){const wasActive=btn.classList.contains('active');if(wasActive){btn.classList.remove('active');}else if(syncDeck(d)!==false){btn.classList.add('active');}}
-      else{dk[u]=!dk[u];btn.classList.toggle('active');}
+      if(!dk)return;
+      if(u==='sync'){
+        // Keep deck.sync boolean and visual class in lockstep
+        if(dk.sync){dk.sync=false;btn.classList.remove('active');}
+        else if(syncDeck(d)!==false){dk.sync=true;btn.classList.add('active');}
+        // syncDeck() already toasted the error on failure — no visual change
+      }else{dk[u]=!dk[u];btn.classList.toggle('active',!!dk[u]);}
     });
   });
   document.querySelectorAll('.cue-btn').forEach(btn=>{
+    const _deckOf=()=>btn.closest('.hot-cues')?.dataset.deck;
     btn.addEventListener('pointerdown',e=>{
-      const d=btn.closest('.hot-cues').dataset.deck,n=parseInt(btn.dataset.cue);
+      const d=_deckOf();if(!d||!decks[d])return;
+      const n=parseInt(btn.dataset.cue);
       triggerPad(d,n);
     });
     btn.addEventListener('pointerup',e=>{
-      const d=btn.closest('.hot-cues').dataset.deck;
+      const d=_deckOf();if(!d||!decks[d])return;
       if(decks[d].padMode==='roll')releaseBeatRoll(d);
     });
     btn.addEventListener('pointerleave',e=>{
-      const d=btn.closest('.hot-cues').dataset.deck;
+      const d=_deckOf();if(!d||!decks[d])return;
       if(decks[d].padMode==='roll'&&beatRollState[d])releaseBeatRoll(d);
     });
     btn.addEventListener('contextmenu',e=>{
       e.preventDefault();
-      const d=btn.closest('.hot-cues').dataset.deck,n=btn.dataset.cue;
+      const d=_deckOf();if(!d||!decks[d])return;
+      const n=btn.dataset.cue;
       if(decks[d].padMode==='cue'){delete decks[d].hotCues[n];btn.classList.remove('active');}
       else if(decks[d].padMode==='pitch'){decks[d].playbackRate=1+decks[d].tempo/100;if(decks[d].source)decks[d].source.playbackRate.value=decks[d].playbackRate;toast('Pitch reset');}
     });
@@ -11948,12 +11979,19 @@ function setupBeatFxUI(){
   });
   let tapTimes=[];
   document.getElementById('tapBtn').addEventListener('click',()=>{
-    const now=performance.now();tapTimes.push(now);
-    if(tapTimes.length>4)tapTimes.shift();
+    const now=performance.now();
+    // Reset the series if the user paused for more than 2 seconds between taps
+    if(tapTimes.length&&now-tapTimes[tapTimes.length-1]>2000)tapTimes=[];
+    tapTimes.push(now);
+    if(tapTimes.length>8)tapTimes.shift();
     if(tapTimes.length>=2){
       const avg=(tapTimes[tapTimes.length-1]-tapTimes[0])/(tapTimes.length-1);
       const bpm=60000/avg;
       document.getElementById('masterBpm').textContent=bpm.toFixed(2);
+      mixerState.tapBpm=bpm;
+      // Re-time any live FX so echo/delay lock to the new BPM immediately
+      if(mixerState.fx&&mixerState.fx.on&&typeof applyBeatFx==='function')applyBeatFx();
+      if(typeof applySceneFx==='function')applySceneFx();
       toast(`Tap: ${bpm.toFixed(1)} BPM`);
     }
   });
@@ -12058,9 +12096,12 @@ function toggleRecording(){
   ensureAudio();
   const btn=document.getElementById('recBtn');
   if(mixerState.isRecording){
-    mediaRecorder.stop();mixerState.isRecording=false;
+    try{mediaRecorder&&mediaRecorder.stop();}catch(e){console.warn('rec stop failed',e);recordedChunks=[];}
+    mixerState.isRecording=false;
     btn.classList.remove('recording');btn.textContent='REC';
   }else{
+    // Drop any prior instance so it can be GC'd (each MediaRecorder pins the stream)
+    if(mediaRecorder){try{mediaRecorder.ondataavailable=null;mediaRecorder.onstop=null;}catch(e){}mediaRecorder=null;}
     recordedChunks=[];
     const mime=MediaRecorder.isTypeSupported('audio/webm')?'audio/webm':'';
     mediaRecorder=new MediaRecorder(recordDestination.stream,mime?{mimeType:mime}:{});
@@ -12070,6 +12111,9 @@ function toggleRecording(){
       const url=URL.createObjectURL(blob);
       const a=document.createElement('a');
       a.href=url;a.download=`dj-mix-${Date.now()}.webm`;a.click();
+      // Release the blob URL once the browser has started the download
+      setTimeout(()=>{try{URL.revokeObjectURL(url);}catch(e){}},10000);
+      recordedChunks=[]; // free chunk buffers after save
       toast('Mix saved','success');
     };
     mediaRecorder.start();mixerState.isRecording=true;
@@ -16234,11 +16278,13 @@ function toggleKill(deckId,band){
   const killKey='kill'+band.charAt(0).toUpperCase()+band.slice(1);
   dk[killKey]=!dk[killKey];
   const filter=band==='low'?dk.eqLow:band==='hi'?dk.eqHigh:null;
+  // −80 dB is inaudible (≈0.01% amplitude); −40 dB still leaks audibly on a loud system.
+  const KILL_DB=-80;
   if(filter){
-    if(dk[killKey]){filter.gain.value=-40;}
+    if(dk[killKey]){filter.gain.value=KILL_DB;}
     else{filter.gain.value=band==='low'?dk.eq.low*12:dk.eq.high*12;}
   }else if(band==='mid'){
-    if(dk[killKey]){dk.eqLoMid.gain.value=-40;dk.eqHiMid.gain.value=-40;}
+    if(dk[killKey]){dk.eqLoMid.gain.value=KILL_DB;dk.eqHiMid.gain.value=KILL_DB;}
     else{dk.eqLoMid.gain.value=dk.eq.loMid*12;dk.eqHiMid.gain.value=dk.eq.hiMid*12;}
   }
   toast(`${deckId} ${band.toUpperCase()} ${dk[killKey]?'KILLED':'ON'}`);
