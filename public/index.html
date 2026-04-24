@@ -20026,8 +20026,19 @@ const studioMeterState={
   gonioPts:[],           // recent (L,R) samples for the scatter plot
   truePeakDb:-Infinity,
   deessDuck:0,           // current de-ess shelf reduction
-  envGain:1              // noise-gate / transient follower gain
+  envGain:1,             // noise-gate / transient follower gain
+  // ─── Display smoothing + throttle state ───
+  // The audio loop runs at 60fps but numeric readouts at 60fps just
+  // flicker — the eye can't parse. Peaks are envelope-followed (fast
+  // attack / slow release) for display, and text is refreshed every
+  // 125ms for peaks and 250ms for LUFS.
+  dispPeakL:-Infinity,dispPeakR:-Infinity,
+  dispLufsM:-Infinity,dispLufsS:-Infinity,dispLufsI:-Infinity,
+  dispLufsLRA:NaN,dispLufsTP:-Infinity,
+  _lastPeakTextAt:0,_lastLufsTextAt:0,
 };
+const PEAK_TEXT_MS=125;    // 8 Hz peak readout refresh
+const LUFS_TEXT_MS=250;    // 4 Hz LUFS readout refresh (matches M integration)
 
 function _dbToNorm(db,low,high){if(db===-Infinity)return 0;return Math.max(0,Math.min(1,(db-low)/(high-low)));}
 
@@ -20142,10 +20153,27 @@ function renderStudioMeter(){
     return 'g';
   };
 
-  const paintLadder=(ladder,peakDb,holdDb,numId,holdId,unitId)=>{
+  // ─── Envelope-followed displayed peak values ───
+  // Attack fast (3ms), release slow (350ms) — a broadcast-PPM feel.
+  // Bars keep the instantaneous peak; only the DISPLAYED number is
+  // smoothed so the readout settles instead of flickering.
+  const dispAtk=3,dispRel=350;  // ms
+  const ATK=Math.min(1,16/dispAtk),REL=Math.min(1,16/dispRel);
+  const followEnv=(curDisp,newDb)=>{
+    if(!isFinite(curDisp))return newDb;
+    if(!isFinite(newDb))return curDisp-REL*60;  // slow fade to silence
+    const coef=newDb>curDisp?ATK:REL;
+    return curDisp+(newDb-curDisp)*coef;
+  };
+  studioMeterState.dispPeakL=followEnv(studioMeterState.dispPeakL,peakLDb);
+  studioMeterState.dispPeakR=followEnv(studioMeterState.dispPeakR,peakRDb);
+
+  const needPeakText=NOW-studioMeterState._lastPeakTextAt>=PEAK_TEXT_MS;
+
+  const paintLadder=(ladder,peakDb,dispDb,holdDb,numId,holdId)=>{
     if(!ladder||!ladder._segs)return;
     const segs=ladder._segs;
-    const lit=dbToSegs(peakDb);
+    const lit=dbToSegs(peakDb);              // bars = instantaneous peak (smooth visual)
     const holdSeg=dbToSegs(holdDb);
     for(let i=0;i<SEGS;i++){
       const s=segs[i];
@@ -20154,23 +20182,26 @@ function renderStudioMeter(){
       if(i===holdSeg-1&&holdSeg>0){cls+=' hold';if(holdSeg>=46)cls+=' clip';}
       if(s.className!==cls)s.className=cls;
     }
-    // Numeric readout
-    const num=document.getElementById(numId);
-    if(num){
-      const txt=isFinite(peakDb)?(peakDb>=0?'+':'')+peakDb.toFixed(1):'-∞';
-      if(num.textContent!==txt)num.textContent=txt;
-      let cls='amp-dm-numeric';
-      if(peakDb>=0)cls+=' clip';
-      else if(peakDb>=-6)cls+=' warn';
-      if(num.className!==cls)num.className=cls;
-    }
-    const hold=document.getElementById(holdId);
-    if(hold){
-      hold.textContent=isFinite(holdDb)?(holdDb>=0?'+':'')+holdDb.toFixed(1):'-∞';
+    // Numeric readouts — throttled, and drawn from the envelope-followed value
+    if(needPeakText){
+      const num=document.getElementById(numId);
+      if(num){
+        const txt=isFinite(dispDb)?(dispDb>=0?'+':'')+dispDb.toFixed(1):'-∞';
+        if(num.textContent!==txt)num.textContent=txt;
+        let cls='amp-dm-numeric';
+        if(dispDb>=0)cls+=' clip';
+        else if(dispDb>=-6)cls+=' warn';
+        if(num.className!==cls)num.className=cls;
+      }
+      const hold=document.getElementById(holdId);
+      if(hold){
+        hold.textContent=isFinite(holdDb)?(holdDb>=0?'+':'')+holdDb.toFixed(1):'-∞';
+      }
     }
   };
-  paintLadder(ladL,peakLDb,studioMeterState.dm.holdL,'ampDmNumL','ampDmHoldL');
-  paintLadder(ladR,peakRDb,studioMeterState.dm.holdR,'ampDmNumR','ampDmHoldR');
+  paintLadder(ladL,peakLDb,studioMeterState.dispPeakL,studioMeterState.dm.holdL,'ampDmNumL','ampDmHoldL');
+  paintLadder(ladR,peakRDb,studioMeterState.dispPeakR,studioMeterState.dm.holdR,'ampDmNumR','ampDmHoldR');
+  if(needPeakText)studioMeterState._lastPeakTextAt=NOW;
 
   // ─── PPM SEGMENT LADDERS (20 segments, top red, middle yellow/orange, bottom green) ───
   const renderPpm=(elId,db)=>{
@@ -20242,12 +20273,48 @@ function renderStudioMeter(){
   const lufsI=studioMeterState.lufsIntN?10*Math.log10(studioMeterState.lufsIntSum/studioMeterState.lufsIntN):-Infinity;
   const lra=isFinite(studioMeterState.lufsMax)&&isFinite(studioMeterState.lufsMin)?(studioMeterState.lufsMax-studioMeterState.lufsMin):NaN;
 
-  const setLufs=(id,v,unit)=>{const el=document.getElementById(id);if(el)el.textContent=isFinite(v)?fmt(v)+(unit?' '+unit:''):'-∞';};
-  setLufs('lufsMVal',lufsM);
-  setLufs('lufsSVal',lufsS);
-  setLufs('lufsIVal',lufsI);
-  const lraEl=document.getElementById('lufsLRAVal');if(lraEl)lraEl.textContent=isFinite(lra)?lra.toFixed(1)+' LU':'—';
-  setLufs('lufsTPVal',studioMeterState.truePeakDb,'dBTP');
+  // ─── THROTTLED + SMOOTHED LUFS readouts ───
+  // We integrate every frame (fast, otherwise the running averages
+  // drift) but only REPAINT the text 4 times per second. Displayed
+  // values are one-pole low-passed so the digits don't jitter even
+  // when the underlying RMS jumps.
+  const sm=(prev,next,tau)=>{
+    if(!isFinite(next))return prev;
+    if(!isFinite(prev))return next;
+    return prev+(next-prev)*tau;
+  };
+  studioMeterState.dispLufsM=sm(studioMeterState.dispLufsM,lufsM,0.18);
+  studioMeterState.dispLufsS=sm(studioMeterState.dispLufsS,lufsS,0.06);
+  studioMeterState.dispLufsI=sm(studioMeterState.dispLufsI,lufsI,0.25);
+
+  // Proper EBU-R128 LRA approximation: 10th→95th percentile of the
+  // short-term window (last ~60 s of samples), gated at -70 LUFS.
+  // Much more stable than the old max-min which exploded to 60 LU
+  // as soon as there was a silent gap.
+  let lraDisp=NaN;
+  if(studioMeterState.lufsHist.length>30){
+    const vals=studioMeterState.lufsHist.filter(v=>isFinite(v)&&v>-70).slice().sort((a,b)=>a-b);
+    if(vals.length>10){
+      const p10=vals[Math.floor(vals.length*0.10)];
+      const p95=vals[Math.floor(vals.length*0.95)];
+      lraDisp=Math.max(0,p95-p10);
+    }
+  }
+  studioMeterState.dispLufsLRA=isFinite(studioMeterState.dispLufsLRA)&&isFinite(lraDisp)
+    ?studioMeterState.dispLufsLRA+(lraDisp-studioMeterState.dispLufsLRA)*0.15:lraDisp;
+  studioMeterState.dispLufsTP=sm(studioMeterState.dispLufsTP,studioMeterState.truePeakDb,0.25);
+
+  const needLufsText=NOW-studioMeterState._lastLufsTextAt>=LUFS_TEXT_MS;
+  if(needLufsText){
+    const setLufs=(id,v,unit)=>{const el=document.getElementById(id);if(el)el.textContent=isFinite(v)?fmt(v)+(unit?' '+unit:''):'-∞';};
+    setLufs('lufsMVal',studioMeterState.dispLufsM);
+    setLufs('lufsSVal',studioMeterState.dispLufsS);
+    setLufs('lufsIVal',studioMeterState.dispLufsI);
+    const lraEl=document.getElementById('lufsLRAVal');
+    if(lraEl)lraEl.textContent=isFinite(studioMeterState.dispLufsLRA)?studioMeterState.dispLufsLRA.toFixed(1)+' LU':'—';
+    setLufs('lufsTPVal',studioMeterState.dispLufsTP,'dBTP');
+    studioMeterState._lastLufsTextAt=NOW;
+  }
   // Color-code vs target
   if(studioState.targetLufs!=null){
     const cell=document.getElementById('lufsI');
@@ -20260,11 +20327,15 @@ function renderStudioMeter(){
     }
   }
 
-  // ─── LEGACY PEAK / LUFS BARS (kept for the limiter block) ───
+  // ─── LEGACY PEAK / LUFS BARS (limiter block) — text also throttled ───
   const setBar=(id,db,low=-60,high=0)=>{const el=document.getElementById(id);if(!el)return;el.style.width=(_dbToNorm(db,low,high)*100).toFixed(1)+'%';};
   setBar('studioPeakL',peakLDb);setBar('studioPeakR',peakRDb);setBar('studioLufs',lufsM,-40,0);
-  const setText=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=fmt(v);};
-  setText('studioPeakLVal',peakLDb);setText('studioPeakRVal',peakRDb);setText('studioLufsVal',lufsM);
+  if(needPeakText){
+    const setText=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=fmt(v);};
+    setText('studioPeakLVal',studioMeterState.dispPeakL);
+    setText('studioPeakRVal',studioMeterState.dispPeakR);
+    setText('studioLufsVal',studioMeterState.dispLufsM);
+  }
 
   // ─── COMPRESSOR + MULTI-BAND GR ───
   if(studioChain.comp){
