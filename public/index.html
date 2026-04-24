@@ -8812,16 +8812,46 @@ Click pad to play · Right-click to clear · Drop audio file/track onto pad · C
 <div class="tab-content" id="tab-midi">
 <div class="midi-panel">
 <div class="library-header"><div class="library-title">🎹 MIDI CONTROLLERS</div>
-<button class="tool-btn" id="midiConnectBtn">CONNECT</button></div>
-<div style="padding:10px 0;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:11px;">
-Connect USB MIDI controller. Tested with Pioneer DDJ, Denon, Numark.
+<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+  <button class="tool-btn" id="midiConnectBtn">CONNECT</button>
+  <select id="midiPresetSelect" class="fx-selector" style="min-width:180px">
+    <option value="">— Controller preset —</option>
+    <option value="generic">Generic 2-deck</option>
+    <option value="ddj400">Pioneer DDJ-400</option>
+    <option value="mixtrack">Numark Mixtrack Pro</option>
+    <option value="none">Clear all mappings</option>
+  </select>
+  <span id="midiStatusChip" style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim);padding:4px 10px;border:1px solid #333;border-radius:4px">● disconnected</span>
+</div>
+</div>
+<div style="padding:10px 0;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:11px;line-height:1.6">
+Connect any class-compliant USB MIDI controller. Pick a preset above for
+instant full-deck mapping, or use <b>MIDI Learn</b> (right-click any knob / button
+in the main console) to bind one-at-a-time.
+Hot-plugging a controller is auto-detected — no need to press CONNECT again.
 </div>
 <div class="midi-devices" id="midiDevices">
 <div style="color:var(--text-dim);text-align:center;padding:20px;font-family:'Share Tech Mono',monospace;font-size:11px;">
-No MIDI devices. Press CONNECT.
+No MIDI devices. Press CONNECT (browser will ask for permission once).
 </div>
 </div>
-<h4 style="font-family:'Orbitron',sans-serif;font-size:11px;color:var(--orange);letter-spacing:2px;margin-bottom:8px;">MIDI LOG</h4>
+
+<div style="display:flex;justify-content:space-between;align-items:center;margin:14px 0 8px">
+<h4 style="font-family:'Orbitron',sans-serif;font-size:11px;color:var(--orange);letter-spacing:2px;">ACTIVE MAPPINGS <span id="midiMapCount" style="color:var(--text-dim);font-size:10px">(0)</span></h4>
+<div style="display:flex;gap:6px">
+  <button class="tool-btn" id="midiExportBtn" style="font-size:9px;padding:4px 8px">EXPORT</button>
+  <button class="tool-btn" id="midiImportBtn" style="font-size:9px;padding:4px 8px">IMPORT</button>
+  <button class="tool-btn" id="midiClearBtn" style="font-size:9px;padding:4px 8px;color:var(--red);border-color:var(--red)">CLEAR</button>
+</div>
+</div>
+<div id="midiMapList" class="midi-devices" style="min-height:60px;max-height:220px">
+<div style="color:var(--text-dim);text-align:center;padding:14px;font-family:'Share Tech Mono',monospace;font-size:11px;">
+No mappings yet. Pick a preset above or right-click any control → MIDI Learn.
+</div>
+</div>
+<input type="file" id="midiImportFile" accept="application/json" style="display:none"/>
+
+<h4 style="font-family:'Orbitron',sans-serif;font-size:11px;color:var(--orange);letter-spacing:2px;margin:14px 0 8px;">MIDI MONITOR</h4>
 <div class="midi-log" id="midiLog">-- Awaiting input --</div>
 </div>
 </div>
@@ -11787,38 +11817,224 @@ async function connectMIDI(){
   if(!navigator.requestMIDIAccess){toast('MIDI not supported','error');return;}
   try{
     midiAccess=await navigator.requestMIDIAccess();
-    midiDevices=[];
-    midiAccess.inputs.forEach(inp=>{midiDevices.push(inp);inp.onmidimessage=handleMIDI;});
-    renderMIDIDevices();
+    rescanMIDIDevices();
+    // Hot-plug: browser fires 'statechange' when a device connects or disconnects
+    midiAccess.onstatechange=e=>{
+      rescanMIDIDevices();
+      if(e&&e.port){
+        const name=e.port.name||'Device';
+        if(e.port.state==='connected')toast(`MIDI plugged: ${name}`,'success');
+        else toast(`MIDI unplugged: ${name}`);
+      }
+    };
     toast(`MIDI: ${midiDevices.length} device(s)`,'success');
   }catch(e){toast('MIDI denied','error');}
 }
 
+function rescanMIDIDevices(){
+  if(!midiAccess)return;
+  midiDevices=[];
+  midiAccess.inputs.forEach(inp=>{
+    if(inp.state!=='connected')return;
+    midiDevices.push(inp);
+    inp.onmidimessage=handleMIDI;
+  });
+  renderMIDIDevices();
+  updateMidiStatusChip();
+}
+
 function renderMIDIDevices(){
   const el=document.getElementById('midiDevices');
-  if(!midiDevices.length){el.innerHTML='<div style="color:var(--text-dim);text-align:center;padding:20px;">No devices</div>';return;}
-  el.innerHTML=midiDevices.map(d=>`<div class="midi-device"><span>${d.name||'Unknown'}</span><span class="status">● CONNECTED</span></div>`).join('');
+  if(!el)return;
+  if(!midiDevices.length){
+    el.innerHTML='<div style="color:var(--text-dim);text-align:center;padding:20px;font-family:\'Share Tech Mono\',monospace;font-size:11px">No devices connected</div>';
+    return;
+  }
+  el.innerHTML=midiDevices.map(d=>{
+    const mfg=d.manufacturer?`<span style="color:var(--text-dim);font-size:9px;margin-left:8px">${d.manufacturer}</span>`:'';
+    return `<div class="midi-device"><span>${d.name||'Unknown'}${mfg}</span><span class="status">● CONNECTED</span></div>`;
+  }).join('');
 }
+
+function updateMidiStatusChip(){
+  const chip=document.getElementById('midiStatusChip');if(!chip)return;
+  const n=midiDevices.length;
+  if(n){chip.textContent=`● ${n} connected`;chip.style.color='var(--play-green)';chip.style.borderColor='var(--play-green)';}
+  else{chip.textContent='● disconnected';chip.style.color='var(--text-dim)';chip.style.borderColor='#333';}
+}
+
+/* Controller presets — pre-built mapping tables.
+   Keys are `${type}_${channel}_${cc_or_note}` in hex, matching handleMIDI. */
+const MIDI_PRESETS={
+  // Minimal generic 2-deck layout: CC 1-8 = deck A/B EQs + vol; notes 36-43 = hot cues A.
+  generic:{
+    'b0_0_1':{target:'knob:low-A',label:'Deck A Low'},
+    'b0_0_2':{target:'knob:mid-A',label:'Deck A Mid'},
+    'b0_0_3':{target:'knob:hi-A',label:'Deck A Hi'},
+    'b0_0_4':{target:'fader:A',label:'Deck A Volume'},
+    'b0_0_5':{target:'knob:low-B',label:'Deck B Low'},
+    'b0_0_6':{target:'knob:mid-B',label:'Deck B Mid'},
+    'b0_0_7':{target:'knob:hi-B',label:'Deck B Hi'},
+    'b0_0_8':{target:'fader:B',label:'Deck B Volume'},
+    'b0_0_9':{target:'crossfader',label:'Crossfader'},
+    '90_0_24':{target:'btn:.big-btn.play[data-deck="A"]',label:'Deck A PLAY'},
+    '90_0_25':{target:'btn:.big-btn.cue[data-deck="A"]',label:'Deck A CUE'},
+    '90_1_24':{target:'btn:.big-btn.play[data-deck="B"]',label:'Deck B PLAY'},
+    '90_1_25':{target:'btn:.big-btn.cue[data-deck="B"]',label:'Deck B CUE'},
+  },
+  // Pioneer DDJ-400 standard HID/MIDI map (simplified — covers main bindings)
+  ddj400:{
+    'b0_0_11':{target:'fader:A',label:'Deck A Volume'},
+    'b0_1_11':{target:'fader:B',label:'Deck B Volume'},
+    'b0_6_31':{target:'crossfader',label:'Crossfader'},
+    'b0_0_7':{target:'knob:low-A',label:'Deck A EQ Low'},
+    'b0_0_11':{target:'knob:mid-A',label:'Deck A EQ Mid'},
+    'b0_0_15':{target:'knob:hi-A',label:'Deck A EQ Hi'},
+    'b0_1_7':{target:'knob:low-B',label:'Deck B EQ Low'},
+    'b0_1_11':{target:'knob:mid-B',label:'Deck B EQ Mid'},
+    'b0_1_15':{target:'knob:hi-B',label:'Deck B EQ Hi'},
+    '90_0_11':{target:'btn:.big-btn.play[data-deck="A"]',label:'Deck A PLAY'},
+    '90_0_12':{target:'btn:.big-btn.cue[data-deck="A"]',label:'Deck A CUE'},
+    '90_1_11':{target:'btn:.big-btn.play[data-deck="B"]',label:'Deck B PLAY'},
+    '90_1_12':{target:'btn:.big-btn.cue[data-deck="B"]',label:'Deck B CUE'},
+    // Hot cues A (pads 1-8 on performance)
+    '97_0_0':{target:'btn:.hot-cues[data-deck="A"] .cue-btn[data-cue="1"]',label:'Deck A Cue 1'},
+    '97_0_1':{target:'btn:.hot-cues[data-deck="A"] .cue-btn[data-cue="2"]',label:'Deck A Cue 2'},
+    '97_0_2':{target:'btn:.hot-cues[data-deck="A"] .cue-btn[data-cue="3"]',label:'Deck A Cue 3'},
+    '97_0_3':{target:'btn:.hot-cues[data-deck="A"] .cue-btn[data-cue="4"]',label:'Deck A Cue 4'},
+  },
+  // Numark Mixtrack Pro — MIDI channel 1 = deck A, channel 2 = deck B (approx)
+  mixtrack:{
+    'b0_0_1':{target:'fader:A',label:'Deck A Volume'},
+    'b0_1_1':{target:'fader:B',label:'Deck B Volume'},
+    'b0_0_8':{target:'crossfader',label:'Crossfader'},
+    'b0_0_5':{target:'knob:low-A',label:'Deck A EQ Low'},
+    'b0_0_6':{target:'knob:mid-A',label:'Deck A EQ Mid'},
+    'b0_0_7':{target:'knob:hi-A',label:'Deck A EQ Hi'},
+    'b0_1_5':{target:'knob:low-B',label:'Deck B EQ Low'},
+    'b0_1_6':{target:'knob:mid-B',label:'Deck B EQ Mid'},
+    'b0_1_7':{target:'knob:hi-B',label:'Deck B EQ Hi'},
+    '90_0_23':{target:'btn:.big-btn.play[data-deck="A"]',label:'Deck A PLAY'},
+    '90_0_22':{target:'btn:.big-btn.cue[data-deck="A"]',label:'Deck A CUE'},
+    '90_1_23':{target:'btn:.big-btn.play[data-deck="B"]',label:'Deck B PLAY'},
+    '90_1_22':{target:'btn:.big-btn.cue[data-deck="B"]',label:'Deck B CUE'},
+  }
+};
+
+function applyMidiPreset(name){
+  if(name==='none'){
+    midiMappings={};
+    localStorage.setItem('djpro_midi_map','{}');
+    renderMidiMapList();
+    toast('MIDI mappings cleared','success');
+    return;
+  }
+  const p=MIDI_PRESETS[name];
+  if(!p){toast('Unknown preset: '+name,'error');return;}
+  midiMappings={...midiMappings,...p};
+  localStorage.setItem('djpro_midi_map',JSON.stringify(midiMappings));
+  renderMidiMapList();
+  toast(`Loaded ${Object.keys(p).length} mappings: ${name}`,'success');
+}
+
+function renderMidiMapList(){
+  const el=document.getElementById('midiMapList');
+  if(!el)return;
+  const keys=Object.keys(midiMappings);
+  const cnt=document.getElementById('midiMapCount');
+  if(cnt)cnt.textContent=`(${keys.length})`;
+  if(!keys.length){
+    el.innerHTML='<div style="color:var(--text-dim);text-align:center;padding:14px;font-family:\'Share Tech Mono\',monospace;font-size:11px">No mappings yet. Pick a preset above or right-click any control → MIDI Learn.</div>';
+    return;
+  }
+  el.innerHTML=keys.map(k=>{
+    const m=midiMappings[k];
+    const [type,ch,d1]=k.split('_');
+    const typeName=type==='b0'?'CC':type==='90'?'Note':type==='97'?'Pad':type;
+    return `<div class="midi-device" style="gap:8px">
+      <span style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim);min-width:120px">${typeName} ch${parseInt(ch,16)+1} #${parseInt(d1,10)}</span>
+      <span style="flex:1;color:var(--screen-glow)">${m.label||m.target}</span>
+      <button class="tool-btn" data-midi-unmap="${k}" style="padding:3px 8px;font-size:9px;color:var(--red);border-color:var(--red)">✕</button>
+    </div>`;
+  }).join('');
+  el.querySelectorAll('[data-midi-unmap]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      delete midiMappings[btn.dataset.midiUnmap];
+      localStorage.setItem('djpro_midi_map',JSON.stringify(midiMappings));
+      renderMidiMapList();
+    });
+  });
+}
+
+function wireMidiPanelControls(){
+  document.getElementById('midiPresetSelect')?.addEventListener('change',e=>{
+    const v=e.target.value;if(!v)return;
+    applyMidiPreset(v);e.target.value='';
+  });
+  document.getElementById('midiExportBtn')?.addEventListener('click',()=>{
+    const blob=new Blob([JSON.stringify(midiMappings,null,2)],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download=`titan-midi-map-${Date.now()}.json`;a.click();
+    setTimeout(()=>{try{URL.revokeObjectURL(url);}catch(e){}},8000);
+    toast('MIDI map exported','success');
+  });
+  document.getElementById('midiImportBtn')?.addEventListener('click',()=>document.getElementById('midiImportFile')?.click());
+  document.getElementById('midiImportFile')?.addEventListener('change',e=>{
+    const f=e.target.files?.[0];if(!f)return;
+    const r=new FileReader();
+    r.onload=ev=>{
+      try{
+        const parsed=JSON.parse(ev.target.result);
+        if(typeof parsed!=='object'||!parsed)throw new Error('Invalid file');
+        midiMappings={...midiMappings,...parsed};
+        localStorage.setItem('djpro_midi_map',JSON.stringify(midiMappings));
+        renderMidiMapList();
+        toast(`Imported ${Object.keys(parsed).length} mappings`,'success');
+      }catch(err){toast('Import failed: '+err.message,'error');}
+    };
+    r.readAsText(f);
+    e.target.value='';
+  });
+  document.getElementById('midiClearBtn')?.addEventListener('click',()=>{
+    if(!Object.keys(midiMappings).length){toast('Already empty');return;}
+    if(!confirm('Remove all '+Object.keys(midiMappings).length+' MIDI mappings?'))return;
+    applyMidiPreset('none');
+  });
+  renderMidiMapList();
+}
+// Refresh the mapping panel whenever the MIDI tab opens
+document.addEventListener('DOMContentLoaded',()=>{
+  setTimeout(wireMidiPanelControls,400);
+});
 
 function handleMIDI(msg){
   const[s,d1,d2]=msg.data,type=s&0xF0,ch=s&0x0F;
+  // Pad messages sometimes come as 0x97 (note-on on channel 7); match both forms
   const midiKey=`${type.toString(16)}_${ch}_${d1}`;
   const log=document.getElementById('midiLog');
-  if(log){log.textContent+=`\n[${new Date().toLocaleTimeString()}] Ch${ch+1} ${type.toString(16)} ${d1} ${d2}`;log.scrollTop=log.scrollHeight;}
+  if(log){
+    // Bound the log so the DOM text node doesn't grow indefinitely over long sets
+    if(log.textContent.length>8000)log.textContent=log.textContent.slice(-4000);
+    log.textContent+=`\n[${new Date().toLocaleTimeString()}] Ch${ch+1} ${type.toString(16)} ${d1} ${d2}`;
+    log.scrollTop=log.scrollHeight;
+  }
 
-  // MIDI Learn mode - capture this control
+  // MIDI Learn mode — capture this control
   if(midiLearnMode&&(type===0xB0||(type===0x90&&d2>0))){
     completeMidiLearn(midiKey);
     return;
   }
 
-  // User mappings
+  // User / preset mappings
   if(midiMappings[midiKey]){
     const m=midiMappings[midiKey];
     const v=d2/127;
     if(m.target.startsWith('knob:')){
       const knobId=m.target.slice(5);
       applyKnob(knobId,v*2-1);
+      // Visually rotate the knob element too
+      const knob=document.querySelector(`.knob[data-knob="${knobId}"]`);
+      if(knob){const ind=knob.querySelector('.knob-indicator');knob._rot=(v*2-1)*135;if(ind)ind.style.transform=`rotate(${knob._rot}deg)`;}
     }else if(m.target.startsWith('btn:')){
       if(type===0x90&&d2>0){
         const el=document.querySelector(m.target.slice(4));
@@ -11826,29 +12042,53 @@ function handleMIDI(msg){
       }
     }else if(m.target.startsWith('fader:')){
       const deck=m.target.slice(6);
-      decks[deck].volume=v;
-      if(decks[deck].volumeGain)decks[deck].volumeGain.gain.value=v;
-      applyCrossfader();
+      if(decks[deck]){
+        decks[deck].volume=v;
+        if(decks[deck].volumeGain)decks[deck].volumeGain.gain.value=v;
+        // Update the per-channel DJ focus slider if visible
+        const ds=document.querySelector(`[data-djfv-slider="${deck}"]`);
+        if(ds){ds.value=Math.round(v*100);const dv=document.querySelector(`[data-djfv-value="${deck}"]`);if(dv)dv.textContent=Math.round(v*100);}
+        applyCrossfader();
+      }
     }else if(m.target==='crossfader'){
       mixerState.crossfader=v;
       const xh=document.getElementById('xfaderHandle');if(xh)xh.style.left=`${v*100}%`;
       applyCrossfader();
+    }else if(m.target.startsWith('tempo:')){
+      const deck=m.target.slice(6);
+      if(decks[deck]){
+        const range=decks[deck].tempoRange||8;
+        setTempo(deck,(v*2-1)*range);
+      }
     }
     return;
   }
 
-  // Default mappings fallback
+  // Default mappings fallback — sensible out-of-the-box behaviour for a
+  // freshly-plugged controller with no preset loaded. Covers both decks.
   if(type===0xB0){
     const v=d2/127;
-    if(d1>=1&&d1<=4){
+    // CC 1-4 on ch 1 → deck A low/mid/hi/trim
+    if(ch===0&&d1>=1&&d1<=4){
       const names=['low','mid','hi','trim'];
       applyKnob(`${names[d1-1]}-A`,v*2-1);
     }
+    // CC 1-4 on ch 2 → deck B low/mid/hi/trim
+    else if(ch===1&&d1>=1&&d1<=4){
+      const names=['low','mid','hi','trim'];
+      applyKnob(`${names[d1-1]}-B`,v*2-1);
+    }
+    // CC 7 = channel volume (standard MIDI spec) per channel
+    else if(d1===7&&(ch===0||ch===1)){
+      const deck=ch===0?'A':'B';
+      if(decks[deck]){decks[deck].volume=v;if(decks[deck].volumeGain)decks[deck].volumeGain.gain.value=v;applyCrossfader();}
+    }
   }
   if(type===0x90&&d2>0){
+    // Notes 36-43 on ch 1 → deck A hot cues; ch 2 → deck B
     if(d1>=36&&d1<=43){
-      const btn=document.querySelector(`.hot-cues[data-deck="A"] .cue-btn[data-cue="${d1-35}"]`);
-      if(btn)btn.click();
+      const deck=ch===0?'A':ch===1?'B':null;
+      if(deck){const btn=document.querySelector(`.hot-cues[data-deck="${deck}"] .cue-btn[data-cue="${d1-35}"]`);if(btn)btn.click();}
     }
   }
 }
