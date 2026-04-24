@@ -14432,7 +14432,7 @@ function attachEvents(){
     sl.addEventListener('input',e=>{
       const d=sl.dataset.compactVol;const v=parseInt(e.target.value)/100;
       decks[d].volume=v;
-      if(decks[d].volumeGain)decks[d].volumeGain.gain.value=v;
+      if(decks[d].volumeGain)_rampGain(decks[d].volumeGain.gain,_djFaderTaper(v),audioCtx,0.012);
       applyCrossfader();
     });
   });
@@ -19603,7 +19603,7 @@ function renderMixerCompactDecks(){
       </div>
       <div class="compact-vol">
         <span class="compact-vol-label">VOL</span>
-        <input type="range" min="0" max="100" value="${Math.round((decks[cd]?.volume||0.8)*100)}" data-compact-vol="${cd}" />
+        <input type="range" min="0" max="100" value="${Math.round((decks[cd]?.volume??0)*100)}" data-compact-vol="${cd}" />
       </div>
       <div class="compact-vol">
         <span class="compact-vol-label">FOCUS</span>
@@ -19656,8 +19656,9 @@ function setDjFocusVolume(d,v){
   if(!decks[d])return;
   decks[d].volume=v;
   if(decks[d].volumeGain&&typeof audioCtx!=='undefined'&&audioCtx){
-    try{decks[d].volumeGain.gain.setTargetAtTime(v,audioCtx.currentTime,0.015);}
-    catch(e){decks[d].volumeGain.gain.value=v;}
+    const target=(typeof _djFaderTaper==='function')?_djFaderTaper(v):v;
+    try{decks[d].volumeGain.gain.setTargetAtTime(target,audioCtx.currentTime,0.012);}
+    catch(e){decks[d].volumeGain.gain.value=target;}
   }
   refreshDjFocusVolumeUI(d);
   const fader=document.getElementById('fader-'+d);
@@ -19667,7 +19668,7 @@ function setDjFocusVolume(d,v){
 function refreshDjFocusVolumeUI(d){
   const strip=document.querySelector(`.dj-focus-vol[data-deck="${d}"]`);
   if(!strip)return;
-  const v=decks[d]?.volume??0.8;
+  const v=decks[d]?.volume??0;
   const pct=Math.round(v*100);
   const sl=strip.querySelector('[data-djfv-slider]');
   if(sl&&document.activeElement!==sl)sl.value=pct;
@@ -21794,7 +21795,12 @@ document.addEventListener('DOMContentLoaded',()=>{
     }
     d.source=src;d.startTime=audioCtx.currentTime;d.playing=true;d._manualStop=false;
     if(d.volumeGain){
-      const target=d.volume!=null?d.volume:0.8;
+      // Apply the perceptual taper so play-in matches what the mixer
+      // fader is actually showing.  d.volume === 0 → target = 0 → the
+      // deck stays silent until the user brings the fader up.  No more
+      // "fader at bottom but deck makes sound on play".
+      const rawV=(d.volume!=null)?d.volume:0;
+      const target=(typeof _djFaderTaper==='function')?_djFaderTaper(rawV):rawV;
       const now=audioCtx.currentTime;
       try{
         d.volumeGain.gain.cancelScheduledValues(now);
