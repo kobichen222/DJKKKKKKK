@@ -19056,23 +19056,12 @@ function init(){
   setTimeout(()=>{try{spStartTour(false);}catch(e){console.warn('tour failed',e);}},1100);
   setupWaveformInteraction();setupAdvancedFeatures();renderSessions();
   renderSampler();renderPlaylists();
-  // First-run: fill all 4 sampler banks with the factory sounds so every
-  // pad is already "loaded" and lit on first open.
-  (function spSeedFactoryOnce(){
-    try{
-      const allEmpty=samplerBanks.every(b=>!b.some(Boolean));
-      if(allEmpty){
-        const seed=()=>{try{loadDefaultSamples();}catch(e){console.warn('factory seed failed',e)}};
-        if(typeof audioCtx!=='undefined'&&audioCtx){seed();}
-        else{
-          // audioCtx only exists after user gesture; seed on first interaction
-          const once=()=>{seed();window.removeEventListener('pointerdown',once,true);window.removeEventListener('keydown',once,true)};
-          window.addEventListener('pointerdown',once,true);
-          window.addEventListener('keydown',once,true);
-        }
-      }
-    }catch(e){console.warn(e)}
-  })();
+  // Factory-seed of 64 sampler sounds disabled on boot per user request:
+  // synthesising every drum / bass / FX / loop buffer at startup pushed
+  // hundreds of AudioBuffer allocations onto the main thread and slowed
+  // the first-paint.  The sampler now starts empty (pads unlit) and the
+  // user loads the factory set on demand via the "LOAD DEFAULTS" button
+  // inside the SAMPLER tab.
 
   // Demo tracks
   if(!library.length){
