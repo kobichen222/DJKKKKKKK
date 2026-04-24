@@ -3925,31 +3925,257 @@ body.work-mode .dsb-wmexit{display:inline-flex;background:linear-gradient(180deg
   color:rgba(255,255,255,.25);
 }
 
-/* ANALOG VU — large SVG with moving needle, gradient arc, peak hold dot */
-.amp-vu-wrap{display:flex;flex-direction:column;gap:6px;justify-content:center}
-.amp-vu{
-  width:100%;max-width:440px;aspect-ratio:2.4/1;
-  background:
-    radial-gradient(ellipse at 50% 130%, rgba(255,180,80,.08) 0%, transparent 60%),
-    linear-gradient(180deg,#f3e8c8 0%,#e4d4a4 35%,#c9b682 100%);
-  border:1px solid #6a5a2a;border-radius:8px;
+/* ═══════ DIGITAL PRECISION METERING — UAD / iZotope aesthetic ═══════
+   Dark matte chassis, 48-segment colour-graded LED ladders, peak-hold
+   indicators that hang + fall, K-weighted reference lines, massive
+   numeric LED read-out. No paper, no paint, no brass. This is the
+   look of a plug-in that costs $400 and ships in every pro studio. */
+.amp-digital{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+  padding:12px;
+  background:linear-gradient(180deg,#0d0d10,#050507);
+  border:1px solid #1a1a1c;border-radius:10px;
   box-shadow:
-    inset 0 2px 6px rgba(255,255,255,.5),
-    inset 0 -4px 10px rgba(90,60,20,.35),
-    inset 0 0 0 3px #0a0a0b,
-    0 6px 16px rgba(0,0,0,.65);
+    inset 0 1px 0 rgba(255,255,255,.03),
+    inset 0 0 30px rgba(0,0,0,.7),
+    0 6px 18px rgba(0,0,0,.7);
+}
+.amp-dm-col{
+  display:grid;
+  grid-template-rows:auto 1fr auto auto;
+  gap:6px;min-height:240px;
+  padding:8px;
+  background:linear-gradient(180deg,#050506,#020203);
+  border:1px solid #141418;border-radius:6px;
+  box-shadow:
+    inset 0 0 14px rgba(0,0,0,.95),
+    inset 0 1px 0 rgba(255,255,255,.04);
+  position:relative;
+}
+.amp-dm-head{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:3px 6px;border-bottom:1px dashed rgba(46,224,255,.15);
+}
+.amp-dm-label{
+  font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:3px;
+  color:#2ee0ff;font-weight:800;
+  text-shadow:0 0 4px rgba(46,224,255,.5);
+}
+.amp-dm-hold{
+  font-family:'Share Tech Mono',monospace;font-size:10px;
+  color:#7a7a80;letter-spacing:1px;
+}
+.amp-dm-hold b{color:#ffb040;font-weight:700}
+
+.amp-dm-body{
+  display:grid;grid-template-columns:28px 1fr 12px;gap:3px;
+  padding:4px 2px;min-height:180px;
+}
+.amp-dm-scale{
+  display:flex;flex-direction:column;justify-content:space-between;
+  font-family:'Share Tech Mono',monospace;font-size:8px;color:#3a3a42;
+  letter-spacing:.5px;text-align:right;padding:1px 3px 1px 0;
+  border-right:1px solid rgba(255,255,255,.03);
+}
+.amp-dm-scale span{line-height:1}
+.amp-dm-scale span.zero{color:#ff6060;font-weight:700}
+.amp-dm-scale span.minus6{color:#ffb040;font-weight:700}
+.amp-dm-scale span.minus18{color:#60ff90;font-weight:700}
+
+.amp-dm-ladder{
+  display:flex;flex-direction:column-reverse;
+  gap:1px;padding:1px;
+  background:#010203;border:1px solid #0a0a0b;border-radius:2px;
+  box-shadow:inset 0 0 8px rgba(0,0,0,.95);
   position:relative;overflow:hidden;
 }
-.amp-vu svg{width:100%;height:100%;display:block}
+.amp-dm-seg{
+  flex:1;min-height:2px;border-radius:0.5px;
+  background:#061014;
+  transition:background .03s,box-shadow .03s;
+}
+/* Lit segments — colour depends on position (set via data-zone) */
+.amp-dm-seg.on.g{background:#28e070;box-shadow:0 0 3px rgba(40,224,112,.8),inset 0 0 1px rgba(255,255,255,.2)}
+.amp-dm-seg.on.y{background:#f0d020;box-shadow:0 0 3px rgba(240,208,32,.85),inset 0 0 1px rgba(255,255,255,.25)}
+.amp-dm-seg.on.o{background:#ff8010;box-shadow:0 0 4px rgba(255,128,16,.9),inset 0 0 1px rgba(255,255,255,.3)}
+.amp-dm-seg.on.r{background:#ff2020;box-shadow:0 0 5px rgba(255,32,32,1),inset 0 0 1px rgba(255,255,255,.35)}
+/* Peak-hold segment — single bright dash that hangs at the peak */
+.amp-dm-seg.hold{
+  background:#ffffff !important;
+  box-shadow:0 0 6px rgba(255,255,255,.95),0 0 2px #fff !important;
+}
+.amp-dm-seg.hold.clip{
+  background:#ff2020 !important;
+  box-shadow:0 0 10px rgba(255,32,32,1),0 0 2px #fff !important;
+}
+
+.amp-dm-gridlines{
+  position:absolute;inset:0;pointer-events:none;z-index:2;
+  background:
+    linear-gradient(to bottom,
+      transparent 0%,
+      rgba(255,32,32,.18) 4.7%,    /* 0 dB */
+      transparent 4.8%,transparent 14.2%,
+      rgba(255,176,64,.12) 14.3%,  /* -6 dB */
+      transparent 14.4%,transparent 28.5%,
+      rgba(96,255,144,.1) 28.6%,   /* -18 dB */
+      transparent 28.7%);
+}
+
+.amp-dm-numeric{
+  font-family:'Orbitron',sans-serif;font-size:30px;font-weight:900;
+  letter-spacing:2px;line-height:1;text-align:center;
+  padding:8px 4px 4px;
+  color:#2ee0ff;
+  text-shadow:
+    0 0 8px rgba(46,224,255,.7),
+    0 0 2px rgba(46,224,255,1);
+  font-variant-numeric:tabular-nums;
+  background:linear-gradient(180deg,#020608,#000);
+  border:1px solid #1a2a30;border-radius:4px;
+  box-shadow:inset 0 0 12px rgba(0,0,0,.9),inset 0 1px 0 rgba(46,224,255,.08);
+}
+.amp-dm-numeric.warn{color:#ffb040;text-shadow:0 0 8px rgba(255,176,64,.7)}
+.amp-dm-numeric.clip{color:#ff4040;text-shadow:0 0 10px rgba(255,64,64,.9),0 0 2px #fff}
+.amp-dm-unit{
+  font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:3px;
+  color:#5a5a60;text-align:center;font-weight:700;
+  padding-bottom:2px;
+}
+
+/* Chip label strip at the top-right of the whole digital block */
+.amp-digital::before{
+  content:'DIGITAL PRECISION METERING · 48 SEG · PEAK+HOLD';
+  position:absolute;top:-1px;right:10px;
+  font-family:'Orbitron',sans-serif;font-size:7px;letter-spacing:3px;
+  color:rgba(46,224,255,.4);font-weight:700;
+  transform:translateY(-50%);
+  background:#0d0d10;padding:0 6px;
+}
+.amp-digital{position:relative}
+
+/* Legacy analog VU CSS kept below so the JS that touches amp-vu-* ids
+   is still valid even after the swap; the SVG elements have been
+   removed from the DOM, so these rules only paint if something opts in. */
+.amp-vu-wrap{display:flex;flex-direction:column;gap:10px;justify-content:center}
+.amp-vu{
+  width:100%;max-width:460px;aspect-ratio:2.4/1;
+  /* The outer "brass bezel" — two gradients stacked give the illusion
+     of polished metal with four subtle highlights at the corners */
+  background:
+    /* Top-left brass highlight */
+    radial-gradient(circle at 10% 10%, rgba(255,235,180,.55), transparent 40%),
+    /* Bottom-right darker brass */
+    radial-gradient(circle at 90% 90%, rgba(80,50,10,.45), transparent 45%),
+    /* Overall brass body */
+    linear-gradient(145deg,#d4a849 0%,#b58630 35%,#8a6420 65%,#5a3f12 100%);
+  border-radius:12px;
+  box-shadow:
+    /* Outer drop shadow — sits on a dark surface */
+    0 10px 26px rgba(0,0,0,.85),
+    0 2px 4px rgba(0,0,0,.6),
+    /* Brass rim highlight */
+    inset 0 1px 0 rgba(255,245,210,.6),
+    inset 0 -1px 0 rgba(40,20,0,.8),
+    /* Inner black gasket where the glass sits in the bezel */
+    inset 0 0 0 4px #0a0a0b,
+    inset 0 0 0 5px rgba(255,220,160,.15);
+  position:relative;overflow:hidden;
+}
+/* Corner screws — 4 tiny Phillips-head indentations */
+.amp-vu::before,
+.amp-vu::after{
+  content:'';position:absolute;width:8px;height:8px;border-radius:50%;
+  background:
+    /* Brass head with a subtle slot */
+    linear-gradient(180deg,transparent 40%,rgba(0,0,0,.4) 44%,rgba(0,0,0,.4) 56%,transparent 60%),
+    radial-gradient(circle at 35% 30%,#f0dca0 0%,#b0832a 40%,#3a1c04 100%);
+  box-shadow:
+    inset 0 0 0 1px #0a0400,
+    0 1px 2px rgba(0,0,0,.7),
+    0 0 0 1px rgba(255,235,180,.2);
+  z-index:5;
+}
+.amp-vu::before{top:8px;left:10px}
+.amp-vu::after{top:8px;right:10px}
+/* Bottom-corner screws, via a small extra pseudo on .amp-vu-dial */
+.amp-vu-dial::before,
+.amp-vu-dial::after{
+  content:'';position:absolute;width:8px;height:8px;border-radius:50%;
+  background:
+    linear-gradient(180deg,transparent 40%,rgba(0,0,0,.4) 44%,rgba(0,0,0,.4) 56%,transparent 60%),
+    radial-gradient(circle at 35% 30%,#f0dca0 0%,#b0832a 40%,#3a1c04 100%);
+  box-shadow:
+    inset 0 0 0 1px #0a0400,
+    0 1px 2px rgba(0,0,0,.7),
+    0 0 0 1px rgba(255,235,180,.2);
+  z-index:5;bottom:-6px;
+}
+.amp-vu-dial::before{left:-6px}
+.amp-vu-dial::after{right:-6px}
+
+/* R CHANNEL — cooler brass tone so at a glance L and R don't look identical */
+.amp-vu-right{
+  background:
+    radial-gradient(circle at 10% 10%, rgba(220,235,255,.45), transparent 40%),
+    radial-gradient(circle at 90% 90%, rgba(40,40,70,.4), transparent 45%),
+    linear-gradient(145deg,#b8a0d0 0%,#8a7aaa 35%,#5a5080 65%,#2e2a4a 100%) !important;
+}
+.amp-vu-right .amp-vu-dial{
+  background:
+    radial-gradient(ellipse at 50% 120%, rgba(180,160,200,.25) 0%, transparent 55%),
+    repeating-linear-gradient(45deg,rgba(80,70,110,.04) 0 1px,transparent 1px 3px),
+    repeating-linear-gradient(-45deg,rgba(80,70,110,.04) 0 1px,transparent 1px 3px),
+    linear-gradient(180deg,#e8e4f2 0%,#d5ccdf 45%,#afa3bd 100%) !important;
+}
+/* The inner dial "face" — cream with subtle patina */
+.amp-vu-dial{
+  position:absolute;inset:14px 12px 12px;
+  border-radius:6px;overflow:hidden;
+  background:
+    /* soft radial vignette for aged paper feel */
+    radial-gradient(ellipse at 50% 120%, rgba(220,180,120,.35) 0%, transparent 55%),
+    /* tiny grid of bumps — subtle paper texture */
+    repeating-linear-gradient(45deg,rgba(160,120,60,.04) 0 1px,transparent 1px 3px),
+    repeating-linear-gradient(-45deg,rgba(160,120,60,.04) 0 1px,transparent 1px 3px),
+    /* main cream paper gradient */
+    linear-gradient(180deg,#fbf0cc 0%,#f3e4b0 45%,#ddc280 100%);
+  box-shadow:
+    inset 0 3px 6px rgba(255,255,255,.55),
+    inset 0 -6px 12px rgba(130,80,20,.4),
+    inset 0 0 0 1px rgba(60,30,0,.4);
+}
+.amp-vu svg{width:100%;height:100%;display:block;position:relative;z-index:2}
+/* Glass dome — a curved highlight across the top-front of the meter,
+   the thing that actually makes it "feel" like real glass */
+.amp-vu-glass{
+  position:absolute;inset:14px 12px 12px;border-radius:6px;
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,.28) 0%,
+      rgba(255,255,255,.12) 18%,
+      rgba(255,255,255,.02) 38%,
+      transparent 55%);
+  pointer-events:none;z-index:3;
+  /* Flick-light streak on the top-right, mimicking a ceiling spot */
+  box-shadow:inset 30px 8px 40px -18px rgba(255,255,255,.35);
+}
 .amp-vu-label{
-  position:absolute;top:6px;left:50%;transform:translateX(-50%);
-  font-family:'Orbitron',sans-serif;font-size:8px;letter-spacing:3px;color:#4a3a1a;
-  opacity:.7;
+  position:absolute;top:10px;left:50%;transform:translateX(-50%);
+  font-family:'Orbitron',sans-serif;font-size:7px;letter-spacing:4px;color:#3a2810;
+  opacity:.55;z-index:4;
+  text-shadow:0 1px 0 rgba(255,255,255,.3);
 }
 .amp-vu-ch{
-  position:absolute;bottom:4px;right:8px;
-  font-family:'Orbitron',sans-serif;font-size:10px;font-weight:800;letter-spacing:2px;color:#2a1a08;
+  position:absolute;bottom:10px;right:16px;z-index:4;
+  font-family:'Orbitron',sans-serif;font-size:11px;font-weight:900;letter-spacing:3px;
+  color:#1a0f04;
+  text-shadow:0 1px 0 rgba(255,255,255,.4),0 -1px 0 rgba(0,0,0,.2);
+  opacity:.7;
 }
+/* Manufacturer / model tag at bottom-center — pure vintage-amp flavour */
+.amp-vu-wrap .amp-vu::before,
+.amp-vu-wrap .amp-vu::after{z-index:4}
 
 /* PPM segmented LED ladders */
 .amp-ppm-col{display:flex;flex-direction:column;gap:4px;justify-content:center;min-width:68px}
@@ -8190,6 +8416,7 @@ body.theme-light .cdj .cue-btn{
 
 <div class="main-tabs">
 <button class="tab-btn active" data-tab="deck" data-t="tab_decks">◉ DECKS</button>
+<button class="tab-btn learn-tab-btn" data-tab="learn" data-t="tab_learn" style="background:linear-gradient(180deg,rgba(92,240,160,.18),rgba(92,240,160,.04));color:#5cf0a0;border:1px solid rgba(92,240,160,.45)">🎓 LEARN</button>
 <button class="tab-btn" data-tab="vinyl" data-t="tab_vinyl">💿 VINYL</button>
 <button class="tab-btn" data-tab="sampler" data-t="tab_sampler">▣ SAMPLER</button>
 <button class="tab-btn" data-tab="playlists" data-t="tab_playlists">≡ PLAYLISTS</button>
@@ -8390,10 +8617,76 @@ body.theme-light .cdj .cue-btn{
   </div>
   <div class="disc-results" id="discoverResults"></div>
 </div>
+
+<!-- CRATES BAR — user-defined + smart crates, chip row above the track list -->
+<div id="cratesBar" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 4px;margin-bottom:8px;border-bottom:1px solid rgba(255,255,255,.04)">
+  <span style="font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:2px;color:var(--text-dim);font-weight:700;margin-right:4px">CRATES</span>
+  <button class="crate-chip active" data-crate-id="__all__" style="padding:4px 10px;background:linear-gradient(180deg,var(--orange),#c85a00);color:#000;border:none;border-radius:3px;font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:1px;font-weight:700;cursor:pointer">ALL</button>
+  <span id="cratesChips" style="display:contents"></span>
+  <button id="newCrateBtn" class="tool-btn" style="padding:4px 10px;font-size:10px;color:var(--play-green);border-color:var(--play-green)">+ NEW CRATE</button>
+  <button id="smartCrateBtn" class="tool-btn" style="padding:4px 10px;font-size:10px;color:var(--screen-glow);border-color:var(--screen-glow)">⚡ SMART</button>
+</div>
+
 <div class="track-list-header"><span>#</span><span>TITLE</span><span class="th-artist">ARTIST</span><span class="th-bpm">BPM</span><span class="th-key">KEY</span><span class="th-rating">RATING</span><span class="th-actions">ACTIONS</span></div>
 <div class="track-list" id="trackList"></div>
 </div>
 </div>
+
+<!-- ========== LEARN TAB — interactive DJ lessons ========== -->
+<div class="tab-content" id="tab-learn">
+<div class="settings-panel learn-panel" style="max-width:1400px;padding:0;background:none;border:none;box-shadow:none">
+
+  <!-- Hero / course overview -->
+  <div id="learnHero" style="background:linear-gradient(135deg,#0a1a12 0%,#061812 60%,#020a06 100%);border:1px solid rgba(92,240,160,.25);border-radius:14px;padding:22px 28px;margin-bottom:14px;position:relative;overflow:hidden">
+    <div style="position:absolute;top:-30%;right:-10%;width:50%;height:180%;background:radial-gradient(ellipse at center,rgba(92,240,160,.08),transparent 60%);pointer-events:none"></div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;position:relative">
+      <div style="flex:1;min-width:280px">
+        <div style="font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:3px;color:#5cf0a0;font-weight:700;margin-bottom:6px">🎓 TITAN ACADEMY</div>
+        <h2 style="font-family:'Orbitron',sans-serif;font-size:28px;font-weight:800;letter-spacing:1px;color:#fff;margin-bottom:8px;line-height:1.1">Become a DJ in your browser.</h2>
+        <p style="font-size:14px;line-height:1.6;color:#9ad8b0;max-width:640px">No turntables. No software to install. No party pressure. Just short, hands-on lessons that walk you through every move a real DJ makes — starting with your very first play button.</p>
+      </div>
+      <div id="learnProgressCard" style="background:#02080c;border:1px solid rgba(92,240,160,.2);border-radius:10px;padding:14px 18px;min-width:200px;text-align:center">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;color:#7a7a80;margin-bottom:4px">YOUR PROGRESS</div>
+        <div style="font-family:'Orbitron',sans-serif;font-size:32px;font-weight:800;color:#5cf0a0;text-shadow:0 0 12px rgba(92,240,160,.5);line-height:1"><span id="learnPctDone">0</span>%</div>
+        <div style="height:6px;background:#020a08;border-radius:3px;margin-top:8px;overflow:hidden;border:1px solid rgba(92,240,160,.15)">
+          <div id="learnProgressBar" style="height:100%;background:linear-gradient(90deg,#5cf0a0,#00d074);width:0%;transition:width .4s ease"></div>
+        </div>
+        <div id="learnXpLine" style="font-family:'Share Tech Mono',monospace;font-size:10px;color:#7a7a80;margin-top:6px"><span id="learnCompleted">0</span> / <span id="learnTotal">0</span> lessons · <span id="learnXp">0</span> XP</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Difficulty filter -->
+  <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
+    <span style="font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:2px;color:var(--text-dim);font-weight:700;margin-right:4px">LEVEL</span>
+    <button class="learn-level-btn active" data-level="all" style="padding:6px 14px;background:linear-gradient(180deg,#5cf0a0,#00a858);color:#000;border:none;border-radius:4px;font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:1.5px;font-weight:700;cursor:pointer">ALL</button>
+    <button class="learn-level-btn" data-level="beginner" style="padding:6px 14px;background:#0a1a12;color:#9ad8b0;border:1px solid rgba(92,240,160,.3);border-radius:4px;font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:1.5px;font-weight:700;cursor:pointer">BEGINNER</button>
+    <button class="learn-level-btn" data-level="intermediate" style="padding:6px 14px;background:#141418;color:#ffd28a;border:1px solid rgba(255,170,90,.3);border-radius:4px;font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:1.5px;font-weight:700;cursor:pointer">INTERMEDIATE</button>
+    <button class="learn-level-btn" data-level="advanced" style="padding:6px 14px;background:#141418;color:#ff90a0;border:1px solid rgba(255,90,120,.3);border-radius:4px;font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:1.5px;font-weight:700;cursor:pointer">ADVANCED</button>
+    <button id="learnResetBtn" class="tool-btn" style="padding:6px 12px;font-size:10px;margin-left:auto;color:var(--red);border-color:var(--red)">RESET PROGRESS</button>
+  </div>
+
+  <!-- Lesson grid -->
+  <div id="learnLessonGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px"></div>
+
+  <!-- Active lesson overlay — shown while a lesson is running -->
+  <div id="learnActiveLesson" style="display:none;position:fixed;bottom:16px;right:16px;max-width:380px;background:linear-gradient(135deg,#02120a 0%,#000 100%);border:2px solid #5cf0a0;border-radius:12px;padding:16px 20px;box-shadow:0 12px 40px rgba(0,0,0,.8),0 0 20px rgba(92,240,160,.3);z-index:4000;font-family:'Share Tech Mono',monospace">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <span style="font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:2px;color:#5cf0a0;font-weight:700">🎓 LESSON · STEP <span id="learnStepN">1</span>/<span id="learnStepTotal">1</span></span>
+      <button id="learnCloseBtn" style="background:none;border:none;color:#7a7a80;font-size:18px;cursor:pointer">✕</button>
+    </div>
+    <h3 id="learnActiveTitle" style="font-family:'Orbitron',sans-serif;font-size:16px;color:#fff;margin-bottom:8px;font-weight:800">…</h3>
+    <p id="learnActiveInstruction" style="font-size:13px;line-height:1.6;color:#cfe6d8;margin-bottom:14px">…</p>
+    <div style="display:flex;gap:8px;justify-content:flex-end;align-items:center">
+      <span id="learnActiveHint" style="flex:1;color:#7a9a88;font-size:11px"></span>
+      <button id="learnSkipBtn" class="tool-btn" style="padding:5px 10px;font-size:10px;color:var(--text-dim);border-color:#333">SKIP</button>
+      <button id="learnNextBtn" class="tool-btn" style="padding:5px 14px;font-size:10px;color:#5cf0a0;border-color:#5cf0a0">NEXT ▸</button>
+    </div>
+  </div>
+
+</div>
+</div>
+<!-- ========== /LEARN TAB ========== -->
 
 <div class="tab-content" id="tab-vinyl">
 <div class="vinyl-stage">
@@ -8868,66 +9161,299 @@ No mappings yet. Pick a preset above or right-click any control → MIDI Learn.
 
 <!-- AMPLIFIER METERING BRIDGE — analog VU + PPM + goniometer + phase + LUFS -->
 <div class="amp-bridge">
-  <div class="amp-vu-wrap">
-    <div class="amp-vu" id="ampVuL">
-      <span class="amp-vu-label">VU · −20 ← 0 → +3</span>
-      <span class="amp-vu-ch">L</span>
-      <svg viewBox="0 0 400 170" preserveAspectRatio="xMidYMid meet">
-        <defs>
-          <linearGradient id="vuArcGrad" x1="0" x2="1" y1="0" y2="0">
-            <stop offset="0" stop-color="#1a1a1c"/>
-            <stop offset="0.55" stop-color="#3a2a1a"/>
-            <stop offset="0.7" stop-color="#7a5a1a"/>
-            <stop offset="0.85" stop-color="#b03a1a"/>
-            <stop offset="1" stop-color="#d8201a"/>
-          </linearGradient>
-        </defs>
-        <!-- Scale arc -->
-        <path d="M 30 155 A 170 170 0 0 1 370 155" fill="none" stroke="url(#vuArcGrad)" stroke-width="4" opacity="0.9"/>
-        <!-- Tick marks -->
-        <g stroke="#3a2a0a" stroke-width="1.2" fill="#3a2a0a" font-family="Orbitron,sans-serif" font-size="11" font-weight="700" text-anchor="middle">
-          <line x1="30" y1="150" x2="36" y2="135"/><text x="36" y="128">-20</text>
-          <line x1="80" y1="110" x2="84" y2="97"/><text x="84" y="90">-10</text>
-          <line x1="140" y1="78" x2="142" y2="64"/><text x="142" y="56">-5</text>
-          <line x1="200" y1="68" x2="200" y2="52"/><text x="200" y="44" fill="#2a1a04" font-size="13">0</text>
-          <line x1="260" y1="78" x2="258" y2="64"/><text x="258" y="56" fill="#b0202a">+3</text>
-          <line x1="320" y1="110" x2="316" y2="97" stroke="#b0202a" fill="#b0202a"/><text x="316" y="90" fill="#b0202a">+6</text>
-          <line x1="370" y1="150" x2="364" y2="135" stroke="#d8201a" fill="#d8201a"/>
-        </g>
-        <!-- Needle (pivoted at (200,155), rotated by JS) -->
-        <g id="ampVuNeedleL" transform="rotate(-45 200 155)">
-          <line x1="200" y1="155" x2="200" y2="45" stroke="#1a1a1c" stroke-width="2.2" stroke-linecap="round"/>
-          <circle cx="200" cy="45" r="3" fill="#1a1a1c"/>
-        </g>
-        <!-- Pivot hub -->
-        <circle cx="200" cy="155" r="8" fill="#2a2a2e" stroke="#0a0a0b" stroke-width="1"/>
-        <circle cx="200" cy="155" r="3" fill="#0a0a0b"/>
-        <!-- Peak-hold dot -->
-        <circle id="ampVuPeakL" cx="200" cy="50" r="2.5" fill="#d8201a" opacity="0"/>
-      </svg>
+  <div class="amp-digital" style="max-width:480px">
+    <!-- L CHANNEL -->
+    <div class="amp-dm-col">
+      <div class="amp-dm-head">
+        <span class="amp-dm-label">LEFT</span>
+        <span class="amp-dm-hold">HOLD <b id="ampDmHoldL">-∞</b></span>
+      </div>
+      <div class="amp-dm-body">
+        <div class="amp-dm-scale">
+          <span>+3</span><span class="zero">0</span><span>-3</span><span class="minus6">-6</span>
+          <span>-12</span><span class="minus18">-18</span><span>-30</span><span>-45</span><span>-60</span>
+        </div>
+        <div class="amp-dm-ladder" id="ampDmLadderL">
+          <div class="amp-dm-gridlines"></div>
+        </div>
+        <div style="display:flex;flex-direction:column;justify-content:space-between;padding:1px 0">
+          <!-- Right-side mini tick strip -->
+          <span style="width:6px;height:1px;background:rgba(255,255,255,.15)"></span>
+          <span style="width:6px;height:1px;background:rgba(255,255,255,.15)"></span>
+          <span style="width:6px;height:1px;background:rgba(255,255,255,.15)"></span>
+          <span style="width:6px;height:1px;background:rgba(255,255,255,.15)"></span>
+          <span style="width:6px;height:1px;background:rgba(255,255,255,.15)"></span>
+        </div>
+      </div>
+      <div class="amp-dm-numeric" id="ampDmNumL">-∞</div>
+      <div class="amp-dm-unit">dBFS · L · PEAK</div>
     </div>
-    <div class="amp-vu" id="ampVuR">
-      <span class="amp-vu-label">VU · −20 ← 0 → +3</span>
-      <span class="amp-vu-ch">R</span>
-      <svg viewBox="0 0 400 170" preserveAspectRatio="xMidYMid meet">
-        <path d="M 30 155 A 170 170 0 0 1 370 155" fill="none" stroke="url(#vuArcGrad)" stroke-width="4" opacity="0.9"/>
-        <g stroke="#3a2a0a" stroke-width="1.2" fill="#3a2a0a" font-family="Orbitron,sans-serif" font-size="11" font-weight="700" text-anchor="middle">
-          <line x1="30" y1="150" x2="36" y2="135"/><text x="36" y="128">-20</text>
-          <line x1="80" y1="110" x2="84" y2="97"/><text x="84" y="90">-10</text>
-          <line x1="140" y1="78" x2="142" y2="64"/><text x="142" y="56">-5</text>
-          <line x1="200" y1="68" x2="200" y2="52"/><text x="200" y="44" fill="#2a1a04" font-size="13">0</text>
-          <line x1="260" y1="78" x2="258" y2="64"/><text x="258" y="56" fill="#b0202a">+3</text>
-          <line x1="320" y1="110" x2="316" y2="97" stroke="#b0202a" fill="#b0202a"/><text x="316" y="90" fill="#b0202a">+6</text>
-          <line x1="370" y1="150" x2="364" y2="135" stroke="#d8201a" fill="#d8201a"/>
+
+    <!-- R CHANNEL -->
+    <div class="amp-dm-col">
+      <div class="amp-dm-head">
+        <span class="amp-dm-label">RIGHT</span>
+        <span class="amp-dm-hold">HOLD <b id="ampDmHoldR">-∞</b></span>
+      </div>
+      <div class="amp-dm-body">
+        <div class="amp-dm-scale">
+          <span>+3</span><span class="zero">0</span><span>-3</span><span class="minus6">-6</span>
+          <span>-12</span><span class="minus18">-18</span><span>-30</span><span>-45</span><span>-60</span>
+        </div>
+        <div class="amp-dm-ladder" id="ampDmLadderR">
+          <div class="amp-dm-gridlines"></div>
+        </div>
+        <div style="display:flex;flex-direction:column;justify-content:space-between;padding:1px 0">
+          <span style="width:6px;height:1px;background:rgba(255,255,255,.15)"></span>
+          <span style="width:6px;height:1px;background:rgba(255,255,255,.15)"></span>
+          <span style="width:6px;height:1px;background:rgba(255,255,255,.15)"></span>
+          <span style="width:6px;height:1px;background:rgba(255,255,255,.15)"></span>
+          <span style="width:6px;height:1px;background:rgba(255,255,255,.15)"></span>
+        </div>
+      </div>
+      <div class="amp-dm-numeric" id="ampDmNumR">-∞</div>
+      <div class="amp-dm-unit">dBFS · R · PEAK</div>
+    </div>
+  </div>
+
+  <!-- Legacy analog wrap, kept hidden so JS references don't 404. -->
+  <div class="amp-vu-wrap" style="display:none" aria-hidden="true">
+
+    <!-- L CHANNEL -->
+    <div class="amp-vu" id="ampVuL">
+      <div class="amp-vu-dial"></div>
+      <span class="amp-vu-label">TITAN AUDIO · VU</span>
+      <span class="amp-vu-ch">CH · L</span>
+      <svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <!-- Scale stroke: dark left + red right. Coordinates match the path. -->
+          <linearGradient id="vuArcStroke" x1="0" x2="1" y1="0" y2="0">
+            <stop offset="0" stop-color="#1a0a00"/>
+            <stop offset="0.64" stop-color="#1a0a00"/>
+            <stop offset="0.72" stop-color="#8a2010"/>
+            <stop offset="1" stop-color="#e42818"/>
+          </linearGradient>
+          <!-- Red zone paint behind the arc — fades from clear at 0 to dense at +6 -->
+          <linearGradient id="vuRedZone" x1="0.5" x2="1" y1="0.5" y2="0.5">
+            <stop offset="0" stop-color="rgba(230,40,24,0)"/>
+            <stop offset="0.4" stop-color="rgba(230,40,24,0.12)"/>
+            <stop offset="1" stop-color="rgba(230,40,24,0.28)"/>
+          </linearGradient>
+          <radialGradient id="vuVignetteL" cx="0.5" cy="0.55" r="0.7">
+            <stop offset="0.55" stop-color="rgba(0,0,0,0)"/>
+            <stop offset="1" stop-color="rgba(80,40,0,0.14)"/>
+          </radialGradient>
+          <!-- Needle gets a real SVG drop shadow so it floats above the paper -->
+          <filter id="vuNeedleShadowL" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="1"/>
+            <feOffset dx="0.8" dy="2.2" result="off"/>
+            <feComponentTransfer><feFuncA type="linear" slope="0.5"/></feComponentTransfer>
+            <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <!-- Needle body gradient — darker near the pivot, solid ink at the tip -->
+          <linearGradient id="vuNeedleBody" x1="0" x2="0" y1="1" y2="0">
+            <stop offset="0" stop-color="#2a180a"/>
+            <stop offset="0.2" stop-color="#0a0608"/>
+            <stop offset="1" stop-color="#000"/>
+          </linearGradient>
+          <!-- Brass pivot cap -->
+          <radialGradient id="vuPivotCap" cx="0.35" cy="0.35" r="0.8">
+            <stop offset="0" stop-color="#ffe9a8"/>
+            <stop offset="0.5" stop-color="#b0832a"/>
+            <stop offset="1" stop-color="#3a2408"/>
+          </radialGradient>
+        </defs>
+
+        <!-- Background vignette -->
+        <rect x="0" y="0" width="400" height="200" fill="url(#vuVignetteL)"/>
+
+        <!-- Red zone fill: 0 dB to +6 dB sits right of centre -->
+        <!-- Pivot (200,180), R=150. 0 dB = angle 0 (straight up, y=30).
+             +6 dB = +55°. Pie slice from 0° to +55°. -->
+        <path d="M 200 180 L 200 30 A 150 150 0 0 1 322.9 93.0 Z"
+              fill="url(#vuRedZone)"/>
+
+        <!-- Main arc: -55° at (200-122.9, 93.0) to +55° at (200+122.9, 93.0) -->
+        <path d="M 77.1 93.0 A 150 150 0 0 1 322.9 93.0"
+              fill="none" stroke="url(#vuArcStroke)" stroke-width="2.6"/>
+
+        <!-- Secondary arc shadow (very thin, below the main arc) for depth -->
+        <path d="M 77.1 94.2 A 150 150 0 0 1 322.9 94.2"
+              fill="none" stroke="rgba(60,30,0,0.25)" stroke-width="0.8"/>
+
+        <!-- Major + minor tick marks. Each tick drawn on the arc at angle θ:
+             outer = (200 + 150 sinθ, 180 - 150 cosθ)
+             inner = (200 + R2 sinθ, 180 - R2 cosθ)   R2 = 138 (major) or 143 (minor)
+             Numbers placed at R=128, centered. -->
+        <g stroke="#1a0a00" fill="#1a0a00" font-family="'Orbitron',sans-serif" font-weight="800" text-anchor="middle">
+          <!-- Minor ticks every 1 dB between major marks (computed positions) -->
+          <g stroke-width="0.9" opacity="0.55">
+            <!-- -18 to -11 (between -20 and -10) -->
+            <line x1="78.8" y1="106.7" x2="83.9" y2="108.0"/>
+            <line x1="81.6" y1="120.2" x2="86.6" y2="121.2"/>
+            <line x1="86.2" y1="132.1" x2="91.0" y2="130.8"/>
+            <line x1="92.4" y1="143.1" x2="96.8" y2="141.3"/>
+            <!-- -8 to -6 (between -10 and -5) -->
+            <line x1="122.7" y1="59.2" x2="127.0" y2="61.6"/>
+            <line x1="133.0" y1="54.9" x2="136.9" y2="58.0"/>
+            <line x1="144.2" y1="52.3" x2="147.6" y2="55.8"/>
+            <!-- -4 to -1 (between -5 and 0) -->
+            <line x1="165.3" y1="48.1" x2="167.2" y2="52.7"/>
+            <line x1="176.0" y1="46.9" x2="177.2" y2="51.7"/>
+            <line x1="186.9" y1="46.0" x2="187.4" y2="51.0"/>
+            <line x1="197.8" y1="45.2" x2="197.8" y2="50.2"/>
+            <!-- +1 to +2 (between 0 and +3) -->
+            <line x1="213.4" y1="46.5" x2="212.9" y2="51.5"/>
+            <line x1="224.2" y1="47.8" x2="223.1" y2="52.7"/>
+            <!-- +4 to +5 (between +3 and +6) -->
+            <line x1="245.0" y1="52.9" x2="242.9" y2="57.6"/>
+            <line x1="255.1" y1="57.3" x2="252.6" y2="61.7"/>
+          </g>
+
+          <!-- Major ticks + numerals. Order: -20 → +6. -->
+          <!-- -20: angle -55°, sin=-0.819, cos=0.574 -->
+          <line x1="77.1" y1="93.0" x2="86.9" y2="100.3" stroke-width="1.8"/>
+          <text x="75" y="82" font-size="11">-20</text>
+
+          <!-- -10: angle -35°, sin=-0.574, cos=0.819 -->
+          <line x1="113.9" y1="57.2" x2="121.3" y2="67.0" stroke-width="1.6"/>
+          <text x="111" y="48" font-size="11">-10</text>
+
+          <!-- -5: angle -20°, sin=-0.342, cos=0.940 -->
+          <line x1="148.7" y1="39.0" x2="152.9" y2="50.3" stroke-width="1.6"/>
+          <text x="148" y="31" font-size="11">-5</text>
+
+          <!-- -3: angle -12°, sin=-0.208, cos=0.978 -->
+          <line x1="168.8" y1="33.3" x2="171.4" y2="45.0" stroke-width="1.4"/>
+          <text x="168" y="24" font-size="9" opacity="0.75">-3</text>
+
+          <!-- 0: angle 0°, sin=0, cos=1 → (200, 30) -->
+          <line x1="200" y1="30" x2="200" y2="42" stroke-width="2.2" stroke="#000"/>
+          <text x="200" y="22" font-size="14" font-weight="900" fill="#000">0</text>
+
+          <!-- +3: angle +21°, sin=0.358, cos=0.934 -->
+          <line x1="253.7" y1="39.9" x2="249.0" y2="51.0" stroke="#a81008" fill="#a81008" stroke-width="1.8"/>
+          <text x="256" y="32" font-size="11" fill="#a81008">+3</text>
+
+          <!-- +6: angle +40°, sin=0.643, cos=0.766 -->
+          <line x1="296.4" y1="65.1" x2="287.4" y2="72.6" stroke="#e42818" fill="#e42818" stroke-width="1.8"/>
+          <text x="303" y="58" font-size="11" fill="#e42818">+6</text>
+
+          <!-- Arc tip +55° -->
+          <line x1="322.9" y1="93.0" x2="313.1" y2="100.3" stroke="#e42818" stroke-width="2"/>
         </g>
-        <g id="ampVuNeedleR" transform="rotate(-45 200 155)">
-          <line x1="200" y1="155" x2="200" y2="45" stroke="#1a1a1c" stroke-width="2.2" stroke-linecap="round"/>
-          <circle cx="200" cy="45" r="3" fill="#1a1a1c"/>
+
+        <!-- Branding line under the scale — small, dim, does NOT overlap the needle path -->
+        <text x="200" y="160" text-anchor="middle" font-family="'Orbitron',sans-serif"
+              font-size="8" letter-spacing="3" fill="rgba(50,25,0,0.35)" font-weight="700">
+          TITAN · PRECISION VU
+        </text>
+
+        <!-- NEEDLE — straight from pivot (200,180) up to (200,40).
+             Length = 140. Rotated by JS around (200,180). -->
+        <g id="ampVuNeedleL" transform="rotate(-55 200 180)" filter="url(#vuNeedleShadowL)">
+          <!-- Tapered needle: 2.2px base, sharp tip -->
+          <polygon points="198.9,180 201.1,180 200.15,42 199.85,42" fill="url(#vuNeedleBody)"/>
+          <!-- Red paint stripe down the needle — classic broadcast detail -->
+          <line x1="200" y1="175" x2="200" y2="60" stroke="#a01808" stroke-width="0.4" opacity="0.6"/>
+          <!-- Counterweight below pivot -->
+          <polygon points="199.4,180 200.6,180 200.4,196 199.6,196" fill="#1a0f04"/>
         </g>
-        <circle cx="200" cy="155" r="8" fill="#2a2a2e" stroke="#0a0a0b" stroke-width="1"/>
-        <circle cx="200" cy="155" r="3" fill="#0a0a0b"/>
-        <circle id="ampVuPeakR" cx="200" cy="50" r="2.5" fill="#d8201a" opacity="0"/>
+
+        <!-- Pivot hub: dark outer ring + brass inner disc + reflection dot. -->
+        <circle cx="200" cy="180" r="10" fill="#0a0402"/>
+        <circle cx="200" cy="180" r="8" fill="url(#vuPivotCap)"/>
+        <circle cx="200" cy="180" r="3.5" fill="#1a0a00"/>
+        <circle cx="198.5" cy="178.5" r="1.2" fill="#ffe9a8" opacity="0.8"/>
+
+        <!-- Peak warning lamp — sits above the "+6" number only, lights red when slammed -->
+        <circle id="ampVuPeakL" cx="300" cy="50" r="4" fill="#ff2010" opacity="0">
+          <animate attributeName="fill-opacity" values="1;0.4;1" dur="0.45s" repeatCount="indefinite"/>
+        </circle>
+        <text x="310" y="54" font-family="'Share Tech Mono',monospace" font-size="8"
+              fill="rgba(180,30,20,0.5)" opacity="0.7">OVER</text>
       </svg>
+      <div class="amp-vu-glass"></div>
+    </div>
+
+    <!-- R CHANNEL — identical geometry, independent needle + peak IDs.
+         Also gets a different subtle tint so the two meters read apart
+         even at silence (blue-tinted brass vs gold-tinted brass). -->
+    <div class="amp-vu amp-vu-right" id="ampVuR">
+      <div class="amp-vu-dial"></div>
+      <span class="amp-vu-label">TITAN AUDIO · VU</span>
+      <span class="amp-vu-ch">CH · R</span>
+      <svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <filter id="vuNeedleShadowR" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="1"/>
+            <feOffset dx="0.8" dy="2.2" result="off"/>
+            <feComponentTransfer><feFuncA type="linear" slope="0.5"/></feComponentTransfer>
+            <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <radialGradient id="vuVignetteR" cx="0.5" cy="0.55" r="0.7">
+            <stop offset="0.55" stop-color="rgba(0,0,0,0)"/>
+            <stop offset="1" stop-color="rgba(80,40,0,0.14)"/>
+          </radialGradient>
+        </defs>
+        <rect x="0" y="0" width="400" height="200" fill="url(#vuVignetteR)"/>
+        <path d="M 200 180 L 200 30 A 150 150 0 0 1 322.9 93.0 Z" fill="url(#vuRedZone)"/>
+        <path d="M 77.1 93.0 A 150 150 0 0 1 322.9 93.0" fill="none" stroke="url(#vuArcStroke)" stroke-width="2.6"/>
+        <path d="M 77.1 94.2 A 150 150 0 0 1 322.9 94.2" fill="none" stroke="rgba(60,30,0,0.25)" stroke-width="0.8"/>
+        <g stroke="#1a0a00" fill="#1a0a00" font-family="'Orbitron',sans-serif" font-weight="800" text-anchor="middle">
+          <g stroke-width="0.9" opacity="0.55">
+            <line x1="78.8" y1="106.7" x2="83.9" y2="108.0"/>
+            <line x1="81.6" y1="120.2" x2="86.6" y2="121.2"/>
+            <line x1="86.2" y1="132.1" x2="91.0" y2="130.8"/>
+            <line x1="92.4" y1="143.1" x2="96.8" y2="141.3"/>
+            <line x1="122.7" y1="59.2" x2="127.0" y2="61.6"/>
+            <line x1="133.0" y1="54.9" x2="136.9" y2="58.0"/>
+            <line x1="144.2" y1="52.3" x2="147.6" y2="55.8"/>
+            <line x1="165.3" y1="48.1" x2="167.2" y2="52.7"/>
+            <line x1="176.0" y1="46.9" x2="177.2" y2="51.7"/>
+            <line x1="186.9" y1="46.0" x2="187.4" y2="51.0"/>
+            <line x1="197.8" y1="45.2" x2="197.8" y2="50.2"/>
+            <line x1="213.4" y1="46.5" x2="212.9" y2="51.5"/>
+            <line x1="224.2" y1="47.8" x2="223.1" y2="52.7"/>
+            <line x1="245.0" y1="52.9" x2="242.9" y2="57.6"/>
+            <line x1="255.1" y1="57.3" x2="252.6" y2="61.7"/>
+          </g>
+          <line x1="77.1" y1="93.0" x2="86.9" y2="100.3" stroke-width="1.8"/>
+          <text x="75" y="82" font-size="11">-20</text>
+          <line x1="113.9" y1="57.2" x2="121.3" y2="67.0" stroke-width="1.6"/>
+          <text x="111" y="48" font-size="11">-10</text>
+          <line x1="148.7" y1="39.0" x2="152.9" y2="50.3" stroke-width="1.6"/>
+          <text x="148" y="31" font-size="11">-5</text>
+          <line x1="168.8" y1="33.3" x2="171.4" y2="45.0" stroke-width="1.4"/>
+          <text x="168" y="24" font-size="9" opacity="0.75">-3</text>
+          <line x1="200" y1="30" x2="200" y2="42" stroke-width="2.2" stroke="#000"/>
+          <text x="200" y="22" font-size="14" font-weight="900" fill="#000">0</text>
+          <line x1="253.7" y1="39.9" x2="249.0" y2="51.0" stroke="#a81008" fill="#a81008" stroke-width="1.8"/>
+          <text x="256" y="32" font-size="11" fill="#a81008">+3</text>
+          <line x1="296.4" y1="65.1" x2="287.4" y2="72.6" stroke="#e42818" fill="#e42818" stroke-width="1.8"/>
+          <text x="303" y="58" font-size="11" fill="#e42818">+6</text>
+          <line x1="322.9" y1="93.0" x2="313.1" y2="100.3" stroke="#e42818" stroke-width="2"/>
+        </g>
+        <text x="200" y="160" text-anchor="middle" font-family="'Orbitron',sans-serif"
+              font-size="8" letter-spacing="3" fill="rgba(50,25,0,0.35)" font-weight="700">
+          TITAN · PRECISION VU
+        </text>
+        <g id="ampVuNeedleR" transform="rotate(-55 200 180)" filter="url(#vuNeedleShadowR)">
+          <polygon points="198.9,180 201.1,180 200.15,42 199.85,42" fill="url(#vuNeedleBody)"/>
+          <line x1="200" y1="175" x2="200" y2="60" stroke="#a01808" stroke-width="0.4" opacity="0.6"/>
+          <polygon points="199.4,180 200.6,180 200.4,196 199.6,196" fill="#1a0f04"/>
+        </g>
+        <circle cx="200" cy="180" r="10" fill="#0a0402"/>
+        <circle cx="200" cy="180" r="8" fill="url(#vuPivotCap)"/>
+        <circle cx="200" cy="180" r="3.5" fill="#1a0a00"/>
+        <circle cx="198.5" cy="178.5" r="1.2" fill="#ffe9a8" opacity="0.8"/>
+        <circle id="ampVuPeakR" cx="300" cy="50" r="4" fill="#ff2010" opacity="0">
+          <animate attributeName="fill-opacity" values="1;0.4;1" dur="0.45s" repeatCount="indefinite"/>
+        </circle>
+        <text x="310" y="54" font-family="'Share Tech Mono',monospace" font-size="8"
+              fill="rgba(180,30,20,0.5)" opacity="0.7">OVER</text>
+      </svg>
+      <div class="amp-vu-glass"></div>
     </div>
   </div>
 
@@ -10544,6 +11070,88 @@ async function detectBPM(buf){
 }
 
 /* LIBRARY */
+// ─── Crates (library organisation, mirrors src/core/crate-state.ts) ──
+const CRATES_KEY='titan_crates_v1';
+let crateState={crates:{},smartCrates:{},tags:{}};
+let activeCrateId='__all__';
+try{const raw=localStorage.getItem(CRATES_KEY);if(raw){const p=JSON.parse(raw);if(p&&typeof p==='object')crateState={crates:p.crates||{},smartCrates:p.smartCrates||{},tags:p.tags||{}};}}catch(_){}
+function _saveCrates(){try{localStorage.setItem(CRATES_KEY,JSON.stringify(crateState));}catch(_){}}
+function _newId(){return 'c_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6);}
+function _cratesFilterTracks(tracks){
+  if(activeCrateId==='__all__')return tracks;
+  if(activeCrateId.startsWith('smart:')){
+    const sc=crateState.smartCrates[activeCrateId.slice(6)];
+    if(!sc)return tracks;
+    const now=Date.now();
+    return tracks.filter(t=>sc.rules.every(r=>{
+      if(r.kind==='bpm-range')return t.bpm>=r.min&&t.bpm<=r.max;
+      if(r.kind==='rating-gte')return (t.rating||0)>=r.min;
+      if(r.kind==='added-days')return now-t.addedAt<=r.within*86400000;
+      if(r.kind==='title-contains')return t.title.toLowerCase().includes(r.query.toLowerCase());
+      if(r.kind==='key-is')return r.keys.includes(t.key);
+      if(r.kind==='tag'){const tags=crateState.tags[t.id]||t.tags||[];return tags.includes(r.tag);}
+      return true;
+    })).slice(0,sc.limit||1e9);
+  }
+  const crate=crateState.crates[activeCrateId];
+  if(!crate)return tracks;
+  return tracks.filter(t=>crate.trackIds.includes(t.id));
+}
+function renderCratesBar(){
+  const host=document.getElementById('cratesChips');if(!host)return;
+  const chips=[];
+  for(const id of Object.keys(crateState.crates)){
+    const c=crateState.crates[id];
+    chips.push(`<button class="crate-chip${activeCrateId===id?' active':''}" data-crate-id="${id}" title="${c.trackIds.length} tracks — right-click to delete" style="padding:4px 10px;background:${activeCrateId===id?'linear-gradient(180deg,var(--orange),#c85a00)':'#1a1a1c'};color:${activeCrateId===id?'#000':'#cfcfd2'};border:1px solid ${activeCrateId===id?'transparent':'#2a2a2e'};border-radius:3px;font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:1px;font-weight:700;cursor:pointer">📁 ${escapeHtml(c.name)} <span style="opacity:.6">(${c.trackIds.length})</span></button>`);
+  }
+  for(const id of Object.keys(crateState.smartCrates)){
+    const sc=crateState.smartCrates[id];const key='smart:'+id;
+    chips.push(`<button class="crate-chip${activeCrateId===key?' active':''}" data-crate-id="${key}" style="padding:4px 10px;background:${activeCrateId===key?'linear-gradient(180deg,var(--screen-glow),#0088aa)':'#1a1a1c'};color:${activeCrateId===key?'#000':'#7ff0ff'};border:1px solid ${activeCrateId===key?'transparent':'rgba(46,224,255,.3)'};border-radius:3px;font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:1px;font-weight:700;cursor:pointer">⚡ ${escapeHtml(sc.name)}</button>`);
+  }
+  host.innerHTML=chips.join('');
+  document.querySelectorAll('.crate-chip').forEach(b=>{
+    b.addEventListener('click',()=>{activeCrateId=b.dataset.crateId||'__all__';document.querySelectorAll('.crate-chip').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderLibrary();renderCratesBar();});
+    b.addEventListener('contextmenu',e=>{
+      e.preventDefault();
+      const id=b.dataset.crateId;
+      if(!id||id==='__all__')return;
+      if(id.startsWith('smart:')){
+        if(!confirm('Delete smart crate?'))return;
+        delete crateState.smartCrates[id.slice(6)];
+      }else{
+        if(!confirm('Delete crate "'+(crateState.crates[id]?.name||'')+'"? (Tracks stay in the library.)'))return;
+        delete crateState.crates[id];
+      }
+      if(activeCrateId===id)activeCrateId='__all__';
+      _saveCrates();renderCratesBar();renderLibrary();
+    });
+  });
+}
+function wireCratesBar(){
+  document.getElementById('newCrateBtn')?.addEventListener('click',()=>{
+    const name=prompt('Crate name?');if(!name||!name.trim())return;
+    const id=_newId();crateState.crates[id]={id,name:name.trim(),trackIds:[],createdAt:Date.now()};
+    _saveCrates();renderCratesBar();toast&&toast('Crate created: '+name,'success');
+  });
+  document.getElementById('smartCrateBtn')?.addEventListener('click',()=>{
+    const name=prompt('Smart crate name?','High-energy peak time');if(!name)return;
+    const bpmLo=parseFloat(prompt('BPM min?','124')||'0');
+    const bpmHi=parseFloat(prompt('BPM max?','132')||'999');
+    const ratMin=parseInt(prompt('Minimum rating (0-5)?','4')||'0',10);
+    const id=_newId();
+    crateState.smartCrates[id]={id,name,rules:[{kind:'bpm-range',min:bpmLo,max:bpmHi},{kind:'rating-gte',min:ratMin}]};
+    _saveCrates();renderCratesBar();toast&&toast('Smart crate: '+name,'success');
+  });
+  document.querySelector('[data-crate-id="__all__"]')?.addEventListener('click',()=>{
+    activeCrateId='__all__';
+    document.querySelectorAll('.crate-chip').forEach(x=>x.classList.remove('active'));
+    document.querySelector('[data-crate-id="__all__"]')?.classList.add('active');
+    renderLibrary();
+  });
+  renderCratesBar();
+}
+document.addEventListener('DOMContentLoaded',()=>setTimeout(wireCratesBar,500));
+
 // ─── Library state + virtualization ─────────────────────────────────
 // At large sizes (5000+ tracks) rendering every row was a multi-hundred-ms
 // reflow that locked the main thread on every keystroke in the search box.
@@ -10608,6 +11216,8 @@ function renderLibrary(){
     if(sort==='rating')return(b.rating||0)-(a.rating||0);
     return b.addedAt-a.addedAt;
   });
+  // Apply the active crate filter (defined alongside wireCratesBar above)
+  if(typeof _cratesFilterTracks==='function')tracks=_cratesFilterTracks(tracks);
   _libView.tracks=tracks;
   // First call: set up the inner wrapper + bind scroll/click/drag delegation
   if(!list._virt){
@@ -10926,12 +11536,54 @@ function drawPhraseMarkers(deckId,track){
 }
 
 /* TRANSPORT */
+// ─── Keylock AudioWorklet (granular pitch shifter) ──────────────────────
+// Loaded lazily on first use so the import doesn't block boot.
+let _titanKeylockReady=null;
+async function ensureKeylockWorklet(){
+  if(!audioCtx)return false;
+  if(_titanKeylockReady)return _titanKeylockReady;
+  _titanKeylockReady=audioCtx.audioWorklet.addModule('./titan-keylock-worklet.js').then(()=>true).catch(err=>{
+    console.warn('[keylock] worklet failed to load',err);
+    _titanKeylockReady=null;
+    return false;
+  });
+  return _titanKeylockReady;
+}
+function _makeKeylockNode(deck){
+  try{
+    const n=new AudioWorkletNode(audioCtx,'titan-keylock',{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[2]});
+    n.parameters.get('pitch').value=1/Math.max(0.5,Math.min(2,deck.playbackRate));
+    n.parameters.get('wet').value=deck.keylock?1:0;
+    return n;
+  }catch(e){console.warn('[keylock] node build failed',e);return null;}
+}
+
 function playDeck(deckId){
   const d=decks[deckId];if(!d.buffer||d.playing)return;
   ensureAudio();
   d.source=audioCtx.createBufferSource();
   d.source.buffer=d.buffer;d.source.playbackRate.value=d.playbackRate;
-  d.source.connect(d.trimGain);
+  // When keylock is enabled, route source → keylockNode → trimGain so the
+  // granular pitch-shifter can cancel out the speed-induced pitch change.
+  // Otherwise we fall back to the original direct connection (still works).
+  if(d.keylock){
+    ensureKeylockWorklet().then(ok=>{
+      if(!ok||!d.source)return;
+      try{
+        const kn=_makeKeylockNode(d);
+        if(!kn)return;
+        d.source.disconnect();
+        d.source.connect(kn);
+        kn.connect(d.trimGain);
+        d.keylockNode=kn;
+      }catch(e){console.warn('[keylock] re-routing failed, falling back',e);
+        try{d.source.connect(d.trimGain);}catch(_){}}
+    });
+    // Until the worklet loads, keep the dry path live so audio isn't silent.
+    d.source.connect(d.trimGain);
+  }else{
+    d.source.connect(d.trimGain);
+  }
   d.source.start(0,d.offset);d.startTime=audioCtx.currentTime;d.playing=true;
   if(d.volumeGain){
     const target=d.volume!==undefined?d.volume:0.8;
@@ -11046,6 +11698,12 @@ function setTempo(deckId,pct){
   if(was)pauseDeck(deckId);
   d.playbackRate=1+pct/100;d.offset=pos;
   if(was)playDeck(deckId);
+  // If the deck has a live keylock worklet, update its pitch inversion
+  // so the harmonic content stays at the original pitch. 1/r cancels the
+  // speed-induced shift.
+  if(d.keylockNode&&d.keylockNode.parameters){
+    try{d.keylockNode.parameters.get('pitch').setTargetAtTime(1/Math.max(0.5,Math.min(2,d.playbackRate)),audioCtx.currentTime,0.02);}catch(_){}
+  }
   const valStr=`${pct>=0?'+':''}${pct.toFixed(2)}%`;
   const tv=document.getElementById(`tempoVal-${deckId}`);if(tv)tv.textContent=valStr;
   const bigEl=document.getElementById(`tempoBig-${deckId}`);
@@ -11057,6 +11715,17 @@ function setTempo(deckId,pct){
     const cdBpm=document.getElementById(`cdBpm-${deckId}`);if(cdBpm)cdBpm.textContent=nb.toFixed(1)+' BPM';
   }
   updateMasterBpm();
+}
+
+// Live-toggle the keylock wet/dry mix when the user clicks the KEY button
+// on an already-playing deck. Called from the util-btn click handler.
+function updateKeylockWet(deckId){
+  const d=decks[deckId];
+  if(!d||!d.keylockNode)return;
+  try{
+    const wet=d.keylock?1:0;
+    d.keylockNode.parameters.get('wet').setTargetAtTime(wet,audioCtx.currentTime,0.02);
+  }catch(_){}
 }
 
 /* Tempo step state per deck */
@@ -12399,7 +13068,11 @@ function attachEvents(){
         if(dk.sync){dk.sync=false;btn.classList.remove('active');}
         else if(syncDeck(d)!==false){dk.sync=true;btn.classList.add('active');}
         // syncDeck() already toasted the error on failure — no visual change
-      }else{dk[u]=!dk[u];btn.classList.toggle('active',!!dk[u]);}
+      }else{
+        dk[u]=!dk[u];btn.classList.toggle('active',!!dk[u]);
+        // Live-update keylock wet/dry if the user toggled KEY mid-play
+        if(u==='keylock'&&typeof updateKeylockWet==='function')updateKeylockWet(d);
+      }
     });
   });
   document.querySelectorAll('.cue-btn').forEach(btn=>{
@@ -18603,15 +19276,99 @@ function renderStudioMeter(){
   const INERTIA=0.22;
   studioMeterState.vuL+=(tgtL-studioMeterState.vuL)*INERTIA;
   studioMeterState.vuR+=(tgtR-studioMeterState.vuR)*INERTIA;
-  const angleFromNorm=n=>-45+Math.max(0,Math.min(1.15,n))*90; // -45° silent, +45° at +6
-  const needL=document.getElementById('ampVuNeedleL');
-  const needR=document.getElementById('ampVuNeedleR');
-  if(needL)needL.setAttribute('transform',`rotate(${angleFromNorm(studioMeterState.vuL).toFixed(2)} 200 155)`);
-  if(needR)needR.setAttribute('transform',`rotate(${angleFromNorm(studioMeterState.vuR).toFixed(2)} 200 155)`);
-  // Peak-hold red dot lights when the needle slams past +3
-  const peakDot=(id,norm)=>{const el=document.getElementById(id);if(!el)return;el.setAttribute('opacity',norm>0.78?1:0);};
-  peakDot('ampVuPeakL',studioMeterState.vuL);
-  peakDot('ampVuPeakR',studioMeterState.vuR);
+
+  // ───── DIGITAL PRECISION METERS ─────
+  // Peak-hold state per channel. The segment holds at the highest peak
+  // for 1.2s then falls at 24 dB/s (the rate used by Waves + iZotope).
+  if(!studioMeterState.dm){
+    studioMeterState.dm={
+      holdL:-Infinity,holdLAt:0,
+      holdR:-Infinity,holdRAt:0,
+    };
+  }
+  const NOW=performance.now();
+  const HOLD_MS=1200;
+  const FALL_DB_PER_MS=24/1000;
+  const updHold=(peakDb,holdKey,atKey)=>{
+    const dm=studioMeterState.dm;
+    if(peakDb>dm[holdKey]){dm[holdKey]=peakDb;dm[atKey]=NOW;}
+    else if(NOW-dm[atKey]>HOLD_MS){
+      dm[holdKey]-=FALL_DB_PER_MS*(16); // ~60fps frame
+      if(dm[holdKey]<-90)dm[holdKey]=-Infinity;
+    }
+  };
+  updHold(peakLDb,'holdL','holdLAt');
+  updHold(peakRDb,'holdR','holdRAt');
+
+  // Build segments once, then toggle classes each frame (cheap)
+  const ensureSegs=(ladderId)=>{
+    const lad=document.getElementById(ladderId);
+    if(!lad||lad._segs)return lad;
+    const SEGS=48;
+    const gridlines=lad.querySelector('.amp-dm-gridlines');
+    const frag=document.createDocumentFragment();
+    const segs=[];
+    for(let i=0;i<SEGS;i++){
+      const s=document.createElement('div');s.className='amp-dm-seg';
+      frag.appendChild(s);segs.push(s);
+    }
+    lad.insertBefore(frag,gridlines);
+    lad._segs=segs;
+    return lad;
+  };
+  const ladL=ensureSegs('ampDmLadderL');
+  const ladR=ensureSegs('ampDmLadderR');
+
+  // Map a dB value to a segment count. Scale: -60 dB = 0 segs, 0 dB = 46, +3 dB = 48.
+  const SEGS=48;
+  const dbToSegs=(db)=>{
+    if(!isFinite(db))return 0;
+    // Piecewise: linear from -60..-18 (18 segs), -18..-6 (14 segs), -6..0 (14 segs), 0..+3 (2 segs)
+    // Packs visual detail into the range you actually care about.
+    if(db<=-60)return 0;
+    if(db>=3)return SEGS;
+    if(db<=-18)return Math.round(((db+60)/42)*18);         // 0..18
+    if(db<=-6) return 18+Math.round(((db+18)/12)*14);      // 18..32
+    if(db<=0)  return 32+Math.round(((db+6)/6)*14);        // 32..46
+    return 46+Math.round((db/3)*2);                        // 46..48
+  };
+  const colourFor=(segIdx)=>{
+    // green up to 32 (=0 dB), yellow 32..40, orange 40..46, red 46..48
+    if(segIdx>=46)return 'r';
+    if(segIdx>=40)return 'o';
+    if(segIdx>=32)return 'y';
+    return 'g';
+  };
+
+  const paintLadder=(ladder,peakDb,holdDb,numId,holdId,unitId)=>{
+    if(!ladder||!ladder._segs)return;
+    const segs=ladder._segs;
+    const lit=dbToSegs(peakDb);
+    const holdSeg=dbToSegs(holdDb);
+    for(let i=0;i<SEGS;i++){
+      const s=segs[i];
+      let cls='amp-dm-seg';
+      if(i<lit)cls+=' on '+colourFor(i);
+      if(i===holdSeg-1&&holdSeg>0){cls+=' hold';if(holdSeg>=46)cls+=' clip';}
+      if(s.className!==cls)s.className=cls;
+    }
+    // Numeric readout
+    const num=document.getElementById(numId);
+    if(num){
+      const txt=isFinite(peakDb)?(peakDb>=0?'+':'')+peakDb.toFixed(1):'-∞';
+      if(num.textContent!==txt)num.textContent=txt;
+      let cls='amp-dm-numeric';
+      if(peakDb>=0)cls+=' clip';
+      else if(peakDb>=-6)cls+=' warn';
+      if(num.className!==cls)num.className=cls;
+    }
+    const hold=document.getElementById(holdId);
+    if(hold){
+      hold.textContent=isFinite(holdDb)?(holdDb>=0?'+':'')+holdDb.toFixed(1):'-∞';
+    }
+  };
+  paintLadder(ladL,peakLDb,studioMeterState.dm.holdL,'ampDmNumL','ampDmHoldL');
+  paintLadder(ladR,peakRDb,studioMeterState.dm.holdR,'ampDmNumR','ampDmHoldR');
 
   // ─── PPM SEGMENT LADDERS (20 segments, top red, middle yellow/orange, bottom green) ───
   const renderPpm=(elId,db)=>{
@@ -20148,6 +20905,325 @@ document.addEventListener('DOMContentLoaded',init);
       });
     },500);
   });
+})();
+
+/* ============================================================
+   TITAN ACADEMY — interactive DJ lessons
+   The "let people learn DJ-ing in their browser" product angle.
+   Pure data + a small runner; every lesson = list of steps with
+   a completion check. No backend — progress is in localStorage.
+   ============================================================ */
+(function(){
+  const LEARN_KEY='titan_learn_progress_v1';
+  let progress={completed:{},xp:0};
+  try{const raw=localStorage.getItem(LEARN_KEY);if(raw)progress={...progress,...JSON.parse(raw)};}catch(_){}
+  const save=()=>{try{localStorage.setItem(LEARN_KEY,JSON.stringify(progress));}catch(_){}};
+
+  /* ─── Lesson library ──────────────────────────────────────────
+     Each step has:
+       title   — big headline
+       text    — detailed instruction
+       hint    — small hint shown when the user lingers
+       check   — () => boolean — returns true when the user did
+                 what the step asks. polled at 300ms.
+       highlight — CSS selector to pulse (optional)
+  ─────────────────────────────────────────────────────────────── */
+  const LESSONS=[
+    { id:'l01', level:'beginner', title:'🎉 Your first play',
+      blurb:"Open the app and drop in the first track. You're about to hear your first DJ cue.",
+      xp:50,
+      steps:[
+        {title:'Load a demo track onto Deck A',
+         text:'Open the LIBRARY below the decks and click the blue "→ A" button on any row. The track appears on Deck A up top.',
+         hint:'No library? Click + DEMO in the header.',
+         highlight:'[data-load="A"]',
+         check:()=>decks&&decks.A&&!!decks.A.track},
+        {title:'Press PLAY on Deck A',
+         text:'Find the big green PLAY button on Deck A — it\'s right under the jog wheel. Click it.',
+         hint:'Orbital LED turns green when playback starts.',
+         highlight:'.big-btn.play[data-deck="A"]',
+         check:()=>decks&&decks.A&&decks.A.playing},
+        {title:'Tap CUE to jump to the start',
+         text:'The orange CUE button sends the track back to its cue point. Try it — it\'s how a DJ rewinds without dragging.',
+         hint:'CUE also pauses when you were playing.',
+         highlight:'.big-btn.cue[data-deck="A"]',
+         check:()=>decks&&decks.A&&!decks.A.playing}
+      ]},
+    { id:'l02', level:'beginner', title:'🔊 Volume + EQ',
+      blurb:'Shape what you\'re hearing. The four knobs above the fader are your ears.',
+      xp:50,
+      steps:[
+        {title:'Turn the LOW knob on Deck A',
+         text:'The bottom knob is the bass. Roll it all the way left (less bass) and back to the center (flat). Hear the difference?',
+         hint:'Grab the knob and drag up/down.',
+         highlight:'.knob[data-knob="low-A"]',
+         check:()=>{const k=document.querySelector('.knob[data-knob="low-A"]');return k&&Math.abs(k._rot||0)>30;}},
+        {title:'Bring the channel fader up',
+         text:'Channel faders (the tall vertical sliders) set how loud each deck is in the mix. Push Deck A\'s fader up to roughly 80%.',
+         hint:'Drag the silver handle up.',
+         check:()=>decks&&decks.A&&decks.A.volume>0.5},
+      ]},
+    { id:'l03', level:'beginner', title:'🎚 Load Deck B and cross-fade',
+      blurb:'The crossfader is how two decks blend into one. You are about to do your first mix.',
+      xp:75,
+      steps:[
+        {title:'Load any track onto Deck B',
+         text:'In the library, pick a different track and click the pink "→ B" button.',
+         highlight:'[data-load="B"]',
+         check:()=>decks&&decks.B&&!!decks.B.track},
+        {title:'Press PLAY on Deck B too',
+         text:'Both decks should now play together. Don\'t worry about timing yet — just let them run.',
+         highlight:'.big-btn.play[data-deck="B"]',
+         check:()=>decks&&decks.A&&decks.B&&decks.A.playing&&decks.B.playing},
+        {title:'Move the crossfader all the way right',
+         text:'The horizontal slider at the bottom of the mixer — slide it right. Deck A fades out, Deck B takes over.',
+         hint:'You are now officially mixing.',
+         check:()=>mixerState&&mixerState.crossfader>0.85},
+      ]},
+    { id:'l04', level:'intermediate', title:'⚡ Beatmatching',
+      blurb:'Making two tracks sound like one song. The core DJ skill.',
+      xp:120,
+      steps:[
+        {title:'Load two tracks with similar BPM',
+         text:'Aim for tracks within 4 BPM of each other. Load them onto A and B.',
+         check:()=>decks&&decks.A&&decks.B&&decks.A.track&&decks.B.track},
+        {title:'Press SYNC on Deck B',
+         text:'SYNC auto-matches tempo AND phase. Hit it — then scroll back and read "· phase-locked" in the toast.',
+         highlight:'.util-btn.sync[data-deck="B"]',
+         check:()=>decks&&decks.B&&decks.B.sync===true},
+        {title:'Try manual nudge',
+         text:'Drag the TEMPO slider on Deck B by a few percent. Even with SYNC on, small nudges keep you in control.',
+         hint:'Touch the pitch fader, not the playback rate.',
+         check:()=>decks&&decks.B&&Math.abs(decks.B.tempo||0)>0.1},
+      ]},
+    { id:'l05', level:'intermediate', title:'🔥 Hot cues',
+      blurb:'Mark favourite moments in a track and jump to them instantly.',
+      xp:100,
+      steps:[
+        {title:'Press pad 1 on Deck A while playing',
+         text:'The 8 pads under the jog wheel are your hot cues. With Deck A playing, click pad 1 to drop a marker.',
+         highlight:'.hot-cues[data-deck="A"] .cue-btn[data-cue="1"]',
+         check:()=>decks&&decks.A&&decks.A.hotCues&&decks.A.hotCues[1]!=null},
+        {title:'Play for a few seconds, then hit pad 1 again',
+         text:'You should jump right back to the moment you marked. Magic, right?',
+         check:()=>decks&&decks.A&&decks.A.hotCues&&decks.A.hotCues[1]!=null}
+      ]},
+    { id:'l06', level:'intermediate', title:'🔁 Loops',
+      blurb:"Capture a killer 4-bar section and let it ride.",
+      xp:100,
+      steps:[
+        {title:'With Deck A playing, press LOOP IN',
+         text:'LOOP IN marks the start of a loop at wherever the track is right now.',
+         highlight:'.loop-btn[data-action="loopIn"][data-deck="A"]',
+         check:()=>decks&&decks.A&&decks.A.loop&&decks.A.loop.loopInSet},
+        {title:'A few seconds later, press LOOP OUT',
+         text:'LOOP OUT marks the end. The loop activates immediately — you\'ll hear the section repeat.',
+         highlight:'.loop-btn[data-action="loopOut"][data-deck="A"]',
+         check:()=>decks&&decks.A&&decks.A.loop&&decks.A.loop.active},
+        {title:'Press RELOOP to toggle it off',
+         text:'RELOOP disables the loop without erasing it. Press it again to bring the loop back — useful for surprise reveals.',
+         check:()=>decks&&decks.A&&decks.A.loop&&!decks.A.loop.active}
+      ]},
+    { id:'l07', level:'intermediate', title:'💿 Filters + FX',
+      blurb:'Sweep a filter and you\'ve just made the crowd raise their hands.',
+      xp:100,
+      steps:[
+        {title:'Turn the COLOR FX knob for Channel A',
+         text:'The small knob at the top of the channel — it\'s a real-time filter. Roll it up: high-pass filter (bass drops out). Down: low-pass.',
+         check:()=>mixerState&&mixerState.colorFx&&Math.abs(mixerState.colorFx.A||0)>0.1},
+      ]},
+    { id:'l08', level:'advanced', title:'🎯 Key-matched mixing',
+      blurb:'Mixing in the same musical key = no clashing notes.',
+      xp:150,
+      steps:[
+        {title:'Open the LIBRARY and sort by KEY',
+         text:'Click the KEY column header — tracks now group by musical key. Pick two tracks in neighbouring Camelot codes (e.g. 8A + 9A).',
+         check:()=>true},
+        {title:'Load them onto A and B',
+         text:'Now when you mix, the keys won\'t fight each other.',
+         check:()=>decks&&decks.A&&decks.B&&decks.A.track&&decks.B.track},
+      ]},
+    { id:'l09', level:'advanced', title:'🎛 The SOUND mastering tab',
+      blurb:'Every broadcaster runs a limiter + compressor. Here\'s how.',
+      xp:120,
+      steps:[
+        {title:'Open the SOUND tab',
+         text:'Top navigation — SOUND. That\'s your mastering chain: EQ, compressor, limiter, the VU meters, LUFS readout.',
+         highlight:'.tab-btn[data-tab="studio"]',
+         check:()=>document.getElementById('tab-studio')?.classList.contains('active')},
+        {title:'Pick the CLUB target loudness',
+         text:'Below the room presets there\'s a TARGET LOUDNESS row. Click CLUB (-8 LUFS). The history graph shows a green target line — aim to sit on it.',
+         check:()=>studioState&&studioState.targetLufs===-8},
+      ]},
+    { id:'l10', level:'advanced', title:'🎙 Record your set',
+      blurb:'Turn what you just did into an MP3 you can share.',
+      xp:100,
+      steps:[
+        {title:'Press REC in the header',
+         text:'Top-right corner — the red REC pill. Click it and TITAN starts capturing the master bus.',
+         highlight:'#recBtn',
+         check:()=>mixerState&&mixerState.isRecording===true},
+        {title:'Press STOP when you\'re done',
+         text:'The button is now STOP. Click it — a .webm file downloads. That\'s your first DJ set on disk.',
+         check:()=>mixerState&&mixerState.isRecording===false}
+      ]},
+  ];
+
+  /* ─── Rendering the lesson grid ─── */
+  function totalXp(){return LESSONS.reduce((a,l)=>a+(l.xp||0),0);}
+  function render(){
+    const grid=document.getElementById('learnLessonGrid');
+    if(!grid)return;
+    const activeLevel=document.querySelector('.learn-level-btn.active')?.dataset.level||'all';
+    const filtered=LESSONS.filter(l=>activeLevel==='all'||l.level===activeLevel);
+    const done=LESSONS.filter(l=>progress.completed[l.id]).length;
+    const pct=Math.round(done/LESSONS.length*100);
+    document.getElementById('learnPctDone').textContent=pct;
+    document.getElementById('learnProgressBar').style.width=pct+'%';
+    document.getElementById('learnCompleted').textContent=done;
+    document.getElementById('learnTotal').textContent=LESSONS.length;
+    document.getElementById('learnXp').textContent=progress.xp||0;
+    grid.innerHTML=filtered.map(l=>{
+      const complete=!!progress.completed[l.id];
+      const levelColor=l.level==='beginner'?'#5cf0a0':l.level==='intermediate'?'#ffaa5a':'#ff90a0';
+      return `<div class="learn-card" data-lesson-id="${l.id}" style="background:${complete?'linear-gradient(135deg,#0a1a12,#061812)':'linear-gradient(180deg,#1a1a1e,#0a0a0c)'};border:1px solid ${complete?'rgba(92,240,160,.4)':'#2a2a2e'};border-radius:10px;padding:16px;cursor:pointer;transition:transform .15s,box-shadow .15s;position:relative;overflow:hidden">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+          <span style="font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:2px;color:${levelColor};font-weight:700">${l.level.toUpperCase()}</span>
+          ${complete?'<span style="color:#5cf0a0;font-size:14px">✓ DONE</span>':''}
+        </div>
+        <div style="font-family:'Orbitron',sans-serif;font-size:15px;font-weight:800;color:#fff;margin-bottom:6px;letter-spacing:.5px">${l.title}</div>
+        <div style="font-size:12px;line-height:1.5;color:#9a9a9e;margin-bottom:10px">${l.blurb}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-family:'Share Tech Mono',monospace;font-size:10px;color:#7a7a80">${l.steps.length} step${l.steps.length!==1?'s':''} · +${l.xp} XP</span>
+          <button class="tool-btn" data-start-lesson="${l.id}" style="padding:5px 14px;font-size:10px;color:${complete?'#7a7a80':'#5cf0a0'};border-color:${complete?'#333':'#5cf0a0'};font-weight:700">${complete?'REPLAY':'START ▸'}</button>
+        </div>
+      </div>`;
+    }).join('');
+    grid.querySelectorAll('[data-start-lesson]').forEach(b=>{
+      b.addEventListener('click',e=>{e.stopPropagation();startLesson(b.dataset.startLesson);});
+    });
+    grid.querySelectorAll('.learn-card').forEach(c=>{
+      c.addEventListener('click',()=>startLesson(c.dataset.lessonId));
+      c.addEventListener('mouseenter',()=>{c.style.transform='translateY(-2px)';c.style.boxShadow='0 8px 20px rgba(0,0,0,.6)';});
+      c.addEventListener('mouseleave',()=>{c.style.transform='';c.style.boxShadow='';});
+    });
+  }
+
+  /* ─── Lesson runner ─── */
+  let active=null,pollTimer=null,hintTimer=null,highlightEl=null;
+  function startLesson(id){
+    const lesson=LESSONS.find(l=>l.id===id);if(!lesson)return;
+    active={lesson,stepIdx:0,startedAt:Date.now()};
+    // If the lesson needs a deck and tab-deck isn't active, jump there
+    document.querySelector('.tab-btn[data-tab="deck"]')?.click();
+    setTimeout(showStep,200);
+  }
+  function showStep(){
+    if(!active)return;
+    const {lesson,stepIdx}=active;
+    const step=lesson.steps[stepIdx];
+    const panel=document.getElementById('learnActiveLesson');
+    panel.style.display='block';
+    document.getElementById('learnStepN').textContent=stepIdx+1;
+    document.getElementById('learnStepTotal').textContent=lesson.steps.length;
+    document.getElementById('learnActiveTitle').textContent=step.title;
+    document.getElementById('learnActiveInstruction').textContent=step.text;
+    document.getElementById('learnActiveHint').textContent='';
+    if(hintTimer)clearTimeout(hintTimer);
+    if(step.hint)hintTimer=setTimeout(()=>{
+      const el=document.getElementById('learnActiveHint');if(el)el.textContent='💡 '+step.hint;
+    },6000);
+    // Highlight
+    clearHighlight();
+    if(step.highlight){
+      const el=document.querySelector(step.highlight);
+      if(el){highlightEl=el;el.classList.add('titan-learn-highlight');}
+    }
+    // Poll for completion
+    if(pollTimer)clearInterval(pollTimer);
+    pollTimer=setInterval(()=>{
+      try{if(step.check&&step.check()){markStepDone();}}catch(_){}
+    },300);
+  }
+  function clearHighlight(){
+    if(highlightEl){highlightEl.classList.remove('titan-learn-highlight');highlightEl=null;}
+  }
+  function markStepDone(){
+    if(!active)return;
+    if(pollTimer){clearInterval(pollTimer);pollTimer=null;}
+    const next=document.getElementById('learnNextBtn');
+    if(next){next.textContent='✓ GREAT! NEXT ▸';next.style.background='linear-gradient(180deg,#5cf0a0,#00a858)';next.style.color='#000';}
+  }
+  function nextStep(){
+    if(!active)return;
+    active.stepIdx++;
+    const next=document.getElementById('learnNextBtn');
+    if(next){next.textContent='NEXT ▸';next.style.background='';next.style.color='#5cf0a0';}
+    if(active.stepIdx>=active.lesson.steps.length){
+      finishLesson();return;
+    }
+    showStep();
+  }
+  function finishLesson(){
+    const {lesson}=active||{};
+    clearHighlight();
+    if(pollTimer){clearInterval(pollTimer);pollTimer=null;}
+    if(hintTimer){clearTimeout(hintTimer);hintTimer=null;}
+    if(lesson&&!progress.completed[lesson.id]){
+      progress.completed[lesson.id]=Date.now();
+      progress.xp=(progress.xp||0)+(lesson.xp||0);
+      save();
+    }
+    document.getElementById('learnActiveLesson').style.display='none';
+    active=null;
+    if(lesson){
+      toast&&toast(`🎉 Lesson complete! +${lesson.xp} XP`,'success');
+    }
+    render();
+  }
+  function closeLesson(){
+    clearHighlight();
+    if(pollTimer){clearInterval(pollTimer);pollTimer=null;}
+    if(hintTimer){clearTimeout(hintTimer);hintTimer=null;}
+    document.getElementById('learnActiveLesson').style.display='none';
+    active=null;
+  }
+
+  document.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{
+    // Inject the highlight CSS (tolerant to existing styles — uses animation)
+    if(!document.getElementById('titanLearnCss')){
+      const s=document.createElement('style');s.id='titanLearnCss';
+      s.textContent=`
+        @keyframes titanLearnPulse{0%,100%{box-shadow:0 0 0 0 rgba(92,240,160,0)}50%{box-shadow:0 0 0 8px rgba(92,240,160,.4),0 0 18px rgba(92,240,160,.6)}}
+        .titan-learn-highlight{animation:titanLearnPulse 1.4s ease-in-out infinite;border-radius:6px;position:relative;z-index:50}
+        .learn-card:hover{border-color:rgba(92,240,160,.7) !important}
+        .learn-level-btn:hover{transform:translateY(-1px)}
+      `;
+      document.head.appendChild(s);
+    }
+    document.querySelectorAll('.learn-level-btn').forEach(b=>{
+      b.addEventListener('click',()=>{
+        document.querySelectorAll('.learn-level-btn').forEach(x=>{
+          x.classList.remove('active');
+          x.style.background=x.dataset.level==='beginner'?'#0a1a12':x.dataset.level==='intermediate'?'#141418':x.dataset.level==='advanced'?'#141418':'#0a1a12';
+          x.style.color=x.dataset.level==='beginner'?'#9ad8b0':x.dataset.level==='intermediate'?'#ffd28a':x.dataset.level==='advanced'?'#ff90a0':'#9ad8b0';
+        });
+        b.classList.add('active');
+        b.style.background='linear-gradient(180deg,#5cf0a0,#00a858)';
+        b.style.color='#000';
+        render();
+      });
+    });
+    document.getElementById('learnNextBtn')?.addEventListener('click',nextStep);
+    document.getElementById('learnSkipBtn')?.addEventListener('click',nextStep);
+    document.getElementById('learnCloseBtn')?.addEventListener('click',closeLesson);
+    document.getElementById('learnResetBtn')?.addEventListener('click',()=>{
+      if(!confirm('Reset all lesson progress and XP? This cannot be undone.'))return;
+      progress={completed:{},xp:0};save();render();
+      toast&&toast('Progress reset','success');
+    });
+    render();
+  },600));
 })();
 </script>
 </body>
