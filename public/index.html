@@ -6184,6 +6184,51 @@ body.work-mode .automix-sync{
   box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 0 8px rgba(var(--tt-accent-rgb),.5);
 }
 
+/* ═══ NEW: transport row — quick CUE + beat-jump buttons ═══
+   Sits between the time/progress bar and the hot-cue pads.
+   Gives the DJ a one-tap way to nudge the playhead exactly where they
+   want a CUE marker, then tap the big red SET CUE to drop it.  No
+   need to scratch-drag the vinyl for a precise set. */
+.tt-pro-nav{
+  display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:2px;
+}
+.tt-pro-nav button{
+  padding:6px 2px;border-radius:3px;
+  font-family:'Orbitron',sans-serif;font-size:10px;font-weight:800;
+  background:linear-gradient(180deg,#1a1a1e 0%,#0a0a0c 100%);
+  border:1px solid #26262c;color:#b0b0b6;cursor:pointer;
+  transition:all .12s;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+}
+.tt-pro-nav button:hover{
+  color:var(--tt-accent);border-color:rgba(var(--tt-accent-rgb),.5);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 0 8px rgba(var(--tt-accent-rgb),.3);
+}
+.tt-pro-nav button:active{transform:translateY(1px)}
+.tt-pro-nav .setcue{
+  background:linear-gradient(180deg,#c83c1a 0%,#7a1a08 100%);
+  border-color:#ff8050;color:#fff;font-weight:900;letter-spacing:1px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 2px 4px rgba(0,0,0,.5),0 0 10px rgba(200,60,26,.4);
+  font-size:11px;
+}
+.tt-pro-nav .setcue:hover{
+  background:linear-gradient(180deg,#ff4818 0%,#a02010 100%);
+  color:#fff;border-color:#ffb890;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 3px 8px rgba(0,0,0,.6),0 0 16px rgba(255,72,24,.55);
+}
+.tt-pro-nav .setcue.armed{
+  animation:setCuePulse .9s ease-in-out infinite;
+}
+@keyframes setCuePulse{
+  0%,100%{box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 2px 4px rgba(0,0,0,.5),0 0 10px rgba(200,60,26,.4)}
+  50%{box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 2px 4px rgba(0,0,0,.5),0 0 20px rgba(255,72,24,.9)}
+}
+.tt-pro-nav .gotocue{
+  background:linear-gradient(180deg,#1a1a1e 0%,#0a0a0c 100%);
+  border:1px solid rgba(255,138,26,.4);color:#ffaa66;
+}
+.tt-pro-nav .gotocue:hover{border-color:#ffaa66;color:#fff;background:linear-gradient(180deg,#2a1a10 0%,#1a0a08 100%);box-shadow:0 0 10px rgba(255,138,26,.4)}
+
 /* original bottom buttons ---------- */
 .tt-btn{
   padding:8px 6px;font-family:'Orbitron',sans-serif;font-size:10px;font-weight:800;
@@ -9688,6 +9733,15 @@ body.theme-gold .step-btn.active{background:#ffcf40 !important;color:#1a0a00 !im
           <div class="tt-pro-bar" id="ttL-bar"><div class="tt-pro-bar-fill" id="ttL-barfill"></div></div>
         </div>
       </div>
+      <div class="tt-pro-nav" data-tt-nav="L">
+        <button data-nav="start"     title="Jump to beginning">⏮</button>
+        <button data-nav="back-4"    title="Back 4 beats">◀◀ 4</button>
+        <button data-nav="back-1"    title="Back 1 beat">◀ 1</button>
+        <button class="setcue" data-nav="setcue"   title="Set CUE point here">⏺ SET CUE</button>
+        <button data-nav="fwd-1"     title="Forward 1 beat">1 ▶</button>
+        <button data-nav="fwd-4"     title="Forward 4 beats">4 ▶▶</button>
+        <button class="gotocue" data-nav="gotocue" title="Jump to CUE point">↩ CUE</button>
+      </div>
       <div class="tt-pro-hotcues" data-tt-hc="L">
         <button class="tt-pro-hc" data-hc="1">1</button>
         <button class="tt-pro-hc" data-hc="2">2</button>
@@ -9832,6 +9886,15 @@ body.theme-gold .step-btn.active{background:#ffcf40 !important;color:#1a0a00 !im
           </div>
           <div class="tt-pro-bar" id="ttR-bar"><div class="tt-pro-bar-fill" id="ttR-barfill"></div></div>
         </div>
+      </div>
+      <div class="tt-pro-nav" data-tt-nav="R">
+        <button data-nav="start"     title="Jump to beginning">⏮</button>
+        <button data-nav="back-4"    title="Back 4 beats">◀◀ 4</button>
+        <button data-nav="back-1"    title="Back 1 beat">◀ 1</button>
+        <button class="setcue" data-nav="setcue"   title="Set CUE point here">⏺ SET CUE</button>
+        <button data-nav="fwd-1"     title="Forward 1 beat">1 ▶</button>
+        <button data-nav="fwd-4"     title="Forward 4 beats">4 ▶▶</button>
+        <button class="gotocue" data-nav="gotocue" title="Jump to CUE point">↩ CUE</button>
       </div>
       <div class="tt-pro-hotcues" data-tt-hc="R">
         <button class="tt-pro-hc" data-hc="1">1</button>
@@ -18731,6 +18794,37 @@ function setupVinylTurntables(){
         if(typeof triggerHotCue==='function'){
           window.event&&(window.event._fromVinyl=true);
           triggerHotCue(d,n);
+        }
+      });
+    });
+
+    // ── Transport nav row: ⏮ / ◀◀4 / ◀1 / SET CUE / 1▶ / 4▶▶ / ↩CUE
+    document.querySelectorAll(`[data-tt-nav="${side}"] button`).forEach(b=>{
+      b.addEventListener('click',()=>{
+        const deck=(typeof decks!=='undefined')?decks[d]:null;
+        if(!deck||!deck.track){toast&&toast('Load a track first','error');return;}
+        const act=b.dataset.nav;
+        if(act==='start'){
+          if(typeof seekDeck==='function')seekDeck(d,0);
+        }else if(act==='back-4'){
+          if(typeof beatJump==='function')beatJump(d,-4);
+        }else if(act==='back-1'){
+          if(typeof beatJump==='function')beatJump(d,-1);
+        }else if(act==='fwd-1'){
+          if(typeof beatJump==='function')beatJump(d,1);
+        }else if(act==='fwd-4'){
+          if(typeof beatJump==='function')beatJump(d,4);
+        }else if(act==='setcue'){
+          // Always DROP a new cue here, regardless of current state
+          const now=(typeof getCurrentTime==='function')?getCurrentTime(d):0;
+          deck.cuePoint=now;
+          const mm=Math.floor(now/60),ss=(now%60).toFixed(1).padStart(4,'0');
+          toast&&toast(`CUE set @ ${mm}:${ss}`,'success');
+          // Brief visual pulse to confirm
+          b.classList.add('armed');
+          setTimeout(()=>b.classList.remove('armed'),900);
+        }else if(act==='gotocue'){
+          if(typeof seekDeck==='function')seekDeck(d,deck.cuePoint||0);
         }
       });
     });
