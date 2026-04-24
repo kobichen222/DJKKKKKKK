@@ -3925,31 +3925,100 @@ body.work-mode .dsb-wmexit{display:inline-flex;background:linear-gradient(180deg
   color:rgba(255,255,255,.25);
 }
 
-/* ANALOG VU — large SVG with moving needle, gradient arc, peak hold dot */
-.amp-vu-wrap{display:flex;flex-direction:column;gap:6px;justify-content:center}
+/* ═══════ PHOTOREALISTIC ANALOG VU METER ═══════
+   Based on the McIntosh / Pioneer amp aesthetic: brushed-brass bezel,
+   aged-ivory dial face, hair-thin black needle casting a soft shadow,
+   red warning zone with inner glow, glass-dome highlight across the top.
+   Zero shortcuts — every detail is stacked: bezel → shadow → face →
+   print → needle → glass. */
+.amp-vu-wrap{display:flex;flex-direction:column;gap:10px;justify-content:center}
 .amp-vu{
-  width:100%;max-width:440px;aspect-ratio:2.4/1;
+  width:100%;max-width:460px;aspect-ratio:2.4/1;
+  /* The outer "brass bezel" — two gradients stacked give the illusion
+     of polished metal with four subtle highlights at the corners */
   background:
-    radial-gradient(ellipse at 50% 130%, rgba(255,180,80,.08) 0%, transparent 60%),
-    linear-gradient(180deg,#f3e8c8 0%,#e4d4a4 35%,#c9b682 100%);
-  border:1px solid #6a5a2a;border-radius:8px;
+    /* Top-left brass highlight */
+    radial-gradient(circle at 10% 10%, rgba(255,235,180,.55), transparent 40%),
+    /* Bottom-right darker brass */
+    radial-gradient(circle at 90% 90%, rgba(80,50,10,.45), transparent 45%),
+    /* Overall brass body */
+    linear-gradient(145deg,#d4a849 0%,#b58630 35%,#8a6420 65%,#5a3f12 100%);
+  border-radius:12px;
   box-shadow:
-    inset 0 2px 6px rgba(255,255,255,.5),
-    inset 0 -4px 10px rgba(90,60,20,.35),
-    inset 0 0 0 3px #0a0a0b,
-    0 6px 16px rgba(0,0,0,.65);
+    /* Outer drop shadow — sits on a dark surface */
+    0 10px 26px rgba(0,0,0,.85),
+    0 2px 4px rgba(0,0,0,.6),
+    /* Brass rim highlight */
+    inset 0 1px 0 rgba(255,245,210,.6),
+    inset 0 -1px 0 rgba(40,20,0,.8),
+    /* Inner black gasket where the glass sits in the bezel */
+    inset 0 0 0 4px #0a0a0b,
+    inset 0 0 0 5px rgba(255,220,160,.15);
   position:relative;overflow:hidden;
+  padding:8px 10px 10px;
+}
+/* Corner screws — 4 tiny Phillips-head indentations */
+.amp-vu::before,
+.amp-vu::after{
+  content:'';position:absolute;width:7px;height:7px;border-radius:50%;
+  background:
+    radial-gradient(circle at 35% 30%,#e6d8a0 0%,#8a6420 40%,#2a1808 100%);
+  box-shadow:
+    inset 0 0 0 1px #1a0a00,
+    0 1px 1px rgba(0,0,0,.6),
+    0 0 0 1px rgba(255,235,180,.15);
+}
+.amp-vu::before{top:6px;left:8px}
+.amp-vu::after{top:6px;right:8px}
+/* The inner dial "face" — cream with subtle patina */
+.amp-vu-dial{
+  position:absolute;inset:14px 12px 12px;
+  border-radius:6px;overflow:hidden;
+  background:
+    /* soft radial vignette for aged paper feel */
+    radial-gradient(ellipse at 50% 120%, rgba(220,180,120,.35) 0%, transparent 55%),
+    /* tiny grid of bumps — subtle paper texture */
+    repeating-linear-gradient(45deg,rgba(160,120,60,.04) 0 1px,transparent 1px 3px),
+    repeating-linear-gradient(-45deg,rgba(160,120,60,.04) 0 1px,transparent 1px 3px),
+    /* main cream paper gradient */
+    linear-gradient(180deg,#fbf0cc 0%,#f3e4b0 45%,#ddc280 100%);
+  box-shadow:
+    inset 0 3px 6px rgba(255,255,255,.55),
+    inset 0 -6px 12px rgba(130,80,20,.4),
+    inset 0 0 0 1px rgba(60,30,0,.4);
+}
+.amp-vu svg{width:100%;height:100%;display:block;position:relative;z-index:2}
+/* Glass dome — a curved highlight across the top-front of the meter,
+   the thing that actually makes it "feel" like real glass */
+.amp-vu-glass{
+  position:absolute;inset:14px 12px 12px;border-radius:6px;
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,.28) 0%,
+      rgba(255,255,255,.12) 18%,
+      rgba(255,255,255,.02) 38%,
+      transparent 55%);
+  pointer-events:none;z-index:3;
+  /* Flick-light streak on the top-right, mimicking a ceiling spot */
+  box-shadow:inset 30px 8px 40px -18px rgba(255,255,255,.35);
 }
 .amp-vu svg{width:100%;height:100%;display:block}
 .amp-vu-label{
-  position:absolute;top:6px;left:50%;transform:translateX(-50%);
-  font-family:'Orbitron',sans-serif;font-size:8px;letter-spacing:3px;color:#4a3a1a;
-  opacity:.7;
+  position:absolute;top:10px;left:50%;transform:translateX(-50%);
+  font-family:'Orbitron',sans-serif;font-size:7px;letter-spacing:4px;color:#3a2810;
+  opacity:.55;z-index:4;
+  text-shadow:0 1px 0 rgba(255,255,255,.3);
 }
 .amp-vu-ch{
-  position:absolute;bottom:4px;right:8px;
-  font-family:'Orbitron',sans-serif;font-size:10px;font-weight:800;letter-spacing:2px;color:#2a1a08;
+  position:absolute;bottom:10px;right:16px;z-index:4;
+  font-family:'Orbitron',sans-serif;font-size:11px;font-weight:900;letter-spacing:3px;
+  color:#1a0f04;
+  text-shadow:0 1px 0 rgba(255,255,255,.4),0 -1px 0 rgba(0,0,0,.2);
+  opacity:.7;
 }
+/* Manufacturer / model tag at bottom-center — pure vintage-amp flavour */
+.amp-vu-wrap .amp-vu::before,
+.amp-vu-wrap .amp-vu::after{z-index:4}
 
 /* PPM segmented LED ladders */
 .amp-ppm-col{display:flex;flex-direction:column;gap:4px;justify-content:center;min-width:68px}
@@ -8936,65 +9005,171 @@ No mappings yet. Pick a preset above or right-click any control → MIDI Learn.
 <!-- AMPLIFIER METERING BRIDGE — analog VU + PPM + goniometer + phase + LUFS -->
 <div class="amp-bridge">
   <div class="amp-vu-wrap">
+    <!-- ───── L CHANNEL VU METER ───── -->
     <div class="amp-vu" id="ampVuL">
-      <span class="amp-vu-label">VU · −20 ← 0 → +3</span>
+      <div class="amp-vu-dial"></div>
+      <span class="amp-vu-label">VU · TITAN AUDIO LAB</span>
       <span class="amp-vu-ch">L</span>
       <svg viewBox="0 0 400 170" preserveAspectRatio="xMidYMid meet">
         <defs>
-          <linearGradient id="vuArcGrad" x1="0" x2="1" y1="0" y2="0">
-            <stop offset="0" stop-color="#1a1a1c"/>
-            <stop offset="0.55" stop-color="#3a2a1a"/>
-            <stop offset="0.7" stop-color="#7a5a1a"/>
-            <stop offset="0.85" stop-color="#b03a1a"/>
-            <stop offset="1" stop-color="#d8201a"/>
+          <!-- Shared gradients for both meters -->
+          <linearGradient id="vuScaleGrad" x1="0" x2="1" y1="0" y2="0">
+            <stop offset="0" stop-color="#1a0f04" stop-opacity="0.8"/>
+            <stop offset="0.62" stop-color="#1a0f04"/>
+            <stop offset="0.72" stop-color="#7a3810"/>
+            <stop offset="0.82" stop-color="#c82818"/>
+            <stop offset="1" stop-color="#c82818"/>
           </linearGradient>
+          <!-- Red danger-zone fill at the high end -->
+          <linearGradient id="vuRedFill" x1="0" x2="1" y1="0" y2="0">
+            <stop offset="0" stop-color="rgba(200,40,24,0)"/>
+            <stop offset="1" stop-color="rgba(200,40,24,0.28)"/>
+          </linearGradient>
+          <!-- Subtle paper-stain filter used on the dial */ -->
+          <radialGradient id="vuVignette" cx="0.5" cy="0.5" r="0.7">
+            <stop offset="0.6" stop-color="rgba(0,0,0,0)"/>
+            <stop offset="1" stop-color="rgba(80,50,10,0.15)"/>
+          </radialGradient>
+          <!-- Needle shadow filter — SVG's native drop-shadow, soft -->
+          <filter id="vuNeedleShadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="1.2"/>
+            <feOffset dx="1.2" dy="2" result="off"/>
+            <feComponentTransfer><feFuncA type="linear" slope="0.55"/></feComponentTransfer>
+            <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
         </defs>
-        <!-- Scale arc -->
-        <path d="M 30 155 A 170 170 0 0 1 370 155" fill="none" stroke="url(#vuArcGrad)" stroke-width="4" opacity="0.9"/>
-        <!-- Tick marks -->
-        <g stroke="#3a2a0a" stroke-width="1.2" fill="#3a2a0a" font-family="Orbitron,sans-serif" font-size="11" font-weight="700" text-anchor="middle">
-          <line x1="30" y1="150" x2="36" y2="135"/><text x="36" y="128">-20</text>
-          <line x1="80" y1="110" x2="84" y2="97"/><text x="84" y="90">-10</text>
-          <line x1="140" y1="78" x2="142" y2="64"/><text x="142" y="56">-5</text>
-          <line x1="200" y1="68" x2="200" y2="52"/><text x="200" y="44" fill="#2a1a04" font-size="13">0</text>
-          <line x1="260" y1="78" x2="258" y2="64"/><text x="258" y="56" fill="#b0202a">+3</text>
-          <line x1="320" y1="110" x2="316" y2="97" stroke="#b0202a" fill="#b0202a"/><text x="316" y="90" fill="#b0202a">+6</text>
-          <line x1="370" y1="150" x2="364" y2="135" stroke="#d8201a" fill="#d8201a"/>
+        <!-- Subtle dial vignette -->
+        <rect x="0" y="0" width="400" height="170" fill="url(#vuVignette)"/>
+        <!-- Red-zone background wash (behind the scale arc) -->
+        <path d="M 220 66 A 170 170 0 0 1 370 156 L 370 168 L 220 168 Z"
+              fill="url(#vuRedFill)" opacity="0.65"/>
+        <!-- Main scale arc — black for left 2/3, fading to red for top-right 1/3 -->
+        <path d="M 30 155 A 170 170 0 0 1 370 155" fill="none"
+              stroke="url(#vuScaleGrad)" stroke-width="3.2" opacity="0.95"/>
+        <!-- Minor tick marks between the big numbers — every 1 dB -->
+        <g stroke="rgba(40,20,0,0.55)" stroke-width="1" fill="none">
+          <!-- 19 minor ticks spaced along the arc from -20 to +6 -->
+          <line x1="54" y1="131" x2="58" y2="121"/>
+          <line x1="68" y1="120" x2="72" y2="110"/>
+          <line x1="92" y1="102" x2="95" y2="92"/>
+          <line x1="110" y1="91" x2="113" y2="80"/>
+          <line x1="126" y1="83" x2="128" y2="72"/>
+          <line x1="158" y1="73" x2="159" y2="61"/>
+          <line x1="178" y1="69" x2="178" y2="57"/>
+          <line x1="222" y1="70" x2="222" y2="58"/>
+          <line x1="242" y1="74" x2="241" y2="62"/>
+          <line x1="278" y1="86" x2="275" y2="75"/>
+          <line x1="298" y1="96" x2="294" y2="86"/>
+          <line x1="336" y1="120" x2="332" y2="110"/>
+          <line x1="352" y1="132" x2="348" y2="122"/>
         </g>
-        <!-- Needle (pivoted at (200,155), rotated by JS) -->
-        <g id="ampVuNeedleL" transform="rotate(-45 200 155)">
-          <line x1="200" y1="155" x2="200" y2="45" stroke="#1a1a1c" stroke-width="2.2" stroke-linecap="round"/>
-          <circle cx="200" cy="45" r="3" fill="#1a1a1c"/>
+        <!-- Major tick marks + numbers. Hand-tuned serif-ish look. -->
+        <g font-family="'Orbitron','Share Tech Mono',serif" font-size="10" font-weight="800" text-anchor="middle"
+           fill="#1a0a00">
+          <line x1="30" y1="155" x2="36" y2="140" stroke="#1a0a00" stroke-width="1.6"/>
+          <text x="38" y="134">-20</text>
+
+          <line x1="80" y1="110" x2="84" y2="98" stroke="#1a0a00" stroke-width="1.6"/>
+          <text x="88" y="93">-10</text>
+
+          <line x1="140" y1="78" x2="143" y2="66" stroke="#1a0a00" stroke-width="1.6"/>
+          <text x="148" y="60">-5</text>
+
+          <line x1="200" y1="68" x2="200" y2="54" stroke="#1a0a00" stroke-width="2"/>
+          <text x="200" y="47" font-size="13" font-weight="900">0</text>
+
+          <line x1="260" y1="78" x2="258" y2="66" stroke="#7a1008" stroke-width="1.8"/>
+          <text x="255" y="60" fill="#a01008">+3</text>
+
+          <line x1="320" y1="110" x2="316" y2="98" stroke="#c82818" stroke-width="1.8"/>
+          <text x="312" y="93" fill="#c82818">+6</text>
+
+          <line x1="370" y1="155" x2="364" y2="140" stroke="#c82818" stroke-width="2"/>
         </g>
-        <!-- Pivot hub -->
-        <circle cx="200" cy="155" r="8" fill="#2a2a2e" stroke="#0a0a0b" stroke-width="1"/>
-        <circle cx="200" cy="155" r="3" fill="#0a0a0b"/>
-        <!-- Peak-hold dot -->
-        <circle id="ampVuPeakL" cx="200" cy="50" r="2.5" fill="#d8201a" opacity="0"/>
+        <!-- "VU" mark under the scale, classic vintage placement -->
+        <text x="200" y="105" text-anchor="middle" font-family="'Orbitron',sans-serif"
+              font-size="16" font-weight="900" letter-spacing="3" fill="rgba(60,30,0,0.35)">VU</text>
+        <text x="200" y="118" text-anchor="middle" font-family="'Share Tech Mono',monospace"
+              font-size="7" letter-spacing="2" fill="rgba(80,45,10,0.5)">CALIBRATED +4 dBu = 0 VU</text>
+
+        <!-- NEEDLE: hair-thin tapered black line with a soft shadow -->
+        <g id="ampVuNeedleL" transform="rotate(-45 200 155)" filter="url(#vuNeedleShadow)">
+          <!-- Needle body — narrower at the tip, wider at the base -->
+          <polygon points="199.4,155 200.6,155 200.1,48" fill="#0a0608"/>
+          <!-- Counterweight on the other side of the pivot — adds the
+               classic analogue look -->
+          <polygon points="199,159 201,159 200,168" fill="#1a0f04"/>
+        </g>
+        <!-- Pivot hub — small brass dot inside a darker ring -->
+        <circle cx="200" cy="155" r="9" fill="#1a0e04" stroke="#d4a849" stroke-width="0.8"/>
+        <circle cx="200" cy="155" r="5" fill="url(#vuScaleGrad)"/>
+        <circle cx="200" cy="155" r="2.5" fill="#d4a849" opacity="0.6"/>
+        <!-- Peak-hold warning lamp — glows red above the "0" when slammed -->
+        <circle id="ampVuPeakL" cx="260" cy="48" r="3.5" fill="#ff3020" opacity="0">
+          <animate attributeName="fill-opacity" values="1;0.5;1" dur="0.4s" repeatCount="indefinite"/>
+        </circle>
       </svg>
+      <div class="amp-vu-glass"></div>
     </div>
+
+    <!-- ───── R CHANNEL VU METER ───── -->
     <div class="amp-vu" id="ampVuR">
-      <span class="amp-vu-label">VU · −20 ← 0 → +3</span>
+      <div class="amp-vu-dial"></div>
+      <span class="amp-vu-label">VU · TITAN AUDIO LAB</span>
       <span class="amp-vu-ch">R</span>
       <svg viewBox="0 0 400 170" preserveAspectRatio="xMidYMid meet">
-        <path d="M 30 155 A 170 170 0 0 1 370 155" fill="none" stroke="url(#vuArcGrad)" stroke-width="4" opacity="0.9"/>
-        <g stroke="#3a2a0a" stroke-width="1.2" fill="#3a2a0a" font-family="Orbitron,sans-serif" font-size="11" font-weight="700" text-anchor="middle">
-          <line x1="30" y1="150" x2="36" y2="135"/><text x="36" y="128">-20</text>
-          <line x1="80" y1="110" x2="84" y2="97"/><text x="84" y="90">-10</text>
-          <line x1="140" y1="78" x2="142" y2="64"/><text x="142" y="56">-5</text>
-          <line x1="200" y1="68" x2="200" y2="52"/><text x="200" y="44" fill="#2a1a04" font-size="13">0</text>
-          <line x1="260" y1="78" x2="258" y2="64"/><text x="258" y="56" fill="#b0202a">+3</text>
-          <line x1="320" y1="110" x2="316" y2="97" stroke="#b0202a" fill="#b0202a"/><text x="316" y="90" fill="#b0202a">+6</text>
-          <line x1="370" y1="150" x2="364" y2="135" stroke="#d8201a" fill="#d8201a"/>
+        <rect x="0" y="0" width="400" height="170" fill="url(#vuVignette)"/>
+        <path d="M 220 66 A 170 170 0 0 1 370 156 L 370 168 L 220 168 Z"
+              fill="url(#vuRedFill)" opacity="0.65"/>
+        <path d="M 30 155 A 170 170 0 0 1 370 155" fill="none"
+              stroke="url(#vuScaleGrad)" stroke-width="3.2" opacity="0.95"/>
+        <g stroke="rgba(40,20,0,0.55)" stroke-width="1" fill="none">
+          <line x1="54" y1="131" x2="58" y2="121"/>
+          <line x1="68" y1="120" x2="72" y2="110"/>
+          <line x1="92" y1="102" x2="95" y2="92"/>
+          <line x1="110" y1="91" x2="113" y2="80"/>
+          <line x1="126" y1="83" x2="128" y2="72"/>
+          <line x1="158" y1="73" x2="159" y2="61"/>
+          <line x1="178" y1="69" x2="178" y2="57"/>
+          <line x1="222" y1="70" x2="222" y2="58"/>
+          <line x1="242" y1="74" x2="241" y2="62"/>
+          <line x1="278" y1="86" x2="275" y2="75"/>
+          <line x1="298" y1="96" x2="294" y2="86"/>
+          <line x1="336" y1="120" x2="332" y2="110"/>
+          <line x1="352" y1="132" x2="348" y2="122"/>
         </g>
-        <g id="ampVuNeedleR" transform="rotate(-45 200 155)">
-          <line x1="200" y1="155" x2="200" y2="45" stroke="#1a1a1c" stroke-width="2.2" stroke-linecap="round"/>
-          <circle cx="200" cy="45" r="3" fill="#1a1a1c"/>
+        <g font-family="'Orbitron','Share Tech Mono',serif" font-size="10" font-weight="800" text-anchor="middle"
+           fill="#1a0a00">
+          <line x1="30" y1="155" x2="36" y2="140" stroke="#1a0a00" stroke-width="1.6"/>
+          <text x="38" y="134">-20</text>
+          <line x1="80" y1="110" x2="84" y2="98" stroke="#1a0a00" stroke-width="1.6"/>
+          <text x="88" y="93">-10</text>
+          <line x1="140" y1="78" x2="143" y2="66" stroke="#1a0a00" stroke-width="1.6"/>
+          <text x="148" y="60">-5</text>
+          <line x1="200" y1="68" x2="200" y2="54" stroke="#1a0a00" stroke-width="2"/>
+          <text x="200" y="47" font-size="13" font-weight="900">0</text>
+          <line x1="260" y1="78" x2="258" y2="66" stroke="#7a1008" stroke-width="1.8"/>
+          <text x="255" y="60" fill="#a01008">+3</text>
+          <line x1="320" y1="110" x2="316" y2="98" stroke="#c82818" stroke-width="1.8"/>
+          <text x="312" y="93" fill="#c82818">+6</text>
+          <line x1="370" y1="155" x2="364" y2="140" stroke="#c82818" stroke-width="2"/>
         </g>
-        <circle cx="200" cy="155" r="8" fill="#2a2a2e" stroke="#0a0a0b" stroke-width="1"/>
-        <circle cx="200" cy="155" r="3" fill="#0a0a0b"/>
-        <circle id="ampVuPeakR" cx="200" cy="50" r="2.5" fill="#d8201a" opacity="0"/>
+        <text x="200" y="105" text-anchor="middle" font-family="'Orbitron',sans-serif"
+              font-size="16" font-weight="900" letter-spacing="3" fill="rgba(60,30,0,0.35)">VU</text>
+        <text x="200" y="118" text-anchor="middle" font-family="'Share Tech Mono',monospace"
+              font-size="7" letter-spacing="2" fill="rgba(80,45,10,0.5)">CALIBRATED +4 dBu = 0 VU</text>
+        <g id="ampVuNeedleR" transform="rotate(-45 200 155)" filter="url(#vuNeedleShadow)">
+          <polygon points="199.4,155 200.6,155 200.1,48" fill="#0a0608"/>
+          <polygon points="199,159 201,159 200,168" fill="#1a0f04"/>
+        </g>
+        <circle cx="200" cy="155" r="9" fill="#1a0e04" stroke="#d4a849" stroke-width="0.8"/>
+        <circle cx="200" cy="155" r="5" fill="url(#vuScaleGrad)"/>
+        <circle cx="200" cy="155" r="2.5" fill="#d4a849" opacity="0.6"/>
+        <circle id="ampVuPeakR" cx="260" cy="48" r="3.5" fill="#ff3020" opacity="0">
+          <animate attributeName="fill-opacity" values="1;0.5;1" dur="0.4s" repeatCount="indefinite"/>
+        </circle>
       </svg>
+      <div class="amp-vu-glass"></div>
     </div>
   </div>
 
