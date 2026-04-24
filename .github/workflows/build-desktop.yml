@@ -1,4 +1,4 @@
-name: Build Desktop App (Windows)
+name: Build Desktop App (All Platforms)
 
 on:
   workflow_dispatch: {}
@@ -14,97 +14,171 @@ on:
 permissions:
   contents: write
 
+# One run per ref — kill in-flight older runs when a newer push lands so the
+# release tag always reflects the latest commit instead of the earlier one
+# winning the race.
+concurrency:
+  group: build-desktop-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  windows:
-    name: Windows installer
-    runs-on: windows-latest
-
+  # ──────────────────────────────────────────────────────────────────
+  # 1. Decide the version once. All three build jobs use the same
+  #    number so the GitHub Release ends up with one tag and three
+  #    matched binaries (.exe + .dmg + .AppImage).
+  # ──────────────────────────────────────────────────────────────────
+  version:
+    name: Derive version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.ver.outputs.version }}
+      tag: ${{ steps.ver.outputs.tag }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node 20
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
-
-      - name: Show build context
-        shell: bash
-        run: |
-          echo "Node:  $(node -v)"
-          echo "npm:   $(npm -v)"
-          echo "OS:    ${{ runner.os }}"
-          echo "Arch:  ${{ runner.arch }}"
-          echo "Ref:   ${{ github.ref }}"
-          echo "SHA:   ${{ github.sha }}"
-          echo "--- package.json (name + version) ---"
-          node -e "const p=require('./package.json');console.log(p.name, p.version)"
-
-      - name: Install dependencies
-        run: npm install --no-audit --no-fund
-
-      - name: Verify electron-builder is present
-        shell: bash
-        run: |
-          ls node_modules/.bin/electron-builder* 2>&1 || true
-          npx --no-install electron-builder --version
-
-      - name: Derive version (auto-bump to next unused tag)
-        id: ver
-        shell: bash
-        # UI-only commits land in public/** without bumping package.json. If we
-        # used that version as-is, the softprops release step would collide with
-        # the existing tag and fail (or return a frozen immutable release).
-        # Instead, walk patch numbers forward until we find one GitHub hasn't
-        # tagged yet, and rewrite package.json in the runner workspace so
-        # electron-builder stamps the same version into the .exe + latest.yml.
-        # The bump isn't committed back — next build re-derives from current
-        # package.json + live remote tags.
+      - id: ver
+        name: Walk to next unused tag
+        # UI-only commits don't bump package.json, so the recorded version
+        # may already be tagged on the remote. Walk patch numbers forward
+        # until we find one GitHub hasn't tagged yet.
         run: |
           V="${{ github.event.inputs.version }}"
           if [ -z "$V" ]; then V="$(node -p "require('./package.json').version")"; fi
           while git ls-remote --exit-code --tags origin "refs/tags/v$V" >/dev/null 2>&1; do
             V="$(node -p "const v='$V'.split('.');v[2]=String(Number(v[2])+1);v.join('.')")"
           done
-          node -e "const fs=require('fs');const p=require('./package.json');p.version='$V';fs.writeFileSync('./package.json',JSON.stringify(p,null,2)+'\n')"
           echo "version=$V" >> "$GITHUB_OUTPUT"
           echo "tag=v$V"    >> "$GITHUB_OUTPUT"
           echo "Building version $V (tag v$V)"
 
-      - name: Build Windows installer (no publish)
+  # ──────────────────────────────────────────────────────────────────
+  # 2. Three parallel builds — Windows .exe, macOS .dmg (universal),
+  #    Linux .AppImage. Each uploads its raw output as an artifact.
+  # ──────────────────────────────────────────────────────────────────
+  windows:
+    name: Windows .exe
+    needs: version
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - name: Stamp package.json with the chosen version
+        shell: bash
+        run: node -e "const fs=require('fs');const p=require('./package.json');p.version='${{ needs.version.outputs.version }}';fs.writeFileSync('./package.json',JSON.stringify(p,null,2)+'\n')"
+      - name: Install
+        run: npm install --no-audit --no-fund
+      - name: Build
         shell: bash
         run: npx electron-builder --win --x64 --publish never
-
-      - name: List dist-electron
+      - name: List output
         shell: bash
         run: |
           ls -la dist-electron/ || true
-          echo "--- .exe files ---"
           find dist-electron -maxdepth 2 -name '*.exe' -printf '%p  %s bytes\n' || true
-
-      - name: Upload installer artifact (always)
-        if: always()
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
-          name: windows-installer-${{ steps.ver.outputs.version }}
+          name: dist-windows
           path: |
             dist-electron/*.exe
             dist-electron/*.blockmap
             dist-electron/latest*.yml
           if-no-files-found: error
-          retention-days: 30
+          retention-days: 7
 
-      - name: Publish GitHub Release with Windows .exe
-        if: success()
+  macos:
+    name: macOS .dmg (universal)
+    needs: version
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - name: Stamp package.json with the chosen version
+        run: node -e "const fs=require('fs');const p=require('./package.json');p.version='${{ needs.version.outputs.version }}';fs.writeFileSync('./package.json',JSON.stringify(p,null,2)+'\n')"
+      - name: Install
+        run: npm install --no-audit --no-fund
+      - name: Build
+        # No code-signing: the binary is fine but Gatekeeper will warn the
+        # user once. They right-click → Open the first time and macOS lets
+        # it run thereafter. Add CSC_LINK + CSC_KEY_PASSWORD secrets to
+        # turn on Apple Developer signing later.
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+        run: npx electron-builder --mac --x64 --arm64 --publish never
+      - name: List output
+        run: |
+          ls -la dist-electron/ || true
+          find dist-electron -maxdepth 2 \( -name '*.dmg' -o -name '*.zip' \) -printf '%p  %s bytes\n' || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-macos
+          path: |
+            dist-electron/*.dmg
+            dist-electron/*.zip
+            dist-electron/*.blockmap
+            dist-electron/latest-mac*.yml
+          if-no-files-found: error
+          retention-days: 7
+
+  linux:
+    name: Linux .AppImage
+    needs: version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - name: Stamp package.json with the chosen version
+        run: node -e "const fs=require('fs');const p=require('./package.json');p.version='${{ needs.version.outputs.version }}';fs.writeFileSync('./package.json',JSON.stringify(p,null,2)+'\n')"
+      - name: Install
+        run: npm install --no-audit --no-fund
+      - name: Build
+        run: npx electron-builder --linux --x64 --publish never
+      - name: List output
+        run: |
+          ls -la dist-electron/ || true
+          find dist-electron -maxdepth 2 -name '*.AppImage' -printf '%p  %s bytes\n' || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-linux
+          path: |
+            dist-electron/*.AppImage
+            dist-electron/*.blockmap
+            dist-electron/latest-linux*.yml
+          if-no-files-found: error
+          retention-days: 7
+
+  # ──────────────────────────────────────────────────────────────────
+  # 3. Collect every artifact and publish ONE GitHub Release with all
+  #    three platform binaries attached. The in-app installer panel
+  #    auto-resolves to the latest release, so users see the right
+  #    download for their OS without us touching the renderer.
+  # ──────────────────────────────────────────────────────────────────
+  release:
+    name: Publish GitHub Release
+    needs: [version, windows, macos, linux]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download all platform artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist-all
+      - name: Flatten + inspect
+        run: |
+          mkdir -p release-files
+          find dist-all -type f \( -name '*.exe' -o -name '*.dmg' -o -name '*.zip' -o -name '*.AppImage' -o -name '*.blockmap' -o -name 'latest*.yml' \) -exec cp {} release-files/ \;
+          ls -la release-files/
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.ver.outputs.tag }}
-          name: ${{ steps.ver.outputs.version }}
+          tag_name: ${{ needs.version.outputs.tag }}
+          name: ${{ needs.version.outputs.version }}
           draft: false
           prerelease: false
           fail_on_unmatched_files: true
           generate_release_notes: true
-          files: |
-            dist-electron/*.exe
-            dist-electron/*.blockmap
-            dist-electron/latest*.yml
+          files: release-files/*

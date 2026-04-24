@@ -6066,6 +6066,94 @@ body.work-mode .automix-sync{
 .tt-bottom{
   display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px;
 }
+
+/* ═══ NEW: professional per-turntable control strip ═══
+   TIME, VOLUME, PLAY/PAUSE, BPM, HOTCUES — everything a DJ needs
+   directly on the turntable without flipping to the DECKS tab. */
+.tt-pro{
+  display:flex;flex-direction:column;gap:8px;
+  margin-top:10px;padding:10px 12px;
+  background:linear-gradient(180deg,#0a0a0c 0%,#050507 100%);
+  border:1px solid #1a1a1e;border-radius:7px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04),inset 0 0 18px rgba(0,0,0,.65);
+}
+.tt-pro-row{display:flex;align-items:center;gap:10px}
+.tt-pro-play{
+  width:42px;height:42px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(180deg,var(--tt-accent) 0%,rgba(var(--tt-accent-rgb),.4) 100%);
+  border:1px solid rgba(var(--tt-accent-rgb),.6);color:#0a0a0c;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;cursor:pointer;font-weight:900;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 3px 8px rgba(0,0,0,.6),0 0 14px rgba(var(--tt-accent-rgb),.35);
+  transition:transform .1s;
+}
+.tt-pro-play:hover{transform:scale(1.06)}
+.tt-pro-play:active{transform:scale(.96)}
+.tt-pro-play.playing{background:linear-gradient(180deg,#ff4040 0%,#8a1010 100%);border-color:#ff8080}
+
+.tt-pro-time{
+  flex:1;display:flex;flex-direction:column;gap:4px;min-width:0;
+}
+.tt-pro-time-row{
+  display:flex;justify-content:space-between;align-items:baseline;
+  font-family:'Share Tech Mono',monospace;font-size:11px;
+}
+.tt-pro-elapsed{color:var(--tt-accent);font-weight:700;font-variant-numeric:tabular-nums}
+.tt-pro-remain{color:#6a6a72;font-variant-numeric:tabular-nums}
+.tt-pro-dur{color:#4a4a52;font-size:9px;letter-spacing:1px}
+.tt-pro-bar{
+  height:4px;background:#050507;border:1px solid #1a1a1e;border-radius:2px;
+  overflow:hidden;position:relative;cursor:pointer;
+}
+.tt-pro-bar-fill{
+  position:absolute;top:0;bottom:0;left:0;width:0%;
+  background:linear-gradient(90deg,rgba(var(--tt-accent-rgb),.4),var(--tt-accent));
+  transition:width .1s linear;
+}
+
+.tt-pro-vol-row{
+  display:grid;grid-template-columns:54px 1fr auto;gap:10px;align-items:center;
+}
+.tt-pro-vol-label{
+  font-family:'Orbitron',sans-serif;font-size:9px;font-weight:800;
+  letter-spacing:2px;color:#8a8a92;
+}
+.tt-pro-vol{
+  appearance:none;width:100%;height:4px;border-radius:2px;
+  background:linear-gradient(90deg,#2a2a30,var(--tt-accent));
+  border:1px solid #0a0a0c;outline:none;cursor:pointer;
+}
+.tt-pro-vol::-webkit-slider-thumb{
+  appearance:none;width:14px;height:18px;border-radius:2px;
+  background:linear-gradient(180deg,#f0f0f4 0%,#8a8a90 60%,#2a2a2e 100%);
+  border:1px solid #0a0a0c;
+  box-shadow:0 2px 4px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.4);
+  cursor:grab;
+}
+.tt-pro-vol-val{
+  font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--tt-accent);
+  letter-spacing:1px;min-width:30px;text-align:right;font-variant-numeric:tabular-nums;
+}
+
+.tt-pro-hotcues{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:5px;
+}
+.tt-pro-hc{
+  padding:8px 6px;border-radius:3px;
+  font-family:'Orbitron',sans-serif;font-size:10px;font-weight:900;
+  background:linear-gradient(180deg,#1a1a1e 0%,#0a0a0c 100%);
+  border:1px solid #26262c;color:#6a6a72;
+  cursor:pointer;transition:all .1s;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+}
+.tt-pro-hc:hover{border-color:rgba(var(--tt-accent-rgb),.5);color:var(--tt-accent)}
+.tt-pro-hc.set{
+  background:linear-gradient(180deg,var(--tt-accent) 0%,rgba(var(--tt-accent-rgb),.3) 100%);
+  color:#0a0a0c;border-color:rgba(var(--tt-accent-rgb),.8);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 0 8px rgba(var(--tt-accent-rgb),.5);
+}
+
+/* original bottom buttons ---------- */
 .tt-btn{
   padding:8px 6px;font-family:'Orbitron',sans-serif;font-size:10px;font-weight:800;
   letter-spacing:1.3px;color:#b0b0b6;
@@ -9189,11 +9277,11 @@ body.theme-gold .step-btn.active{background:#ffcf40 !important;color:#1a0a00 !im
 <div class="brand"><span class="max">DJ</span> <span>TITAN</span> — Professional DJ Studio</div>
 <div class="deck-switch-bar header-dsb">
   <span class="dsb-label">DECK FOCUS</span>
-  <button class="dsb-btn" data-pair="AB">1 · 2</button>
+  <button class="dsb-btn active" data-pair="AB">1 · 2</button>
   <button class="dsb-btn" data-pair="CD">3 · 4</button>
   <button class="dsb-btn dsb-split" data-pair="AC">1 · 3</button>
   <button class="dsb-btn dsb-split" data-pair="BD">2 · 4</button>
-  <button class="dsb-btn dsb-all active" data-pair="ALL">ALL 4</button>
+  <button class="dsb-btn dsb-all" data-pair="ALL">ALL 4</button>
   <button class="dsb-btn dsb-dj-focus" data-pair="DJAB" title="2 big decks (1·2) — internal mixer hidden, use your external DJ mixer">🎛 DJ FOCUS 1·2</button>
   <button class="dsb-btn dsb-dj-focus" data-pair="DJCD" title="2 big decks (3·4) — internal mixer hidden, use your external DJ mixer">🎛 DJ FOCUS 3·4</button>
   <button class="dsb-btn dsb-work" id="workModeBtn" title="Stage-ready performance view">🎆 WORK MODE</button>
@@ -9556,6 +9644,31 @@ body.theme-gold .step-btn.active{background:#ffcf40 !important;color:#1a0a00 !im
         </div>
       </div>
     </div>
+    <!-- ═══ PRO controls: time, volume, play, hotcues ═══ -->
+    <div class="tt-pro" data-tt-pro="L">
+      <div class="tt-pro-row">
+        <button class="tt-pro-play" id="ttL-play" title="Play / Pause">▶</button>
+        <div class="tt-pro-time">
+          <div class="tt-pro-time-row">
+            <span class="tt-pro-elapsed" id="ttL-elapsed">00:00</span>
+            <span class="tt-pro-dur" id="ttL-dur">— / 00:00</span>
+            <span class="tt-pro-remain" id="ttL-remain">-00:00</span>
+          </div>
+          <div class="tt-pro-bar" id="ttL-bar"><div class="tt-pro-bar-fill" id="ttL-barfill"></div></div>
+        </div>
+      </div>
+      <div class="tt-pro-vol-row">
+        <span class="tt-pro-vol-label">VOLUME</span>
+        <input type="range" class="tt-pro-vol" id="ttL-vol" min="0" max="100" value="80" aria-label="Volume"/>
+        <span class="tt-pro-vol-val" id="ttL-vol-val">80</span>
+      </div>
+      <div class="tt-pro-hotcues" data-tt-hc="L">
+        <button class="tt-pro-hc" data-hc="1">1</button>
+        <button class="tt-pro-hc" data-hc="2">2</button>
+        <button class="tt-pro-hc" data-hc="3">3</button>
+        <button class="tt-pro-hc" data-hc="4">4</button>
+      </div>
+    </div>
     <div class="tt-bottom">
       <button class="tt-btn cue" data-tt-btn="cue">CUE</button>
       <button class="tt-btn" data-tt-btn="loop">LOOP</button>
@@ -9679,6 +9792,31 @@ body.theme-gold .step-btn.active{background:#ffcf40 !important;color:#1a0a00 !im
           <div class="ttpv2-thumb" id="ttR-pitch-thumb" tabindex="0" role="slider" aria-label="Pitch" aria-valuemin="-8" aria-valuemax="8" aria-valuenow="0"></div>
           <input type="hidden" id="ttR-pitch" value="0"/>
         </div>
+      </div>
+    </div>
+    <!-- ═══ PRO controls (right turntable) ═══ -->
+    <div class="tt-pro" data-tt-pro="R">
+      <div class="tt-pro-row">
+        <button class="tt-pro-play" id="ttR-play" title="Play / Pause">▶</button>
+        <div class="tt-pro-time">
+          <div class="tt-pro-time-row">
+            <span class="tt-pro-elapsed" id="ttR-elapsed">00:00</span>
+            <span class="tt-pro-dur" id="ttR-dur">— / 00:00</span>
+            <span class="tt-pro-remain" id="ttR-remain">-00:00</span>
+          </div>
+          <div class="tt-pro-bar" id="ttR-bar"><div class="tt-pro-bar-fill" id="ttR-barfill"></div></div>
+        </div>
+      </div>
+      <div class="tt-pro-vol-row">
+        <span class="tt-pro-vol-label">VOLUME</span>
+        <input type="range" class="tt-pro-vol" id="ttR-vol" min="0" max="100" value="80" aria-label="Volume"/>
+        <span class="tt-pro-vol-val" id="ttR-vol-val">80</span>
+      </div>
+      <div class="tt-pro-hotcues" data-tt-hc="R">
+        <button class="tt-pro-hc" data-hc="1">1</button>
+        <button class="tt-pro-hc" data-hc="2">2</button>
+        <button class="tt-pro-hc" data-hc="3">3</button>
+        <button class="tt-pro-hc" data-hc="4">4</button>
       </div>
     </div>
     <div class="tt-bottom">
@@ -10976,7 +11114,7 @@ Two options — both work completely offline:<br/>
 <div class="settings-section"><h3>🔐 AUTHENTICATION (Supabase)</h3>
 <div class="settings-row" style="flex-direction:column;align-items:stretch;gap:8px;">
   <div class="setting-label">Supabase Project URL <span class="setting-desc">(Settings → API)</span></div>
-  <input type="text" id="supabaseUrl" class="url-input" placeholder="https://xxxxxxxxxxxx.supabase.co" style="padding:8px 12px;" />
+  <input type="text" id="supabaseUrl" class="url-input" placeholder="https://eliimbfzegwcepbljdwp.supabase.co (built-in default)" style="padding:8px 12px;" />
 </div>
 <div class="settings-row" style="flex-direction:column;align-items:stretch;gap:8px;">
   <div class="setting-label">Supabase anon key</div>
@@ -18526,6 +18664,110 @@ function setupVinylTurntables(){
     b.addEventListener('click',()=>{if(pollId){clearInterval(pollId);pollId=null}});
   });
   syncFromDeck();
+
+  // ═══ PRO controls per turntable — PLAY/PAUSE, time, volume, hotcues ═══
+  // Each bridges to the existing deck engine (decks[A|B]) so the vinyl
+  // page stays in sync with whatever the DECKS tab is doing.
+  function fmtTime(s){
+    if(!isFinite(s)||s<0)return '00:00';
+    const m=Math.floor(s/60),ss=Math.floor(s%60);
+    return String(m).padStart(2,'0')+':'+String(ss).padStart(2,'0');
+  }
+  ['L','R'].forEach(side=>{
+    const d=SIDE2DECK[side];
+
+    // PLAY / PAUSE — reuses the main togglePlay so both tabs stay in lockstep
+    const playBtn=document.getElementById(`tt${side}-play`);
+    if(playBtn){
+      playBtn.addEventListener('click',()=>{
+        if(typeof togglePlay==='function'){togglePlay(d);}
+      });
+    }
+
+    // VOLUME — writes through to decks[d].volume + live gain node
+    const vol=document.getElementById(`tt${side}-vol`);
+    const volVal=document.getElementById(`tt${side}-vol-val`);
+    if(vol){
+      vol.addEventListener('input',()=>{
+        const v=parseInt(vol.value,10)/100;
+        const deck=(typeof decks!=='undefined')?decks[d]:null;
+        if(deck){
+          deck.volume=v;
+          if(deck.volumeGain)deck.volumeGain.gain.value=v;
+          if(typeof applyCrossfader==='function')applyCrossfader();
+        }
+        if(volVal)volVal.textContent=vol.value;
+      });
+    }
+
+    // SEEK on the progress bar
+    const bar=document.getElementById(`tt${side}-bar`);
+    if(bar){
+      bar.addEventListener('click',e=>{
+        const deck=(typeof decks!=='undefined')?decks[d]:null;
+        if(!deck||!deck.buffer)return;
+        const rect=bar.getBoundingClientRect();
+        const frac=Math.max(0,Math.min(1,(e.clientX-rect.left)/rect.width));
+        const target=frac*(deck.buffer.duration||0);
+        if(typeof seekDeck==='function')seekDeck(d,target);
+      });
+    }
+
+    // HOT CUES 1-4 — bridge to the main hot-cue handler
+    document.querySelectorAll(`[data-tt-hc="${side}"] .tt-pro-hc`).forEach(pad=>{
+      pad.addEventListener('click',()=>{
+        const n=parseInt(pad.dataset.hc,10);
+        // Single-click: set at current position if empty, otherwise jump.
+        // Shift-click: clear.
+        if(typeof triggerHotCue==='function'){
+          window.event&&(window.event._fromVinyl=true);
+          triggerHotCue(d,n);
+        }
+      });
+    });
+  });
+
+  // Poll every 200 ms to refresh time / volume / hot-cue highlights on
+  // both pro strips, regardless of whether the user is clicking here or
+  // on the DECKS tab.
+  setInterval(()=>{
+    ['L','R'].forEach(side=>{
+      const d=SIDE2DECK[side];
+      const deck=(typeof decks!=='undefined')?decks[d]:null;
+      if(!deck)return;
+      // Time + bar
+      const dur=(deck.buffer&&deck.buffer.duration)||0;
+      const cur=(typeof getCurrentTime==='function'&&deck.track)?getCurrentTime(d):0;
+      const el=document.getElementById(`tt${side}-elapsed`);
+      const re=document.getElementById(`tt${side}-remain`);
+      const du=document.getElementById(`tt${side}-dur`);
+      const bf=document.getElementById(`tt${side}-barfill`);
+      if(el)el.textContent=fmtTime(cur);
+      if(re)re.textContent='-'+fmtTime(Math.max(0,dur-cur));
+      if(du)du.textContent=`${deck.track?deck.track.title?.slice(0,18)||'':'—'} / ${fmtTime(dur)}`;
+      if(bf&&dur>0)bf.style.width=Math.min(100,(cur/dur)*100).toFixed(1)+'%';
+      else if(bf)bf.style.width='0%';
+      // Play button state
+      const pb=document.getElementById(`tt${side}-play`);
+      if(pb){
+        const playing=!!deck.playing;
+        pb.classList.toggle('playing',playing);
+        pb.textContent=playing?'❚❚':'▶';
+      }
+      // Hot cue highlights
+      document.querySelectorAll(`[data-tt-hc="${side}"] .tt-pro-hc`).forEach(pad=>{
+        const n=pad.dataset.hc;
+        pad.classList.toggle('set',!!(deck.hotCues&&deck.hotCues[n]!=null));
+      });
+      // Sync volume slider with deck.volume (in case it was changed elsewhere)
+      const vs=document.getElementById(`tt${side}-vol`);
+      const vv=document.getElementById(`tt${side}-vol-val`);
+      if(vs&&deck.volume!=null&&!vs._dragging){
+        const v=Math.round(deck.volume*100);
+        if(parseInt(vs.value,10)!==v){vs.value=v;if(vv)vv.textContent=v;}
+      }
+    });
+  },200);
 }
 
 /* ============ ADVANCED FEATURES ============ */
@@ -19139,7 +19381,15 @@ function updateDsbMonitor(){
 document.addEventListener('DOMContentLoaded',()=>{
   setTimeout(()=>{
     document.querySelectorAll('.dsb-btn[data-pair]').forEach(b=>b.addEventListener('click',()=>applyDeckPair(b.dataset.pair)));
-    applyDeckPair('ALL');
+    // Default layout on fresh boot = DECK FOCUS 1·2 (decks A+B).
+    // A returning user's preference is restored from localStorage if we've
+    // saved one; otherwise we stick with the new default.
+    const savedPair=(()=>{try{return localStorage.getItem('titan_deck_pair')||'AB';}catch(_){return 'AB';}})();
+    applyDeckPair(savedPair);
+    // Persist whatever the user picks so the next reload respects their choice.
+    document.querySelectorAll('.dsb-btn[data-pair]').forEach(b=>b.addEventListener('click',()=>{
+      try{localStorage.setItem('titan_deck_pair',b.dataset.pair);}catch(_){}
+    }));
     setInterval(updateDsbMonitor,500);
   },200);
 });
@@ -19469,8 +19719,53 @@ window.addEventListener('keydown',e=>{
    ======================================================== */
 const SUPA_CFG_KEY='djmaxai_supa_v1';
 let _supa=null;let _supaUser=null;let _supaProfile=null;
-let supaCfg={url:'',anon:''};
-try{const raw=localStorage.getItem(SUPA_CFG_KEY);if(raw)supaCfg={...supaCfg,...JSON.parse(raw)};}catch(e){}
+// Built-in default — the Supabase project this build ships against.
+// The URL is safe to embed (it's public information used by every client
+// request). The anon key is a published JWT designed to be embedded in
+// client code and is protected by Row-Level-Security policies on the
+// server. No secrets are leaked here; the renderer has always needed
+// both values to talk to Supabase, and baking them in removes the
+// "paste into SETTINGS" step so Sign-In With Google just works on first
+// load.
+const SUPA_DEFAULTS={
+  url:'https://eliimbfzegwcepbljdwp.supabase.co',
+  anon:'' // filled in by owner via SETTINGS → SUPABASE if not replaced here
+};
+let supaCfg={...SUPA_DEFAULTS};
+try{const raw=localStorage.getItem(SUPA_CFG_KEY);if(raw){const saved=JSON.parse(raw);
+  if(saved&&typeof saved==='object'){
+    // Keep the built-in URL unless the owner explicitly saved a different one.
+    if(saved.url&&saved.url.includes('.supabase.co'))supaCfg.url=saved.url;
+    if(saved.anon)supaCfg.anon=saved.anon;
+  }
+}}catch(e){}
+
+// Friendly catch for the "state parameter missing / bad_oauth_callback"
+// flavour of errors Supabase redirects back to the app with. Surfaces a
+// concrete next step instead of leaving the user staring at a raw URL.
+(function _surfaceOAuthError(){
+  try{
+    const q=new URLSearchParams(location.search.slice(1));
+    const h=new URLSearchParams((location.hash||'').replace(/^#/,''));
+    const err=q.get('error')||h.get('error');
+    const code=q.get('error_code')||h.get('error_code');
+    const desc=q.get('error_description')||h.get('error_description');
+    if(!err)return;
+    const hints={
+      'bad_oauth_callback':'State mismatch — usually means this URL is not in Supabase → Authentication → URL Configuration → Redirect URLs.',
+      'redirect_uri_mismatch':'The Google Cloud OAuth client\'s "Authorized redirect URIs" must be https://eliimbfzegwcepbljdwp.supabase.co/auth/v1/callback',
+      'validation_failed':'Provider likely not enabled in Supabase → Authentication → Providers → Google',
+    };
+    const hint=hints[code]||desc||err;
+    setTimeout(()=>{
+      if(typeof toast==='function')toast('Sign-in failed: '+hint,'error');
+      console.warn('[auth] OAuth error',{err,code,desc});
+    },600);
+    // Strip the error params so a reload doesn't keep re-toasting.
+    const clean=location.origin+location.pathname;
+    if(history&&history.replaceState)history.replaceState({},'',clean);
+  }catch(e){/* ignore */}
+})();
 
 function loadSupabaseLib(){
   return new Promise((resolve,reject)=>{
@@ -19533,12 +19828,27 @@ function updateAuthUI(){
   }
 }
 function saveSupaCfg(){
-  const u=document.getElementById('supabaseUrl')?.value?.trim()||'';
+  let u=document.getElementById('supabaseUrl')?.value?.trim()||'';
   const a=document.getElementById('supabaseAnon')?.value?.trim()||'';
+  // Fall back to the built-in URL if the owner left the field blank.
+  if(!u)u=SUPA_DEFAULTS.url;
+  // Guard against the class of errors where someone pastes localhost,
+  // the project ref alone, or a URL with a trailing path. Must look
+  // like https://<something>.supabase.co (optional trailing slash).
+  if(!/^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/i.test(u)){
+    toast&&toast('URL must look like https://<project>.supabase.co — got '+u,'error');
+    return;
+  }
+  u=u.replace(/\/+$/,''); // strip trailing slash
+  if(a && !a.startsWith('eyJ')){
+    toast&&toast('Anon key should start with "eyJ..." — you pasted something else','error');
+    return;
+  }
   supaCfg={url:u,anon:a};
   try{localStorage.setItem(SUPA_CFG_KEY,JSON.stringify(supaCfg));}catch(e){}
   toast&&toast('Saved — connecting…','success');
-  initSupabase().then(s=>{if(s)toast&&toast('Supabase connected','success');});
+  initSupabase().then(s=>{if(s)toast&&toast('Supabase connected ✓','success');
+    else toast&&toast('Could not connect — check the anon key','error');});
 }
 
 /* ADMIN: list/edit users via profiles table (RLS restricts to admins) */
