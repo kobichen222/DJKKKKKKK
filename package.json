@@ -17,6 +17,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit --project tsconfig.src.json",
+    "e2e": "playwright test",
+    "e2e:install": "playwright install --with-deps chromium",
     "ci": "npm run typecheck && npm test"
   },
   "dependencies": {
@@ -26,11 +28,13 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.59.1",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "electron": "^32.0.0",
     "electron-builder": "^25.0.0",
+    "http-server": "^14.1.1",
     "typescript": "^5.7.0",
     "vitest": "^2.1.9"
   },
