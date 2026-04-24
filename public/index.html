@@ -7958,21 +7958,21 @@ body.theme-light .sup-card{background:linear-gradient(180deg,#fefcf6,#f1ebdc) !i
     transparent 360deg) !important;
 }
 .tt-label{
+  /* PRO v2 polish — SIZE tweaks only. The colour + texture of the
+     label now comes from the earlier .tt-label block (cream paper,
+     cross-hatch grain, ink ring, brass spindle) — that's the
+     user-requested analog look. Do NOT paint per-deck colour here. */
   width:36% !important;height:36% !important;
-  background:
-    radial-gradient(circle at 30% 25%,rgba(255,255,255,.25) 0%,transparent 45%),
-    linear-gradient(150deg,var(--tt-accent) 0%,#7a2e00 100%) !important;
-  box-shadow:
-    inset 0 0 0 2px rgba(0,0,0,.35),
-    inset 0 0 14px rgba(0,0,0,.45),
-    0 0 0 1px rgba(0,0,0,.5),
-    0 2px 4px rgba(0,0,0,.55) !important;
   font-size:11px !important;letter-spacing:2px !important;
 }
-.turntable[data-tt="R"] .tt-label{background:radial-gradient(circle at 30% 25%,rgba(255,255,255,.25) 0%,transparent 45%),linear-gradient(150deg,var(--tt-accent) 0%,#004e60 100%) !important}
 .tt-label::after{
   width:8px !important;height:8px !important;
-  box-shadow:0 0 0 3px rgba(255,255,255,.65),inset 0 0 3px #000,0 0 4px rgba(0,0,0,.7) !important;
+  background:#0a0708 !important;
+  box-shadow:
+    0 0 0 1px rgba(180,140,80,.7),
+    inset 0 0 3px #000,
+    inset 0 1px 0 rgba(255,255,255,.15),
+    0 0 3px rgba(0,0,0,.7) !important;
 }
 
 /* TONEARM — richer SVG detail with counterweight + cueing lever */
