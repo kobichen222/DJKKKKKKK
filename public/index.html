@@ -426,7 +426,7 @@ body.show-all .console.show-all{max-width:none;width:calc(100vw - 16px)}
 .vu-led.on.red{background:var(--red);box-shadow:0 0 3px var(--red)}
 .fader-wrap{position:relative;width:28px;height:170px;background:linear-gradient(180deg,#1a1a1c 0%,#050506 100%);border-radius:4px;box-shadow:inset 0 0 10px rgba(0,0,0,.9);border:1px solid #0a0a0b}
 .fader-wrap::before{content:'';position:absolute;left:50%;top:8px;bottom:8px;width:2px;background:repeating-linear-gradient(180deg,rgba(255,255,255,.1) 0,rgba(255,255,255,.1) 1px,transparent 1px,transparent 8px);transform:translateX(-50%)}
-.fader-handle{position:absolute;left:2px;right:2px;height:24px;background:linear-gradient(180deg,#9a9aa0 0%,#5a5a5e 30%,#3a3a3e 50%,#1e1e22 80%,#0e0e10 100%);border-radius:4px;bottom:20%;cursor:grab;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -1px 0 rgba(0,0,0,.4),0 4px 8px rgba(0,0,0,.8),0 1px 2px rgba(0,0,0,.5);transition:box-shadow .12s}
+.fader-handle{position:absolute;left:2px;right:2px;height:24px;background:linear-gradient(180deg,#9a9aa0 0%,#5a5a5e 30%,#3a3a3e 50%,#1e1e22 80%,#0e0e10 100%);border-radius:4px;bottom:0%;cursor:grab;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -1px 0 rgba(0,0,0,.4),0 4px 8px rgba(0,0,0,.8),0 1px 2px rgba(0,0,0,.5);transition:box-shadow .12s}
 .fader-handle:hover{box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 -1px 0 rgba(0,0,0,.4),0 5px 12px rgba(0,0,0,.9),0 0 0 1px rgba(255,122,0,.3)}
 .fader-handle::before{content:'';position:absolute;top:50%;left:3px;right:3px;height:2px;background:linear-gradient(90deg,transparent,#ff3c00 20%,#ff8a3a 50%,#ff3c00 80%,transparent);box-shadow:0 0 6px #ff3c00;transform:translateY(-50%)}
 .channel-body{display:flex;gap:7px;align-items:flex-start}
@@ -5974,24 +5974,55 @@ body.work-mode .automix-sync{
   background:conic-gradient(from 200deg,transparent 0deg,rgba(255,255,255,.06) 18deg,transparent 38deg,transparent 360deg);
   pointer-events:none;
 }
+/* ═══ Analog vinyl centre label — cream paper, no colourful gradient ═══
+   Emulates a real 7"/12" record label: off-white paper stock with a
+   subtle radial darkening at the edge (light box in a studio), thin
+   concentric ring, standard black text. Both decks look identical —
+   only the spindle hole says which side is playing. */
 .tt-label{
   position:relative;width:38%;height:38%;border-radius:50%;
   background:
-    radial-gradient(circle at 35% 30%,#fff2,transparent 40%),
-    linear-gradient(145deg,var(--tt-accent) 0%,#7a2e00 100%);
+    /* paper grain — very fine diagonal crosshatch */
+    repeating-linear-gradient(45deg,rgba(60,40,20,.02) 0 1px,transparent 1px 3px),
+    repeating-linear-gradient(-45deg,rgba(60,40,20,.02) 0 1px,transparent 1px 3px),
+    /* soft spotlight top-left, age darkening at edge */
+    radial-gradient(circle at 30% 25%,rgba(255,255,255,.25) 0%,transparent 35%),
+    radial-gradient(circle at 50% 50%,#f0e6cc 35%,#d6c9a5 80%,#a88f5a 100%);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  color:#fff;font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:1.5px;
+  color:#1a0a00;font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:1.5px;
   text-align:center;padding:6px;
-  box-shadow:inset 0 0 10px rgba(0,0,0,.4),0 0 0 1px rgba(0,0,0,.4);
-  text-shadow:0 1px 2px rgba(0,0,0,.5);
+  box-shadow:
+    inset 0 0 12px rgba(80,50,20,.35),
+    inset 0 0 0 1px rgba(80,50,20,.25),
+    0 0 0 1px rgba(0,0,0,.35);
+  text-shadow:0 1px 0 rgba(255,245,210,.35);
 }
-.turntable[data-tt="R"] .tt-label{background:radial-gradient(circle at 35% 30%,#fff2,transparent 40%),linear-gradient(145deg,var(--tt-accent) 0%,#005566 100%)}
+.turntable[data-tt="R"] .tt-label{
+  /* same cream as deck L — no colour accent */
+  background:
+    repeating-linear-gradient(45deg,rgba(60,40,20,.02) 0 1px,transparent 1px 3px),
+    repeating-linear-gradient(-45deg,rgba(60,40,20,.02) 0 1px,transparent 1px 3px),
+    radial-gradient(circle at 30% 25%,rgba(255,255,255,.25) 0%,transparent 35%),
+    radial-gradient(circle at 50% 50%,#f0e6cc 35%,#d6c9a5 80%,#a88f5a 100%);
+}
+/* Thin ink-ring just inside the label's edge — the real thing almost
+   always has one. */
+.tt-label::before{
+  content:'';position:absolute;inset:8%;border-radius:50%;
+  border:1px solid rgba(40,25,10,.3);
+  pointer-events:none;
+}
+/* Spindle hole — dark well with a faint brass rim like a real record */
 .tt-label::after{
-  content:'';position:absolute;width:6px;height:6px;border-radius:50%;
-  background:#0a0a0a;box-shadow:0 0 0 2px rgba(255,255,255,.5),inset 0 0 2px #000;
+  content:'';position:absolute;width:7px;height:7px;border-radius:50%;
+  background:#0a0708;
+  box-shadow:
+    0 0 0 1px rgba(180,140,80,.6),
+    inset 0 0 2px #000,
+    inset 0 1px 0 rgba(255,255,255,.12);
 }
-.tt-label .lbl-title{font-size:10px;font-weight:900;line-height:1.1;margin-top:-6px}
-.tt-label .lbl-sub{font-size:7px;letter-spacing:2px;opacity:.9;margin-top:3px}
+.tt-label .lbl-title{font-size:10px;font-weight:800;line-height:1.1;margin-top:-6px;color:#1a0a00}
+.tt-label .lbl-sub{font-size:7px;letter-spacing:2px;opacity:.75;margin-top:3px;color:#3a2a10}
 
 /* Tonearm */
 .tt-tonearm{
@@ -9657,11 +9688,6 @@ body.theme-gold .step-btn.active{background:#ffcf40 !important;color:#1a0a00 !im
           <div class="tt-pro-bar" id="ttL-bar"><div class="tt-pro-bar-fill" id="ttL-barfill"></div></div>
         </div>
       </div>
-      <div class="tt-pro-vol-row">
-        <span class="tt-pro-vol-label">VOLUME</span>
-        <input type="range" class="tt-pro-vol" id="ttL-vol" min="0" max="100" value="80" aria-label="Volume"/>
-        <span class="tt-pro-vol-val" id="ttL-vol-val">80</span>
-      </div>
       <div class="tt-pro-hotcues" data-tt-hc="L">
         <button class="tt-pro-hc" data-hc="1">1</button>
         <button class="tt-pro-hc" data-hc="2">2</button>
@@ -9806,11 +9832,6 @@ body.theme-gold .step-btn.active{background:#ffcf40 !important;color:#1a0a00 !im
           </div>
           <div class="tt-pro-bar" id="ttR-bar"><div class="tt-pro-bar-fill" id="ttR-barfill"></div></div>
         </div>
-      </div>
-      <div class="tt-pro-vol-row">
-        <span class="tt-pro-vol-label">VOLUME</span>
-        <input type="range" class="tt-pro-vol" id="ttR-vol" min="0" max="100" value="80" aria-label="Volume"/>
-        <span class="tt-pro-vol-val" id="ttR-vol-val">80</span>
       </div>
       <div class="tt-pro-hotcues" data-tt-hc="R">
         <button class="tt-pro-hc" data-hc="1">1</button>
@@ -11491,7 +11512,7 @@ let stats={totalTime:0,tracksPlayed:0,fxCount:0,cueCount:0,mixHistory:[],session
 let settings={theme:'dark',rgbAmbient:true,phraseMarkers:true,limiter:true,autoGain:false,autoSave:true};
 let aiDJ={active:false,style:'smooth',transLen:16,bpmTol:6,order:'energy-flow',transitionTimer:null};
 
-function createDeck(id){return{id,track:null,playing:false,startTime:0,offset:0,tempo:0,playbackRate:1,tempoRange:8,cuePoint:0,hotCues:{},savedLoops:{},loop:{active:false,start:null,end:null,loopInSet:false},keylock:false,quantize:false,slip:false,slipReturn:null,reverse:false,sync:false,source:null,volumeGain:null,trimGain:null,channelGain:null,eqLow:null,eqLoMid:null,eqHiMid:null,eqHigh:null,killLow:false,killMid:false,killHi:false,compressor:null,saturation:null,colorFilter:null,buffer:null,volume:0.8,eq:{low:0,loMid:0,hiMid:0,high:0},trim:1,analyser:null,padMode:'cue',waveZoom:1,energy:0,beatgrid:null,phraseOffset:0};}
+function createDeck(id){return{id,track:null,playing:false,startTime:0,offset:0,tempo:0,playbackRate:1,tempoRange:8,cuePoint:0,hotCues:{},savedLoops:{},loop:{active:false,start:null,end:null,loopInSet:false},keylock:false,quantize:false,slip:false,slipReturn:null,reverse:false,sync:false,source:null,volumeGain:null,trimGain:null,channelGain:null,eqLow:null,eqLoMid:null,eqHiMid:null,eqHigh:null,killLow:false,killMid:false,killHi:false,compressor:null,saturation:null,colorFilter:null,buffer:null,volume:0,eq:{low:0,loMid:0,hiMid:0,high:0},trim:1,analyser:null,padMode:'cue',waveZoom:1,energy:0,beatgrid:null,phraseOffset:0};}
 const decks={A:createDeck('A'),B:createDeck('B'),C:createDeck('C'),D:createDeck('D')};
 const mixerState={crossfader:0.5,xfaderCurve:'smooth',master:0.9,booth:0.7,balance:0,hpMix:0.5,hpVol:0.7,hpCue:{A:false,B:false,C:false,D:false},micOn:false,micVol:0,micHi:0,micLow:0,fx:{type:'delay',channel:'master',beat:1,level:0.5,on:false},colorFx:{type:'filter',A:0,B:0,C:0,D:0},xfaderAssign:{A:'A',B:'B',C:'THRU',D:'THRU'},isRecording:false,sceneFx:{type:null,depth:0.5,xpadX:0.5,xpadY:0.5,xpadActive:false},isolator:{low:0,mid:0,hi:0}};
 
@@ -11568,9 +11589,9 @@ function buildDeckHTML(d){
     </div>
     <div class="djfv-body">
       <button class="djfv-btn" data-djfv-step="${d}" data-djfv-dir="-1" title="Volume down">−</button>
-      <input type="range" class="djfv-slider" min="0" max="100" value="80" step="1" data-djfv-slider="${d}" aria-label="Volume deck ${d}"/>
+      <input type="range" class="djfv-slider" min="0" max="100" value="0" step="1" data-djfv-slider="${d}" aria-label="Volume deck ${d}"/>
       <button class="djfv-btn" data-djfv-step="${d}" data-djfv-dir="1" title="Volume up">+</button>
-      <div class="djfv-value" data-djfv-value="${d}">80</div>
+      <div class="djfv-value" data-djfv-value="${d}">0</div>
     </div>
   </div>`;
 }
@@ -18684,21 +18705,9 @@ function setupVinylTurntables(){
       });
     }
 
-    // VOLUME — writes through to decks[d].volume + live gain node
-    const vol=document.getElementById(`tt${side}-vol`);
-    const volVal=document.getElementById(`tt${side}-vol-val`);
-    if(vol){
-      vol.addEventListener('input',()=>{
-        const v=parseInt(vol.value,10)/100;
-        const deck=(typeof decks!=='undefined')?decks[d]:null;
-        if(deck){
-          deck.volume=v;
-          if(deck.volumeGain)deck.volumeGain.gain.value=v;
-          if(typeof applyCrossfader==='function')applyCrossfader();
-        }
-        if(volVal)volVal.textContent=vol.value;
-      });
-    }
+    // (Volume slider removed — volume lives on the mixer only, per user
+    // request. The mixer channel fader for this deck is the source of
+    // truth and any change there is still reflected via the main engine.)
 
     // SEEK on the progress bar
     const bar=document.getElementById(`tt${side}-bar`);
@@ -18759,13 +18768,6 @@ function setupVinylTurntables(){
         const n=pad.dataset.hc;
         pad.classList.toggle('set',!!(deck.hotCues&&deck.hotCues[n]!=null));
       });
-      // Sync volume slider with deck.volume (in case it was changed elsewhere)
-      const vs=document.getElementById(`tt${side}-vol`);
-      const vv=document.getElementById(`tt${side}-vol-val`);
-      if(vs&&deck.volume!=null&&!vs._dragging){
-        const v=Math.round(deck.volume*100);
-        if(parseInt(vs.value,10)!==v){vs.value=v;if(vv)vv.textContent=v;}
-      }
     });
   },200);
 }
