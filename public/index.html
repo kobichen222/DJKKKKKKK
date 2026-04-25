@@ -3440,6 +3440,127 @@ body.theme-pioneer .seq-step{background:linear-gradient(180deg,#1a1a20,#08080c);
 body.theme-pioneer .seq-step.on{color:#1a0800;background:linear-gradient(180deg,#ffc080,#ff9020);box-shadow:0 0 10px rgba(255,144,32,.7)}
 
 /* ============================================================
+   XDJ-XZ THEME — Pioneer DJ XDJ-XZ all-in-one inspired.
+   Matte jet-black chassis, polished chrome jog wheels,
+   cyan LCD screens, deep Pioneer orange accents, RGB pads.
+   ============================================================ */
+body.theme-xdjxz{
+  --orange:#ff8a1e;--orange-glow:#ffb764;--cue-orange:#ff8a1e;--play-green:#2ee066;
+  --screen-glow:#36d8ff;--yellow:#ffcf3a;--red:#ff3838;--purple:#b07aff;--pink:#ff4faa;
+  --text:#eaeaee;--text-dim:#8a8a92;--bg:#040406;--deck-bg:#101014;--deck-panel:#16161c;--deck-border:#26262c;
+}
+body.theme-xdjxz,body.theme-xdjxz html{background:radial-gradient(ellipse at 50% 0%,rgba(54,216,255,.04) 0%,transparent 42%),radial-gradient(ellipse at 50% 100%,rgba(255,138,30,.035) 0%,transparent 45%),radial-gradient(ellipse at center,#0c0c12 0%,#020203 82%)}
+body.theme-xdjxz::after{background:radial-gradient(ellipse at center,transparent 52%,rgba(0,0,0,.72) 100%)}
+body.theme-xdjxz ::-webkit-scrollbar-track{background:#06060a}
+body.theme-xdjxz ::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#5a5a64,#1e1e24);border:1px solid #26262c}
+body.theme-xdjxz .header-bar{color:#eaeaee}
+body.theme-xdjxz .brand{color:#f0f0f4;text-shadow:0 1px 0 rgba(0,0,0,.95),0 0 20px rgba(54,216,255,.22)}
+body.theme-xdjxz .brand .max{background:linear-gradient(180deg,#ffc888 0%,#ff8a1e 50%,#a84600 100%);color:#1a0800;box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 1px 2px rgba(0,0,0,.55),0 0 16px rgba(255,138,30,.6)}
+body.theme-xdjxz .header-right{color:#8a8a92}
+body.theme-xdjxz .power-led{background:radial-gradient(circle,#ffd0a0,#ff8a1e);box-shadow:0 0 10px rgba(255,138,30,.95),0 0 2px rgba(255,255,255,.6)}
+body.theme-xdjxz .cdj,body.theme-xdjxz .mixer,body.theme-xdjxz .library,
+body.theme-xdjxz .sampler-panel,body.theme-xdjxz .youtube-panel,body.theme-xdjxz .playlists-panel,
+body.theme-xdjxz .ai-dj-panel,body.theme-xdjxz .analytics-panel,body.theme-xdjxz .midi-panel,
+body.theme-xdjxz .settings-panel,body.theme-xdjxz .beat-fx-panel,body.theme-xdjxz .scene-fx-panel,
+body.theme-xdjxz .deck-switch-bar,body.theme-xdjxz .mixer-toolbar{
+  background:linear-gradient(180deg,rgba(255,255,255,.07) 0%,transparent 4px,transparent calc(100% - 2px),rgba(0,0,0,.65) 100%),repeating-linear-gradient(0deg,rgba(255,255,255,.006) 0px,rgba(255,255,255,.006) 1px,transparent 1px,transparent 4px),linear-gradient(180deg,#1a1a20 0%,#0e0e12 55%,#040406 100%);
+  border:1px solid #26262c;border-top-color:rgba(255,255,255,.12);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),inset 0 -1px 0 rgba(0,0,0,.6),0 2px 0 rgba(0,0,0,.6),0 20px 44px -12px rgba(0,0,0,.92)
+}
+body.theme-xdjxz .main-tabs{background:linear-gradient(180deg,#1a1a20 0%,#08080c 100%);border:1px solid #26262c;box-shadow:inset 0 2px 6px rgba(0,0,0,.78)}
+body.theme-xdjxz .tab-btn{color:#8a8a92}
+body.theme-xdjxz .tab-btn:hover{color:#eaeaee}
+body.theme-xdjxz .tab-btn.active{background:linear-gradient(180deg,#ffc888 0%,#ff8a1e 48%,#a84600 100%);color:#1a0800;box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 0 18px rgba(255,138,30,.6);text-shadow:0 1px 0 rgba(255,255,255,.22)}
+body.theme-xdjxz .screen{background:linear-gradient(180deg,#03060c 0%,#000 100%);border:2px solid #08080c;box-shadow:inset 0 0 16px rgba(0,0,0,.96),0 0 0 1px rgba(255,255,255,.06),0 0 14px rgba(54,216,255,.12)}
+body.theme-xdjxz .jog-center-screen{background:radial-gradient(circle,#06080e 0%,#000 100%);border:2px solid #08080c;box-shadow:inset 0 0 24px rgba(0,0,0,.96),0 0 0 1px rgba(255,255,255,.06)}
+body.theme-xdjxz .track-title{color:#fff;text-shadow:0 0 8px rgba(255,255,255,.5)}
+body.theme-xdjxz .screen-bpm{color:#36d8ff;text-shadow:0 0 14px rgba(54,216,255,.95)}
+body.theme-xdjxz .screen-key{color:#ff8a1e;text-shadow:0 0 8px rgba(255,138,30,.45)}
+body.theme-xdjxz .master-bpm{background:#000;border:1px solid #26262c;color:#36d8ff;text-shadow:0 0 11px rgba(54,216,255,.9)}
+body.theme-xdjxz .jog-center-screen .bpm-display{color:#36d8ff;text-shadow:0 0 11px rgba(54,216,255,.9)}
+body.theme-xdjxz .jog-center-screen .bpm-sub,body.theme-xdjxz .jog-center-screen .deck-badge{color:#eaeaee}
+body.theme-xdjxz .deck-number{background:linear-gradient(180deg,rgba(255,255,255,.5) 0%,transparent 14%,transparent 55%,rgba(0,0,0,.5) 100%),linear-gradient(180deg,#dadae0 0%,#888890 40%,#42424a 72%,#1a1a20 100%);color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.6),0 -1px 0 rgba(255,255,255,.22);box-shadow:inset 0 1px 0 rgba(255,255,255,.6),inset 0 -1px 0 rgba(0,0,0,.6),0 2px 6px rgba(0,0,0,.75)}
+body.theme-xdjxz .deck-label{color:#eaeaee}
+body.theme-xdjxz .deck-label .model{color:#ff8a1e;text-shadow:0 0 8px rgba(255,138,30,.4)}
+body.theme-xdjxz .jog-outer{background:radial-gradient(circle at 50% 4%,rgba(255,255,255,.78) 0%,transparent 22%),radial-gradient(circle at 50% 96%,rgba(0,0,0,.75) 0%,transparent 30%),conic-gradient(from 0deg,#7a7a82 0deg,#a8a8b0 28deg,#dcdce0 58deg,#f6f6f8 88deg,#d0d0d6 118deg,#90909a 150deg,#bcbcc2 190deg,#74747c 220deg,#b0b0b8 260deg,#e0e0e6 300deg,#90909a 340deg,#7a7a82 360deg);border:3px solid #04040a;box-shadow:inset 0 0 0 1px rgba(255,255,255,.55),inset 0 0 0 2px rgba(0,0,0,.78),inset 0 2px 12px rgba(0,0,0,.7),0 4px 20px rgba(0,0,0,.9),0 0 0 1px rgba(255,255,255,.12)}
+body.theme-xdjxz .jog-platter{background:radial-gradient(circle at 50% 18%,rgba(255,255,255,.24) 0%,transparent 30%),radial-gradient(circle at 50% 92%,rgba(0,0,0,.85) 0%,transparent 30%),radial-gradient(circle,#16161c 0%,#08080c 70%,#000 100%);box-shadow:inset 0 0 46px rgba(0,0,0,.97),inset 0 2px 6px rgba(255,255,255,.14),0 0 0 2px rgba(255,255,255,.05)}
+body.theme-xdjxz .jog-platter-disc{background:repeating-conic-gradient(from 0deg at 50% 50%,rgba(255,255,255,.04) 0deg,transparent 3deg,transparent 6deg),radial-gradient(circle at 50% 35%,rgba(255,138,30,.55) 0%,transparent 14%),radial-gradient(circle at 50% 55%,rgba(54,216,255,.5) 0%,transparent 14%),radial-gradient(circle,#12121a 0%,#06060a 72%,#000 100%)}
+body.theme-xdjxz .jog-indicator{background:linear-gradient(180deg,#fff 0%,#ffc888 35%,#ff8a1e 70%,#a84600 100%);box-shadow:0 0 8px rgba(0,0,0,.85),0 0 22px rgba(255,138,30,1),0 0 4px rgba(255,255,255,.95)}
+body.theme-xdjxz .knob{background:radial-gradient(ellipse 55% 28% at 45% 18%,rgba(255,255,255,.62) 0%,rgba(255,255,255,.22) 30%,transparent 58%),radial-gradient(circle at 50% 108%,rgba(0,0,0,.88) 0%,transparent 48%),radial-gradient(circle at 40% 35%,#5e5e66 0%,#2e2e34 35%,#141418 70%,#06060a 100%);border:1px solid #04040a;box-shadow:inset 0 2px 1px rgba(255,255,255,.32),inset 0 -3px 6px rgba(0,0,0,.92),0 3px 7px rgba(0,0,0,.88)}
+body.theme-xdjxz .knob-indicator{background:linear-gradient(180deg,#fff 0%,#ffc888 50%,#ff8a1e 100%);box-shadow:0 0 4px rgba(0,0,0,.85),0 0 12px rgba(255,138,30,.95)}
+body.theme-xdjxz .knob-label{color:#9a9aa0;font-weight:700;letter-spacing:1.8px;text-shadow:0 1px 0 rgba(0,0,0,.88)}
+body.theme-xdjxz .vu-meter{background:#000;border:1px solid #26262c;box-shadow:inset 0 0 6px rgba(0,0,0,.96)}
+body.theme-xdjxz .vu-led{background:#08080a}
+body.theme-xdjxz .vu-led.on.green{background:linear-gradient(90deg,#16a834,#2ee066);box-shadow:0 0 6px rgba(46,224,102,.92),inset 0 0 2px rgba(255,255,255,.32)}
+body.theme-xdjxz .vu-led.on.yellow{background:linear-gradient(90deg,#c89000,#ffcf3a);box-shadow:0 0 6px rgba(255,207,58,.92),inset 0 0 2px rgba(255,255,255,.32)}
+body.theme-xdjxz .vu-led.on.red{background:linear-gradient(90deg,#c81e1e,#ff4848);box-shadow:0 0 7px rgba(255,72,72,.96),inset 0 0 2px rgba(255,255,255,.32)}
+body.theme-xdjxz .fader-wrap,body.theme-xdjxz .crossfader-track,body.theme-xdjxz .tempo-slider{background:linear-gradient(180deg,#03030a 0%,#12121a 100%);border:1px solid #26262c;box-shadow:inset 0 2px 6px rgba(0,0,0,.96)}
+body.theme-xdjxz .fader-handle,body.theme-xdjxz .tempo-handle,body.theme-xdjxz .crossfader-handle{background:linear-gradient(180deg,rgba(255,255,255,.6) 0%,transparent 18%,transparent 82%,rgba(0,0,0,.5) 100%),linear-gradient(180deg,#dcdce0 0%,#a4a4ac 25%,#62626a 60%,#2c2c32 100%);border:1px solid #04040a;box-shadow:inset 0 1px 0 rgba(255,255,255,.72),inset 0 -1px 0 rgba(0,0,0,.5),0 3px 9px rgba(0,0,0,.92)}
+body.theme-xdjxz .big-btn,body.theme-xdjxz .loop-btn,body.theme-xdjxz .jump-btn,body.theme-xdjxz .util-btn,
+body.theme-xdjxz .beat-btn,body.theme-xdjxz .scene-btn,body.theme-xdjxz .pad-mode-btn,
+body.theme-xdjxz .tempo-btn,body.theme-xdjxz .step-btn,body.theme-xdjxz .mic-btn,
+body.theme-xdjxz .cue-btn,body.theme-xdjxz .compact-btn,body.theme-xdjxz .cue-hp-btn,
+body.theme-xdjxz .automix-btn,body.theme-xdjxz .dsb-btn,body.theme-xdjxz .search-src-btn,
+body.theme-xdjxz .studio-preset-btn,body.theme-xdjxz .tool-btn,body.theme-xdjxz .assign-btn,
+body.theme-xdjxz .curve-btn,body.theme-xdjxz .ai-dj-btn{
+  background:linear-gradient(180deg,rgba(255,255,255,.13) 0%,transparent 30%,rgba(0,0,0,.4) 100%),linear-gradient(180deg,#3c3c44 0%,#1e1e24 55%,#08080c 100%);
+  border:1px solid #04040a;border-top-color:rgba(255,255,255,.24);color:#eaeaee;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.3),inset 0 -2px 4px rgba(0,0,0,.78),0 2px 5px rgba(0,0,0,.72);
+  text-shadow:0 1px 0 rgba(0,0,0,.92)
+}
+body.theme-xdjxz .big-btn:hover,body.theme-xdjxz .loop-btn:hover,body.theme-xdjxz .jump-btn:hover,
+body.theme-xdjxz .util-btn:hover,body.theme-xdjxz .beat-btn:hover,body.theme-xdjxz .scene-btn:hover,
+body.theme-xdjxz .pad-mode-btn:hover{filter:brightness(1.28);border-color:#ff8a1e}
+body.theme-xdjxz .big-btn.cue.active{background:linear-gradient(180deg,#ffd8a8 0%,#ff8a1e 50%,#9c4000 100%);color:#1a0800;border-color:#ffc888;box-shadow:0 0 26px rgba(255,138,30,.92),inset 0 1px 0 rgba(255,255,255,.5)}
+body.theme-xdjxz .big-btn.play.active{background:linear-gradient(180deg,#bcffcc 0%,#2ee066 50%,#16a834 100%);color:#00200a;border-color:#a8ffb8;box-shadow:0 0 26px rgba(46,224,102,.88),inset 0 1px 0 rgba(255,255,255,.5);animation:playPulse 1s ease-in-out infinite}
+body.theme-xdjxz .loop-btn.active,body.theme-xdjxz .beat-btn.active,body.theme-xdjxz .scene-btn.active{background:linear-gradient(180deg,#ffc888 0%,#ff8a1e 55%,#9c4000 100%);color:#1a0800;box-shadow:0 0 18px rgba(255,138,30,.88)}
+body.theme-xdjxz .fx-onoff{background:linear-gradient(180deg,#1a1a20 0%,#08080a 100%);border:2px solid #26262c;color:#eaeaee}
+body.theme-xdjxz .fx-onoff.active{background:linear-gradient(180deg,#ffc888 0%,#ff8a1e 55%,#9c4000 100%);color:#1a0800;border-color:#ffc888;box-shadow:0 0 16px rgba(255,138,30,.78)}
+body.theme-xdjxz .cue-btn.active{background:linear-gradient(180deg,#ffd8a8 0%,#ff8a1e 55%,#9c4000 100%) !important;color:#1a0800 !important;border-color:#ffc888;box-shadow:0 0 22px rgba(255,138,30,.88),inset 0 1px 0 rgba(255,255,255,.45)}
+body.theme-xdjxz .sample-pad{background:linear-gradient(180deg,#2c2c34 0%,#12121a 100%);border:1px solid #26262c;color:#eaeaee;box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -3px 5px rgba(0,0,0,.78),0 3px 6px rgba(0,0,0,.68)}
+body.theme-xdjxz .sample-pad .pad-num{color:#ff8a1e}
+body.theme-xdjxz .sample-pad .pad-name{color:#8a8a92}
+body.theme-xdjxz .sample-pad.playing{box-shadow:inset 0 2px 4px rgba(0,0,0,.5),0 0 32px rgba(255,138,30,.92),0 0 3px rgba(255,200,136,.92)}
+body.theme-xdjxz input,body.theme-xdjxz select,body.theme-xdjxz textarea{background:#12121a;color:#eaeaee;border:1px solid #26262c}
+body.theme-xdjxz input:focus,body.theme-xdjxz select:focus{border-color:#ff8a1e;outline:none;box-shadow:0 0 0 3px rgba(255,138,30,.24)}
+body.theme-xdjxz .fx-selector{background:#000;color:#36d8ff;border-color:#26262c}
+body.theme-xdjxz .library-title,body.theme-xdjxz .mixer-brand,body.theme-xdjxz .sampler-title,
+body.theme-xdjxz .modal-box h3,body.theme-xdjxz .settings-section h3,
+body.theme-xdjxz .ai-dj-title,body.theme-xdjxz .dsb-label{color:#ffc888;text-shadow:0 0 8px rgba(255,138,30,.32)}
+body.theme-xdjxz .count{color:#ff8a1e}
+body.theme-xdjxz .setting-desc{color:#6a6a72}
+body.theme-xdjxz .playlist-card,body.theme-xdjxz .session-card,body.theme-xdjxz .stat-card,body.theme-xdjxz .midi-device,body.theme-xdjxz .shortcut-item{background:linear-gradient(180deg,#1a1a20 0%,#08080c 100%);border:1px solid #26262c;color:#eaeaee}
+body.theme-xdjxz .track-row{background:#10101a;border:1px solid transparent;color:#eaeaee}
+body.theme-xdjxz .track-row:hover{background:#1c1c24;border-color:#ff8a1e;box-shadow:0 4px 10px rgba(0,0,0,.55),0 0 14px rgba(255,138,30,.22)}
+body.theme-xdjxz .track-row .t-title{color:#fff}
+body.theme-xdjxz .track-row .t-artist{color:#8a8a92}
+body.theme-xdjxz .track-list-header{color:#ff8a1e;border-bottom:1px solid rgba(255,138,30,.32)}
+body.theme-xdjxz .toast{background:linear-gradient(180deg,#1a1a20 0%,#08080c 100%);color:#eaeaee;border:1px solid #ff8a1e;box-shadow:0 12px 30px rgba(0,0,0,.75),0 0 22px rgba(255,138,30,.28)}
+body.theme-xdjxz .modal-box{background:linear-gradient(180deg,#1a1a20 0%,#08080c 100%);color:#eaeaee;border:1px solid #26262c;box-shadow:0 40px 80px rgba(0,0,0,.88)}
+body.theme-xdjxz .modal-overlay{background:rgba(4,4,6,.88)}
+body.theme-xdjxz .channel-label{color:#ff8a1e}
+body.theme-xdjxz .compact-decks{background:#08080c;border-color:#26262c}
+body.theme-xdjxz .compact-deck{background:#12121a;border-color:#26262c}
+body.theme-xdjxz .compact-deck-title{background:#000;color:#36d8ff;border-color:#26262c}
+body.theme-xdjxz .isolator-panel{background:#10101a;border-color:rgba(255,138,30,.28)}
+body.theme-xdjxz .master-section,body.theme-xdjxz .color-fx-row,body.theme-xdjxz .color-fx-grid,
+body.theme-xdjxz .crossfader-section,body.theme-xdjxz .headphone-section,body.theme-xdjxz .mic-section,
+body.theme-xdjxz .automix-panel{background:#0a0a12;border:1px solid #26262c}
+body.theme-xdjxz .dsb-btn.active{background:linear-gradient(180deg,#ffc888 0%,#ff8a1e 55%,#9c4000 100%);color:#1a0800;border-color:#ffc888;box-shadow:0 0 14px rgba(255,138,30,.78)}
+body.theme-xdjxz .auth-btn{background:linear-gradient(180deg,#1a1a20,#08080c);border:1px solid #ff8a1e;color:#ffc888}
+body.theme-xdjxz .rec-btn{background:linear-gradient(180deg,#1a1a20,#08080c);border-color:#ff3838;color:#ff8a8a}
+body.theme-xdjxz .rec-btn.recording{background:linear-gradient(180deg,#ff6060,#c81e1e);color:#fff}
+body.theme-xdjxz .toggle-switch{background:#10101a;border:1px solid #26262c}
+body.theme-xdjxz .toggle-switch.on{background:linear-gradient(180deg,#ffc888,#ff8a1e);border-color:#ffc888;box-shadow:0 0 10px rgba(255,138,30,.65)}
+body.theme-xdjxz .master-meters{background:#000;border-color:#26262c;box-shadow:inset 0 2px 6px rgba(0,0,0,.96)}
+body.theme-xdjxz .cdj[data-deck]{--deck-accent:#ff8a1e;--deck-accent-rgb:255,138,30}
+body.theme-xdjxz .rgb-ambient{background:linear-gradient(90deg,#9c4000 0%,#ff8a1e 25%,#36d8ff 50%,#ff8a1e 75%,#9c4000 100%);box-shadow:0 0 22px rgba(255,138,30,.55)}
+body.theme-xdjxz .bank-btn{color:#8a8a92}
+body.theme-xdjxz .bank-btn.active{color:#1a0800;background:linear-gradient(180deg,#ffc888,#ff8a1e)}
+body.theme-xdjxz .seq-step{background:linear-gradient(180deg,#1a1a20,#08080c);color:rgba(234,234,238,.25);border:1px solid #26262c}
+body.theme-xdjxz .seq-step.on{color:#1a0800;background:linear-gradient(180deg,#ffc888,#ff8a1e);box-shadow:0 0 10px rgba(255,138,30,.72)}
+
+/* ============================================================
    EUPHONIA THEME — Pioneer DJM-A9 / Euphonia inspired.
    Matte jet-black body, copper/rose-gold knobs, amber SEND
    glow, clean white labels, subtle cyan meter accents.
@@ -11542,6 +11663,7 @@ No mappings yet. Pick a preset above or right-click any control → MIDI Learn.
 <option value="dark">TITAN ONYX</option>
 <option value="neon">TITAN PULSE</option>
 <option value="pioneer">TITAN-3K PRO</option>
+<option value="xdjxz">TITAN XDJ-XZ</option>
 <option value="euphonia">TITAN COPPER</option>
 <option value="blade">TITAN BLADE</option>
 <option value="gold">TITAN GOLD</option>
@@ -15016,7 +15138,7 @@ function loadFromDB(){
 
 /* SETTINGS */
 function applyTheme(name){
-  document.body.classList.remove('theme-light','theme-neon','theme-gold','theme-pioneer','theme-euphonia','theme-blade');
+  document.body.classList.remove('theme-light','theme-neon','theme-gold','theme-pioneer','theme-xdjxz','theme-euphonia','theme-blade');
   if(name!=='dark')document.body.classList.add(`theme-${name}`);
   settings.theme=name;saveToDB();
 }
