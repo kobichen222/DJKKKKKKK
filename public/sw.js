@@ -3,10 +3,21 @@
    - HTML/navigation → network-first with cache fallback
    - Same-origin static (CSS/JS/images/fonts) → stale-while-revalidate
    - CDN assets (Google Fonts, jsDelivr) → cache-first once seen
-   - Everything cached stays reachable offline forever */
+   - Everything cached stays reachable offline forever
 
-const CACHE = 'djtitan-shell-v109-perf-arch';
-const CDN_CACHE = 'djtitan-cdn-v109';
+   Cache versioning:
+   The two cache names below are namespaced with SHELL_VERSION so that any
+   bump to package.json triggers a hard cache reset on the next install —
+   without this, users on slow connections can stay pinned to a stale
+   monolith forever because the network-first fetch keeps failing back to
+   whatever shell was cached on first visit. The `activate` handler purges
+   any cache whose name doesn't match the current pair, including the
+   previously hardcoded 'djtitan-shell-v109-*' families left over from
+   pre-versioning installs. */
+
+const SHELL_VERSION = 'v1.0.12';
+const CACHE = `djtitan-shell-${SHELL_VERSION}`;
+const CDN_CACHE = `djtitan-cdn-${SHELL_VERSION}`;
 const SHELL = [
   './','./index.html',
   './analyzer.worker.js','./manifest.json','./icon.svg','./auth.sql'
@@ -26,7 +37,11 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE && k !== CDN_CACHE).map(k => caches.delete(k)))
+      Promise.all(
+        keys
+          .filter(k => k.startsWith('djtitan-') && k !== CACHE && k !== CDN_CACHE)
+          .map(k => caches.delete(k))
+      )
     ).then(()=>self.clients.claim())
   );
 });

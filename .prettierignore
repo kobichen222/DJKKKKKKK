@@ -1,0 +1,11 @@
+node_modules
+.next
+dist-electron
+site
+coverage
+package-lock.json
+public/index.html
+public/sw.js
+public/analyzer.worker.js
+public/titan-keylock-worklet.js
+*.sql

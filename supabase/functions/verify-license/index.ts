@@ -39,6 +39,51 @@ interface LicenseEnvelope {
   alg?: string;
 }
 
+// ─── Rate limiting ──────────────────────────────────────────────────────────
+// A naive in-memory token bucket per client IP. This survives only for the
+// lifetime of the edge function isolate, which Supabase recycles often, but
+// it raises the bar enough to block trivial brute-force loops and accidental
+// retry storms from misconfigured clients. For sustained protection move to
+// Deno.openKv() once it leaves beta.
+const RL_WINDOW_MS = 60_000;            // 1 minute window
+const RL_MAX_REQUESTS = 30;             // 30 verify attempts per IP per minute
+const RL_MAX_TRACKED = 4096;            // hard cap on map entries (memory budget)
+const rlBuckets = new Map<string, { count: number; resetAt: number }>();
+
+function clientKey(req: Request): string {
+  const fwd = req.headers.get('x-forwarded-for');
+  if (fwd) {
+    const first = fwd.split(',')[0]?.trim();
+    if (first) return first;
+  }
+  const real = req.headers.get('x-real-ip');
+  if (real) return real.trim();
+  // Fall back to a constant key — better to share-rate-limit unknown
+  // origins than to open the bucket entirely.
+  return 'unknown';
+}
+
+function rateLimit(req: Request): { ok: true } | { ok: false; retryAfter: number } {
+  const now = Date.now();
+  const key = clientKey(req);
+  let bucket = rlBuckets.get(key);
+  if (!bucket || bucket.resetAt <= now) {
+    bucket = { count: 0, resetAt: now + RL_WINDOW_MS };
+    rlBuckets.set(key, bucket);
+  }
+  bucket.count += 1;
+  if (rlBuckets.size > RL_MAX_TRACKED) {
+    // Drop the oldest entry — Map iteration is insertion-ordered, so the
+    // first key is the oldest. This keeps the table bounded under DoS.
+    const oldest = rlBuckets.keys().next().value;
+    if (oldest && oldest !== key) rlBuckets.delete(oldest);
+  }
+  if (bucket.count > RL_MAX_REQUESTS) {
+    return { ok: false, retryAfter: Math.max(1, Math.ceil((bucket.resetAt - now) / 1000)) };
+  }
+  return { ok: true };
+}
+
 function hexToBytes(hex: string): Uint8Array {
   const clean = hex.replace(/[^0-9a-fA-F]/g, '');
   const out = new Uint8Array(clean.length / 2);
@@ -96,6 +141,18 @@ serve(async (req) => {
   if (req.method !== 'POST') {
     return new Response(JSON.stringify({ ok: false, error: 'method-not-allowed' }), {
       status: 405, headers: { ...corsHeaders, 'content-type': 'application/json' },
+    });
+  }
+
+  const rl = rateLimit(req);
+  if (!rl.ok) {
+    return new Response(JSON.stringify({ ok: false, error: 'rate-limited' }), {
+      status: 429,
+      headers: {
+        ...corsHeaders,
+        'content-type': 'application/json',
+        'retry-after': String(rl.retryAfter),
+      },
     });
   }
 

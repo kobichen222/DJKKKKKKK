@@ -17,24 +17,34 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit --project tsconfig.src.json",
+    "lint": "eslint \"src/**/*.{ts,tsx}\" \"app/**/*.{ts,tsx}\" \"supabase/**/*.ts\"",
+    "lint:fix": "eslint --fix \"src/**/*.{ts,tsx}\" \"app/**/*.{ts,tsx}\" \"supabase/**/*.ts\"",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\" \"app/**/*.{ts,tsx}\" \"supabase/**/*.ts\" \"*.{json,md}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx}\" \"app/**/*.{ts,tsx}\" \"supabase/**/*.ts\"",
     "e2e": "playwright test",
     "e2e:install": "playwright install --with-deps chromium",
-    "ci": "npm run typecheck && npm test"
+    "ci": "npm run typecheck && npm run lint && npm test"
   },
   "dependencies": {
     "electron-updater": "^6.3.0",
     "next": "^15.3.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@playwright/test": "^1.59.1",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.59.0",
+    "@typescript-eslint/parser": "^8.59.0",
     "electron": "^32.0.0",
     "electron-builder": "^25.0.0",
+    "eslint": "^9.39.4",
+    "globals": "^15.15.0",
     "http-server": "^14.1.1",
+    "prettier": "^3.8.3",
     "typescript": "^5.7.0",
     "vitest": "^2.1.9"
   },

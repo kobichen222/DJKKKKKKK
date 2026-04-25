@@ -24,6 +24,19 @@ jobs:
           mkdir -p site
           cp -r public/. site/
           touch site/.nojekyll
+          # Stamp the service worker with the current package.json version
+          # so a release bump invalidates user caches automatically. The
+          # source has a fallback constant; here we just keep it in sync
+          # with the published artifact.
+          VERSION="$(node -p "require('./package.json').version")"
+          node -e "
+            const fs=require('fs');
+            const p='site/sw.js';
+            let s=fs.readFileSync(p,'utf8');
+            s=s.replace(/const SHELL_VERSION\\s*=\\s*'[^']*'/, \"const SHELL_VERSION = 'v$VERSION'\");
+            fs.writeFileSync(p,s);
+            console.log('sw.js stamped with v$VERSION');
+          "
           ls -la site/
       - uses: actions/upload-pages-artifact@v3
         with:

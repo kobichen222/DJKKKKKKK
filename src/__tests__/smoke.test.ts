@@ -37,17 +37,25 @@ describe('public/index.html — structural smoke checks', () => {
     expect(HTML).toMatch(/<title>[^<]*TITAN[^<]*<\/title>/);
   });
 
-  it('contains exactly one inline <script> block (the monolith)', () => {
+  it('contains the monolith inline <script> block', () => {
+    // The renderer used to be exactly one inline script. The landing-page
+    // gate (Aug-2025) added a small second one that drives the splash-then-
+    // hide animation, so we now assert "at least one" plus a size floor on
+    // the largest block to guarantee the real monolith is still embedded.
     const scripts = extractScripts(HTML);
-    expect(scripts.length).toBe(1);
+    expect(scripts.length).toBeGreaterThanOrEqual(1);
+    const longest = scripts.reduce((a, b) => (a.length >= b.length ? a : b));
+    expect(longest.length).toBeGreaterThan(400_000);
   });
 
-  it('the inline <script> parses as valid JavaScript', () => {
+  it('every inline <script> parses as valid JavaScript', () => {
     const scripts = extractScripts(HTML);
     expect(scripts.length).toBeGreaterThanOrEqual(1);
     // new Function() throws a SyntaxError on parse failure without executing.
     // This is strictly a parse check — we never call the function.
-    expect(() => new Function(scripts[0]!)).not.toThrow();
+    for (const s of scripts) {
+      expect(() => new Function(s)).not.toThrow();
+    }
   });
 
   it('declares the four decks A, B, C, D', () => {
@@ -74,6 +82,20 @@ describe('public/index.html — structural smoke checks', () => {
     // this test must fail so we notice before shipping.
     expect(HTML).not.toMatch(/KOBI2100/);
     expect(HTML).not.toMatch(/titan_installer_unlocked_kobi/);
+  });
+
+  it('admin office page no longer ships a hardcoded unlock code', () => {
+    // Companion to the renderer guard above: the admin panel
+    // (`app/office/page.tsx`) used the same shared secret. It now
+    // gates on Supabase auth + profiles.role === 'admin', so the
+    // string must not reappear in the source either.
+    const officeSource = readFileSync(
+      resolve(process.cwd(), 'app/office/page.tsx'),
+      'utf8',
+    );
+    expect(officeSource).not.toMatch(/KOBI2100/);
+    expect(officeSource).not.toMatch(/titan_office_unlocked/);
+    expect(officeSource).toMatch(/profiles[\s\S]*role/);
   });
 
   it('has the Supabase auth modal (sign-in gate for downloads)', () => {

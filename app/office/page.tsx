@@ -1,11 +1,58 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { z } from "zod";
 import "./office.css";
 
+/* ---------- runtime validation schemas ---------- */
+// All untrusted form input crosses these schemas before touching Supabase.
+// Zod gives us (a) precise error messages instead of silent .insert failures
+// when the DB constraint trips, and (b) a single source of truth for shape
+// that the TypeScript types are derived from.
+const LicensePayloadSchema = z.object({
+  tier: z.string().min(1, "tier is required"),
+  email: z.string().email("payload email is not a valid address"),
+  expiresAt: z.number().int().nullable(),
+  issuedAt: z.number().int().optional(),
+});
+
+const SignedLicenseSchema = z.object({
+  payload: LicensePayloadSchema,
+  sig: z.string().regex(/^[0-9a-fA-F]+$/, "sig must be hex").min(2),
+  alg: z.literal("ed25519").optional(),
+});
+
+const DealKind = z.enum(["percent", "fixed", "bundle", "free-month"]);
+const DealFormSchema = z
+  .object({
+    code: z
+      .string()
+      .trim()
+      .min(2, "code must be at least 2 characters")
+      .max(40, "code must be 40 characters or fewer")
+      .regex(/^[A-Z0-9_-]+$/, "code may only contain A-Z, 0-9, _ and -"),
+    title: z.string().trim().max(120).optional(),
+    kind: DealKind,
+    amount: z.number().min(0, "amount cannot be negative"),
+    maxUses: z.number().int().min(1).nullable(),
+    validDays: z.number().int().min(1).nullable(),
+  })
+  .superRefine((d, ctx) => {
+    if (d.kind === "percent" && d.amount > 100) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["amount"],
+        message: "percent discount cannot exceed 100",
+      });
+    }
+  });
+
 /* ---------- constants ---------- */
-const OFFICE_CODE = "KOBI2100";
-const UNLOCK_KEY = "titan_office_unlocked_v1";
+// Office access is gated by Supabase auth + profiles.role === 'admin'.
+// The previous hardcoded unlock string was readable in the bundled JS,
+// so anyone could open the panel; the smoke test in src/__tests__/smoke.test.ts
+// guards the renderer against its return — this file is now the second
+// half of that promise.
 const SUPA_KEY = "djmaxai_supa_v1";
 // Ed25519 public key (32 bytes, hex) — must match SP_LICENSE_PUBKEY_HEX in
 // public/index.html.  The matching private key lives only on the operator's
@@ -87,40 +134,90 @@ async function verifySignedLicense(lic: SignedLicense): Promise<boolean> {
 /* =============================================================
  * PAGE
  * ============================================================= */
+type AuthStatus =
+  | "checking"
+  | "no-config"
+  | "signed-out"
+  | "not-admin"
+  | "banned"
+  | "error"
+  | "ready";
+
 export default function OfficePage() {
   const [mounted, setMounted] = useState(false);
-  const [unlocked, setUnlocked] = useState(false);
-  const [code, setCode] = useState("");
-  const [codeErr, setCodeErr] = useState("");
   const [tab, setTab] = useState<Tab>("users");
   const [toast, setToast] = useState<Toast>(null);
   const [supa, setSupa] = useState<any>(null);
-  const [supaErr, setSupaErr] = useState<string>("");
+  const [authStatus, setAuthStatus] = useState<AuthStatus>("checking");
+  const [authEmail, setAuthEmail] = useState<string>("");
+  const [authError, setAuthError] = useState<string>("");
 
   useEffect(() => {
     setMounted(true);
-    if (sessionStorage.getItem(UNLOCK_KEY) === "1") setUnlocked(true);
   }, []);
 
+  // Single auth/role check on mount. We deliberately do NOT offer a sign-in
+  // UI here — sign-in goes through the main TITAN app so there is one
+  // identity flow to audit.  This panel is read-only on auth state.
   useEffect(() => {
-    if (!unlocked) return;
+    if (!mounted) return;
     const cfg = readSupaCfg();
     if (!cfg) {
-      setSupaErr("no-config");
+      setAuthStatus("no-config");
       return;
     }
+    let cancelled = false;
     (async () => {
       try {
         const sdk = await loadSupabaseUmd();
         const client = sdk.createClient(cfg.url, cfg.anon, {
           auth: { persistSession: true, autoRefreshToken: true },
         });
+        if (cancelled) return;
         setSupa(client);
+        await refreshAuth(client);
       } catch (e: any) {
-        setSupaErr(e?.message || "Supabase init failed");
+        if (cancelled) return;
+        setAuthStatus("error");
+        setAuthError(e?.message || "Supabase init failed");
       }
     })();
-  }, [unlocked]);
+    return () => { cancelled = true; };
+  }, [mounted]);
+
+  async function refreshAuth(client: any) {
+    const { data: userRes, error: userErr } = await client.auth.getUser();
+    if (userErr || !userRes?.user) {
+      setAuthStatus("signed-out");
+      setAuthEmail("");
+      return;
+    }
+    const u = userRes.user;
+    setAuthEmail(u.email ?? "");
+    const { data: profile, error: profileErr } = await client
+      .from("profiles")
+      .select("role,banned")
+      .eq("id", u.id)
+      .maybeSingle();
+    if (profileErr) {
+      setAuthStatus("error");
+      setAuthError(profileErr.message);
+      return;
+    }
+    if (!profile) {
+      setAuthStatus("not-admin");
+      return;
+    }
+    if (profile.banned) {
+      setAuthStatus("banned");
+      return;
+    }
+    if (profile.role !== "admin") {
+      setAuthStatus("not-admin");
+      return;
+    }
+    setAuthStatus("ready");
+  }
 
   function notify(text: string, kind: "ok" | "err" = "ok") {
     const id = Date.now();
@@ -128,48 +225,51 @@ export default function OfficePage() {
     setTimeout(() => setToast((t) => (t?.id === id ? null : t)), 2600);
   }
 
-  function submitCode(e?: React.FormEvent) {
-    e?.preventDefault();
-    if (code.trim() === OFFICE_CODE) {
-      sessionStorage.setItem(UNLOCK_KEY, "1");
-      setUnlocked(true);
-      setCodeErr("");
-    } else {
-      setCodeErr("✗ Invalid code");
-      setCode("");
-    }
-  }
-
-  function lock() {
-    sessionStorage.removeItem(UNLOCK_KEY);
-    setUnlocked(false);
-    setCode("");
+  async function signOut() {
+    if (supa) await supa.auth.signOut();
+    setAuthStatus("signed-out");
+    setAuthEmail("");
     setTab("users");
   }
 
   if (!mounted) return null;
 
-  if (!unlocked) {
+  if (authStatus !== "ready") {
     return (
       <div className="office-shell">
-        <form className="gate-wrap" onSubmit={submitCode}>
-          <div className="gate-icon">🔒</div>
+        <div className="gate-wrap">
+          <div className="gate-icon">
+            {authStatus === "checking" ? "⟳" :
+             authStatus === "no-config" ? "⚙" :
+             authStatus === "signed-out" ? "🔑" :
+             authStatus === "banned" ? "⛔" :
+             authStatus === "error" ? "✗" : "🔒"}
+          </div>
           <div className="gate-title">TITAN · OFFICE</div>
-          <div className="gate-sub">Admin access code required</div>
-          <input
-            className="gate-input"
-            type="password"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            placeholder="— — — — — —"
-            autoFocus
-            autoComplete="off"
-          />
-          <div className="gate-err">{codeErr}</div>
-          <button className="gate-btn" type="submit" disabled={!code}>
-            UNLOCK
-          </button>
-        </form>
+          <div className="gate-sub">
+            {authStatus === "checking" && "Checking your session…"}
+            {authStatus === "no-config" && (
+              <>Supabase not configured. Open the main TITAN app → Settings → 🔐 AUTHENTICATION, paste your Project URL + anon key, then return here.</>
+            )}
+            {authStatus === "signed-out" && (
+              <>You are not signed in. Sign in via the main TITAN app, then return to this page.</>
+            )}
+            {authStatus === "not-admin" && (
+              <>Access denied for <code>{authEmail || "(no email)"}</code>. Admin role required.</>
+            )}
+            {authStatus === "banned" && (
+              <>Account suspended. Contact the platform owner.</>
+            )}
+            {authStatus === "error" && (
+              <>Auth check failed: <code>{authError}</code></>
+            )}
+          </div>
+          {supa && (authStatus === "not-admin" || authStatus === "banned") && (
+            <button className="gate-btn" type="button" onClick={signOut}>
+              SIGN OUT
+            </button>
+          )}
+        </div>
       </div>
     );
   }
@@ -184,8 +284,9 @@ export default function OfficePage() {
           <span>
             <span className="dot" /> LIVE
           </span>
-          <span>{supa ? "SUPABASE · CONNECTED" : supaErr === "no-config" ? "NO SUPABASE CONFIG" : "CONNECTING…"}</span>
-          <button className="signout-btn" onClick={lock}>LOCK</button>
+          <span>SUPABASE · CONNECTED</span>
+          <span title={authEmail}>{authEmail || "admin"}</span>
+          <button className="signout-btn" onClick={signOut}>SIGN OUT</button>
         </div>
       </header>
 
@@ -206,28 +307,10 @@ export default function OfficePage() {
         ))}
       </nav>
 
-      {supaErr === "no-config" ? (
-        <div className="office-panel">
-          <div className="cfg-notice">
-            <b>Supabase is not configured in this browser.</b> Open the main
-            TITAN app → Settings → 🔐 AUTHENTICATION and paste your Project URL
-            + anon key. Then run <code>public/auth.sql</code> and{" "}
-            <code>public/office.sql</code> in Supabase SQL Editor. Return here
-            and refresh.
-          </div>
-        </div>
-      ) : !supa ? (
-        <div className="office-panel">
-          <div className="empty-state"><div className="big">⟳</div>Initialising Supabase…</div>
-        </div>
-      ) : (
-        <>
-          {tab === "users" && <UsersPanel supa={supa} notify={notify} />}
-          {tab === "licenses" && <LicensesPanel supa={supa} notify={notify} />}
-          {tab === "deals" && <DealsPanel supa={supa} notify={notify} />}
-          {tab === "audit" && <AuditPanel supa={supa} />}
-        </>
-      )}
+      {tab === "users" && <UsersPanel supa={supa} notify={notify} />}
+      {tab === "licenses" && <LicensesPanel supa={supa} notify={notify} />}
+      {tab === "deals" && <DealsPanel supa={supa} notify={notify} />}
+      {tab === "audit" && <AuditPanel supa={supa} />}
 
       {toast && <div className={`toast-bar ${toast.kind === "err" ? "err" : ""}`}>{toast.text}</div>}
     </div>
@@ -257,7 +340,7 @@ function UsersPanel({ supa, notify }: { supa: any; notify: (t: string, k?: "ok" 
     setRows((data || []) as Profile[]);
   }
 
-  useEffect(() => { load(); /* eslint-disable-next-line */ }, []);
+  useEffect(() => { load(); }, []);
 
   async function audit(action: string, target_id: string, details: object = {}) {
     const { data: userRes } = await supa.auth.getUser();
@@ -378,7 +461,7 @@ function LicensesPanel({ supa, notify }: { supa: any; notify: (t: string, k?: "o
     if (error) { notify(error.message, "err"); return; }
     setRows((data || []) as License[]);
   }
-  useEffect(() => { load(); /* eslint-disable-next-line */ }, []);
+  useEffect(() => { load(); }, []);
 
   // Licenses are signed offline with the Ed25519 private key via
   // `node tools/gen-license.js`.  The admin pastes the resulting JSON here;
@@ -390,12 +473,21 @@ function LicensesPanel({ supa, notify }: { supa: any; notify: (t: string, k?: "o
     const text = pastedJson.trim();
     if (!text) return notify("Paste the signed license JSON first", "err");
 
-    let lic: SignedLicense;
+    let parsed: unknown;
     try {
-      lic = JSON.parse(text) as SignedLicense;
+      parsed = JSON.parse(text);
     } catch {
       return notify("Not valid JSON — run tools/gen-license.js to produce it", "err");
     }
+
+    const result = SignedLicenseSchema.safeParse(parsed);
+    if (!result.success) {
+      const first = result.error.issues[0];
+      const where = first?.path.join(".") || "root";
+      const msg = first?.message || "schema validation failed";
+      return notify(`Bad license shape (${where}): ${msg}`, "err");
+    }
+    const lic = result.data;
 
     setBusy(true);
     try {
@@ -405,10 +497,6 @@ function LicensesPanel({ supa, notify }: { supa: any; notify: (t: string, k?: "o
         return;
       }
       const p = lic.payload;
-      if (!p.email || !p.tier) {
-        notify("Payload missing email or tier", "err");
-        return;
-      }
 
       const { data: userRes } = await supa.auth.getUser();
       const { data, error } = await supa
@@ -572,20 +660,35 @@ function DealsPanel({ supa, notify }: { supa: any; notify: (t: string, k?: "ok" 
     if (error) { notify(error.message, "err"); return; }
     setRows((data || []) as Deal[]);
   }
-  useEffect(() => { load(); /* eslint-disable-next-line */ }, []);
+  useEffect(() => { load(); }, []);
 
   async function create() {
-    if (!code.trim()) return notify("Code required", "err");
+    const candidate = {
+      code: code.trim().toUpperCase(),
+      title: title.trim() || undefined,
+      kind,
+      amount: Number(amount),
+      maxUses: maxUses === "" ? null : Number(maxUses),
+      validDays: validDays === "" ? null : Number(validDays),
+    };
+    const parsed = DealFormSchema.safeParse(candidate);
+    if (!parsed.success) {
+      const first = parsed.error.issues[0];
+      return notify(first?.message || "Invalid deal", "err");
+    }
+    const v = parsed.data;
     setBusy(true);
     try {
-      const validUntil = validDays !== "" ? new Date(Date.now() + Number(validDays) * 86400000).toISOString() : null;
+      const validUntil = v.validDays
+        ? new Date(Date.now() + v.validDays * 86_400_000).toISOString()
+        : null;
       const { data: userRes } = await supa.auth.getUser();
       const { error } = await supa.from("deals").insert({
-        code: code.trim().toUpperCase(),
-        title: title.trim() || null,
-        kind,
-        amount: Number(amount) || 0,
-        max_uses: maxUses === "" ? null : Number(maxUses),
+        code: v.code,
+        title: v.title ?? null,
+        kind: v.kind,
+        amount: v.amount,
+        max_uses: v.maxUses,
         valid_until: validUntil,
         active: true,
         created_by: userRes?.user?.id || null,
