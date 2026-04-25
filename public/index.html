@@ -9749,6 +9749,128 @@ body.show-all .cdj .jog-center-screen .bpm-sub{
   <!-- Lesson grid -->
   <div id="learnLessonGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px"></div>
 
+  <!-- Button reference — every relevant control in TITAN, grouped by area -->
+  <div class="learn-ref-wrap" style="margin-top:24px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+      <div>
+        <div style="font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:3px;color:#5cf0a0;font-weight:700">📖 BUTTON REFERENCE</div>
+        <div style="font-size:12px;color:#9ad8b0;margin-top:2px">Every relevant control in TITAN — what it does, where to find it.</div>
+      </div>
+      <input id="learnRefSearch" type="text" placeholder="Search controls…" style="background:#02080c;border:1px solid rgba(92,240,160,.25);border-radius:6px;padding:7px 10px;color:#cfe6d8;font-family:'Share Tech Mono',monospace;font-size:12px;min-width:220px">
+    </div>
+    <div id="learnRefGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px">
+
+      <details class="learn-ref-card" data-ref-cat="deck" open style="background:#0a0a0c;border:1px solid #2a2a2e;border-radius:10px;padding:12px 14px">
+        <summary style="font-family:'Orbitron',sans-serif;font-size:12px;letter-spacing:2px;color:#ff7a00;font-weight:800;cursor:pointer;outline:none">🎚 DECK · per-channel controls</summary>
+        <ul class="learn-ref-list" style="list-style:none;padding:0;margin:10px 0 0 0;display:flex;flex-direction:column;gap:6px;font-size:12.5px;line-height:1.45;color:#cfe6d8">
+          <li><b style="color:#ffd089">⬆ UPLOAD</b> — Pick an audio file from disk and drop it on this deck.</li>
+          <li><b style="color:#ffd089">📚 LIBRARY</b> — Open your saved-track browser scoped to this deck.</li>
+          <li><b style="color:#ffd089">▶ PLAY</b> — Start / pause playback. Orbital LED turns green when playing.</li>
+          <li><b style="color:#ffd089">◐ CUE</b> — Jump to the cue point. Press-and-hold to preview from cue without latching.</li>
+          <li><b style="color:#ffd089">PADS 1–8</b> — Multifunction pads. First press = save / arm; subsequent press = trigger; right-click = clear.</li>
+          <li><b style="color:#ffd089">HOT CUE / ROLL / SLICER / SAMPLER / LOOP / PITCH</b> — Pad-mode selector. Reassigns what the 8 pads do.</li>
+          <li><b style="color:#ffd089">LOOP IN</b> — Mark the loop start at the current playhead.</li>
+          <li><b style="color:#ffd089">LOOP OUT</b> — Mark the loop end. Activates the loop instantly.</li>
+          <li><b style="color:#ffd089">RELOOP</b> — Toggle the last set loop on/off without erasing it.</li>
+          <li><b style="color:#ffd089">← 4 / ← 1 / 1 → / 4 →</b> — Beat-jump backward / forward by 1 or 4 beats.</li>
+          <li><b style="color:#ffd089">SYNC</b> — Auto-match BPM + phase to the master deck.</li>
+          <li><b style="color:#ffd089">KEY</b> — Keylock: change tempo without changing pitch.</li>
+          <li><b style="color:#ffd089">QUANT</b> — Quantize: snap pad / loop triggers to the next beat.</li>
+          <li><b style="color:#ffd089">SLIP</b> — Slip mode: a ghost playhead keeps running while you mash, so the track returns to where it would have been.</li>
+          <li><b style="color:#ffd089">REV</b> — Reverse playback in real time.</li>
+          <li><b style="color:#ffd089">TEMPO slider</b> — Manual pitch. Range is adjustable per-deck (default ±8 %).</li>
+          <li><b style="color:#ffd089">TRIM knob</b> — Per-channel input gain. Match loudness across tracks here, not on the fader.</li>
+          <li><b style="color:#ffd089">HI / MID / LOW</b> — 3-band EQ. Past -20 dB = full kill. Use LOW to bass-swap on transitions.</li>
+          <li><b style="color:#ffd089">Channel fader</b> — Per-channel volume in the master mix.</li>
+        </ul>
+      </details>
+
+      <details class="learn-ref-card" data-ref-cat="mixer" open style="background:#0a0a0c;border:1px solid #2a2a2e;border-radius:10px;padding:12px 14px">
+        <summary style="font-family:'Orbitron',sans-serif;font-size:12px;letter-spacing:2px;color:#2ee0ff;font-weight:800;cursor:pointer;outline:none">🎛 MIXER · master + colour FX</summary>
+        <ul class="learn-ref-list" style="list-style:none;padding:0;margin:10px 0 0 0;display:flex;flex-direction:column;gap:6px;font-size:12.5px;line-height:1.45;color:#cfe6d8">
+          <li><b style="color:#9ed8ff">CROSSFADER</b> — Horizontal slider. Blends Deck A (left) ↔ Deck B (right). C/D assignable in mixer settings.</li>
+          <li><b style="color:#9ed8ff">MASTER</b> — Master output volume to the speakers.</li>
+          <li><b style="color:#9ed8ff">BOOTH</b> — Booth / stage-monitor volume (independent of master).</li>
+          <li><b style="color:#9ed8ff">BAL</b> — Master left / right balance.</li>
+          <li><b style="color:#9ed8ff">COLOR A / B / C / D</b> — Per-channel filter. Up = high-pass (bass drops out); down = low-pass (highs drop out). Centre = bypass.</li>
+          <li><b style="color:#9ed8ff">REC</b> — Header pill. Captures the master bus to a downloadable .webm.</li>
+        </ul>
+      </details>
+
+      <details class="learn-ref-card" data-ref-cat="fx" open style="background:#0a0a0c;border:1px solid #2a2a2e;border-radius:10px;padding:12px 14px">
+        <summary style="font-family:'Orbitron',sans-serif;font-size:12px;letter-spacing:2px;color:#c800ff;font-weight:800;cursor:pointer;outline:none">💥 BEAT FX + SCENE FX</summary>
+        <ul class="learn-ref-list" style="list-style:none;padding:0;margin:10px 0 0 0;display:flex;flex-direction:column;gap:6px;font-size:12.5px;line-height:1.45;color:#cfe6d8">
+          <li><b style="color:#e0a8ff">FX TYPE</b> — Delay · Echo · Ping-Pong · Reverb · Filter · Flanger · Phaser · Roll.</li>
+          <li><b style="color:#e0a8ff">FX CHANNEL</b> — Where the FX lands: master · CH 1–4 · mic.</li>
+          <li><b style="color:#e0a8ff">1/16 … 16</b> — Beat division. The FX is tempo-locked to the master BPM.</li>
+          <li><b style="color:#e0a8ff">LEVEL</b> — Wet / dry mix.</li>
+          <li><b style="color:#e0a8ff">TAP</b> — Tap 4+ times in time to set the master BPM by ear.</li>
+          <li><b style="color:#e0a8ff">ON / OFF</b> — Engage BEAT FX.</li>
+          <li><b style="color:#e0a8ff">DUB SPIRAL · SWEEP · HELIX · MOD · SHIMMER · PLAZA</b> — One-tap scene macros.</li>
+          <li><b style="color:#e0a8ff">X-PAD</b> — 2-D control surface for the active scene. Drag = active; release = instantly off.</li>
+          <li><b style="color:#e0a8ff">DEPTH</b> — Overall scene FX intensity.</li>
+        </ul>
+      </details>
+
+      <details class="learn-ref-card" data-ref-cat="automix" open style="background:#0a0a0c;border:1px solid #2a2a2e;border-radius:10px;padding:12px 14px">
+        <summary style="font-family:'Orbitron',sans-serif;font-size:12px;letter-spacing:2px;color:#5cf0a0;font-weight:800;cursor:pointer;outline:none">🤖 AUTO-MIX</summary>
+        <ul class="learn-ref-list" style="list-style:none;padding:0;margin:10px 0 0 0;display:flex;flex-direction:column;gap:6px;font-size:12.5px;line-height:1.45;color:#cfe6d8">
+          <li><b style="color:#9ad8b0">SMOOTH</b> — Long bass-swap blend.</li>
+          <li><b style="color:#9ad8b0">ENERGY</b> — High-pass sweep + exponential fade.</li>
+          <li><b style="color:#9ad8b0">HARMONIC</b> — Key-matched blend.</li>
+          <li><b style="color:#9ad8b0">CUT</b> — Hard cut on the next downbeat.</li>
+          <li><b style="color:#9ad8b0">ECHO</b> — Outgoing deck dives into an echo tail.</li>
+          <li><b style="color:#9ad8b0">PICK</b> — Auto-load the best next track based on key + BPM.</li>
+          <li><b style="color:#9ad8b0">BARS</b> — Length of the auto-mix transition (4 / 8 / 16 / 32 / 64).</li>
+          <li><b style="color:#9ad8b0">SYNC</b> — Sync the incoming deck before transitioning.</li>
+          <li><b style="color:#9ad8b0">CONT</b> — Auto-chain transitions forever — hands-free DJ.</li>
+        </ul>
+      </details>
+
+      <details class="learn-ref-card" data-ref-cat="hpmic" open style="background:#0a0a0c;border:1px solid #2a2a2e;border-radius:10px;padding:12px 14px">
+        <summary style="font-family:'Orbitron',sans-serif;font-size:12px;letter-spacing:2px;color:#ffaa5a;font-weight:800;cursor:pointer;outline:none">🎧 HEADPHONES · 📣 MIC · 🔊 ISOLATOR</summary>
+        <ul class="learn-ref-list" style="list-style:none;padding:0;margin:10px 0 0 0;display:flex;flex-direction:column;gap:6px;font-size:12.5px;line-height:1.45;color:#cfe6d8">
+          <li><b style="color:#ffd28a">CUE MIX</b> — Blend between cue and master in the headphones.</li>
+          <li><b style="color:#ffd28a">HP VOL</b> — Headphone amp volume.</li>
+          <li><b style="color:#ffd28a">DECK A / B / C / D (cue)</b> — Pick which decks flow into headphones only.</li>
+          <li><b style="color:#ffd28a">MIC ON</b> — Toggle microphone input. Browser will request permission on first use.</li>
+          <li><b style="color:#ffd28a">MIC VOL · HI · LOW</b> — Mic gain + tone shaping.</li>
+          <li><b style="color:#ffd28a">ISOLATOR LOW · MID · HI</b> — Master-bus 3-band kill rotary, harder than channel EQ.</li>
+        </ul>
+      </details>
+
+      <details class="learn-ref-card" data-ref-cat="sound" open style="background:#0a0a0c;border:1px solid #2a2a2e;border-radius:10px;padding:12px 14px">
+        <summary style="font-family:'Orbitron',sans-serif;font-size:12px;letter-spacing:2px;color:#ff90a0;font-weight:800;cursor:pointer;outline:none">🎯 SOUND tab · mastering + LUFS</summary>
+        <ul class="learn-ref-list" style="list-style:none;padding:0;margin:10px 0 0 0;display:flex;flex-direction:column;gap:6px;font-size:12.5px;line-height:1.45;color:#cfe6d8">
+          <li><b style="color:#ffb0c0">7-band EQ</b> — Master-bus tone. Drag the dots; presets live above the graph.</li>
+          <li><b style="color:#ffb0c0">COMP THRESHOLD / RATIO / ATK / REL / MAKEUP</b> — Master compressor for glue.</li>
+          <li><b style="color:#ffb0c0">EXCITER · TAPE · TRANSIENT · DE-ESS · MULTIBAND · GATE</b> — Studio-grade colour and dynamics chain.</li>
+          <li><b style="color:#ffb0c0">LIMITER THRESHOLD</b> — Final ceiling before clipping. Default -0.5 dB.</li>
+          <li><b style="color:#ffb0c0">CLUB -8 / RADIO -12 / STREAMING -14 / YOUTUBE -14 / PODCAST -16 / BROADCAST -23</b> — Loudness target lines on the LUFS history graph.</li>
+          <li><b style="color:#ffb0c0">MONO / DIM / BYPASS</b> — Reference checks. Mono-sums for translation; dim for level checks; bypass to A/B.</li>
+        </ul>
+      </details>
+
+      <details class="learn-ref-card" data-ref-cat="tabs" open style="background:#0a0a0c;border:1px solid #2a2a2e;border-radius:10px;padding:12px 14px">
+        <summary style="font-family:'Orbitron',sans-serif;font-size:12px;letter-spacing:2px;color:#7aa7ff;font-weight:800;cursor:pointer;outline:none">🗂 TOP TABS</summary>
+        <ul class="learn-ref-list" style="list-style:none;padding:0;margin:10px 0 0 0;display:flex;flex-direction:column;gap:6px;font-size:12.5px;line-height:1.45;color:#cfe6d8">
+          <li><b style="color:#aac4ff">DECKS</b> — The main 4-deck console. This is where mixing happens.</li>
+          <li><b style="color:#aac4ff">LEARN</b> — You are here. Lessons + reference.</li>
+          <li><b style="color:#aac4ff">VINYL</b> — Two physical-style turntables driving Decks A and B.</li>
+          <li><b style="color:#aac4ff">SAMPLER</b> — 16 sample slots for stabs, drops and one-shots.</li>
+          <li><b style="color:#aac4ff">PLAYLISTS</b> — Group tracks into setlists.</li>
+          <li><b style="color:#aac4ff">SESSIONS</b> — Save / restore the entire console state (decks, FX, mixer).</li>
+          <li><b style="color:#aac4ff">MIDI</b> — Map a hardware controller. Learn-mode supported.</li>
+          <li><b style="color:#aac4ff">SOUND</b> — Master mastering chain + LUFS metering.</li>
+          <li><b style="color:#aac4ff">TITAN LAB</b> — Synth / drawbars / experimental sound design.</li>
+          <li><b style="color:#aac4ff">SETTINGS</b> — Auth, themes, audio engine, licensing.</li>
+          <li><b style="color:#aac4ff">SUPPORT · GUIDE · SHORTCUTS</b> — Help, walkthroughs and keyboard cheatsheet.</li>
+        </ul>
+      </details>
+
+    </div>
+  </div>
+
   <!-- Active lesson overlay — shown while a lesson is running -->
   <div id="learnActiveLesson" style="display:none;position:fixed;bottom:16px;right:16px;max-width:380px;background:linear-gradient(135deg,#02120a 0%,#000 100%);border:2px solid #5cf0a0;border-radius:12px;padding:16px 20px;box-shadow:0 12px 40px rgba(0,0,0,.8),0 0 20px rgba(92,240,160,.3);z-index:4000;font-family:'Share Tech Mono',monospace">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
@@ -9759,6 +9881,7 @@ body.show-all .cdj .jog-center-screen .bpm-sub{
     <p id="learnActiveInstruction" style="font-size:13px;line-height:1.6;color:#cfe6d8;margin-bottom:14px">…</p>
     <div style="display:flex;gap:8px;justify-content:flex-end;align-items:center">
       <span id="learnActiveHint" style="flex:1;color:#7a9a88;font-size:11px"></span>
+      <button id="learnBackBtn" class="tool-btn" style="padding:5px 10px;font-size:10px;color:var(--text-dim);border-color:#333">◂ BACK</button>
       <button id="learnSkipBtn" class="tool-btn" style="padding:5px 10px;font-size:10px;color:var(--text-dim);border-color:#333">SKIP</button>
       <button id="learnNextBtn" class="tool-btn" style="padding:5px 14px;font-size:10px;color:#5cf0a0;border-color:#5cf0a0">NEXT ▸</button>
     </div>
@@ -22834,6 +22957,219 @@ document.addEventListener('DOMContentLoaded',init);
          text:'The button is now STOP. Click it — a .webm file downloads. That\'s your first DJ set on disk.',
          check:()=>mixerState&&mixerState.isRecording===false}
       ]},
+    { id:'l11', level:'beginner', title:'🎧 Cue with headphones',
+      blurb:'Pre-listen to the next track silently. The single biggest unlock for blind beatmatching.',
+      xp:75,
+      steps:[
+        {title:'Send Deck A to your headphones',
+         text:'In the HEADPHONES section of the mixer toolbar, click "DECK A". The cue light turns on — Deck A is now flowing into your cans, but not the master.',
+         hint:'Look for the row of DECK A/B/C/D buttons under the CUE MIX knob.',
+         highlight:'#hpCue-A',
+         check:()=>mixerState&&mixerState.hpCue&&mixerState.hpCue.A===true},
+        {title:'Crank HP VOL',
+         text:'The HP VOL knob is your headphone amp. Turn it up so you can actually hear the cue over a loud room.',
+         highlight:'.knob[data-knob="hpVol"]',
+         check:()=>{const k=document.querySelector('.knob[data-knob="hpVol"]');return k&&Math.abs(k._rot||0)>30;}},
+        {title:'Set the CUE / MASTER blend',
+         text:'CUE MIX bleeds master back into your headphones. Move it off the extremes — pros sit around 50/50 so they hear both sides.',
+         highlight:'.knob[data-knob="hpMix"]',
+         check:()=>{const k=document.querySelector('.knob[data-knob="hpMix"]');return k&&Math.abs(k._rot||0)>20;}}
+      ]},
+    { id:'l12', level:'beginner', title:'🎚 Trim — your gain stage',
+      blurb:'Two tracks rarely arrive at the same loudness. TRIM evens them out before the fader.',
+      xp:60,
+      steps:[
+        {title:'Turn Deck A\'s TRIM knob',
+         text:'TRIM lives at the very top of the channel strip — above the EQ. Adjust it until the channel meter lives in the green/amber, never red.',
+         hint:'A safe target is the channel meter peaking around -6 dB.',
+         highlight:'.knob[data-knob="trim-A"]',
+         check:()=>{const k=document.querySelector('.knob[data-knob="trim-A"]');return k&&Math.abs(k._rot||0)>30;}},
+        {title:'Push the channel fader to ~75 %',
+         text:'TRIM handles loudness; the channel fader is for performance moves. Push it up — that\'s your "voice" in the mix.',
+         check:()=>decks&&decks.A&&decks.A.volume>0.6}
+      ]},
+    { id:'l13', level:'beginner', title:'🎯 Bank three hot cues',
+      blurb:'Skip drag-scrubbing forever. Mark intro, drop and breakdown — jump there in one tap.',
+      xp:80,
+      steps:[
+        {title:'Play Deck A, then hit pad 1 at the intro',
+         text:'Pad 1 saves where the track is right now. You\'ll use it to start fresh whenever you want.',
+         highlight:'.hot-cues[data-deck="A"] .cue-btn[data-cue="1"]',
+         check:()=>decks&&decks.A&&decks.A.hotCues&&decks.A.hotCues[1]!=null},
+        {title:'Let it play to the drop, then hit pad 2',
+         text:'Pad 2 is your "drop" marker. Mash it whenever the crowd needs the kick back.',
+         highlight:'.hot-cues[data-deck="A"] .cue-btn[data-cue="2"]',
+         check:()=>decks&&decks.A&&decks.A.hotCues&&decks.A.hotCues[2]!=null},
+        {title:'Save a third cue at the breakdown',
+         text:'Three cues is the magic number — intro, drop, breakdown. Drop pad 3 wherever the track strips back.',
+         highlight:'.hot-cues[data-deck="A"] .cue-btn[data-cue="3"]',
+         check:()=>decks&&decks.A&&decks.A.hotCues&&decks.A.hotCues[3]!=null}
+      ]},
+    { id:'l14', level:'intermediate', title:'🔇 The bass swap',
+      blurb:'Two basses fighting = mud. Pros never let both decks hit the bass at once.',
+      xp:150,
+      steps:[
+        {title:'Have both decks playing',
+         text:'Load tracks onto Deck A and Deck B and start them. They don\'t have to be in sync yet.',
+         check:()=>decks&&decks.A&&decks.B&&decks.A.track&&decks.B.track&&decks.A.playing&&decks.B.playing},
+        {title:'Roll Deck B\'s LOW knob hard down',
+         text:'Cut the bass on the *incoming* deck. You can now blend without two kicks colliding.',
+         hint:'Drag the LOW knob all the way down — past -40 dB.',
+         highlight:'.knob[data-knob="low-B"]',
+         check:()=>decks&&decks.B&&decks.B.eq&&decks.B.eq.low<-0.7},
+        {title:'Move the crossfader to the centre',
+         text:'Both decks are mixing — but Deck B has no bass, so there\'s no clash.',
+         check:()=>mixerState&&Math.abs(mixerState.crossfader-0.5)<0.2},
+        {title:'Now swap: bring B\'s LOW back, kill A\'s LOW',
+         text:'On the next downbeat, restore B\'s bass and pull A\'s. The kick stays continuous; only the source changed.',
+         hint:'Aim for B\'s LOW back near zero and A\'s LOW past -40 dB.',
+         check:()=>decks&&decks.A&&decks.B&&decks.A.eq.low<-0.7&&decks.B.eq.low>-0.3}
+      ]},
+    { id:'l15', level:'intermediate', title:'🔑 KEYLOCK — pitch without warble',
+      blurb:'Speed a track up 5 % without it sounding like the Chipmunks.',
+      xp:110,
+      steps:[
+        {title:'Press KEY on Deck A',
+         text:'KEY engages the pitch-preserving algorithm. You\'ll hear the difference once you nudge tempo.',
+         highlight:'.util-btn.keylock[data-deck="A"]',
+         check:()=>decks&&decks.A&&decks.A.keylock===true},
+        {title:'Push tempo by more than 3 %',
+         text:'Use the TEMPO slider on Deck A. With KEY on, the music speeds up but stays in its original key.',
+         hint:'Tempo lives on the right edge of the deck.',
+         check:()=>decks&&decks.A&&Math.abs(decks.A.tempo||0)>3}
+      ]},
+    { id:'l16', level:'intermediate', title:'📐 QUANTIZE — perfect cue drops',
+      blurb:'Even sloppy fingers land on the beat when QUANT is on.',
+      xp:100,
+      steps:[
+        {title:'Engage QUANT on Deck A',
+         text:'Light the QUANT button. Every cue and loop trigger now snaps to the next beat instead of firing instantly.',
+         highlight:'.util-btn.quantize[data-deck="A"]',
+         check:()=>decks&&decks.A&&decks.A.quantize===true},
+        {title:'With Deck A playing, hit pad 4 anywhere',
+         text:'Save a hot cue. Notice it lands cleanly on the next beat — no off-grid wobble.',
+         highlight:'.hot-cues[data-deck="A"] .cue-btn[data-cue="4"]',
+         check:()=>decks&&decks.A&&decks.A.hotCues&&decks.A.hotCues[4]!=null}
+      ]},
+    { id:'l17', level:'intermediate', title:'🌀 SLIP MODE — return to the future',
+      blurb:'Mash any cue or loop, then jump back to where the song would have been if you hadn\'t.',
+      xp:110,
+      steps:[
+        {title:'Enable SLIP on Deck A',
+         text:'SLIP keeps a "ghost" playhead running in the background. Pads and loops only affect the audible stream.',
+         highlight:'.util-btn.slip[data-deck="A"]',
+         check:()=>decks&&decks.A&&decks.A.slip===true},
+        {title:'With Deck A playing, mash pad 5',
+         text:'Punch pad 5 to fire a cue. Release — the track snaps back to where it would have been. Pure magic.',
+         highlight:'.hot-cues[data-deck="A"] .cue-btn[data-cue="5"]',
+         check:()=>decks&&decks.A&&decks.A.hotCues&&decks.A.hotCues[5]!=null}
+      ]},
+    { id:'l18', level:'intermediate', title:'◀ REVERSE moment',
+      blurb:'A 1-bar reverse before the drop is the oldest trick in the DJ book — and still kills.',
+      xp:80,
+      steps:[
+        {title:'Tap REV on Deck A',
+         text:'With the deck playing, hit REV. The track plays backwards in real time.',
+         highlight:'.util-btn.reverse[data-deck="A"]',
+         check:()=>decks&&decks.A&&decks.A.reverse===true},
+        {title:'Tap REV again to return to forward play',
+         text:'Toggle off — the track resumes forward, ideally on the next downbeat for the cleanest land.',
+         check:()=>decks&&decks.A&&decks.A.reverse===false}
+      ]},
+    { id:'l19', level:'intermediate', title:'⏰ TAP the BPM by ear',
+      blurb:'Numbers wrong? Beatgrid drifting? Tap-tempo is your manual override.',
+      xp:90,
+      steps:[
+        {title:'Play a track on Deck A',
+         text:'Anything will do. Listen to the kick.',
+         check:()=>decks&&decks.A&&decks.A.playing},
+        {title:'Tap the TAP button in time, 4+ times',
+         text:'Hit TAP on every downbeat. After a few taps the master BPM updates to your taps.',
+         hint:'TAP lives in the BEAT FX panel.',
+         highlight:'#tapBtn',
+         check:()=>mixerState&&typeof mixerState.tapBpm==='number'&&mixerState.tapBpm>0}
+      ]},
+    { id:'l20', level:'intermediate', title:'💥 BEAT FX — your first echo',
+      blurb:'A tempo-locked echo on the last beat before a drop is pure ear candy.',
+      xp:130,
+      steps:[
+        {title:'Turn FX LEVEL up',
+         text:'Without level there\'s no FX, no matter how hard you press. Find the LEVEL knob in the BEAT FX panel.',
+         highlight:'.knob[data-knob="fxLevel"]',
+         check:()=>{const k=document.querySelector('.knob[data-knob="fxLevel"]');return k&&Math.abs(k._rot||0)>20;}},
+        {title:'Switch beat division to 1/4',
+         text:'BEAT FX is tempo-synced. 1/4 = quarter-note feedback. Click the 1/4 button.',
+         highlight:'.beat-btn[data-beat="0.25"]',
+         check:()=>mixerState&&mixerState.fx&&Math.abs((mixerState.fx.beat||0)-0.25)<0.001},
+        {title:'Engage FX ON / OFF',
+         text:'Press the big ON/OFF — the effect is now live on the master bus.',
+         highlight:'#fxOnOff',
+         check:()=>mixerState&&mixerState.fx&&mixerState.fx.on===true}
+      ]},
+    { id:'l21', level:'advanced', title:'🎬 SCENE FX X-PAD',
+      blurb:'A 2-D pad that drives two FX parameters at once. Where DJs feel like keyboardists.',
+      xp:140,
+      steps:[
+        {title:'Pick the SWEEP scene',
+         text:'In the SCENE FX panel, click SWEEP. The X-PAD now drives a noise-sweep + gain.',
+         highlight:'.scene-btn[data-scene="sweep"]',
+         check:()=>mixerState&&mixerState.sceneFx&&mixerState.sceneFx.type==='sweep'},
+        {title:'Drag inside the X-PAD',
+         text:'Touch and drag the pad. Release = the FX disengages instantly. That\'s the entire trick.',
+         highlight:'#xPad',
+         check:()=>mixerState&&mixerState.sceneFx&&mixerState.sceneFx.xpadActive===true}
+      ]},
+    { id:'l22', level:'advanced', title:'📣 MIC announcement',
+      blurb:'Drop a "Make some NOISE!" at the right moment.',
+      xp:100,
+      steps:[
+        {title:'Press MIC ON',
+         text:'In the MIC section of the mixer toolbar, hit ON. Your browser will ask for microphone permission — accept.',
+         highlight:'#micOnBtn',
+         check:()=>mixerState&&mixerState.micOn===true},
+        {title:'Push MIC VOL above zero',
+         text:'Turn the VOL knob until the mic peaks show life when you speak.',
+         highlight:'.knob[data-knob="micVol"]',
+         check:()=>{const k=document.querySelector('.knob[data-knob="micVol"]');return k&&Math.abs(k._rot||0)>10;}},
+        {title:'Toggle MIC OFF when you\'re done',
+         text:'Don\'t leave a hot mic open. Press ON again to disengage.',
+         highlight:'#micOnBtn',
+         check:()=>mixerState&&mixerState.micOn===false}
+      ]},
+    { id:'l23', level:'advanced', title:'🤖 AUTO-MIX takes the wheel',
+      blurb:'Long bathroom break? Let TITAN swap decks for you, on grid, in key.',
+      xp:130,
+      steps:[
+        {title:'Load tracks on Deck A and Deck B',
+         text:'AUTO-MIX needs an outgoing deck and an incoming target.',
+         check:()=>decks&&decks.A&&decks.B&&decks.A.track&&decks.B.track},
+        {title:'Run a SMOOTH transition',
+         text:'In the AUTO-MIX panel of the mixer toolbar, click SMOOTH. The button starts pulsing and the crossfader animates itself.',
+         highlight:'.automix-btn[data-mix="smooth"]',
+         check:()=>window.automix&&window.automix.phase&&window.automix.phase!=='idle'}
+      ]},
+    { id:'l24', level:'advanced', title:'💿 Vinyl mode',
+      blurb:'Same engine — but now with platters, tone-arms and the satisfaction of physical scratch.',
+      xp:90,
+      steps:[
+        {title:'Open the VINYL tab',
+         text:'Top navigation — VINYL. Two turntables appear, wired to Decks A and B.',
+         highlight:'.tab-btn[data-tab="vinyl"]',
+         check:()=>document.getElementById('tab-vinyl')?.classList.contains('active')}
+      ]},
+    { id:'l25', level:'advanced', title:'🎯 Loudness target = pro masters',
+      blurb:'Streaming, club and radio expect different loudness. Let the limiter do the heavy lifting.',
+      xp:120,
+      steps:[
+        {title:'Open the SOUND tab',
+         text:'Top navigation — SOUND. The mastering chain (EQ + comp + limiter + LUFS meter) lives here.',
+         highlight:'.tab-btn[data-tab="studio"]',
+         check:()=>document.getElementById('tab-studio')?.classList.contains('active')},
+        {title:'Pick the STREAMING -14 LUFS target',
+         text:'Spotify, Apple Music and Tidal all normalise to about -14 LUFS. Click STREAMING and watch the LUFS history aim for that line.',
+         highlight:'.studio-target-btn[data-target="streaming"]',
+         check:()=>studioState&&studioState.targetLufs===-14}
+      ]},
   ];
 
   /* ─── Rendering the lesson grid ─── */
@@ -22877,18 +23213,37 @@ document.addEventListener('DOMContentLoaded',init);
   }
 
   /* ─── Lesson runner ─── */
-  let active=null,pollTimer=null,hintTimer=null,highlightEl=null;
+  let active=null,pollTimer=null,hintTimer=null,highlightEl=null,highlightRetryTimer=null;
+  // Per-lesson default tab — keeps users from getting stuck if they wandered off.
+  // Steps can override with their own `tab` field.
+  const LESSON_TABS={l09:'studio',l24:'vinyl',l25:'studio'};
   function startLesson(id){
     const lesson=LESSONS.find(l=>l.id===id);if(!lesson)return;
     active={lesson,stepIdx:0,startedAt:Date.now()};
-    // If the lesson needs a deck and tab-deck isn't active, jump there
-    document.querySelector('.tab-btn[data-tab="deck"]')?.click();
+    // Hop to the tab the lesson lives on (defaults to DECKS).
+    const targetTab=LESSON_TABS[id]||'deck';
+    document.querySelector(`.tab-btn[data-tab="${targetTab}"]`)?.click();
     setTimeout(showStep,200);
+  }
+  function applyHighlight(selector){
+    clearHighlight();
+    if(!selector)return;
+    let tries=0;
+    const tryFind=()=>{
+      const el=document.querySelector(selector);
+      if(el){highlightEl=el;el.classList.add('titan-learn-highlight');try{el.scrollIntoView({behavior:'smooth',block:'center'});}catch(_){}return;}
+      if(++tries<10)highlightRetryTimer=setTimeout(tryFind,200);
+    };
+    tryFind();
   }
   function showStep(){
     if(!active)return;
     const {lesson,stepIdx}=active;
     const step=lesson.steps[stepIdx];
+    // Auto-jump to the step's preferred tab if it differs from the active one.
+    const stepTab=step.tab||LESSON_TABS[lesson.id]||'deck';
+    const currentTab=document.querySelector('.tab-btn.active')?.dataset.tab;
+    if(stepTab&&currentTab!==stepTab)document.querySelector(`.tab-btn[data-tab="${stepTab}"]`)?.click();
     const panel=document.getElementById('learnActiveLesson');
     panel.style.display='block';
     document.getElementById('learnStepN').textContent=stepIdx+1;
@@ -22896,16 +23251,14 @@ document.addEventListener('DOMContentLoaded',init);
     document.getElementById('learnActiveTitle').textContent=step.title;
     document.getElementById('learnActiveInstruction').textContent=step.text;
     document.getElementById('learnActiveHint').textContent='';
+    const back=document.getElementById('learnBackBtn');
+    if(back)back.disabled=stepIdx===0;
     if(hintTimer)clearTimeout(hintTimer);
     if(step.hint)hintTimer=setTimeout(()=>{
       const el=document.getElementById('learnActiveHint');if(el)el.textContent='💡 '+step.hint;
     },6000);
-    // Highlight
-    clearHighlight();
-    if(step.highlight){
-      const el=document.querySelector(step.highlight);
-      if(el){highlightEl=el;el.classList.add('titan-learn-highlight');}
-    }
+    // Highlight (with retry — element may not be mounted yet after a tab switch)
+    applyHighlight(step.highlight);
     // Poll for completion
     if(pollTimer)clearInterval(pollTimer);
     pollTimer=setInterval(()=>{
@@ -22913,6 +23266,7 @@ document.addEventListener('DOMContentLoaded',init);
     },300);
   }
   function clearHighlight(){
+    if(highlightRetryTimer){clearTimeout(highlightRetryTimer);highlightRetryTimer=null;}
     if(highlightEl){highlightEl.classList.remove('titan-learn-highlight');highlightEl=null;}
   }
   function markStepDone(){
@@ -22929,6 +23283,13 @@ document.addEventListener('DOMContentLoaded',init);
     if(active.stepIdx>=active.lesson.steps.length){
       finishLesson();return;
     }
+    showStep();
+  }
+  function prevStep(){
+    if(!active||active.stepIdx<=0)return;
+    active.stepIdx--;
+    const next=document.getElementById('learnNextBtn');
+    if(next){next.textContent='NEXT ▸';next.style.background='';next.style.color='#5cf0a0';}
     showStep();
   }
   function finishLesson(){
@@ -22983,13 +23344,49 @@ document.addEventListener('DOMContentLoaded',init);
     });
     document.getElementById('learnNextBtn')?.addEventListener('click',nextStep);
     document.getElementById('learnSkipBtn')?.addEventListener('click',nextStep);
+    document.getElementById('learnBackBtn')?.addEventListener('click',prevStep);
     document.getElementById('learnCloseBtn')?.addEventListener('click',closeLesson);
     document.getElementById('learnResetBtn')?.addEventListener('click',()=>{
       if(!confirm('Reset all lesson progress and XP? This cannot be undone.'))return;
       progress={completed:{},xp:0};save();render();
       toast&&toast('Progress reset','success');
     });
+    // Live filter for the BUTTON REFERENCE list
+    const refSearch=document.getElementById('learnRefSearch');
+    if(refSearch){
+      refSearch.addEventListener('input',()=>{
+        const q=refSearch.value.trim().toLowerCase();
+        document.querySelectorAll('#learnRefGrid .learn-ref-card').forEach(card=>{
+          let any=false;
+          card.querySelectorAll('li').forEach(li=>{
+            const match=!q||li.textContent.toLowerCase().includes(q);
+            li.style.display=match?'':'none';
+            if(match)any=true;
+          });
+          card.style.display=any?'':'none';
+          if(q&&any&&!card.open)card.open=true;
+        });
+      });
+    }
     render();
+    // First-run nudge: if a brand-new user lands on the LEARN tab and hasn't
+    // completed anything yet, gently auto-start lesson 1 so onboarding never
+    // stalls on a blank screen.
+    try{
+      const ONBOARD_KEY='titan_learn_onboarded_v1';
+      if(!localStorage.getItem(ONBOARD_KEY)&&!Object.keys(progress.completed||{}).length){
+        const learnTabBtn=document.querySelector('.tab-btn[data-tab="learn"]');
+        const onLearn=()=>{
+          if(document.getElementById('tab-learn')?.classList.contains('active')){
+            localStorage.setItem(ONBOARD_KEY,'1');
+            setTimeout(()=>{if(!active)startLesson('l01');},900);
+          }
+        };
+        learnTabBtn?.addEventListener('click',onLearn,{once:true});
+        // If they're already on the LEARN tab right now, fire immediately.
+        onLearn();
+      }
+    }catch(_){}
   },600));
 })();
 
