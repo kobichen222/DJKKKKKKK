@@ -3449,6 +3449,14 @@ body.theme-xdjxz{
   --screen-glow:#36d8ff;--yellow:#ffcf3a;--red:#ff3838;--purple:#b07aff;--pink:#ff4faa;
   --text:#eaeaee;--text-dim:#8a8a92;--bg:#040406;--deck-bg:#101014;--deck-panel:#16161c;--deck-border:#26262c;
 }
+/* Make the XDJ-XZ identity unmistakable: glowing cyan top hairline on every
+   deck/mixer panel, bright chrome jog wheels with a cyan halo, neon-cyan
+   inner glow on screens. */
+body.theme-xdjxz .cdj::before{background:linear-gradient(90deg,transparent 0%,rgba(54,216,255,.45) 18%,rgba(54,216,255,.95) 50%,rgba(54,216,255,.45) 82%,transparent 100%) !important;box-shadow:0 0 14px rgba(54,216,255,.85),0 0 28px rgba(54,216,255,.45) !important;height:3px !important}
+body.theme-xdjxz .cdj{box-shadow:inset 0 1px 0 rgba(54,216,255,.18),inset 0 0 60px rgba(54,216,255,.04),inset 0 -1px 0 rgba(0,0,0,.7),0 28px 80px rgba(0,0,0,.85),0 0 0 1px rgba(54,216,255,.12) !important}
+body.theme-xdjxz .mixer{box-shadow:inset 0 1px 0 rgba(255,138,30,.22),inset 0 0 60px rgba(255,138,30,.04),inset 0 -1px 0 rgba(0,0,0,.75),0 28px 80px rgba(0,0,0,.88),0 0 0 1px rgba(255,138,30,.14) !important}
+body.theme-xdjxz .jog-wheel{box-shadow:0 0 32px rgba(54,216,255,.28),0 0 0 1px rgba(54,216,255,.18) !important}
+/* End XDJ-XZ identity boosters */
 body.theme-xdjxz,body.theme-xdjxz html{background:radial-gradient(ellipse at 50% 0%,rgba(54,216,255,.04) 0%,transparent 42%),radial-gradient(ellipse at 50% 100%,rgba(255,138,30,.035) 0%,transparent 45%),radial-gradient(ellipse at center,#0c0c12 0%,#020203 82%)}
 body.theme-xdjxz::after{background:radial-gradient(ellipse at center,transparent 52%,rgba(0,0,0,.72) 100%)}
 body.theme-xdjxz ::-webkit-scrollbar-track{background:#06060a}
