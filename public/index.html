@@ -3452,10 +3452,16 @@ body.theme-xdjxz{
 /* Make the XDJ-XZ identity unmistakable: glowing cyan top hairline on every
    deck/mixer panel, bright chrome jog wheels with a cyan halo, neon-cyan
    inner glow on screens. */
-body.theme-xdjxz .cdj::before{background:linear-gradient(90deg,transparent 0%,rgba(54,216,255,.45) 18%,rgba(54,216,255,.95) 50%,rgba(54,216,255,.45) 82%,transparent 100%) !important;box-shadow:0 0 14px rgba(54,216,255,.85),0 0 28px rgba(54,216,255,.45) !important;height:3px !important}
-body.theme-xdjxz .cdj{box-shadow:inset 0 1px 0 rgba(54,216,255,.18),inset 0 0 60px rgba(54,216,255,.04),inset 0 -1px 0 rgba(0,0,0,.7),0 28px 80px rgba(0,0,0,.85),0 0 0 1px rgba(54,216,255,.12) !important}
-body.theme-xdjxz .mixer{box-shadow:inset 0 1px 0 rgba(255,138,30,.22),inset 0 0 60px rgba(255,138,30,.04),inset 0 -1px 0 rgba(0,0,0,.75),0 28px 80px rgba(0,0,0,.88),0 0 0 1px rgba(255,138,30,.14) !important}
-body.theme-xdjxz .jog-wheel{box-shadow:0 0 32px rgba(54,216,255,.28),0 0 0 1px rgba(54,216,255,.18) !important}
+body.theme-xdjxz .cdj::before{background:linear-gradient(90deg,transparent 0%,rgba(54,216,255,.55) 16%,rgba(54,216,255,1) 50%,rgba(54,216,255,.55) 84%,transparent 100%) !important;box-shadow:0 0 16px rgba(54,216,255,.95),0 0 32px rgba(54,216,255,.5) !important;height:4px !important;opacity:1 !important}
+body.theme-xdjxz .mixer::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,transparent 0%,rgba(255,138,30,.55) 16%,rgba(255,138,30,1) 50%,rgba(255,138,30,.55) 84%,transparent 100%);box-shadow:0 0 16px rgba(255,138,30,.95),0 0 32px rgba(255,138,30,.5);pointer-events:none;z-index:3}
+body.theme-xdjxz .cdj{background:linear-gradient(180deg,#0e0e14 0%,#070709 55%,#020203 100%) !important;border:1px solid rgba(54,216,255,.22) !important;box-shadow:inset 0 1px 0 rgba(54,216,255,.22),inset 0 0 80px rgba(54,216,255,.05),inset 0 -1px 0 rgba(0,0,0,.8),0 30px 90px rgba(0,0,0,.92),0 0 0 1px rgba(54,216,255,.15),0 0 60px -20px rgba(54,216,255,.4) !important}
+body.theme-xdjxz .mixer{background:linear-gradient(180deg,#0e0e14 0%,#070709 55%,#020203 100%) !important;border:1px solid rgba(255,138,30,.22) !important;box-shadow:inset 0 1px 0 rgba(255,138,30,.24),inset 0 0 80px rgba(255,138,30,.05),inset 0 -1px 0 rgba(0,0,0,.82),0 30px 90px rgba(0,0,0,.94),0 0 0 1px rgba(255,138,30,.18),0 0 60px -20px rgba(255,138,30,.4) !important;position:relative}
+/* Polished-chrome jog wheel — brighter and more reflective than the default. */
+body.theme-xdjxz .jog-wheel{box-shadow:0 0 40px rgba(54,216,255,.32),0 0 0 1px rgba(54,216,255,.22),0 12px 38px rgba(0,0,0,.82) !important}
+body.theme-xdjxz .jog-outer{background:radial-gradient(circle at 50% 6%,rgba(255,255,255,.92) 0%,transparent 22%),radial-gradient(circle at 50% 94%,rgba(0,0,0,.78) 0%,transparent 32%),conic-gradient(from 0deg,#9a9aa2 0deg,#cccdd2 24deg,#f0f0f4 56deg,#ffffff 90deg,#dcdce0 122deg,#a4a4ac 152deg,#cacace 188deg,#86868e 222deg,#bcbcc2 258deg,#eeeef2 296deg,#a0a0a8 332deg,#9a9aa2 360deg) !important;border:3px solid #04040a !important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.7),inset 0 0 0 2px rgba(0,0,0,.82),inset 0 2px 14px rgba(0,0,0,.65),0 5px 22px rgba(0,0,0,.92),0 0 0 1px rgba(255,255,255,.16) !important}
+/* RGB performance pads at rest — so the deck looks lit like the XDJ-XZ. */
+body.theme-xdjxz .pad-mode-btn[data-mode]{filter:saturate(1.25) brightness(1.05)}
+body.theme-xdjxz .sample-pad{background:linear-gradient(180deg,#2a2a32 0%,#0e0e14 100%) !important;border:1px solid rgba(54,216,255,.12) !important;box-shadow:inset 0 1px 0 rgba(54,216,255,.18),inset 0 -3px 5px rgba(0,0,0,.78),0 3px 6px rgba(0,0,0,.7),0 0 14px rgba(54,216,255,.08) !important}
 /* End XDJ-XZ identity boosters */
 body.theme-xdjxz,body.theme-xdjxz html{background:radial-gradient(ellipse at 50% 0%,rgba(54,216,255,.04) 0%,transparent 42%),radial-gradient(ellipse at 50% 100%,rgba(255,138,30,.035) 0%,transparent 45%),radial-gradient(ellipse at center,#0c0c12 0%,#020203 82%)}
 body.theme-xdjxz::after{background:radial-gradient(ellipse at center,transparent 52%,rgba(0,0,0,.72) 100%)}
