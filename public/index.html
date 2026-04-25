@@ -87,6 +87,8 @@ body.work-mode .header-bar .header-dsb{
 .mixer-toolbar .mtb-automix .automix-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
 .mixer-toolbar .mtb-automix .automix-btn{padding:7px 4px;font-size:10px;letter-spacing:1px;border-radius:4px}
 .mixer-toolbar .mtb-automix .automix-sub{display:grid;grid-template-columns:auto auto 1fr auto;gap:8px;align-items:center;padding-top:2px;flex-wrap:wrap}
+.mixer-toolbar .mtb-automix .automix-pick-row{grid-template-columns:auto 1fr auto 1fr;padding-top:6px}
+.mixer-toolbar .mtb-automix .automix-pick-row > .automix-bars{min-width:0;width:100%}
 .mixer-toolbar .mtb-automix .automix-sub > span{font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:1.5px;color:var(--text-dim);font-weight:700}
 .mixer-toolbar .mtb-automix .automix-bars{padding:4px 8px;font-size:10px;width:auto;min-width:62px;border-radius:4px}
 .mixer-toolbar .mtb-automix .automix-sync{padding:5px 10px;font-size:9px;letter-spacing:1.5px;white-space:nowrap}
@@ -11914,6 +11916,20 @@ function buildMixerToolbarHTML(){
         <button class="automix-btn echo" data-mix="echo" title="Echo tail on outgoing">ECHO</button>
         <button class="automix-btn pick" id="automixPickBtn" title="Load smart next track">PICK</button>
       </div>
+      <div class="automix-sub automix-pick-row">
+        <span class="automix-sub-label">FROM</span>
+        <select class="fx-selector automix-bars automix-from" id="automixFrom" title="Outgoing deck (AUTO = the deck currently playing)">
+          <option value="">AUTO</option>
+          <option value="A">DECK A</option><option value="B">DECK B</option>
+          <option value="C">DECK C</option><option value="D">DECK D</option>
+        </select>
+        <span class="automix-sub-label" style="text-align:center">→</span>
+        <select class="fx-selector automix-bars automix-to" id="automixTo" title="Incoming deck (AUTO = next idle deck on the opposite crossfader side)">
+          <option value="">AUTO</option>
+          <option value="A">DECK A</option><option value="B">DECK B</option>
+          <option value="C">DECK C</option><option value="D">DECK D</option>
+        </select>
+      </div>
       <div class="automix-sub">
         <span class="automix-sub-label">BARS</span>
         <select class="fx-selector automix-bars" id="automixBars">
@@ -22279,13 +22295,23 @@ const automix={
 window.automix=automix;
 let _automixRunning=false; // legacy watchdog hook
 
+// User overrides set by the FROM/TO selects in the AUTO-MIX panel.
+// Empty string (or null) = AUTO — use the default heuristic.
+function automixUserFrom(){return (document.getElementById('automixFrom')?.value||'').trim()||null;}
+function automixUserTo(){return (document.getElementById('automixTo')?.value||'').trim()||null;}
 function automixPickSource(){
+  // Manual override wins — the user explicitly picked a FROM deck.
+  const manual=automixUserFrom();
+  if(manual&&decks[manual]&&decks[manual].track&&decks[manual].track.source!=='yt')return manual;
   for(const id of ['A','B','C','D']){
     const d=decks[id];if(d&&d.playing&&d.track&&d.track.source!=='yt')return id;
   }
   return null;
 }
 function automixPickTarget(from){
+  // Manual TO overrides the heuristic, as long as it's not the FROM deck.
+  const manual=automixUserTo();
+  if(manual&&manual!==from&&decks[manual])return manual;
   const xa=mixerState.xfaderAssign||{};
   const fromSide=xa[from];
   const candidates=['A','B','C','D'].filter(id=>id!==from&&decks[id]&&!decks[id].playing);
@@ -22295,6 +22321,12 @@ function automixPickTarget(from){
 }
 function automixSetButtonState(style,active){
   document.querySelectorAll('.automix-btn.running').forEach(b=>b.classList.remove('running'));
+  // Lock the FROM/TO selects while a mix is in flight so the user can't
+  // change targets mid-transition.
+  const fromSel=document.getElementById('automixFrom');
+  const toSel=document.getElementById('automixTo');
+  if(fromSel)fromSel.disabled=!!active;
+  if(toSel)toSel.disabled=!!active;
   if(!active)return;
   const btn=document.querySelector(`.automix-btn[data-mix="${style}"]`);
   if(btn)btn.classList.add('running');
@@ -22556,6 +22588,20 @@ document.addEventListener('DOMContentLoaded',()=>{
     const sync=document.getElementById('automixSync');if(sync)sync.addEventListener('click',manualSync);
     const pick=document.getElementById('automixPickBtn');if(pick)pick.addEventListener('click',manualPickNext);
     const cont=document.getElementById('automixContBtn');if(cont)cont.addEventListener('click',automixToggleContinuous);
+    // FROM/TO deck selection — refresh the direction badge live and prevent
+    // picking the same deck on both sides.
+    const fromSel=document.getElementById('automixFrom');
+    const toSel=document.getElementById('automixTo');
+    const onPickChange=()=>{
+      // Clear the conflicting side if the user picked the same deck on both.
+      if(fromSel&&toSel&&fromSel.value&&fromSel.value===toSel.value){
+        toast&&toast('FROM and TO must be different decks — clearing TO','error');
+        toSel.value='';
+      }
+      updateAutomixDirection();
+    };
+    fromSel?.addEventListener('change',onPickChange);
+    toSel?.addEventListener('change',onPickChange);
     setInterval(()=>{if(automix.phase==='idle')updateAutomixDirection();},1000);
     document.addEventListener('keydown',e=>{
       if(e.key==='Escape'&&automix.phase!=='idle'){cancelAutoMix();e.preventDefault();}
