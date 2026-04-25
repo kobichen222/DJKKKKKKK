@@ -9,6 +9,8 @@ dist/
 # Test / build
 coverage/
 .vitest/
+test-results/
+playwright-report/
 # Environment
 .env
 .env.local
