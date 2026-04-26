@@ -23005,6 +23005,58 @@ document.addEventListener('DOMContentLoaded',()=>{
   };
   window.stopDeck=function(id){const d=decks[id];if(!d)return;pauseDeck(id);d.offset=0;};
 
+  /* 9.5) FADER SAFETY GATE — last line of defense.
+         If the visual mixer fader is parked at the bottom (within 0.5%),
+         force-zero the deck's volumeGain regardless of whatever d.volume
+         /  scheduled gain ramps say it should be. Also mute the YouTube
+         player if this deck happens to hold a YT track (YT audio
+         bypasses our WebAudio chain entirely). Runs every 50 ms — not
+         expensive (4 reads of getComputedStyle + maybe 4 gain writes)
+         and bulletproof against any rogue code path that leaves the
+         deck audible while the user thinks it's silent.
+         When the fader is above 0, the safety loop does NOTHING — it
+         only intervenes at the bottom, so normal playback isn't
+         affected. */
+  function _faderSafetyTick(){
+    if(!audioCtx)return;
+    ['A','B','C','D'].forEach(id=>{
+      const d=decks[id];if(!d)return;
+      const w=document.querySelector(`.fader-wrap[data-fader="${id}"]`);
+      const h=document.getElementById(`fader-${id}`);
+      if(!w||!h)return;
+      const wrapH=w.getBoundingClientRect().height||0;
+      if(wrapH<=0)return;
+      const handleH=h.offsetHeight||24;
+      const travel=Math.max(1,wrapH-handleH);
+      const cs=getComputedStyle(h);
+      const bottomPx=parseFloat(cs.bottom)||0;
+      const visualV=Math.max(0,Math.min(1,bottomPx/travel));
+      if(visualV<=0.005){
+        // Fader effectively at the bottom — guarantee silence
+        if(d.volumeGain){
+          try{
+            const cur=d.volumeGain.gain.value;
+            if(cur>0.0001){
+              d.volumeGain.gain.cancelScheduledValues(audioCtx.currentTime);
+              d.volumeGain.gain.setValueAtTime(0,audioCtx.currentTime);
+            }
+          }catch(_){}
+        }
+        // YouTube audio doesn't go through volumeGain at all
+        if(window.ytPlayers&&ytPlayers[id]&&d.track&&d.track.source==='yt'){
+          try{
+            if(typeof ytPlayers[id].getVolume==='function'){
+              if(ytPlayers[id].getVolume()>0)ytPlayers[id].setVolume(0);
+            }
+          }catch(_){}
+        }
+        // Keep d.volume in sync so subsequent code paths see 0
+        d.volume=0;
+      }
+    });
+  }
+  setInterval(_faderSafetyTick,50);
+
   /* 10) Tick override: update elapsed/remain/waveform for ALL four
          decks (was A/B only), and use native source loop instead of
          calling seekDeck every frame. */

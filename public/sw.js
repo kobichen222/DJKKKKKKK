@@ -5,8 +5,8 @@
    - CDN assets (Google Fonts, jsDelivr) → cache-first once seen
    - Everything cached stays reachable offline forever */
 
-const CACHE = 'djtitan-shell-v123-fader-source-of-truth';
-const CDN_CACHE = 'djtitan-cdn-v123';
+const CACHE = 'djtitan-shell-v124-fader-safety-gate';
+const CDN_CACHE = 'djtitan-cdn-v124';
 const SHELL = [
   './','./index.html',
   './analyzer.worker.js','./manifest.json','./icon.svg','./auth.sql'
