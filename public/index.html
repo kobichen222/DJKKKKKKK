@@ -12273,15 +12273,20 @@ Two options — both work completely offline:<br/>
   <div class="setting-label">Supabase anon key</div>
   <input type="password" id="supabaseAnon" class="url-input" placeholder="eyJhbGciOiJIUzI1NiIs…" style="padding:8px 12px;" />
 </div>
-<div class="settings-row">
-  <button class="tool-btn" id="saveSupabase">SAVE & CONNECT</button>
+<div class="settings-row" style="gap:8px;flex-wrap:wrap">
+  <button class="tool-btn" id="saveSupabase">SAVE &amp; CONNECT</button>
+  <button class="tool-btn" id="authDiagnoseBtn" style="border-color:var(--screen-glow);color:var(--screen-glow)">🔍 RUN AUTH DIAGNOSTIC</button>
   <a href="./auth.sql" download class="setting-desc" style="color:var(--screen-glow);cursor:pointer;">⬇ Download SQL schema</a>
 </div>
-<div class="setting-desc" style="padding-top:4px;line-height:1.6;">
-  1. Create a free project at <strong>supabase.com</strong><br/>
-  2. SQL Editor → paste <code>auth.sql</code> → Run<br/>
-  3. Authentication → Providers → enable <strong>Google</strong> + <strong>Phone (WhatsApp via Twilio)</strong><br/>
-  4. Settings → API → copy URL + anon key here → SAVE & CONNECT
+<div id="authDiagnoseOut" class="setting-desc" style="display:none;margin-top:8px;padding:10px 12px;background:rgba(0,0,0,.35);border-radius:6px;border:1px solid rgba(255,138,26,.18);font-family:'Share Tech Mono',monospace;font-size:11px;line-height:1.7;white-space:pre-wrap;color:#cfd6dd;max-height:280px;overflow:auto"></div>
+<div class="setting-desc" style="padding-top:6px;line-height:1.6;">
+  <b>Quick setup (3 places must agree)</b><br/>
+  <b>1.</b> <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener" style="color:var(--screen-glow)">Google Cloud → Credentials</a> → OAuth Client → <i>Authorized redirect URIs</i> include:<br/>
+  &nbsp;&nbsp;&nbsp;<code id="authRedirectHint">https://eliimbfzegwcepbljdwp.supabase.co/auth/v1/callback</code> <button class="tool-btn" id="copyAuthRedirect" style="padding:2px 6px;font-size:9px">COPY</button><br/>
+  <b>2.</b> <a href="https://supabase.com/dashboard/project/_/auth/providers" target="_blank" rel="noopener" style="color:var(--screen-glow)">Supabase → Auth → Providers → Google</a> → ENABLE + paste Google Client ID + Client Secret<br/>
+  <b>3.</b> <a href="https://supabase.com/dashboard/project/_/auth/url-configuration" target="_blank" rel="noopener" style="color:var(--screen-glow)">Supabase → Auth → URL Configuration</a> → add this app's origin: <code id="authOriginHint">—</code> <button class="tool-btn" id="copyAuthOrigin" style="padding:2px 6px;font-size:9px">COPY</button><br/>
+  <b>4.</b> SQL Editor → paste <code>auth.sql</code> → Run<br/>
+  <b>5.</b> Settings → API → copy URL + anon key here → <b>SAVE &amp; CONNECT</b>
 </div>
 </div>
 
@@ -21234,6 +21239,91 @@ function saveSupaCfg(){
     else toast&&toast('Could not connect — check the anon key','error');});
 }
 
+/* ====================================================================
+   AUTH DIAGNOSTIC — end-to-end self-test of the Google OAuth pipe.
+   Walks the user through 6 checks and surfaces the EXACT step that
+   needs fixing in Google Cloud / Supabase / Vercel. No secrets are
+   logged; only public values (project ref, current origin) appear.
+   ==================================================================== */
+async function runAuthDiagnostic(){
+  const out=document.getElementById('authDiagnoseOut');
+  if(!out)return;
+  out.style.display='block';
+  const lines=[];
+  const log=(ok,msg,hint)=>{
+    const mark=ok===true?'✓':ok===false?'✗':'•';
+    const color=ok===true?'#9affb0':ok===false?'#ff9f9f':'#cfd6dd';
+    lines.push(`<span style="color:${color}">${mark}</span> ${msg}${hint?`\n   <span style="color:#a8b8c8">↳ ${hint}</span>`:''}`);
+    out.innerHTML=lines.join('\n');
+  };
+  out.innerHTML='Running…';
+  await new Promise(r=>setTimeout(r,30));
+
+  // 1. URL format
+  const url=(supaCfg.url||'').trim();
+  if(/^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/i.test(url)){
+    log(true,`Supabase URL valid (${url.replace(/^https:\/\//,'')})`);
+  }else{
+    log(false,'Supabase URL not set or malformed','Paste your project URL in the field above and SAVE.');
+    return;
+  }
+
+  // 2. Anon key shape
+  const anon=(supaCfg.anon||'').trim();
+  if(!anon){log(false,'Anon key is empty','Supabase → Settings → API → copy the anon public key.');return;}
+  if(!anon.startsWith('eyJ')){log(false,'Anon key shape wrong (must start with eyJ)','Did you paste the service_role by mistake? Use the ANON public key.');return;}
+  log(true,`Anon key shape OK (${anon.slice(0,12)}…)`);
+
+  // 3. SDK loaded
+  try{await loadSupabaseLib();log(true,'Supabase JS SDK loaded');}
+  catch(e){log(false,'SDK failed to load','Network blocked CDN? '+e.message);return;}
+
+  // 4. Client connects (REST ping)
+  let client;
+  try{
+    client=window.supabase.createClient(url,anon,{auth:{persistSession:false}});
+    log(true,'Client created');
+  }catch(e){log(false,'Client init failed',e.message);return;}
+
+  // 5. Auth REST reachable + provider list
+  try{
+    const r=await fetch(url+'/auth/v1/settings',{headers:{apikey:anon,Authorization:'Bearer '+anon}});
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    const cfg=await r.json();
+    const providers=cfg?.external||{};
+    if(providers.google){
+      log(true,'Google provider ENABLED in Supabase');
+    }else{
+      log(false,'Google provider NOT enabled','Supabase → Authentication → Providers → Google → toggle ENABLED + paste Client ID/Secret from Google Cloud.');
+    }
+    log(null,`External providers detected: ${Object.keys(providers).filter(k=>providers[k]).join(', ')||'(none)'}`);
+  }catch(e){
+    log(false,'Could not reach /auth/v1/settings — '+e.message,'Anon key wrong, project paused, or RLS blocking auth.settings.');
+    return;
+  }
+
+  // 6. profiles table reachable (RLS-friendly anon read of the table's existence)
+  try{
+    const{error}=await client.from('profiles').select('id',{head:true,count:'exact'}).limit(0);
+    if(error){
+      if(/relation .* does not exist/i.test(error.message)){
+        log(false,'profiles table missing','SQL Editor → paste auth.sql → Run.');
+      }else{
+        log(true,`profiles table reachable (RLS active: ${error.message.slice(0,80)})`);
+      }
+    }else{
+      log(true,'profiles table reachable');
+    }
+  }catch(e){log(null,'profiles probe inconclusive: '+e.message);}
+
+  // 7. Origin / redirect-URL hints — what the user must add to Supabase URL Config
+  log(null,`This app's origin: ${location.origin}`);
+  log(null,`Required redirect URI in Google Cloud: ${url.replace(/\/$/,'')}/auth/v1/callback`);
+  log(null,`Required Site URL / Redirect URLs in Supabase URL Config: ${location.origin}/**`);
+
+  log(true,'\nDIAGNOSTIC COMPLETE — fix any ✗ rows above, then click SAVE & CONNECT and try Sign In With Google.');
+}
+
 /* ADMIN: list/edit users via profiles table (RLS restricts to admins) */
 async function loadAdminUsers(){
   const body=document.getElementById('adminUsersBody');
@@ -21287,6 +21377,30 @@ document.addEventListener('DOMContentLoaded',()=>{
     document.getElementById('supabaseUrl')&&(document.getElementById('supabaseUrl').value=supaCfg.url||'');
     document.getElementById('supabaseAnon')&&(document.getElementById('supabaseAnon').value=supaCfg.anon||'');
     document.getElementById('saveSupabase')?.addEventListener('click',saveSupaCfg);
+    document.getElementById('authDiagnoseBtn')?.addEventListener('click',()=>{
+      try{runAuthDiagnostic();}catch(e){
+        const out=document.getElementById('authDiagnoseOut');
+        if(out){out.style.display='block';out.textContent='Diagnostic crashed: '+(e.message||e);}
+      }
+    });
+    // Populate the dynamic redirect/origin hints + COPY buttons
+    (function fillAuthHints(){
+      const redirHint=document.getElementById('authRedirectHint');
+      const originHint=document.getElementById('authOriginHint');
+      if(redirHint)redirHint.textContent=(supaCfg.url||SUPA_DEFAULTS.url).replace(/\/$/,'')+'/auth/v1/callback';
+      if(originHint)originHint.textContent=location.origin+'/**';
+      const copyTo=(btnId,txtFn)=>{
+        const b=document.getElementById(btnId);
+        if(!b)return;
+        b.addEventListener('click',()=>{
+          const t=txtFn();
+          try{navigator.clipboard.writeText(t);toast&&toast('Copied · '+t.slice(0,40)+'…','success');}
+          catch(_){toast&&toast(t,'success');}
+        });
+      };
+      copyTo('copyAuthRedirect',()=>(supaCfg.url||SUPA_DEFAULTS.url).replace(/\/$/,'')+'/auth/v1/callback');
+      copyTo('copyAuthOrigin',()=>location.origin+'/**');
+    })();
     initSupabase();
     const modal=document.getElementById('authModal');
     const openAuth=()=>{
