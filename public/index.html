@@ -6123,9 +6123,14 @@ body.work-mode .automix-sync{
 }
 .top-fx-row .scene-fx-panel .scene-fx-label{
   flex:0 0 100%;font-size:11px;letter-spacing:2.5px;
-  padding:0 0 5px 8px;border-bottom:1px solid rgba(255,138,26,.22);margin-bottom:2px;
+  padding:0 0 5px 0;border-bottom:1px solid rgba(255,138,26,.22);margin-bottom:2px;
   position:relative;
 }
+/* Bar sits just to the LEFT of the text — matches BEAT FX exactly.
+   Removing the label's padding-left (was 8px) lets the text start
+   flush with the label box, so left:-4px puts the accent in the
+   panel's padding zone right next to the text instead of leaving a
+   12px visible gap between bar and text. */
 .top-fx-row .scene-fx-panel .scene-fx-label::before{
   content:'';position:absolute;left:-4px;top:50%;transform:translateY(-50%);
   width:3px;height:14px;border-radius:2px;
