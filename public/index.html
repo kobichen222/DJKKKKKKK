@@ -5898,6 +5898,75 @@ body.work-mode .automix-sync{
 }
 
 /* ================================================================
+   SPLIT MIXER TOOLBARS — top (AUTO MIX) and bottom (HP/MIC/ISO)
+   ================================================================ */
+.mixer-toolbar.mixer-toolbar-top{
+  grid-template-columns:1fr;
+  margin:0 auto 8px;
+}
+.mixer-toolbar.mixer-toolbar-top .mtb-automix{min-height:auto}
+.mixer-toolbar.mixer-toolbar-bottom{
+  grid-template-columns:minmax(260px,1.3fr) minmax(240px,1.1fr) minmax(220px,1fr);
+  margin:8px auto 0;
+}
+@media(max-width:980px){
+  .mixer-toolbar.mixer-toolbar-bottom{grid-template-columns:1fr 1fr;gap:6px}
+  .mixer-toolbar.mixer-toolbar-bottom .mtb-hp{grid-column:1/-1}
+}
+@media(max-width:600px){
+  .mixer-toolbar.mixer-toolbar-bottom{grid-template-columns:1fr;gap:5px}
+  .mixer-toolbar.mixer-toolbar-bottom .mtb-section{grid-column:auto}
+}
+
+/* ================================================================
+   AUTO MIX — theme-aware LED indicators + polished buttons
+   ================================================================ */
+.automix-btn .amx-led{
+  width:6px;height:6px;border-radius:50%;flex:0 0 auto;
+  background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.45) 0%,var(--amx-led-color,var(--orange)) 55%,rgba(0,0,0,.6) 100%);
+  box-shadow:0 0 4px var(--amx-led-color,var(--orange)),inset 0 0 1px rgba(255,255,255,.4);
+  opacity:.55;transition:opacity .15s,box-shadow .15s,transform .15s;
+  margin-right:6px;display:inline-block;
+}
+.automix-btn{
+  --amx-led-color:var(--purple);
+  gap:0;
+}
+.automix-btn[data-mix="smooth"]{--amx-led-color:var(--screen-glow)}
+.automix-btn[data-mix="energy"]{--amx-led-color:var(--orange)}
+.automix-btn[data-mix="harmonic"]{--amx-led-color:var(--play-green)}
+.automix-btn.danger{--amx-led-color:var(--red)}
+.automix-btn.echo{--amx-led-color:var(--screen-glow)}
+.automix-btn.pick{--amx-led-color:var(--yellow)}
+.automix-btn:hover .amx-led{
+  opacity:1;
+  box-shadow:0 0 8px var(--amx-led-color,var(--orange)),inset 0 0 1px rgba(255,255,255,.6);
+}
+.automix-btn.running .amx-led{
+  opacity:1;
+  background:radial-gradient(circle at 30% 30%,#fff 0%,var(--amx-led-color,var(--orange)) 60%,rgba(0,0,0,.6) 100%);
+  box-shadow:0 0 10px var(--amx-led-color,var(--orange)),0 0 18px var(--amx-led-color,var(--orange)),inset 0 0 1px #fff;
+  animation:amxBtnLed 1.1s ease-in-out infinite;
+}
+.automix-btn .amx-txt{
+  display:inline-block;line-height:1;
+  text-shadow:0 0 1px rgba(0,0,0,.6);
+}
+.automix-btn.running .amx-txt{
+  text-shadow:0 0 6px var(--amx-led-color,var(--orange)),0 0 1px rgba(0,0,0,.7);
+}
+.automix-btn.running{
+  --amx-active-rgb:200,0,255;
+  background:linear-gradient(180deg,var(--amx-led-color,var(--purple)) 0%,#000 220%) !important;
+  color:#fff !important;border-color:var(--amx-led-color,#dea0ff) !important;
+  box-shadow:0 0 14px var(--amx-led-color,var(--purple)),inset 0 1px 0 rgba(255,255,255,.25) !important;
+}
+@keyframes amxBtnLed{
+  0%,100%{opacity:.85;transform:scale(1)}
+  50%{opacity:1;transform:scale(1.15)}
+}
+
+/* ================================================================
    VINYL TAB — realistic twin turntables + centered mixer core
    ================================================================ */
 #tab-vinyl{padding:4px 0 28px}
@@ -9985,15 +10054,7 @@ body.tl-locked{overflow:hidden}
   <button class="wm-exit-bar" id="wmExitBarBtn">← EXIT WORK MODE  <span class="wm-esc-hint">(ESC)</span></button>
 </div>
 
-<div class="mixer-toolbar" id="mixer-toolbar"></div>
-
-<div class="console" id="console">
-<div class="cdj" data-deck="A" id="deckA-container"></div>
-<div class="cdj" data-deck="C" id="deckC-container" style="display:none"></div>
-<div class="mixer" id="mixer-container"></div>
-<div class="cdj" data-deck="B" id="deckB-container"></div>
-<div class="cdj" data-deck="D" id="deckD-container" style="display:none"></div>
-</div>
+<div class="mixer-toolbar mixer-toolbar-top" id="mixer-toolbar-top"></div>
 
 <div class="beat-fx-panel">
 <div class="beat-fx-label">BEAT FX</div>
@@ -10046,6 +10107,16 @@ body.tl-locked{overflow:hidden}
 </div>
 <div class="knob-wrap"><div class="knob small" data-knob="sceneDepth"><div class="knob-indicator"></div></div><span class="knob-label">DEPTH</span></div>
 </div>
+
+<div class="console" id="console">
+<div class="cdj" data-deck="A" id="deckA-container"></div>
+<div class="cdj" data-deck="C" id="deckC-container" style="display:none"></div>
+<div class="mixer" id="mixer-container"></div>
+<div class="cdj" data-deck="B" id="deckB-container"></div>
+<div class="cdj" data-deck="D" id="deckD-container" style="display:none"></div>
+</div>
+
+<div class="mixer-toolbar mixer-toolbar-bottom" id="mixer-toolbar-bottom"></div>
 
 <div class="library">
 <div class="library-header">
@@ -12325,7 +12396,7 @@ function buildDeckHTML(d){
   </div>`;
 }
 
-function buildMixerToolbarHTML(){
+function buildMixerToolbarTopHTML(){
   return `<div class="mtb-section mtb-automix">
     <div class="mtb-head">
       <span class="mtb-label"><span class="mtb-led" aria-hidden="true"></span>AUTO&nbsp;MIX</span>
@@ -12333,12 +12404,12 @@ function buildMixerToolbarHTML(){
     </div>
     <div class="mtb-body">
       <div class="automix-grid">
-        <button class="automix-btn" data-mix="smooth" title="Long bass-swap blend">SMOOTH</button>
-        <button class="automix-btn" data-mix="energy" title="High-pass sweep + expo fade">ENERGY</button>
-        <button class="automix-btn" data-mix="harmonic" title="Key-matched blend">HARMONIC</button>
-        <button class="automix-btn danger" data-mix="cut" title="Hard cut on next downbeat">CUT</button>
-        <button class="automix-btn echo" data-mix="echo" title="Echo tail on outgoing">ECHO</button>
-        <button class="automix-btn pick" id="automixPickBtn" title="Load smart next track">PICK</button>
+        <button class="automix-btn" data-mix="smooth" title="Long bass-swap blend"><span class="amx-led" aria-hidden="true"></span><span class="amx-txt">SMOOTH</span></button>
+        <button class="automix-btn" data-mix="energy" title="High-pass sweep + expo fade"><span class="amx-led" aria-hidden="true"></span><span class="amx-txt">ENERGY</span></button>
+        <button class="automix-btn" data-mix="harmonic" title="Key-matched blend"><span class="amx-led" aria-hidden="true"></span><span class="amx-txt">HARMONIC</span></button>
+        <button class="automix-btn danger" data-mix="cut" title="Hard cut on next downbeat"><span class="amx-led" aria-hidden="true"></span><span class="amx-txt">CUT</span></button>
+        <button class="automix-btn echo" data-mix="echo" title="Echo tail on outgoing"><span class="amx-led" aria-hidden="true"></span><span class="amx-txt">ECHO</span></button>
+        <button class="automix-btn pick" id="automixPickBtn" title="Load smart next track"><span class="amx-led" aria-hidden="true"></span><span class="amx-txt">PICK</span></button>
       </div>
       <div class="automix-sub">
         <span class="automix-sub-label">BARS</span>
@@ -12351,8 +12422,11 @@ function buildMixerToolbarHTML(){
         <button class="automix-sync automix-cont" id="automixContBtn" title="Auto-chain transitions forever">CONT</button>
       </div>
     </div>
-  </div>
-  <div class="mtb-section mtb-hp">
+  </div>`;
+}
+
+function buildMixerToolbarBottomHTML(){
+  return `<div class="mtb-section mtb-hp">
     <div class="mtb-head"><span class="mtb-label">HEADPHONES</span></div>
     <div class="mtb-body">
       <div class="mtb-knobrow">
@@ -19783,7 +19857,8 @@ function init(){
   document.getElementById('deckC-container').innerHTML=buildDeckHTML('C');
   document.getElementById('deckD-container').innerHTML=buildDeckHTML('D');
   document.getElementById('mixer-container').innerHTML=buildMixerHTML();
-  const mtb=document.getElementById('mixer-toolbar');if(mtb)mtb.innerHTML=buildMixerToolbarHTML();
+  const mtbTop=document.getElementById('mixer-toolbar-top');if(mtbTop)mtbTop.innerHTML=buildMixerToolbarTopHTML();
+  const mtbBot=document.getElementById('mixer-toolbar-bottom');if(mtbBot)mtbBot.innerHTML=buildMixerToolbarBottomHTML();
   setupVU('vu-A',20);setupVU('vu-B',20);setupVU('vu-C',20);setupVU('vu-D',20);
   setupVU('masterHVuL',20);setupVU('masterHVuR',20);
   attachKnobs();attachEvents();setupBeatFxUI();setupSceneFx();setupKeyboard();setupTabs();setupSettings();setupVinylTurntables();setupOfflineDownload();setupDesktopDownloads();setupDiscover();setupTitanClock();setupSupport();setupStudioPro();
