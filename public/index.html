@@ -22895,6 +22895,19 @@ document.addEventListener('DOMContentLoaded',()=>{
       d.playing=false;d.source=null;d.offset=0;d._playToken=null;
       _updatePlayUI(id,false);
     };
+    // CRITICAL: zero volumeGain BEFORE src.start. WebAudio renders
+    // audio in 128-sample chunks (~2.7 ms); if the source is started
+    // before the gain has been forced to 0, the very first chunk plays
+    // through at whatever pauseDeck restored on the previous stop —
+    // that's the "PLAY burst at fader=0" the user reported.
+    if(d.volumeGain&&audioCtx){
+      try{
+        const now0=audioCtx.currentTime;
+        d.volumeGain.gain.cancelScheduledValues(now0);
+        d.volumeGain.gain.value=0;
+        d.volumeGain.gain.setValueAtTime(0,now0);
+      }catch(_){try{d.volumeGain.gain.value=0;}catch(__){}}
+    }
     const startOffset=Math.max(0,Math.min((d.offset||0),Math.max(0,d.buffer.duration-0.02)));
     try{src.start(0,startOffset);}
     catch(e){
@@ -22909,15 +22922,22 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(d.volumeGain){
       // Apply the perceptual taper so play-in matches what the mixer
       // fader is actually showing.  d.volume === 0 → target = 0 → the
-      // deck stays silent until the user brings the fader up.  No more
-      // "fader at bottom but deck makes sound on play".
+      // deck stays silent until the user brings the fader up.
       const rawV=(d.volume!=null)?d.volume:0;
       const target=(typeof _djFaderTaper==='function')?_djFaderTaper(rawV):rawV;
       const now=audioCtx.currentTime;
       try{
-        d.volumeGain.gain.cancelScheduledValues(now);
-        d.volumeGain.gain.setValueAtTime(0,now);
-        d.volumeGain.gain.linearRampToValueAtTime(target,now+0.008);
+        if(target<=0){
+          // Hold at 0. No up-ramp at all — fader at the bottom means
+          // mathematically silent until the user moves the fader.
+          d.volumeGain.gain.setValueAtTime(0,now+0.025);
+        }else{
+          // 25 ms up-ramp from 0 → tapered target. Long enough to kill
+          // any click/transient when audio comes in, short enough to
+          // feel instant under the finger.
+          d.volumeGain.gain.setValueAtTime(0,now);
+          d.volumeGain.gain.linearRampToValueAtTime(target,now+0.025);
+        }
       }catch(e){d.volumeGain.gain.value=target;}
     }
     _updatePlayUI(id,true);
