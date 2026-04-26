@@ -1009,8 +1009,11 @@ button:active:not(:disabled),.big-btn:active,.loop-btn:active,.jump-btn:active,
   box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 0 28px rgba(255,138,26,.75);
 }
 .beat-btn.active{
-  background:linear-gradient(180deg,#7ff0ff 0%,var(--screen-glow) 55%,#0e88a6 100%);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 0 12px rgba(46,224,255,.7);
+  background:linear-gradient(180deg,#b8f6ff 0%,#7ff0ff 35%,var(--screen-glow) 100%);
+  color:#001820;
+  border:1px solid rgba(168,240,255,.7);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 0 14px rgba(46,224,255,.85);
+  text-shadow:0 1px 0 rgba(255,255,255,.35);
 }
 
 /* ACTIVE UTIL BUTTONS — uniform soft glow */
@@ -5948,7 +5951,7 @@ body.work-mode .automix-sync{
   margin-right:2px;
 }
 .automix-deck-btn{
-  flex:1 1 0;min-width:0;height:24px;padding:0 6px;
+  flex:1 1 0;min-width:0;height:24px;padding:0 6px 0 16px;
   font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:1.2px;font-weight:800;
   background:linear-gradient(180deg,#1a1a20 0%,#0d0d12 100%);
   border:1px solid #2a2a32;color:var(--text-dim);
@@ -5961,16 +5964,28 @@ body.work-mode .automix-sync{
   border-color:rgba(255,138,26,.55);color:var(--orange-glow);
   box-shadow:0 0 8px rgba(255,138,26,.25);
 }
-.automix-deck-btn.active{
-  background:linear-gradient(180deg,var(--orange) 0%,#a64500 100%);
-  color:#0a0a0a;border-color:var(--orange-glow);
-  box-shadow:0 0 10px rgba(255,138,26,.45),inset 0 1px 0 rgba(255,255,255,.25);
-  text-shadow:0 0 1px rgba(0,0,0,.6);
+/* Small LED pip on the left identifies the deck (per-deck color),
+   while the body stays uniform with the rest of the UI. */
+.automix-deck-btn::before{
+  content:'';position:absolute;left:6px;top:50%;transform:translateY(-50%);
+  width:6px;height:6px;border-radius:50%;
+  background:#2a2a30;box-shadow:inset 0 0 0 1px rgba(0,0,0,.5);
+  transition:background .12s,box-shadow .12s;
 }
-.automix-deck-btn[data-amx-deck="A"].active{background:linear-gradient(180deg,#ff8a3c 0%,#a64500 100%)}
-.automix-deck-btn[data-amx-deck="B"].active{background:linear-gradient(180deg,#3cd2ff 0%,#0070a0 100%);border-color:#7feaff;box-shadow:0 0 10px rgba(46,224,255,.45),inset 0 1px 0 rgba(255,255,255,.25)}
-.automix-deck-btn[data-amx-deck="C"].active{background:linear-gradient(180deg,#5dff8a 0%,#1a8a3a 100%);border-color:#a0ffba;box-shadow:0 0 10px rgba(46,255,140,.45),inset 0 1px 0 rgba(255,255,255,.25)}
-.automix-deck-btn[data-amx-deck="D"].active{background:linear-gradient(180deg,#d685ff 0%,#7000c0 100%);border-color:#e8b5ff;box-shadow:0 0 10px rgba(200,80,255,.45),inset 0 1px 0 rgba(255,255,255,.25)}
+.automix-deck-btn[data-amx-deck="A"]::before{background:#3a2418}
+.automix-deck-btn[data-amx-deck="B"]::before{background:#1a2c34}
+.automix-deck-btn[data-amx-deck="C"]::before{background:#1a3324}
+.automix-deck-btn[data-amx-deck="D"]::before{background:#2a1a34}
+.automix-deck-btn.active{
+  background:linear-gradient(180deg,#221912 0%,#15100b 100%);
+  color:var(--orange-glow);
+  border-color:rgba(255,138,26,.45);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 0 8px rgba(255,138,26,.2);
+}
+.automix-deck-btn[data-amx-deck="A"].active::before{background:#ff8a3c;box-shadow:0 0 6px #ff8a3c}
+.automix-deck-btn[data-amx-deck="B"].active::before{background:#3cd2ff;box-shadow:0 0 6px #3cd2ff}
+.automix-deck-btn[data-amx-deck="C"].active::before{background:#5dff8a;box-shadow:0 0 6px #5dff8a}
+.automix-deck-btn[data-amx-deck="D"].active::before{background:#d685ff;box-shadow:0 0 6px #d685ff}
 
 /* AUTO MIX engaged state — pulsing border on the section */
 .mtb-section.mtb-automix.is-running{
