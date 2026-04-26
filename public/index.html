@@ -12144,6 +12144,25 @@ Two options — both work completely offline:<br/>
     If no assets appear on the Release page, an admin must trigger the <b>Build Desktop App</b> workflow in the repo's Actions tab (or push a <code>v*</code> tag).
   </div>
 </div>
+
+<div class="settings-row" style="flex-direction:column;align-items:stretch;gap:8px;margin-top:14px;padding:12px;border:1px solid rgba(255,170,102,.35);border-radius:8px;background:rgba(255,170,102,.04)">
+  <div class="setting-label" style="color:#ffaa66">🔑 ADMIN DOWNLOAD (bypass sign-in)</div>
+  <div class="setting-desc" style="line-height:1.5">Enter the admin code to unlock direct installer downloads without signing in.</div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+    <input type="password" id="adminDownloadCode" class="url-input" placeholder="Admin code" autocomplete="off" style="padding:8px 12px;flex:1;min-width:160px" />
+    <button class="tool-btn" id="adminDownloadUnlockBtn" style="color:#ffaa66;border-color:#ffaa66">UNLOCK</button>
+  </div>
+  <div id="adminDownloadErr" class="setting-desc" style="color:var(--red);min-height:14px"></div>
+  <div id="adminDownloadLinks" style="display:none;margin-top:6px">
+    <div class="setting-label" style="color:var(--play-green);margin-bottom:6px">✓ ADMIN UNLOCKED — Direct installers</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px">
+      <a class="tool-btn" id="adminDlWin" href="https://github.com/kobichen222/titan/releases/latest" target="_blank" rel="noopener" style="color:#9fd8ff;border-color:#9fd8ff;text-decoration:none">⊞ WINDOWS (.exe)</a>
+      <a class="tool-btn" id="adminDlMac" href="https://github.com/kobichen222/titan/releases/latest" target="_blank" rel="noopener" style="color:#fff;border-color:#fff;text-decoration:none">🍎 macOS (.dmg)</a>
+      <a class="tool-btn" id="adminDlLinux" href="https://github.com/kobichen222/titan/releases/latest" target="_blank" rel="noopener" style="color:#ffaa66;border-color:#ffaa66;text-decoration:none">🐧 LINUX (.AppImage)</a>
+    </div>
+    <div class="setting-desc" id="adminDlReleaseInfo" style="font-size:10.5px;line-height:1.5;color:var(--text-dim)">Resolving latest release…</div>
+  </div>
+</div>
 </div>
 <div class="settings-section"><h3>🔐 AUTHENTICATION (Supabase)</h3>
 <div class="settings-row" style="flex-direction:column;align-items:stretch;gap:8px;">
@@ -15915,6 +15934,85 @@ function setupDesktopDownloads(){
           :'Could not contact GitHub API — opens the releases page directly.';
       }
     });
+}
+
+/* ====================================================================
+   ADMIN DOWNLOAD — owner-only shortcut: type the admin code to unlock
+   direct installer links without going through Supabase sign-in. The
+   installers are public on GitHub Releases anyway, so this is purely
+   a UX bypass for the owner — not a security boundary.
+   ==================================================================== */
+function setupAdminDownload(){
+  const ADMIN_CODE='KOBI2100';
+  const REPO='kobichen222/titan';
+  const fallback=`https://github.com/${REPO}/releases/latest`;
+  const input=document.getElementById('adminDownloadCode');
+  const unlockBtn=document.getElementById('adminDownloadUnlockBtn');
+  const errEl=document.getElementById('adminDownloadErr');
+  const linksEl=document.getElementById('adminDownloadLinks');
+  const dlWin=document.getElementById('adminDlWin');
+  const dlMac=document.getElementById('adminDlMac');
+  const dlLinux=document.getElementById('adminDlLinux');
+  const info=document.getElementById('adminDlReleaseInfo');
+  if(!input||!unlockBtn||!linksEl)return;
+
+  let resolved=false;
+  function resolveAssets(){
+    if(resolved)return;
+    resolved=true;
+    fetch(`https://api.github.com/repos/${REPO}/releases/latest`,{cache:'no-store'})
+      .then(r=>{if(!r.ok)throw new Error('api-'+r.status);return r.json();})
+      .then(rel=>{
+        const a=rel.assets||[];
+        const pick=re=>a.find(x=>re.test(x.name));
+        const wire=(btn,asset)=>{
+          if(!btn||!asset)return;
+          btn.href=asset.browser_download_url;
+          btn.setAttribute('download',asset.name);
+          btn.title=asset.name;
+        };
+        wire(dlWin,pick(/\.exe$/i));
+        wire(dlMac,pick(/\.dmg$/i));
+        wire(dlLinux,pick(/\.AppImage$/i));
+        if(info){
+          const when=rel.published_at?new Date(rel.published_at).toLocaleDateString():'';
+          info.textContent=`Latest release: ${rel.tag_name||rel.name||''}${when?' · '+when:''}`;
+        }
+      })
+      .catch(()=>{
+        [dlWin,dlMac,dlLinux].forEach(b=>{if(b){b.href=fallback;b.removeAttribute('download');}});
+        if(info)info.textContent='Could not contact GitHub API — opens the releases page directly.';
+      });
+  }
+
+  function unlock(){
+    const v=(input.value||'').trim();
+    if(v===ADMIN_CODE){
+      errEl.textContent='';
+      linksEl.style.display='block';
+      input.disabled=true;
+      unlockBtn.disabled=true;
+      unlockBtn.textContent='✓ UNLOCKED';
+      unlockBtn.style.opacity='.7';
+      resolveAssets();
+      try{sessionStorage.setItem('djtitan-admin-dl','1');}catch(e){}
+      if(typeof toast==='function')toast('Admin downloads unlocked','success');
+    }else{
+      errEl.textContent='Wrong admin code';
+      linksEl.style.display='none';
+    }
+  }
+
+  unlockBtn.addEventListener('click',unlock);
+  input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();unlock();}});
+
+  // Stay unlocked for the rest of the session once the code was entered.
+  try{
+    if(sessionStorage.getItem('djtitan-admin-dl')==='1'){
+      input.value=ADMIN_CODE;
+      unlock();
+    }
+  }catch(e){}
 }
 
 /* ====================================================================
@@ -20081,7 +20179,7 @@ function init(){
   const mtbBot=document.getElementById('mixer-toolbar-bottom');if(mtbBot)mtbBot.innerHTML=buildMixerToolbarBottomHTML();
   setupVU('vu-A',20);setupVU('vu-B',20);setupVU('vu-C',20);setupVU('vu-D',20);
   setupVU('masterHVuL',20);setupVU('masterHVuR',20);
-  attachKnobs();attachEvents();setupBeatFxUI();setupSceneFx();setupKeyboard();setupTabs();setupSettings();setupVinylTurntables();setupOfflineDownload();setupDesktopDownloads();setupDiscover();setupTitanClock();setupSupport();setupStudioPro();
+  attachKnobs();attachEvents();setupBeatFxUI();setupSceneFx();setupKeyboard();setupTabs();setupSettings();setupVinylTurntables();setupOfflineDownload();setupDesktopDownloads();setupAdminDownload();setupDiscover();setupTitanClock();setupSupport();setupStudioPro();
   // Restart-tour button + first-run auto-tour
   document.getElementById('restartTourBtn')?.addEventListener('click',()=>spStartTour(true));
   setTimeout(()=>{try{spStartTour(false);}catch(e){console.warn('tour failed',e);}},1100);
