@@ -4055,6 +4055,9 @@ body.work-mode .dsb-wmexit{display:inline-flex;background:linear-gradient(180deg
 .studio-preset-btn{padding:8px 14px;background:linear-gradient(180deg,#2a2a2e 0%,#151518 100%);border:1px solid #333;color:var(--text-dim);font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:2px;font-weight:700;border-radius:4px;cursor:pointer;transition:all .15s}
 .studio-preset-btn:hover{border-color:var(--orange);color:var(--orange);transform:translateY(-1px)}
 .studio-preset-btn.active{background:linear-gradient(180deg,var(--orange),#c85a00);color:#0a0a0a;border-color:var(--orange-glow);box-shadow:0 0 16px rgba(255,138,26,.5)}
+.studio-preset-btn[data-preset="natural"]{border-color:rgba(92,240,160,.5);color:#9ce6b8}
+.studio-preset-btn[data-preset="natural"]:hover{border-color:#5cf0a0;color:#5cf0a0;box-shadow:0 0 10px rgba(92,240,160,.3)}
+.studio-preset-btn[data-preset="natural"].active{background:linear-gradient(180deg,#5cf0a0,#2db86b);color:#04140a;border-color:#5cf0a0;box-shadow:0 0 16px rgba(92,240,160,.5)}
 .studio-eq{padding:12px;background:#0a0a0b;border-radius:8px;border:1px solid #222}
 .studio-eq-canvas{width:100%;display:block;background:linear-gradient(180deg,#04080c 0%,#020406 100%);border-radius:6px;border:1px solid #1a2a30}
 .studio-eq-bands{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:10px}
@@ -11170,18 +11173,23 @@ No mappings yet. Pick a preset above or right-click any control → MIDI Learn.
 </div>
 
 <div class="studio-presets">
-<div class="studio-sub-label">ROOM / VENUE PRESETS</div>
+<div class="studio-sub-label">ROOM / VENUE PRESETS · click NATURAL to reset everything</div>
 <div class="studio-preset-row">
-<button class="studio-preset-btn active" data-preset="flat">FLAT</button>
-<button class="studio-preset-btn" data-preset="club">CLUB</button>
-<button class="studio-preset-btn" data-preset="studio">STUDIO</button>
-<button class="studio-preset-btn" data-preset="outdoor">OUTDOOR</button>
-<button class="studio-preset-btn" data-preset="headphones">HEADPHONES</button>
-<button class="studio-preset-btn" data-preset="car">CAR</button>
-<button class="studio-preset-btn" data-preset="warm">WARM</button>
-<button class="studio-preset-btn" data-preset="bright">BRIGHT</button>
-<button class="studio-preset-btn" data-preset="bassboost">BASS+</button>
-<button class="studio-preset-btn" data-preset="vocal">VOCAL</button>
+<button class="studio-preset-btn active" data-preset="natural" title="Bypass-equivalent reset — every knob back to the neutral/transparent position">🌿 NATURAL</button>
+<button class="studio-preset-btn" data-preset="flat" title="Flat reference — no EQ, no compression, no colour">FLAT</button>
+<button class="studio-preset-btn" data-preset="club" title="Club PA — full-range smile EQ + glue compression + width">CLUB</button>
+<button class="studio-preset-btn" data-preset="studio" title="Studio reference monitor — gentle polish only">STUDIO</button>
+<button class="studio-preset-btn" data-preset="outdoor" title="Outdoor festival — wide, bright, loud, big bottom end">OUTDOOR</button>
+<button class="studio-preset-btn" data-preset="headphones" title="Headphones — tighter image, presence lift">HEADPHONES</button>
+<button class="studio-preset-btn" data-preset="car" title="Car stereo — boosted lows + presence, narrower image">CAR</button>
+<button class="studio-preset-btn" data-preset="warm" title="Warm — tape-style lows + soft top, vintage tilt">WARM</button>
+<button class="studio-preset-btn" data-preset="bright" title="Bright — air on top, sparkle">BRIGHT</button>
+<button class="studio-preset-btn" data-preset="bassboost" title="Bass+ — deep low-end emphasis with mono bass focus">BASS+</button>
+<button class="studio-preset-btn" data-preset="vocal" title="Vocal — presence + de-essing for vocal-led tracks">VOCAL</button>
+<button class="studio-preset-btn" data-preset="master" title="Master — full mastering chain with multiband + glue">MASTER</button>
+<button class="studio-preset-btn" data-preset="punch" title="Punch — transient designer kicks the attack forward">PUNCH</button>
+<button class="studio-preset-btn" data-preset="radio" title="Radio — heavy compression, hot output for broadcast">RADIO</button>
+<button class="studio-preset-btn" data-preset="lofi" title="Lo-Fi — tape saturation + roll-off for vintage character">LO-FI</button>
 </div>
 <div class="studio-target-row">
 <span style="font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:2px;color:#7a7a80;font-weight:700;align-self:center;margin-right:4px">TARGET LOUDNESS →</span>
@@ -12282,7 +12290,7 @@ function buildDeckHTML(d){
     <button class="pad-mode-btn" data-pad-mode="pitch" data-deck="${d}">PITCH</button>
   </div>
   <div class="hot-cues" data-deck="${d}">${[1,2,3,4,5,6,7,8].map(n=>`<button class="cue-btn" data-color="${n}" data-cue="${n}">${n}</button>`).join('')}</div>
-  <div class="jog-wrapper"><div class="jog-wheel" id="jog-${d}"><div class="jog-outer"></div><div class="jog-ring"><div class="jog-ring-light"></div></div><div class="jog-markers"></div><div class="jog-platter" id="platter-${d}"><div class="jog-platter-disc"></div></div><div class="jog-indicator"></div><div class="jog-center-screen"><svg class="jog-bpm-dial" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46" fill="none" stroke="#2a2a30" stroke-width="0.8"/><circle cx="50" cy="50" r="44" fill="none" stroke="#0f0f14" stroke-width="0.6"/><g class="jdial-ticks" stroke="#4a4a52" stroke-width="0.8" stroke-linecap="round"><line x1="50" y1="6" x2="50" y2="10" stroke="#ff8a1a" stroke-width="1.1"/><line x1="74" y1="12.5" x2="72.5" y2="15.5"/><line x1="88" y1="26" x2="85" y2="27.5"/><line x1="94" y1="50" x2="90" y2="50"/><line x1="88" y1="74" x2="85" y2="72.5"/><line x1="74" y1="87.5" x2="72.5" y2="84.5"/><line x1="50" y1="94" x2="50" y2="90"/><line x1="26" y1="87.5" x2="27.5" y2="84.5"/><line x1="12" y1="74" x2="15" y2="72.5"/><line x1="6" y1="50" x2="10" y2="50"/><line x1="12" y1="26" x2="15" y2="27.5"/><line x1="26" y1="12.5" x2="27.5" y2="15.5"/></g><g class="jdial-needle" id="bpmNeedle-${d}" transform="rotate(0 50 50)" opacity="0.85"><line x1="50" y1="50" x2="50" y2="13" stroke="#ff8a1a" stroke-width="0.9" stroke-linecap="round"/></g></svg><div class="jdial-text"><div class="bpm-display" id="centerBpm-${d}">---</div><div class="bpm-sub">BPM</div></div></div></div></div>
+  <div class="jog-wrapper"><div class="jog-wheel" id="jog-${d}"><div class="jog-outer"></div><div class="jog-ring"><div class="jog-ring-light"></div></div><div class="jog-markers"></div><div class="jog-platter" id="platter-${d}"><div class="jog-platter-disc"></div></div><div class="jog-indicator"></div><div class="jog-center-screen"><svg class="jog-bpm-dial" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46" fill="none" stroke="#2a2a30" stroke-width="0.8"/><circle cx="50" cy="50" r="44" fill="none" stroke="#0f0f14" stroke-width="0.6"/><g class="jdial-ticks" stroke="#4a4a52" stroke-width="0.8" stroke-linecap="round"><line x1="50" y1="6" x2="50" y2="10" stroke="#ff8a1a" stroke-width="1.1"/><line x1="74" y1="12.5" x2="72.5" y2="15.5"/><line x1="88" y1="26" x2="85" y2="27.5"/><line x1="94" y1="50" x2="90" y2="50"/><line x1="88" y1="74" x2="85" y2="72.5"/><line x1="74" y1="87.5" x2="72.5" y2="84.5"/><line x1="50" y1="94" x2="50" y2="90"/><line x1="26" y1="87.5" x2="27.5" y2="84.5"/><line x1="12" y1="74" x2="15" y2="72.5"/><line x1="6" y1="50" x2="10" y2="50"/><line x1="12" y1="26" x2="15" y2="27.5"/><line x1="26" y1="12.5" x2="27.5" y2="15.5"/></g><g class="jdial-needle" id="bpmNeedle-${d}" transform="rotate(0 50 50)" opacity="0.95"><line x1="50" y1="20" x2="50" y2="9" stroke="#ff8a1a" stroke-width="1.6" stroke-linecap="round"/><circle cx="50" cy="9" r="1.6" fill="#ff8a1a"/></g></svg><div class="jdial-text"><div class="bpm-display" id="centerBpm-${d}">---</div><div class="bpm-sub">BPM</div></div></div></div></div>
   <div class="transport">
     <button class="big-btn cue" data-deck="${d}" data-action="cue"><span class="icon">◄◄</span><span class="lbl">CUE</span></button>
     <button class="big-btn play" data-deck="${d}" data-action="play"><span class="icon" id="playIcon-${d}">▶</span><span class="lbl" id="playLabel-${d}">PLAY</span></button>
@@ -21076,39 +21084,51 @@ const STUDIO_BANDS=[
   {freq:8000,type:'peaking',label:'8k'},
   {freq:14000,type:'highshelf',label:'14k'}
 ];
-const studioState={
-  bypass:false,
+// NATURAL = fully transparent mastering chain. No compression, no widening,
+// no saturation, no excitement. The audio passes through untouched. This is
+// the *only* safe default — anything else changes the perceived volume the
+// moment audio first plays, which is what previously made playback feel
+// "off" until the user opened the SOUND tab.
+const STUDIO_NATURAL={
   eqGains:[0,0,0,0,0,0,0],
-  compThreshold:-24,compRatio:4,compAttack:0.005,compRelease:0.15,compMakeup:0,
+  compThreshold:0,compRatio:1,compAttack:0.005,compRelease:0.15,compMakeup:0,
   widener:1,balance:0,bassMono:120,
   exciterDrive:0,exciterMix:0,exciterTone:4000,
   limitThreshold:-0.5,masterTrim:0,
-  // Tape saturation
   tapeDrive:0,tapeBias:0,tapeTone:0,tapeMix:0,
-  // De-esser
   deessFreq:6000,deessThresh:-18,deessAmt:0,
-  // Transient designer
-  transAttack:0,transSustain:0,transMix:1,
-  // Multi-band comp
+  transAttack:0,transSustain:0,transMix:0,
   mbcLow:0,mbcMid:0,mbcHi:0,mbcXover:250,
-  // Noise gate
-  gateThresh:-60,gateAttack:0.001,gateRelease:0.1,
-  // Amp bridge state
+  gateThresh:-80,gateAttack:0.001,gateRelease:0.1
+};
+const studioState={
+  bypass:false,
+  ...JSON.parse(JSON.stringify(STUDIO_NATURAL)),
+  // Amp bridge state — not part of the audio preset
   targetLufs:null,          // null | -8 | -12 | -14 | -16 | -23
   monoSum:false,
   dim:false
 };
+// Each preset is a partial override on top of NATURAL — applyStudioPreset()
+// always resets to NATURAL first, so presets only need to spell out the
+// parameters that differ. Every preset that compresses also includes makeup
+// gain so the perceived loudness stays close to the natural reference.
 const STUDIO_PRESETS={
-  flat:{eqGains:[0,0,0,0,0,0,0],compThreshold:-24,compRatio:4,widener:1,exciterDrive:0,exciterMix:0},
-  club:{eqGains:[5,3,-2,0,1,2,4],compThreshold:-16,compRatio:6,widener:1.3,exciterDrive:0.3,exciterMix:0.4},
-  studio:{eqGains:[0,0,0,0,0,0,1],compThreshold:-20,compRatio:3,widener:1,exciterDrive:0.15,exciterMix:0.3},
-  outdoor:{eqGains:[6,4,0,0,2,3,5],compThreshold:-14,compRatio:8,widener:1.4,exciterDrive:0.5,exciterMix:0.5},
-  headphones:{eqGains:[-2,-1,0,1,2,1,3],compThreshold:-22,compRatio:3,widener:0.8,exciterDrive:0.2,exciterMix:0.3},
-  car:{eqGains:[4,2,-1,-1,0,2,3],compThreshold:-18,compRatio:5,widener:0.9,exciterDrive:0.25,exciterMix:0.35},
-  warm:{eqGains:[3,2,1,0,-1,-2,-2],compThreshold:-22,compRatio:3,widener:1.1,exciterDrive:0.3,exciterMix:0.3},
-  bright:{eqGains:[-1,-1,0,1,3,4,5],compThreshold:-22,compRatio:3,widener:1.15,exciterDrive:0.35,exciterMix:0.4},
-  bassboost:{eqGains:[8,5,2,-1,0,1,2],compThreshold:-16,compRatio:5,widener:1.1,exciterDrive:0.2,exciterMix:0.3},
-  vocal:{eqGains:[-2,-1,1,3,4,2,1],compThreshold:-20,compRatio:3,widener:0.95,exciterDrive:0.2,exciterMix:0.35}
+  natural:{},
+  flat:{},
+  club:{eqGains:[4,2,-1,0,1,2,3],compThreshold:-18,compRatio:4,compMakeup:4,widener:1.2,exciterDrive:0.3,exciterMix:0.35,exciterTone:5000,limitThreshold:-0.5,masterTrim:1,mbcLow:-3,mbcMid:-2,mbcHi:-2},
+  studio:{eqGains:[0,0,0,0,1,0,1],compThreshold:-22,compRatio:2.5,compMakeup:2,widener:1,exciterDrive:0.15,exciterMix:0.25},
+  outdoor:{eqGains:[5,3,0,0,2,3,4],compThreshold:-14,compRatio:6,compMakeup:6,widener:1.3,exciterDrive:0.4,exciterMix:0.45,limitThreshold:-0.5,masterTrim:2},
+  headphones:{eqGains:[-1,-1,0,1,2,1,2],compThreshold:-22,compRatio:2,compMakeup:1.5,widener:0.85,exciterDrive:0.2,exciterMix:0.3},
+  car:{eqGains:[3,2,-1,-1,0,2,3],compThreshold:-18,compRatio:3,compMakeup:3,widener:0.9,exciterDrive:0.25,exciterMix:0.3},
+  warm:{eqGains:[2,2,1,0,-1,-2,-2],compThreshold:-22,compRatio:2.5,compMakeup:2,widener:1.05,exciterDrive:0.2,exciterMix:0.25,tapeDrive:0.3,tapeMix:0.4,tapeTone:0.3},
+  bright:{eqGains:[-1,-1,0,1,3,4,4],compThreshold:-22,compRatio:2.5,compMakeup:2,widener:1.15,exciterDrive:0.35,exciterMix:0.4},
+  bassboost:{eqGains:[7,4,1,-1,0,1,1],compThreshold:-16,compRatio:4,compMakeup:3,widener:1.1,exciterDrive:0.2,exciterMix:0.3,bassMono:100},
+  vocal:{eqGains:[-2,-1,1,3,4,2,1],compThreshold:-20,compRatio:3,compMakeup:2,widener:0.95,exciterDrive:0.2,exciterMix:0.35,deessAmt:0.5},
+  master:{eqGains:[1,1,0,0,1,1,2],compThreshold:-18,compRatio:3,compMakeup:3,widener:1.1,exciterDrive:0.25,exciterMix:0.3,limitThreshold:-0.5,masterTrim:2,mbcLow:-3,mbcMid:-2,mbcHi:-2},
+  punch:{eqGains:[3,1,-1,0,1,2,3],compThreshold:-16,compRatio:4,compMakeup:3,widener:1.1,transAttack:0.4,transSustain:-0.2,transMix:0.7},
+  radio:{eqGains:[-1,0,0,1,2,1,2],compThreshold:-14,compRatio:6,compMakeup:5,widener:1,exciterDrive:0.3,exciterMix:0.4,limitThreshold:-1,masterTrim:3},
+  lofi:{eqGains:[1,1,0,-1,-2,-3,-4],compThreshold:-20,compRatio:3,compMakeup:2,widener:0.85,tapeDrive:0.6,tapeMix:0.7,tapeTone:0.5,tapeBias:0.3}
 };
 const STUDIO_KNOBS={
   compThreshold:{min:-60,max:0,unit:'dB',fmt:v=>v.toFixed(0)+'dB'},
@@ -21361,9 +21381,28 @@ function applyStudioState(){
 
 function applyStudioPreset(name){
   const p=STUDIO_PRESETS[name];if(!p)return;
-  if(p.eqGains)studioState.eqGains=[...p.eqGains];
-  ['compThreshold','compRatio','widener','exciterDrive','exciterMix'].forEach(k=>{if(p[k]!=null)studioState[k]=p[k];});
+  // Reset every audio parameter to the natural (transparent) baseline first
+  // so switching presets is deterministic — no leftover knob from the
+  // previous preset bleeding into the new one.
+  Object.keys(STUDIO_NATURAL).forEach(k=>{
+    const v=STUDIO_NATURAL[k];
+    studioState[k]=Array.isArray(v)?v.slice():v;
+  });
+  // Overlay this preset's overrides on top.
+  Object.keys(p).forEach(k=>{
+    const v=p[k];
+    studioState[k]=Array.isArray(v)?v.slice():v;
+  });
   applyStudioState();renderStudioUI();drawStudioEq();
+  // Keep the active button highlight + knob rotations in sync with state.
+  document.querySelectorAll('.studio-preset-btn').forEach(b=>{
+    b.classList.toggle('active',b.dataset.preset===name);
+  });
+  if(window._studioKnobUpdaters){
+    Object.keys(window._studioKnobUpdaters).forEach(k=>{
+      try{window._studioKnobUpdaters[k]();}catch(e){}
+    });
+  }
   toast(`Preset: ${name.toUpperCase()}`,'success');
 }
 
@@ -21882,6 +21921,7 @@ function renderStudioMeter(){
 }
 
 /* Hook Studio knobs into the existing attachKnobs pointer system */
+window._studioKnobUpdaters=window._studioKnobUpdaters||{};
 function setupStudioKnobs(){
   document.querySelectorAll('[data-studio-knob]').forEach(kn=>{
     const name=kn.dataset.studioKnob;const spec=STUDIO_KNOBS[name];if(!spec)return;
@@ -21892,6 +21932,7 @@ function setupStudioKnobs(){
       if(ind)ind.style.transform=`rotate(${deg}deg)`;
       const valEl=document.getElementById('val-'+name);if(valEl)valEl.textContent=spec.fmt(studioState[name]);
     };
+    window._studioKnobUpdaters[name]=updateRotation;
     updateRotation();
     const pd=e=>{dragging=true;startY=e.clientY||(e.touches&&e.touches[0].clientY)||0;startVal=studioState[name];kn.setPointerCapture&&kn.setPointerCapture(e.pointerId);e.preventDefault();};
     const pm=e=>{
@@ -21907,8 +21948,8 @@ function setupStudioKnobs(){
     window.addEventListener('pointermove',pm);
     window.addEventListener('pointerup',pu);
     kn.addEventListener('dblclick',()=>{
-      const defaults={compThreshold:-24,compRatio:4,compAttack:0.005,compRelease:0.15,compMakeup:0,widener:1,balance:0,bassMono:120,exciterDrive:0,exciterMix:0,exciterTone:4000,limitThreshold:-0.5,masterTrim:0};
-      if(defaults[name]!=null){studioState[name]=defaults[name];updateRotation();applyStudioState();}
+      // Snap an individual knob back to its natural (transparent) value.
+      if(STUDIO_NATURAL[name]!=null){studioState[name]=STUDIO_NATURAL[name];updateRotation();applyStudioState();}
     });
   });
 }
@@ -21917,8 +21958,9 @@ document.addEventListener('DOMContentLoaded',()=>{
   setTimeout(()=>{
     renderStudioUI();drawStudioEq();setupStudioKnobs();
     document.querySelectorAll('.studio-preset-btn').forEach(b=>b.addEventListener('click',()=>{
-      document.querySelectorAll('.studio-preset-btn').forEach(x=>x.classList.remove('active'));
-      b.classList.add('active');applyStudioPreset(b.dataset.preset);
+      // applyStudioPreset() handles its own active-button bookkeeping so the
+      // knob rotations and the highlight always stay in sync.
+      applyStudioPreset(b.dataset.preset);
     }));
     // Target loudness presets — set a reference line on the LUFS history graph
     const TARGETS={club:-8,radio:-12,streaming:-14,youtube:-14,podcast:-16,broadcast:-23};
