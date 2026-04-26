@@ -10442,7 +10442,7 @@ body.tl-locked{overflow:hidden}
           <span class="vx-knob-lbl">LOW</span>
         </div>
         <div class="vx-fader-wrap">
-          <input type="range" class="vx-fader" id="vxFaderA" min="0" max="100" value="85"/>
+          <input type="range" class="vx-fader" id="vxFaderA" min="0" max="100" value="0"/>
         </div>
         <button class="vx-cue" data-vx-cue="A">CUE</button>
       </div>
@@ -10459,7 +10459,7 @@ body.tl-locked{overflow:hidden}
           <span class="vx-knob-lbl">LOW</span>
         </div>
         <div class="vx-fader-wrap">
-          <input type="range" class="vx-fader" id="vxFaderB" min="0" max="100" value="85"/>
+          <input type="range" class="vx-fader" id="vxFaderB" min="0" max="100" value="0"/>
         </div>
         <button class="vx-cue" data-vx-cue="B">CUE</button>
       </div>
@@ -13281,11 +13281,17 @@ function _makeKeylockNode(deck){
 function playDeck(deckId){
   const d=decks[deckId];if(!d.buffer||d.playing)return;
   ensureAudio();
-  // Belt + braces: zero the volumeGain *before* the source even starts so
-  // no leftover gain from a previous play / automix fade can leak through
-  // for the few-microsecond window between source.start() and the ramp
-  // schedule below. This is the "song starts loud even though the fader
-  // is at 0" bug — solved by forcing gain to 0 first, every time.
+  // 1. Re-sync d.volume from the *visible* fader handle.  Whatever stale
+  //    state d.volume had, the user only trusts what they see.
+  const handle=document.getElementById('fader-'+deckId);
+  if(handle&&handle.style.bottom){
+    const pct=parseFloat(handle.style.bottom);
+    if(isFinite(pct))d.volume=Math.max(0,Math.min(1,pct/90));
+  }
+  // 2. Hard-zero the bus *before* the source can possibly start playing.
+  //    Cancels any pending ramp and snaps the gain to exact 0 so no
+  //    leftover audio from a previous play / automix can leak in the
+  //    microsecond gap between source.start() and the post-start ramp.
   if(d.volumeGain&&audioCtx){
     try{d.volumeGain.gain.cancelScheduledValues(audioCtx.currentTime);}catch(e){}
     d.volumeGain.gain.value=0;
@@ -13314,25 +13320,20 @@ function playDeck(deckId){
     d.source.connect(d.trimGain);
   }
   d.source.start(0,d.offset);d.startTime=audioCtx.currentTime;d.playing=true;
+  // 3. Now ramp the bus up.  At d.volume === 0 we leave the gain at the
+  //    hard zero we set above — no exponential tail, true silence.
   if(d.volumeGain){
-    // Read the visible mixer fader as the authoritative source of truth so
-    // play-in always matches what the user sees. If the visible handle is
-    // at the bottom (bottom: 0%), the deck must be silent — full stop.
-    let rawV=(d.volume!==undefined)?d.volume:0;
-    const h=document.getElementById('fader-'+deckId);
-    if(h&&h.style.bottom){
-      const pct=parseFloat(h.style.bottom);
-      if(isFinite(pct))rawV=Math.max(0,Math.min(1,pct/90));
-    }
-    d.volume=rawV;
-    const target=(typeof _djFaderTaper==='function')?_djFaderTaper(rawV):rawV;
+    const v=d.volume||0;
+    const target=_djFaderTaper(v);
     const now=audioCtx.currentTime;
-    // 30 ms ramp from 0 → target. Smooth enough to kill any click, slow
-    // enough that even at full fader the start feels like a fade-in, not
-    // a punch.
-    d.volumeGain.gain.cancelScheduledValues(now);
-    d.volumeGain.gain.setValueAtTime(0,now);
-    d.volumeGain.gain.linearRampToValueAtTime(target,now+0.03);
+    if(v>0){
+      try{
+        d.volumeGain.gain.cancelScheduledValues(now);
+        d.volumeGain.gain.setValueAtTime(0,now);
+        // 35 ms linear fade-in — clean, click-free, still feels instant.
+        d.volumeGain.gain.linearRampToValueAtTime(target,now+0.035);
+      }catch(e){d.volumeGain.gain.value=target;}
+    }
   }
   if(deckId==='A'||deckId==='B'){
     document.getElementById(`jog-${deckId}`)?.classList.add('playing');
@@ -13374,8 +13375,16 @@ function pauseDeck(deckId){
     const cur=d.volumeGain.gain.value;
     d.volumeGain.gain.cancelScheduledValues(now);
     d.volumeGain.gain.setValueAtTime(cur,now);
-    d.volumeGain.gain.linearRampToValueAtTime(0,now+0.006);
-    setTimeout(()=>{try{src.stop();src.disconnect();}catch(e){}if(d.source===src)d.source=null;const raw=(d.volume!==undefined)?d.volume:0;const restore=(typeof _djFaderTaper==='function')?_djFaderTaper(raw):raw;d.volumeGain.gain.setValueAtTime(restore,audioCtx.currentTime);},12);
+    d.volumeGain.gain.linearRampToValueAtTime(0,now+0.012);
+    setTimeout(()=>{
+      try{src.stop();src.disconnect();}catch(e){}
+      if(d.source===src)d.source=null;
+      // Restore the bus to the user-visible fader's tapered value, but
+      // hard-zero when v===0 so the bus is *exactly* silent on pause.
+      const raw=(d.volume!=null)?d.volume:0;
+      const restore=raw>0?_djFaderTaper(raw):0;
+      try{d.volumeGain.gain.setValueAtTime(restore,audioCtx.currentTime);}catch(e){d.volumeGain.gain.value=restore;}
+    },20);
   }else{
     try{d.source.stop();}catch(e){}
     d.source.disconnect();
@@ -14479,14 +14488,7 @@ function handleMIDI(msg){
       }
     }else if(m.target.startsWith('fader:')){
       const deck=m.target.slice(6);
-      if(decks[deck]){
-        decks[deck].volume=v;
-        if(decks[deck].volumeGain)_rampGain(decks[deck].volumeGain.gain,_djFaderTaper(v),audioCtx,0.012);
-        // Update the per-channel DJ focus slider if visible
-        const ds=document.querySelector(`[data-djfv-slider="${deck}"]`);
-        if(ds){ds.value=Math.round(v*100);const dv=document.querySelector(`[data-djfv-value="${deck}"]`);if(dv)dv.textContent=Math.round(v*100);}
-        applyCrossfader();
-      }
+      setDeckVolume(deck,v);
     }else if(m.target==='crossfader'){
       mixerState.crossfader=v;
       const xh=document.getElementById('xfaderHandle');if(xh)xh.style.left=`${v*100}%`;
@@ -14518,7 +14520,7 @@ function handleMIDI(msg){
     // CC 7 = channel volume (standard MIDI spec) per channel
     else if(d1===7&&(ch===0||ch===1)){
       const deck=ch===0?'A':'B';
-      if(decks[deck]){decks[deck].volume=v;if(decks[deck].volumeGain)_rampGain(decks[deck].volumeGain.gain,_djFaderTaper(v),audioCtx,0.012);applyCrossfader();}
+      setDeckVolume(deck,v);
     }
   }
   if(type===0x90&&d2>0){
@@ -14749,17 +14751,72 @@ function setupSceneFx(){
      v=0.9 → 0.78 (~ -2 dB)
      v=1.0 → 1   (0 dB / unity) */
 function _djFaderTaper(v){
-  // Single source of truth for every fader path (mixer channel faders,
-  // DJ-focus slider, MIDI CC, stop-fade restore). The previous curve was
-  // v²·(0.3 + 0.7v): fader at 50 % gave 0.16 gain (-16 dB) and only the
-  // top quarter did anything audible — the user heard that as "raising
-  // and lowering doesn't work".  Math.pow(v, 1.5) is the classic DJ-style
-  // audio taper: smooth, monotonic, perceptually even across 0-100 with
-  // no dead zones at either end.
+  // Single audio taper used everywhere. Pioneer DJM-style log curve:
+  // v=0    → 0       (true silence — exact, never an exponential tail)
+  // v=0.25 → 0.125   (-18 dB)
+  // v=0.50 → 0.354   ( -9 dB)
+  // v=0.75 → 0.650   ( -3.7 dB)
+  // v=1.00 → 1       (0 dB)
+  // Smooth, monotonic, perceptually even across the full travel.
   if(v<=0)return 0;
   if(v>=1)return 1;
   return Math.pow(v,1.5);
 }
+
+/* ──────────────────────────────────────────────────────────────────────
+   setDeckVolume — canonical entry point for every fader change.
+   Every code path (mixer fader pointer, DJ-focus slider, compact-vol,
+   MIDI CC, automix, mute, master reset) now goes through this one
+   function so the audio gain, the visual fader, the slider readouts,
+   and the cached d.volume can never disagree.
+
+   v ∈ [0, 1].  At v === 0 the audio is *exactly* silent (we write a
+   hard 0 with setValueAtTime — setTargetAtTime alone uses an
+   exponential approach that never reaches zero).  Otherwise we
+   smoothly approach taper(v) with a 12 ms time constant — fast
+   enough to feel instant under the finger, slow enough to kill
+   zipper noise.
+   ──────────────────────────────────────────────────────────────────── */
+function setDeckVolume(deckId,v,opts){
+  opts=opts||{};
+  const d=decks&&decks[deckId];if(!d)return;
+  v=+v;if(!isFinite(v))v=0;
+  v=Math.max(0,Math.min(1,v));
+  d.volume=v;
+  const tau=(opts.tau!=null)?opts.tau:0.012;
+  if(d.volumeGain&&typeof audioCtx!=='undefined'&&audioCtx){
+    const target=_djFaderTaper(v);
+    const now=audioCtx.currentTime;
+    try{
+      d.volumeGain.gain.cancelScheduledValues(now);
+      if(v<=0){
+        // Hard zero — no exponential tail.  Snap immediately so the
+        // bus is mathematically silent the moment the fader hits 0.
+        d.volumeGain.gain.setValueAtTime(0,now);
+      }else{
+        d.volumeGain.gain.setTargetAtTime(target,now,tau);
+      }
+    }catch(_){try{d.volumeGain.gain.value=target;}catch(__){}}
+  }
+  // Sync every visual representation of this deck's volume.
+  if(!opts.skipUi){
+    const handle=document.getElementById('fader-'+deckId);
+    if(handle)handle.style.bottom=(v*90)+'%';
+    const pct=Math.round(v*100);
+    document.querySelectorAll(`[data-djfv-slider="${deckId}"]`).forEach(sl=>{
+      if(document.activeElement!==sl)sl.value=pct;
+      sl.style.setProperty('--djfv-pct',pct+'%');
+    });
+    document.querySelectorAll(`[data-djfv-value="${deckId}"]`).forEach(el=>{
+      el.textContent=pct;
+    });
+    document.querySelectorAll(`[data-compact-vol="${deckId}"]`).forEach(sl=>{
+      if(document.activeElement!==sl)sl.value=pct;
+    });
+  }
+  try{if(typeof applyCrossfader==='function')applyCrossfader();}catch(_){}
+}
+if(typeof window!=='undefined')window.setDeckVolume=setDeckVolume;
 /* Short smoothing time constant for all fader / xfader writes. 12 ms
    is slow enough to kill zipper noise, fast enough to still feel
    instant under the finger.  The pre-existing `.gain.value = …` made
@@ -14940,14 +14997,10 @@ function attachEvents(){
     function setY(cy){
       const r=w.getBoundingClientRect();let y=(cy-r.top)/r.height;
       y=Math.max(0,Math.min(0.9,y));
-      h.style.bottom=`${(1-y-0.1)*100}%`;
-      const v=1-y/0.9;
-      decks[d].volume=v;
-      // Smooth 12 ms ramp on both gain stages — no zipper noise. The taper
-      // is applied once, on volumeGain. applyCrossfader composes the
-      // crossfader position into channelGain using the same taper.
-      if(decks[d].volumeGain)_rampGain(decks[d].volumeGain.gain,_djFaderTaper(v),audioCtx,0.012);
-      applyCrossfader();
+      // setDeckVolume updates the handle position, every other sibling
+      // slider, the audio gain (with hard-zero at v=0), and triggers
+      // applyCrossfader.  We just feed it the raw 0..1.
+      setDeckVolume(d,1-y/0.9);
     }
     function scheduleSetY(cy){pendingCy=cy;if(rafId!=null)return;rafId=requestAnimationFrame(()=>{rafId=null;if(pendingCy!=null)setY(pendingCy);pendingCy=null;});}
     const endFader=e=>{try{w.releasePointerCapture(e.pointerId);}catch(_){}drag=false;if(rafId!=null){cancelAnimationFrame(rafId);rafId=null;}};
@@ -15008,9 +15061,7 @@ function attachEvents(){
   document.querySelectorAll('[data-compact-vol]').forEach(sl=>{
     sl.addEventListener('input',e=>{
       const d=sl.dataset.compactVol;const v=parseInt(e.target.value)/100;
-      decks[d].volume=v;
-      if(decks[d].volumeGain)_rampGain(decks[d].volumeGain.gain,_djFaderTaper(v),audioCtx,0.012);
-      applyCrossfader();
+      setDeckVolume(d,v);
     });
   });
 }
@@ -19395,16 +19446,21 @@ function setupVinylTurntables(){
     knob.addEventListener('pointercancel',stop);
     knob.addEventListener('dblclick',()=>{val=(kind==='trim')?0.33:0.5;render();applyVal();});
   });
-  // Channel faders → real volume
+  // VINYL-tab channel faders → route through setDeckVolume so the audio
+  // gain, the visible mixer handle, every other slider for this deck, and
+  // d.volume all stay in lock-step.  No initial apply() — that used to
+  // silently slam d.volume to 0.85 when the VINYL tab first mounted, even
+  // though the mixer handle still showed 0; the deck then played at 85 %
+  // when the user pressed Play.  Now the slider only writes on input.
   ['A','B'].forEach(dId=>{
     const f=document.getElementById(`vxFader${dId}`);
     if(!f)return;
-    const apply=()=>{
+    f.addEventListener('input',()=>{
       const v=parseFloat(f.value)/100;
-      if(typeof decks!=='undefined'&&decks[dId]){decks[dId].volume=v;}
-      if(typeof applyCrossfader==='function')applyCrossfader();
-    };
-    f.addEventListener('input',apply);apply();
+      if(typeof setDeckVolume==='function')setDeckVolume(dId,v);
+    });
+    // Reflect the deck's current volume into this slider on init.
+    if(typeof decks!=='undefined'&&decks[dId])f.value=Math.round((decks[dId].volume||0)*100);
   });
   // Crossfader → real crossfader
   const xf=document.getElementById('vxXfader');
@@ -20214,12 +20270,8 @@ function renderMixerCompactDecks(){
   container.querySelectorAll('[data-compact="tempo-plus"]').forEach(b=>b.addEventListener('click',()=>{const d=b.dataset.deck;setTempo(d,(decks[d].tempo||0)+0.1);}));
   container.querySelectorAll('[data-compact="tempo-reset"]').forEach(b=>b.addEventListener('click',()=>setTempo(b.dataset.deck,0)));
   container.querySelectorAll('[data-compact-vol]').forEach(r=>r.addEventListener('input',e=>{
-    const d=r.dataset.compactVol,v=parseInt(e.target.value)/100;decks[d].volume=v;
-    if(decks[d].volumeGain&&decks[d].playing){
-      const target=(typeof _djFaderTaper==='function')?_djFaderTaper(v):v;
-      decks[d].volumeGain.gain.setTargetAtTime(target,audioCtx.currentTime,0.012);
-    }
-    try{if(typeof applyCrossfader==='function')applyCrossfader();}catch(e){}
+    const d=r.dataset.compactVol,v=parseInt(e.target.value)/100;
+    setDeckVolume(d,v);
   }));
 }
 function updateDsbMonitor(){
@@ -20254,18 +20306,10 @@ window.applyDeckPair=applyDeckPair;
    decks[d].volume + volumeGain and syncs with the main fader.
    ======================================================== */
 function setDjFocusVolume(d,v){
-  v=Math.max(0,Math.min(1,v));
-  if(!decks[d])return;
-  decks[d].volume=v;
-  if(decks[d].volumeGain&&typeof audioCtx!=='undefined'&&audioCtx){
-    const target=(typeof _djFaderTaper==='function')?_djFaderTaper(v):v;
-    try{decks[d].volumeGain.gain.setTargetAtTime(target,audioCtx.currentTime,0.012);}
-    catch(e){decks[d].volumeGain.gain.value=target;}
-  }
+  setDeckVolume(d,v);
+  // refreshDjFocusVolumeUI maintains the muted/active state on the
+  // mute button — setDeckVolume already syncs the slider value itself.
   refreshDjFocusVolumeUI(d);
-  const fader=document.getElementById('fader-'+d);
-  if(fader)fader.style.bottom=(v*90)+'%';
-  try{if(typeof applyCrossfader==='function')applyCrossfader();}catch(e){}
 }
 function refreshDjFocusVolumeUI(d){
   const strip=document.querySelector(`.dj-focus-vol[data-deck="${d}"]`);
@@ -20428,13 +20472,8 @@ function handleControllerMsg(ctrlName,msg){
   if(isCC&&map.knobs[data1]){
     const b=map.knobs[data1];
     const v=data2/127;
-    if(b.type==='volume'&&decks[b.deck]&&decks[b.deck].volumeGain){
-      decks[b.deck].volume=v;
-      const target=(typeof _djFaderTaper==='function')?_djFaderTaper(v):v;
-      try{decks[b.deck].volumeGain.gain.setTargetAtTime(target,audioCtx.currentTime,0.012);}catch(e){}
-      const h=document.getElementById('fader-'+b.deck);
-      if(h){const bottom=v*90;h.style.bottom=bottom+'%';}
-      try{if(typeof applyCrossfader==='function')applyCrossfader();}catch(e){}
+    if(b.type==='volume'&&decks[b.deck]){
+      setDeckVolume(b.deck,v);
     }else if(b.type==='crossfader'){
       mixerState.crossfader=v;
       const h=document.getElementById('xfaderHandle');if(h)h.style.left=(v*100)+'%';
@@ -22423,9 +22462,14 @@ document.addEventListener('DOMContentLoaded',()=>{
       src.loop=true;src.loopStart=d.loop.start;src.loopEnd=d.loop.end;
     }
     try{src.connect(d.trimGain);}catch(e){console.warn('connect fail',e);toast&&toast('Audio routing failed','error');return;}
-    // Force volumeGain to 0 *before* the source ever starts so leftover
-    // gain from a previous play / automix fade can't leak through during
-    // the few-microsecond gap between src.start() and the ramp schedule.
+    // Re-sync from the visible fader handle (source of truth) and hard-
+    // zero the bus *before* the source can start, so leftover gain
+    // can't leak through the microsecond gap before the post-start ramp.
+    const handle=document.getElementById('fader-'+id);
+    if(handle&&handle.style.bottom){
+      const pct=parseFloat(handle.style.bottom);
+      if(isFinite(pct))d.volume=Math.max(0,Math.min(1,pct/90));
+    }
     if(d.volumeGain){try{d.volumeGain.gain.cancelScheduledValues(audioCtx.currentTime);}catch(e){}d.volumeGain.gain.value=0;}
     const token=Symbol('src');
     src._dmxToken=token;d._playToken=token;
@@ -22446,25 +22490,19 @@ document.addEventListener('DOMContentLoaded',()=>{
     }
     d.source=src;d.startTime=audioCtx.currentTime;d.playing=true;d._manualStop=false;
     if(d.volumeGain){
-      // Read the visible mixer fader as the source of truth — never trust
-      // a stale d.volume that an earlier code path might have left at a
-      // non-zero value.  Handle.bottom is 0..90 % across the whole track,
-      // so dividing by 90 gives us a clean 0..1.
-      let rawV=(d.volume!=null)?d.volume:0;
-      const h=document.getElementById('fader-'+id);
-      if(h&&h.style.bottom){
-        const pct=parseFloat(h.style.bottom);
-        if(isFinite(pct))rawV=Math.max(0,Math.min(1,pct/90));
-      }
-      d.volume=rawV;
-      const target=(typeof _djFaderTaper==='function')?_djFaderTaper(rawV):rawV;
+      const v=d.volume||0;
+      const target=_djFaderTaper(v);
       const now=audioCtx.currentTime;
-      try{
-        d.volumeGain.gain.cancelScheduledValues(now);
-        d.volumeGain.gain.setValueAtTime(0,now);
-        // 30 ms ramp — silent if rawV===0, smooth fade-in otherwise.
-        d.volumeGain.gain.linearRampToValueAtTime(target,now+0.03);
-      }catch(e){d.volumeGain.gain.value=target;}
+      // v === 0 → leave the bus at the hard zero set just before src.start.
+      // No exponential tail, no audible click — the deck is just silent
+      // until the user raises the fader.  v > 0 → 35 ms linear fade-in.
+      if(v>0){
+        try{
+          d.volumeGain.gain.cancelScheduledValues(now);
+          d.volumeGain.gain.setValueAtTime(0,now);
+          d.volumeGain.gain.linearRampToValueAtTime(target,now+0.035);
+        }catch(e){d.volumeGain.gain.value=target;}
+      }
     }
     _updatePlayUI(id,true);
   };
@@ -22481,11 +22519,18 @@ document.addEventListener('DOMContentLoaded',()=>{
       const cur=d.volumeGain.gain.value;
       d.volumeGain.gain.cancelScheduledValues(now);
       d.volumeGain.gain.setValueAtTime(cur,now);
-      d.volumeGain.gain.linearRampToValueAtTime(0,now+0.008);
+      d.volumeGain.gain.linearRampToValueAtTime(0,now+0.012);
       setTimeout(()=>{
         try{src&&src.stop();src&&src.disconnect();}catch(e){}
-        if(audioCtx){d.volumeGain.gain.cancelScheduledValues(audioCtx.currentTime);const raw=d.volume!=null?d.volume:0;const tap=(typeof _djFaderTaper==='function')?_djFaderTaper(raw):raw;d.volumeGain.gain.setValueAtTime(tap,audioCtx.currentTime);}
-      },18);
+        if(audioCtx){
+          d.volumeGain.gain.cancelScheduledValues(audioCtx.currentTime);
+          // Restore to the user-visible fader's tapered value, but hard-
+          // zero when v===0 — pause leaves the bus exactly silent.
+          const raw=d.volume!=null?d.volume:0;
+          const restore=raw>0?_djFaderTaper(raw):0;
+          try{d.volumeGain.gain.setValueAtTime(restore,audioCtx.currentTime);}catch(e){d.volumeGain.gain.value=restore;}
+        }
+      },20);
     }else if(src){try{src.stop();src.disconnect();}catch(e){}}
     _updatePlayUI(id,false);
   };
@@ -22831,13 +22876,7 @@ function cancelAutoMix(silent){
       if(d.eqLow&&audioCtx){d.eqLow.gain.cancelScheduledValues(t);d.eqLow.gain.setValueAtTime((d.eq?.low||0)*12,t);}
       if(d.colorFilter){d.colorFilter.type='allpass';d.colorFilter.frequency.cancelScheduledValues&&d.colorFilter.frequency.cancelScheduledValues(t);d.colorFilter.frequency.value=1000;}
       if(automix.preVol[id]!==undefined){
-        d.volume=automix.preVol[id];
-        if(d.volumeGain){
-          const tap=(typeof _djFaderTaper==='function')?_djFaderTaper(d.volume):d.volume;
-          d.volumeGain.gain.value=tap;
-        }
-        const h=document.getElementById(`fader-${id}`);
-        if(h)h.style.bottom=`${d.volume*90}%`;
+        setDeckVolume(id,automix.preVol[id]);
       }
     });
     if(window.sceneFxWet&&audioCtx){sceneFxWet.gain.cancelScheduledValues(t);sceneFxWet.gain.setValueAtTime(0,t);}
@@ -22866,32 +22905,20 @@ function automixProgressLoop(){
 }
 
 function fadeChannelVolume(deckId,target,durSec){
-  const d=decks[deckId];if(!d||!d.volumeGain||!audioCtx)return;
-  const t0=audioCtx.currentTime,t1=t0+durSec;
+  const d=decks&&decks[deckId];if(!d)return;
   const start=d.volume;
-  // Apply the taper to *both* endpoints so an automix fade tracks the
-  // exact same loudness curve a manual fader would, and so 50 % visual
-  // position means the same thing whether the user dragged the fader or
-  // automix is sliding it for them.
-  const tap=(typeof _djFaderTaper==='function')?_djFaderTaper:(v=>v);
-  d.volumeGain.gain.cancelScheduledValues(t0);
-  d.volumeGain.gain.setValueAtTime(tap(start),t0);
-  d.volumeGain.gain.linearRampToValueAtTime(tap(target),t1);
-  const h=document.getElementById(`fader-${deckId}`);
-  if(h){
-    const t0p=performance.now();
-    function step(){
-      const el=(performance.now()-t0p)/(durSec*1000);
-      if(el>=1){d.volume=target;h.style.bottom=`${target*90}%`;return;}
-      const v=start+(target-start)*el;
-      d.volume=v;
-      h.style.bottom=`${v*90}%`;
-      requestAnimationFrame(step);
-    }
-    requestAnimationFrame(step);
-  }else{
-    d.volume=target;
+  // Drive the automix fade through setDeckVolume on every animation frame
+  // so the audio gain, the visible handle, every slider, and d.volume
+  // stay in lock-step — and so the taper is applied identically to a
+  // manual move.  At target===0 the final frame also hard-zeros the bus.
+  const t0p=performance.now();
+  function step(){
+    const el=Math.min(1,(performance.now()-t0p)/(durSec*1000));
+    const v=start+(target-start)*el;
+    setDeckVolume(deckId,v,{tau:0.02});
+    if(el<1)requestAnimationFrame(step);
   }
+  requestAnimationFrame(step);
 }
 
 async function runProfessionalTransition(from,to,style,bars){
