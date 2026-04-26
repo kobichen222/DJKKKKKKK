@@ -13665,24 +13665,30 @@ function playDeck(deckId){
   }else{
     d.source.connect(d.trimGain);
   }
+  // CRITICAL: zero the gain BEFORE starting the source. WebAudio
+  // processes audio in 128-sample chunks; if the source starts even a
+  // single chunk before the gain reset takes effect, that chunk plays
+  // at whatever gain stopDeck restored on the previous stop — this is
+  // exactly the "burst on PLAY" the user heard at fader=0.
+  if(d.volumeGain){
+    const now0=audioCtx.currentTime;
+    d.volumeGain.gain.cancelScheduledValues(now0);
+    try{d.volumeGain.gain.value=0;}catch(_){}
+    d.volumeGain.gain.setValueAtTime(0,now0);
+  }
   d.source.start(0,d.offset);d.startTime=audioCtx.currentTime;d.playing=true;
   if(d.volumeGain){
     // Apply the perceptual taper so play-in matches the fader's current
-    // audible position. A linear ramp to raw d.volume sounded louder than
-    // whatever the fader was actually showing. Force-zero the param value
-    // first (independent of any pending automation) so a track that starts
-    // while the fader is at 0 is genuinely silent — no leftover residue
-    // from a prior setTargetAtTime asymptote.
+    // audible position. Up-ramp over 25 ms — long enough to avoid any
+    // click/transient when audio comes in, short enough to feel instant.
     const rawV=(d.volume!==undefined)?d.volume:0;
     const target=(typeof _djFaderTaper==='function')?_djFaderTaper(rawV):rawV;
     const now=audioCtx.currentTime;
-    d.volumeGain.gain.cancelScheduledValues(now);
-    try{d.volumeGain.gain.value=0;}catch(_){}
-    d.volumeGain.gain.setValueAtTime(0,now);
     if(target<=0){
-      d.volumeGain.gain.setValueAtTime(0,now+0.008);
+      d.volumeGain.gain.setValueAtTime(0,now+0.025);
     }else{
-      d.volumeGain.gain.linearRampToValueAtTime(target,now+0.008);
+      d.volumeGain.gain.setValueAtTime(0,now);
+      d.volumeGain.gain.linearRampToValueAtTime(target,now+0.025);
     }
   }
   if(deckId==='A'||deckId==='B'){
