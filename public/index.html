@@ -5237,22 +5237,31 @@ body.dj-focus-mode .rgb-ambient{
   display:none !important;
 }
 
-body.dj-focus-mode body,body.dj-focus-mode{padding:0;gap:0}
+body.dj-focus-mode body,body.dj-focus-mode{padding:8px;gap:8px}
 body.dj-focus-mode .console{
   grid-template-columns:1fr 1fr !important;
   gap:14px;
-  max-width:none !important;
-  width:calc(100vw - 16px);
+  max-width:1400px;
+  width:100%;
+  margin:0 auto;
   padding:4px;
   align-items:stretch;
 }
 @media(min-width:1920px){
-  body.dj-focus-mode .console{width:calc(100vw - 24px);gap:20px}
+  body.dj-focus-mode .console{max-width:1500px;gap:20px}
+}
+@media(max-width:1200px){
+  body.dj-focus-mode .console{max-width:100%;gap:10px}
 }
 body.dj-focus-mode .header-bar,
 body.dj-focus-mode .main-tabs,
 body.dj-focus-mode .deck-switch-bar{
-  max-width:none;width:calc(100vw - 16px);
+  max-width:1400px;width:100%;margin-left:auto;margin-right:auto;
+}
+@media(min-width:1920px){
+  body.dj-focus-mode .header-bar,
+  body.dj-focus-mode .main-tabs,
+  body.dj-focus-mode .deck-switch-bar{max-width:1500px}
 }
 
 body.dj-focus-mode::before{
