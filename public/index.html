@@ -1009,11 +1009,12 @@ button:active:not(:disabled),.big-btn:active,.loop-btn:active,.jump-btn:active,
   box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 0 28px rgba(255,138,26,.75);
 }
 .beat-btn.active{
-  background:linear-gradient(180deg,#b8f6ff 0%,#7ff0ff 35%,var(--screen-glow) 100%);
-  color:#001820;
-  border:1px solid rgba(168,240,255,.7);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 0 14px rgba(46,224,255,.85);
-  text-shadow:0 1px 0 rgba(255,255,255,.35);
+  background:linear-gradient(180deg,#d6faff 0%,#7ff0ff 50%,#2ee0ff 100%) !important;
+  color:#00131a !important;
+  border:1px solid #d6faff !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.7),0 0 16px rgba(46,224,255,.95) !important;
+  text-shadow:0 1px 0 rgba(255,255,255,.5);
+  font-weight:900;
 }
 
 /* ACTIVE UTIL BUTTONS — uniform soft glow */
@@ -15099,12 +15100,31 @@ function _djFaderTaper(v){
    is slow enough to kill zipper noise, fast enough to still feel
    instant under the finger.  The pre-existing `.gain.value = …` made
    every fader movement a discontinuity and that's what the user heard
-   as "not smooth". */
+   as "not smooth".
+
+   setTargetAtTime exponentially approaches the target — perfect for
+   moving between non-zero values, but it asymptotes and never exactly
+   reaches 0. That left a barely-audible residue at "fader at 0", so
+   target<=0 takes a guaranteed-zero linear ramp instead. Coming UP
+   from a current value of 0 also needs an explicit setValueAtTime
+   anchor before the ramp, otherwise the curve restarts from whatever
+   was scheduled before. */
 function _rampGain(param,target,ctx,tau){
   if(!param||!ctx)return;
+  const t=tau||0.012;
   try{
-    param.cancelScheduledValues(ctx.currentTime);
-    param.setTargetAtTime(target,ctx.currentTime,tau||0.012);
+    const now=ctx.currentTime;
+    const cur=param.value;
+    param.cancelScheduledValues(now);
+    if(target<=0){
+      param.setValueAtTime(cur,now);
+      param.linearRampToValueAtTime(0,now+t);
+    }else if(cur<=0.0001){
+      param.setValueAtTime(cur,now);
+      param.linearRampToValueAtTime(target,now+t);
+    }else{
+      param.setTargetAtTime(target,now,t);
+    }
   }catch(_){param.value=target;}
 }
 
@@ -15272,15 +15292,25 @@ function attachEvents(){
     const w=document.querySelector(`.fader-wrap[data-fader="${d}"]`);
     if(!w)return;
     const h=document.getElementById(`fader-${d}`);let drag=false;let pendingCy=null,rafId=null;
+    /* Click → volume mapping. Full range, no dead zones:
+         click at top of wrap        → v=1 (max)
+         click at bottom of wrap     → v=0 (silent)
+       Visual handle position is computed against the available travel
+       (wrap height − handle height) so the handle's edges align with
+       the wrap's edges at the extremes — no overflow at the top, no
+       gap at the bottom. */
     function setY(cy){
-      const r=w.getBoundingClientRect();let y=(cy-r.top)/r.height;
-      y=Math.max(0,Math.min(0.9,y));
-      h.style.bottom=`${(1-y-0.1)*100}%`;
-      const v=1-y/0.9;
+      const r=w.getBoundingClientRect();
+      const handleH=h.offsetHeight||24;
+      const travel=Math.max(1,r.height-handleH);
+      // Center-of-handle is what the user expects under the cursor.
+      const raw=(cy-r.top-handleH/2)/travel;
+      const y=Math.max(0,Math.min(1,raw));
+      h.style.bottom=`${(1-y)*travel}px`;
+      const v=1-y;
       decks[d].volume=v;
-      // Smooth 12 ms ramp on both gain stages — no zipper noise. The taper
-      // is applied once, on volumeGain. applyCrossfader composes the
-      // crossfader position into channelGain using the same taper.
+      // Smooth 12 ms ramp. _rampGain force-zeros at v<=0 so "fader at 0"
+      // is genuinely silent (setTargetAtTime alone never quite hits 0).
       if(decks[d].volumeGain)_rampGain(decks[d].volumeGain.gain,_djFaderTaper(v),audioCtx,0.012);
       applyCrossfader();
     }
