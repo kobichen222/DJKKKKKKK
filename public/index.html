@@ -23900,7 +23900,8 @@ function syncDeckPhase(toId,fromId){
   const newRate=(df.track.bpm*(1+df.tempo/100))/dt.track.bpm;
   dt.tempo=(newRate-1)*100;
   dt.playbackRate=newRate;
-  if(dt.source)try{dt.source.playbackRate.setTargetAtTime(newRate,audioCtx.currentTime,0.05);}catch(e){}
+  // 0.4s time-constant gives a musical glide instead of a tempo step.
+  if(dt.source)try{dt.source.playbackRate.setTargetAtTime(newRate,audioCtx.currentTime,0.4);}catch(e){}
   const fromBeat=60/(df.track.bpm*(1+df.tempo/100));
   const fromCur=getCurrentTime(fromId)-(df.cuePoint||0);
   const phaseInBar=((fromCur/fromBeat)%4+4)%4;
@@ -23909,23 +23910,74 @@ function syncDeckPhase(toId,fromId){
   dt.offset=Math.max(0,targetOffset);
 }
 
+/* Pro EQ-swap technique: fade outgoing's bass over the full transition
+   while incoming's bass comes up faster (60%) so it's planted before the
+   volume crossfade lands. Highs swap with a gentler curve so the spectral
+   handoff feels seamless. The optional filterStyle tells eqSwap what to
+   do with the outgoing's body (HF sweep, LP sweep, or reverb tail). */
 function eqSwap(outId,inId,durSec,filterStyle){
   if(!audioCtx)return;
   const t0=audioCtx.currentTime,t1=t0+durSec;
   const dOut=decks[outId],dIn=decks[inId];
-  if(dOut.eqLow){dOut.eqLow.gain.cancelScheduledValues(t0);dOut.eqLow.gain.setValueAtTime(dOut.eqLow.gain.value,t0);dOut.eqLow.gain.linearRampToValueAtTime(-80,t1);}
-  if(dIn.eqLow){dIn.eqLow.gain.cancelScheduledValues(t0);dIn.eqLow.gain.setValueAtTime(-80,t0);dIn.eqLow.gain.linearRampToValueAtTime(0,t0+durSec*0.6);}
+  // BASS SWAP — strict: outgoing dies over the whole window, incoming
+  // arrives at 60% so the new bass replaces the old before vol crossfade
+  if(dOut.eqLow){
+    dOut.eqLow.gain.cancelScheduledValues(t0);
+    dOut.eqLow.gain.setValueAtTime(dOut.eqLow.gain.value,t0);
+    dOut.eqLow.gain.linearRampToValueAtTime(-80,t1);
+  }
+  if(dIn.eqLow){
+    dIn.eqLow.gain.cancelScheduledValues(t0);
+    dIn.eqLow.gain.setValueAtTime(-80,t0);
+    dIn.eqLow.gain.linearRampToValueAtTime(0,t0+durSec*0.6);
+  }
+  // HIGH SWAP — gentler than bass. Outgoing's highs back off ~20 dB by
+  // 70%, incoming's highs come up by 50% to brighten the new track.
+  if(dOut.eqHigh){
+    dOut.eqHigh.gain.cancelScheduledValues(t0);
+    dOut.eqHigh.gain.setValueAtTime(dOut.eqHigh.gain.value,t0);
+    dOut.eqHigh.gain.linearRampToValueAtTime(-20,t0+durSec*0.7);
+  }
+  if(dIn.eqHigh){
+    dIn.eqHigh.gain.cancelScheduledValues(t0);
+    dIn.eqHigh.gain.setValueAtTime(-20,t0);
+    dIn.eqHigh.gain.linearRampToValueAtTime(0,t0+durSec*0.5);
+  }
+  // OPTIONAL OUTGOING TREATMENT
   if(filterStyle==='hp-sweep'&&dOut.colorFilter){
-    dOut.colorFilter.type='highpass';dOut.colorFilter.frequency.cancelScheduledValues(t0);
+    // Energy: aggressive high-pass sweep — outgoing thins out as it leaves
+    dOut.colorFilter.type='highpass';
+    dOut.colorFilter.frequency.cancelScheduledValues(t0);
     dOut.colorFilter.frequency.setValueAtTime(20,t0);
     dOut.colorFilter.frequency.exponentialRampToValueAtTime(8000,t1);
-  }
-  if(filterStyle==='echo-out'&&window.sceneFxWet){
+  }else if(filterStyle==='lp-sweep'&&dOut.colorFilter){
+    // Smooth/Harmonic: gentle low-pass sweep — outgoing softens into a pad
+    dOut.colorFilter.type='lowpass';
+    dOut.colorFilter.frequency.cancelScheduledValues(t0);
+    dOut.colorFilter.frequency.setValueAtTime(20000,t0);
+    dOut.colorFilter.frequency.exponentialRampToValueAtTime(900,t1);
+  }else if(filterStyle==='echo-out'&&window.sceneFxWet){
+    // Echo: scene reverb wet swells, then tails out
     sceneFxWet.gain.cancelScheduledValues(t0);
     sceneFxWet.gain.setValueAtTime(sceneFxWet.gain.value,t0);
     sceneFxWet.gain.linearRampToValueAtTime(0.7,t0+durSec*0.5);
     sceneFxWet.gain.linearRampToValueAtTime(0,t1+1);
   }
+}
+
+/* Master dip — drops the master bus by ~1.5 dB during the overlap so
+   summed audio from both decks doesn't clip the limiter. Restores the
+   user's master setting smoothly after the transition. */
+function _autoMixMasterDip(durSec){
+  if(!masterGain||!audioCtx)return;
+  const t0=audioCtx.currentTime;
+  const baseG=mixerState.master;
+  const dipG=Math.max(0,baseG*0.84); // ≈ −1.5 dB
+  masterGain.gain.cancelScheduledValues(t0);
+  masterGain.gain.setValueAtTime(baseG,t0);
+  masterGain.gain.linearRampToValueAtTime(dipG,t0+Math.min(0.8,durSec*0.25));
+  masterGain.gain.setValueAtTime(dipG,t0+durSec*0.75);
+  masterGain.gain.linearRampToValueAtTime(baseG,t0+durSec+0.6);
 }
 
 function fadeCrossfaderCurve(target,durMs,curve){
@@ -24064,20 +24116,36 @@ function automixReset(){
 function cancelAutoMix(silent){
   if(automix.phase==='idle')return false;
   automixClearTimers();
+  // Drop the safety-tick suppression flags up-front so any in-flight
+  // ramp we cancel below can't leave the safety gate disabled.
+  if(automix.fading){automix.fading.A=automix.fading.B=automix.fading.C=automix.fading.D=false;}
+  const taper=(typeof _djFaderTaper==='function')?_djFaderTaper:(v=>v);
   try{
     const t=audioCtx?audioCtx.currentTime:0;
     ['A','B','C','D'].forEach(id=>{
       const d=decks[id];if(!d)return;
       if(d.eqLow&&audioCtx){d.eqLow.gain.cancelScheduledValues(t);d.eqLow.gain.setValueAtTime((d.eq?.low||0)*12,t);}
+      if(d.eqHigh&&audioCtx){d.eqHigh.gain.cancelScheduledValues(t);d.eqHigh.gain.setValueAtTime((d.eq?.high||0)*12,t);}
       if(d.colorFilter){d.colorFilter.type='allpass';d.colorFilter.frequency.cancelScheduledValues&&d.colorFilter.frequency.cancelScheduledValues(t);d.colorFilter.frequency.value=1000;}
       if(automix.preVol[id]!==undefined){
         d.volume=automix.preVol[id];
-        if(d.volumeGain)d.volumeGain.gain.value=d.volume;
+        // Restore audio with the same DJ taper the user fader uses, and
+        // place the visible handle in pixels using the same formula as
+        // setY (15860) so the visual matches the audio exactly.
+        if(d.volumeGain&&audioCtx){d.volumeGain.gain.cancelScheduledValues(t);d.volumeGain.gain.setValueAtTime(taper(d.volume),t);}
+        const w=document.querySelector(`.fader-wrap[data-fader="${id}"]`);
         const h=document.getElementById(`fader-${id}`);
-        if(h)h.style.bottom=`${(1-(1-d.volume)/0.9-0.1)*100}%`;
+        if(h&&w){
+          const wrapH=w.getBoundingClientRect().height||170;
+          const handleH=h.offsetHeight||24;
+          const travel=Math.max(1,wrapH-handleH);
+          h.style.bottom=(d.volume*travel)+'px';
+        }
       }
     });
     if(window.sceneFxWet&&audioCtx){sceneFxWet.gain.cancelScheduledValues(t);sceneFxWet.gain.setValueAtTime(0,t);}
+    // Restore master in case the dip was mid-ramp
+    if(masterGain&&audioCtx){masterGain.gain.cancelScheduledValues(t);masterGain.gain.setValueAtTime(mixerState.master,t);}
     if(automix.usedCrossfader){
       mixerState.crossfader=automix.preXf;
       const h=document.getElementById('xfaderHandle');
@@ -24183,32 +24251,46 @@ async function runProfessionalTransition(from,to,style,bars){
                    &&(xa.A==='A'||!xa.A)&&(xa.B==='B'||!xa.B);
 
     if(style==='cut'){
+      // Beat-synced cut: 4-beat window, ~80 ms taper on outgoing and a
+      // ~60 ms ramp-up on incoming so neither deck clicks. The xfader
+      // handle still snaps over for the visible "cut" feel when usable.
       const cutDur=beatDur*4;
       automix.endAt=audioCtx.currentTime+cutDur;
       if(canUseXf){
         const xfTarget=from==='A'?1:0;
         automix.usedCrossfader=true;
-        fadeCrossfaderCurve(xfTarget,cutDur*1000,'cut');
-      }else{
-        fadeChannelVolume(from,0,cutDur*0.5);
-        fadeChannelVolume(to,1,0.05);
+        fadeCrossfaderCurve(xfTarget,Math.max(140,cutDur*200),'cut');
       }
+      // Always taper volumes — even with a cut xfader, this protects
+      // against pops on either deck if the user's xfader assign bypasses.
+      fadeChannelVolume(from,0,0.08);
+      fadeChannelVolume(to,1,0.06);
       automix.timers.push(setTimeout(()=>automixFinish(from,to),cutDur*1000+200));
       return;
     }
 
+    // Blend transitions all share the master-dip + 3-band EQ swap.
+    // The per-style differences are: outgoing treatment (HF/LP/echo) and
+    // crossfader curve. Volume crossfade is handled by the xfader when
+    // possible, with channel-volume ramps as the fallback for non-xf decks.
+    _autoMixMasterDip(durSec);
     if(style==='energy'){
-      eqSwap(from,to,durSec*0.6,'hp-sweep');
+      // Aggressive: HF sweep on outgoing thins it out, exp xfader curve
+      // brings the new track in fast for a peak-time energy push
+      eqSwap(from,to,durSec*0.7,'hp-sweep');
       if(canUseXf){automix.usedCrossfader=true;fadeCrossfaderCurve(from==='A'?1:0,durSec*1000,'exp');}
-      else{fadeChannelVolume(from,0,durSec);fadeChannelVolume(to,1,durSec*0.4);}
+      else{fadeChannelVolume(from,0,durSec*0.85);fadeChannelVolume(to,1,durSec*0.45);}
     }else if(style==='harmonic'||style==='smooth'){
-      eqSwap(from,to,durSec*0.8,null);
+      // Polished blend: gentle LP sweep softens the outgoing into a pad,
+      // cosine xfader gives an equal-power-feeling handoff
+      eqSwap(from,to,durSec*0.85,'lp-sweep');
+      if(canUseXf){automix.usedCrossfader=true;fadeCrossfaderCurve(from==='A'?1:0,durSec*1000,'cosine');}
+      else{fadeChannelVolume(from,0,durSec);fadeChannelVolume(to,1,durSec*0.55);}
+    }else{
+      // Echo: reverb wet swells then tails out, cosine xfader for smoothness
+      eqSwap(from,to,durSec*0.75,'echo-out');
       if(canUseXf){automix.usedCrossfader=true;fadeCrossfaderCurve(from==='A'?1:0,durSec*1000,'cosine');}
       else{fadeChannelVolume(from,0,durSec);fadeChannelVolume(to,1,durSec*0.5);}
-    }else{
-      eqSwap(from,to,durSec*0.7,'echo-out');
-      if(canUseXf){automix.usedCrossfader=true;fadeCrossfaderCurve(from==='A'?1:0,durSec*1000,'cosine');}
-      else{fadeChannelVolume(from,0,durSec);fadeChannelVolume(to,1,durSec*0.4);}
     }
 
     automix.timers.push(setTimeout(()=>automixFinish(from,to),durSec*1000+400));
@@ -24224,9 +24306,22 @@ function automixFinish(from,to){
     pauseDeck(from);
     const t=decks[from].track;
     if(t){_recentlyPlayed.push(t.id);if(_recentlyPlayed.length>8)_recentlyPlayed.shift();}
+    // Reset every node we touched on the outgoing deck so the next time
+    // it's loaded the EQ/filter starts neutral.
     if(decks[from].colorFilter){decks[from].colorFilter.type='allpass';decks[from].colorFilter.frequency.value=1000;}
-    if(decks[from].eqLow&&audioCtx)decks[from].eqLow.gain.setValueAtTime(0,audioCtx.currentTime);
+    if(audioCtx){
+      const tn=audioCtx.currentTime;
+      if(decks[from].eqLow){decks[from].eqLow.gain.cancelScheduledValues(tn);decks[from].eqLow.gain.setValueAtTime(0,tn);}
+      if(decks[from].eqHigh){decks[from].eqHigh.gain.cancelScheduledValues(tn);decks[from].eqHigh.gain.setValueAtTime(0,tn);}
+      // Incoming deck ended the swap with eqHigh at 0, but cancel any
+      // straggler ramps just in case the user re-cancelled mid-mix.
+      if(decks[to].eqHigh){decks[to].eqHigh.gain.cancelScheduledValues(tn);decks[to].eqHigh.gain.setValueAtTime(0,tn);}
+      // Restore master to the user's setting (in case the dip overran)
+      if(masterGain){masterGain.gain.cancelScheduledValues(tn);masterGain.gain.setValueAtTime(mixerState.master,tn);}
+    }
     if(window.sceneFxWet&&audioCtx)sceneFxWet.gain.setValueAtTime(0,audioCtx.currentTime);
+    // Clear all fading flags so the safety tick resumes guarding faders.
+    if(automix.fading){automix.fading.A=automix.fading.B=automix.fading.C=automix.fading.D=false;}
   }catch(e){}
   toast&&toast(`✓ Deck ${to} now live`,'success');
   const chain=automix.continuous;
