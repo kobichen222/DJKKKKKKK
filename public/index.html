@@ -12741,31 +12741,6 @@ Two options — both work completely offline:<br/>
   </div>
 </div>
 </div>
-<div class="settings-section"><h3>🔐 AUTHENTICATION (Supabase)</h3>
-<div class="settings-row" style="flex-direction:column;align-items:stretch;gap:8px;">
-  <div class="setting-label">Supabase Project URL <span class="setting-desc">(Settings → API)</span></div>
-  <input type="text" id="supabaseUrl" class="url-input" placeholder="https://eliimbfzegwcepbljdwp.supabase.co (built-in default)" style="padding:8px 12px;" />
-</div>
-<div class="settings-row" style="flex-direction:column;align-items:stretch;gap:8px;">
-  <div class="setting-label">Supabase anon key</div>
-  <input type="password" id="supabaseAnon" class="url-input" placeholder="eyJhbGciOiJIUzI1NiIs…" style="padding:8px 12px;" />
-</div>
-<div class="settings-row" style="gap:8px;flex-wrap:wrap">
-  <button class="tool-btn" id="saveSupabase">SAVE &amp; CONNECT</button>
-  <button class="tool-btn" id="authDiagnoseBtn" style="border-color:var(--screen-glow);color:var(--screen-glow)">🔍 RUN AUTH DIAGNOSTIC</button>
-  <a href="./auth.sql" download class="setting-desc" style="color:var(--screen-glow);cursor:pointer;">⬇ Download SQL schema</a>
-</div>
-<div id="authDiagnoseOut" class="setting-desc" style="display:none;margin-top:8px;padding:10px 12px;background:rgba(0,0,0,.35);border-radius:6px;border:1px solid rgba(255,138,26,.18);font-family:'Share Tech Mono',monospace;font-size:11px;line-height:1.7;white-space:pre-wrap;color:#cfd6dd;max-height:280px;overflow:auto"></div>
-<div class="setting-desc" style="padding-top:6px;line-height:1.6;">
-  <b>Quick setup (3 places must agree)</b><br/>
-  <b>1.</b> <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener" style="color:var(--screen-glow)">Google Cloud → Credentials</a> → OAuth Client → <i>Authorized redirect URIs</i> include:<br/>
-  &nbsp;&nbsp;&nbsp;<code id="authRedirectHint">https://eliimbfzegwcepbljdwp.supabase.co/auth/v1/callback</code> <button class="tool-btn" id="copyAuthRedirect" style="padding:2px 6px;font-size:9px">COPY</button><br/>
-  <b>2.</b> <a href="https://supabase.com/dashboard/project/_/auth/providers" target="_blank" rel="noopener" style="color:var(--screen-glow)">Supabase → Auth → Providers → Google</a> → ENABLE + paste Google Client ID + Client Secret<br/>
-  <b>3.</b> <a href="https://supabase.com/dashboard/project/_/auth/url-configuration" target="_blank" rel="noopener" style="color:var(--screen-glow)">Supabase → Auth → URL Configuration</a> → add this app's origin: <code id="authOriginHint">—</code> <button class="tool-btn" id="copyAuthOrigin" style="padding:2px 6px;font-size:9px">COPY</button><br/>
-  <b>4.</b> SQL Editor → paste <code>auth.sql</code> → Run<br/>
-  <b>5.</b> Settings → API → copy URL + anon key here → <b>SAVE &amp; CONNECT</b>
-</div>
-</div>
 
 <div class="settings-section"><h3>🎵 MUSIC SERVICES</h3>
 <div class="settings-row" style="flex-direction:column;align-items:stretch;gap:8px;">
