@@ -10110,27 +10110,30 @@ body.show-all .cdj .jog-center-screen .bpm-sub{
 #titan-landing .tl-brow-r::after{right:0;background:linear-gradient(90deg,#00d4ff,rgba(0,212,255,0));box-shadow:0 0 14px rgba(0,212,255,.65),0 0 4px rgba(0,212,255,.9);transform-origin:left center;transform:translateY(-50%) rotate(15deg)}
 
 /* Override mixer: becomes the nose plate (a 4-channel mixer strip), with a bridge tying it to the forehead chip */
-#titan-landing .tl-mock-bot .tl-mixer{width:15%;height:32%;bottom:28%;padding:7% 7% 6%;border-radius:6px 6px 10px 10px;background:linear-gradient(180deg,#1f1f23 0%,#0a0a0b 60%,#050506 100%);border:1px solid #2a2a2e;box-shadow:0 8px 22px rgba(0,0,0,.6),inset 1px 0 0 rgba(255,255,255,.04),inset -1px 0 0 rgba(0,0,0,.6),inset 0 0 18px rgba(0,0,0,.7);display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:5px}
+#titan-landing .tl-mock-bot .tl-mixer{width:18%;height:34%;bottom:27%;padding:8px 8px 8px;border-radius:6px 6px 10px 10px;background:linear-gradient(180deg,#252529 0%,#0a0a0b 70%,#050506 100%);border:1px solid #3a3a3e;box-shadow:0 8px 22px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.06),inset 0 0 18px rgba(0,0,0,.7);display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:7px}
 #titan-landing .tl-mock-bot .tl-mixer::before{content:'';position:absolute;top:-22%;left:50%;transform:translateX(-50%);width:30%;height:24%;background:linear-gradient(180deg,rgba(255,122,0,.22) 0%,rgba(255,122,0,.05) 60%,transparent 100%);border-radius:0 0 6px 6px;filter:blur(2px);pointer-events:none}
 #titan-landing .tl-mock-bot .tl-mixer::after{content:'';position:absolute;top:-3px;left:50%;transform:translateX(-50%);width:70%;height:3px;border-radius:2px;background:linear-gradient(90deg,transparent,#ff7a00 30%,#00d4ff 70%,transparent);filter:blur(.4px);box-shadow:0 0 12px rgba(255,122,0,.55)}
 
-/* Mixer knob rows: 4 small rotary knobs per row (trim + EQ) */
-#titan-landing .tl-mock-bot .tl-mix-knobs{display:flex;justify-content:space-between;align-items:center;gap:3px;flex:0 0 auto}
-#titan-landing .tl-mock-bot .tl-mix-knobs i{display:block;width:18%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 30% 30%,#4a4a4e 0%,#0a0a0b 75%);border:1px solid #1a1a1c;box-shadow:inset 0 -1px 1px rgba(0,0,0,.7),0 1px 1px rgba(0,0,0,.5),0 0 3px rgba(255,122,0,.2);position:relative}
-#titan-landing .tl-mock-bot .tl-mix-knobs i::after{content:'';position:absolute;top:14%;left:50%;width:1.5px;height:38%;background:#ff7a00;transform:translateX(-50%);border-radius:1px;box-shadow:0 0 3px rgba(255,122,0,.8)}
+/* Mixer knob rows: 4 rotary knobs per row (trim + EQ) — larger and high-contrast */
+#titan-landing .tl-mock-bot .tl-mix-knobs{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;flex:0 0 auto}
+#titan-landing .tl-mock-bot .tl-mix-knobs i{display:block;width:100%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 32% 28%,#7a7a7e 0%,#2a2a2e 55%,#0a0a0b 100%);border:1px solid #4a4a4e;box-shadow:inset 0 -1px 2px rgba(0,0,0,.85),inset 0 1px 1px rgba(255,255,255,.08),0 1px 2px rgba(0,0,0,.6),0 0 4px rgba(255,122,0,.25);position:relative}
+#titan-landing .tl-mock-bot .tl-mix-knobs-trim i{box-shadow:inset 0 -1px 2px rgba(0,0,0,.85),inset 0 1px 1px rgba(255,255,255,.08),0 1px 2px rgba(0,0,0,.6),0 0 6px rgba(255,122,0,.45)}
+#titan-landing .tl-mock-bot .tl-mix-knobs-eq i{box-shadow:inset 0 -1px 2px rgba(0,0,0,.85),inset 0 1px 1px rgba(255,255,255,.08),0 1px 2px rgba(0,0,0,.6),0 0 6px rgba(0,212,255,.45)}
+#titan-landing .tl-mock-bot .tl-mix-knobs i::after{content:'';position:absolute;top:10%;left:50%;width:2px;height:42%;background:#ffd17a;transform:translateX(-50%);border-radius:1px;box-shadow:0 0 4px #ff7a00,0 0 2px #ffb347}
 #titan-landing .tl-mock-bot .tl-mix-knobs-trim i:nth-child(1)::after{transform:translateX(-50%) rotate(-35deg);transform-origin:bottom center}
 #titan-landing .tl-mock-bot .tl-mix-knobs-trim i:nth-child(2)::after{transform:translateX(-50%) rotate(20deg);transform-origin:bottom center}
 #titan-landing .tl-mock-bot .tl-mix-knobs-trim i:nth-child(3)::after{transform:translateX(-50%) rotate(-10deg);transform-origin:bottom center}
 #titan-landing .tl-mock-bot .tl-mix-knobs-trim i:nth-child(4)::after{transform:translateX(-50%) rotate(40deg);transform-origin:bottom center}
-#titan-landing .tl-mock-bot .tl-mix-knobs-eq i::after{background:#00d4ff;box-shadow:0 0 3px rgba(0,212,255,.8)}
+#titan-landing .tl-mock-bot .tl-mix-knobs-eq i::after{background:#7fefff;box-shadow:0 0 4px #00d4ff,0 0 2px #7fefff}
 #titan-landing .tl-mock-bot .tl-mix-knobs-eq i:nth-child(1)::after{transform:translateX(-50%) rotate(15deg);transform-origin:bottom center}
 #titan-landing .tl-mock-bot .tl-mix-knobs-eq i:nth-child(2)::after{transform:translateX(-50%) rotate(-25deg);transform-origin:bottom center}
 #titan-landing .tl-mock-bot .tl-mix-knobs-eq i:nth-child(3)::after{transform:translateX(-50%) rotate(30deg);transform-origin:bottom center}
 #titan-landing .tl-mock-bot .tl-mix-knobs-eq i:nth-child(4)::after{transform:translateX(-50%) rotate(-15deg);transform-origin:bottom center}
 
-/* Mixer fader row: 4 vertical channel faders along the bottom */
-#titan-landing .tl-mock-bot .tl-mix-faders{flex:1;display:flex;justify-content:space-around;align-items:flex-end;gap:3px;padding-top:5px;border-top:1px solid rgba(255,255,255,.05)}
-#titan-landing .tl-mock-bot .tl-mix-faders span{width:5px;height:100%}
+/* Mixer fader row: 4 vertical channel faders with glowing caps */
+#titan-landing .tl-mock-bot .tl-mix-faders{flex:1;display:grid;grid-template-columns:repeat(4,1fr);gap:5px;padding-top:6px;border-top:1px solid rgba(255,255,255,.08)}
+#titan-landing .tl-mock-bot .tl-mix-faders span{width:auto;height:auto;justify-self:center;align-self:stretch;width:6px;position:relative;background:linear-gradient(to top,#1a1a1c 0%,#1a1a1c 55%,#ff7a00 55%,#ffd17a 100%) !important;box-shadow:0 0 8px rgba(255,122,0,.35)}
+#titan-landing .tl-mock-bot .tl-mix-faders span::after{content:'';position:absolute;left:-3px;right:-3px;height:6px;top:42%;background:linear-gradient(180deg,#5a5a5e,#1a1a1c);border:1px solid #6a6a6e;border-radius:2px;box-shadow:0 1px 2px rgba(0,0,0,.7),0 0 4px rgba(255,122,0,.5)}
 
 /* Mouth: wide audio-reactive grille that spans the lower face */
 #titan-landing .tl-mouth{position:absolute;left:18%;right:18%;bottom:14%;height:14%;background:radial-gradient(ellipse at 50% 50%,#0a0a0b 0%,#020203 100%);border:1px solid #1a1a1c;border-radius:8px;display:flex;justify-content:space-between;align-items:flex-end;padding:6px 10px;box-shadow:inset 0 0 18px rgba(0,0,0,.85),0 6px 18px rgba(0,0,0,.5),0 0 22px rgba(255,122,0,.08)}
