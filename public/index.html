@@ -16448,7 +16448,7 @@ function setupOfflineDownload(){
 
   googleBtn?.addEventListener('click',async()=>{
     if(loginErr)loginErr.textContent='';
-    if(!_supa){loginErr.textContent='Sign-in not configured yet. Owner must add Supabase URL + Anon Key in SETTINGS → SUPABASE.';return;}
+    if(!_supa){loginErr.textContent='Sign-in unavailable — could not reach the auth service. Try again in a moment.';return;}
     loginErr.textContent='Redirecting to Google…';
     try{
       const{error}=await _supa.auth.signInWithOAuth({provider:'google',options:{redirectTo:_oauthRedirectTo()}});
@@ -16457,7 +16457,7 @@ function setupOfflineDownload(){
   });
 
   emailBtn?.addEventListener('click',()=>{
-    if(!_supa){loginErr.textContent='Sign-in not configured yet. Owner must add Supabase URL + Anon Key in SETTINGS → SUPABASE.';return;}
+    if(!_supa){loginErr.textContent='Sign-in unavailable — could not reach the auth service. Try again in a moment.';return;}
     document.getElementById('authModal')?.classList.add('open');
   });
 
@@ -21560,7 +21560,12 @@ let _supa=null;let _supaUser=null;let _supaProfile=null;
 // load.
 const SUPA_DEFAULTS={
   url:'https://eliimbfzegwcepbljdwp.supabase.co',
-  anon:'' // filled in by owner via SETTINGS → SUPABASE if not replaced here
+  // The anon key is a PUBLIC client key (Supabase explicitly designs it
+  // to be embedded in the browser). Database access is gated by RLS on
+  // the server, so shipping it here is safe. Embedding means customers
+  // never have to enter Supabase credentials — they just click "Sign in
+  // with Google" and the OAuth flow runs against the project below.
+  anon:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVsaWltYmZ6ZWd3Y2VwYmxqZHdwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1NjQ0ODEsImV4cCI6MjA5MjE0MDQ4MX0.TOZODn__zOwnT1KyTGbOO8Bvwt4M-XvTYguzZ5aD_CU'
 };
 let supaCfg={...SUPA_DEFAULTS};
 try{const raw=localStorage.getItem(SUPA_CFG_KEY);if(raw){const saved=JSON.parse(raw);
