@@ -16451,7 +16451,7 @@ function setupOfflineDownload(){
     if(!_supa){loginErr.textContent='Sign-in not configured yet. Owner must add Supabase URL + Anon Key in SETTINGS → SUPABASE.';return;}
     loginErr.textContent='Redirecting to Google…';
     try{
-      const{error}=await _supa.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.href}});
+      const{error}=await _supa.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.origin+'/'}});
       if(error)loginErr.textContent='Error: '+error.message;
     }catch(e){loginErr.textContent='Error: '+(e.message||e);}
   });
@@ -21867,7 +21867,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     document.getElementById('authGoogleBtn')?.addEventListener('click',async()=>{
       if(!_supa){setStatus('Not connected','error');return;}
       setStatus('Redirecting to Google…');
-      const{error}=await _supa.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.href}});
+      const{error}=await _supa.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.origin+'/'}});
       if(error)setStatus('Error: '+error.message,'error');
     });
     document.getElementById('authEmailBtn')?.addEventListener('click',async()=>{
