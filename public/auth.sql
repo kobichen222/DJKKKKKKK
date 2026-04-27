@@ -13,22 +13,40 @@ create table if not exists public.profiles (
   avatar_url text,
   role text not null default 'user' check (role in ('user','admin')),
   banned boolean not null default false,
+  tier text not null default 'beginner' check (tier in ('beginner','pro')),
+  api_key uuid not null default gen_random_uuid(),
+  pro_since timestamptz,
+  pro_until timestamptz,
   created_at timestamptz not null default now(),
   last_login timestamptz not null default now(),
   metadata jsonb not null default '{}'::jsonb
 );
 
+-- Idempotent column adds for projects that already created the table
+-- before these fields existed.
+alter table public.profiles
+  add column if not exists tier text not null default 'beginner' check (tier in ('beginner','pro'));
+alter table public.profiles
+  add column if not exists api_key uuid not null default gen_random_uuid();
+alter table public.profiles
+  add column if not exists pro_since timestamptz;
+alter table public.profiles
+  add column if not exists pro_until timestamptz;
+update public.profiles set api_key = gen_random_uuid() where api_key is null;
+
 -- Auto-create a profile row whenever a new auth user signs up
 create or replace function public.handle_new_user()
 returns trigger language plpgsql security definer as $$
 begin
-  insert into public.profiles(id, email, phone, name, avatar_url)
+  insert into public.profiles(id, email, phone, name, avatar_url, tier, api_key)
   values (
     new.id,
     new.email,
     new.phone,
     coalesce(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name', new.email, new.phone),
-    new.raw_user_meta_data->>'avatar_url'
+    new.raw_user_meta_data->>'avatar_url',
+    'beginner',
+    gen_random_uuid()
   )
   on conflict (id) do nothing;
   return new;
@@ -62,7 +80,17 @@ create policy "profiles_admin_read_all" on public.profiles
 drop policy if exists "profiles_self_update" on public.profiles;
 create policy "profiles_self_update" on public.profiles
   for update using (auth.uid() = id)
-  with check (auth.uid() = id and role = (select role from public.profiles where id = auth.uid()));
+  with check (
+    auth.uid() = id
+    -- User cannot escalate role, change their tier, regenerate their
+    -- api_key, or move pro_since/until — only admins (or server-side
+    -- functions, e.g. a Stripe webhook) can flip those fields.
+    and role     = (select role     from public.profiles where id = auth.uid())
+    and tier     = (select tier     from public.profiles where id = auth.uid())
+    and api_key  = (select api_key  from public.profiles where id = auth.uid())
+    and pro_since is not distinct from (select pro_since from public.profiles where id = auth.uid())
+    and pro_until is not distinct from (select pro_until from public.profiles where id = auth.uid())
+  );
 
 drop policy if exists "profiles_admin_all" on public.profiles;
 create policy "profiles_admin_all" on public.profiles

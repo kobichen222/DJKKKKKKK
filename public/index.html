@@ -503,6 +503,68 @@ body.show-all .console.show-all{max-width:none;width:calc(100vw - 16px)}
 .track-row .actions .remove:hover{border-color:var(--red);color:var(--red)}
 .sampler-panel,.youtube-panel,.playlists-panel,.ai-dj-panel,.analytics-panel,.midi-panel,.settings-panel{width:100%;max-width:1700px;background:linear-gradient(180deg,#2a2a2e 0%,#1a1a1c 100%);border-radius:10px;padding:14px;border:1px solid var(--deck-border)}
 .settings-panel{max-width:900px;padding:20px}
+
+/* ════════════════════════════════════════════════════════════════
+   ACCOUNT — personal area shown to signed-in users
+   ════════════════════════════════════════════════════════════════ */
+.account-page{width:100%;max-width:980px;margin:0 auto;padding:18px;display:flex;flex-direction:column;gap:18px}
+.account-signed-out{background:linear-gradient(180deg,#2a2a2e 0%,#1a1a1c 100%);border:1px solid var(--deck-border);border-radius:14px;padding:48px 28px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+.account-signed-out .account-so-icon{font-size:42px;filter:drop-shadow(0 4px 10px rgba(255,122,0,.35))}
+.account-signed-out h2{font-family:'Orbitron',sans-serif;font-size:22px;letter-spacing:.5px;color:#fff;margin:0}
+.account-signed-out p{color:var(--text-dim);max-width:480px;line-height:1.6;margin:0}
+.account-cta{margin-top:6px;padding:13px 28px;background:linear-gradient(180deg,var(--orange) 0%,#a64500 100%);color:#0a0a0a;border:1px solid var(--orange-glow);border-radius:6px;font-family:'Orbitron',sans-serif;font-size:13px;font-weight:800;letter-spacing:2px;cursor:pointer;box-shadow:0 6px 20px rgba(255,122,0,.45),inset 0 1px 0 rgba(255,255,255,.3);transition:transform .12s,box-shadow .15s}
+.account-cta:hover{transform:translateY(-1px);box-shadow:0 10px 26px rgba(255,122,0,.55),inset 0 1px 0 rgba(255,255,255,.35)}
+
+.account-hero{display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center;background:linear-gradient(135deg,#222226 0%,#15151a 100%);border:1px solid var(--deck-border);border-radius:14px;padding:20px 22px;box-shadow:0 10px 40px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.04)}
+.account-avatar{position:relative;width:72px;height:72px;border-radius:50%;background:radial-gradient(circle at 32% 28%,#3a3a3e,#0a0a0b 70%);border:2px solid var(--orange);box-shadow:0 0 16px rgba(255,122,0,.4),inset 0 0 12px rgba(0,0,0,.6);overflow:hidden;display:flex;align-items:center;justify-content:center}
+.account-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.account-avatar img:not([src]),.account-avatar img[src=""]{display:none}
+.account-avatar #accInitial{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-size:28px;font-weight:900;color:var(--orange);text-shadow:0 0 10px rgba(255,122,0,.6)}
+.account-avatar img[src]:not([src=""]) ~ #accInitial{display:none}
+.account-id h2{font-family:'Orbitron',sans-serif;font-size:22px;letter-spacing:.5px;color:#fff;margin:0 0 4px}
+.account-id p{font-family:'Share Tech Mono',monospace;font-size:13px;color:var(--text-dim);margin:0 0 8px;letter-spacing:.5px}
+.account-tier-badge{display:inline-block;padding:5px 12px;background:linear-gradient(180deg,#1a1a1c 0%,#0a0a0b 100%);border:1px solid #2e2e36;color:#cfcfd2;font-family:'Orbitron',sans-serif;font-size:10px;font-weight:800;letter-spacing:2.5px;border-radius:3px}
+.account-tier-badge.is-pro{background:linear-gradient(180deg,var(--orange) 0%,#a64500 100%);color:#0a0a0a;border-color:var(--orange-glow);box-shadow:0 0 12px rgba(255,122,0,.5)}
+.account-since{text-align:right;display:flex;flex-direction:column;gap:3px}
+.acc-meta-label{font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:2px;color:var(--text-dim)}
+.account-since b{font-family:'Share Tech Mono',monospace;font-size:13px;color:#cfcfd2;font-weight:700}
+
+.account-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.account-card{background:linear-gradient(180deg,#1f1f23 0%,#0f0f12 100%);border:1px solid var(--deck-border);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:12px;box-shadow:0 6px 22px rgba(0,0,0,.4)}
+.account-card h3{font-family:'Orbitron',sans-serif;font-size:13px;letter-spacing:2px;color:var(--orange);margin:0;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.05);text-transform:uppercase}
+.account-card-desc{font-size:12px;color:var(--text-dim);line-height:1.55;margin:0}
+.account-key-row{display:flex;align-items:center;gap:6px;background:#020608;border:1px solid #1a2a30;border-radius:6px;padding:8px 10px}
+.account-key{flex:1;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:1.5px;color:var(--screen-glow);text-shadow:0 0 6px rgba(46,224,255,.4);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:transparent;border:0;padding:0}
+.account-key-toggle,.account-copy-btn{padding:6px 10px;background:linear-gradient(180deg,#2a2a2e 0%,#1a1a1c 100%);border:1px solid #333;color:var(--text-dim);font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;letter-spacing:1.5px;border-radius:4px;cursor:pointer;transition:border-color .15s,color .15s}
+.account-key-toggle:hover,.account-copy-btn:hover{border-color:var(--orange);color:var(--orange)}
+.account-copy-btn.is-copied{background:var(--play-green);color:#001a0a;border-color:var(--play-green)}
+
+.account-tier-row{display:flex;flex-direction:column;gap:4px}
+.account-tier-current{font-family:'Orbitron',sans-serif;font-size:24px;font-weight:900;letter-spacing:2px;color:#cfcfd2}
+.account-tier-current.is-pro{background:linear-gradient(135deg,var(--orange),#ffb347);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 0 12px rgba(255,122,0,.3)}
+.account-tier-meta{font-size:12px;color:var(--text-dim);line-height:1.55}
+.account-pro-info{display:flex;flex-wrap:wrap;gap:18px;background:#0a0a0b;border:1px solid #1a1a1c;border-radius:6px;padding:10px 12px}
+.account-pro-info > span{display:flex;flex-direction:column;gap:2px}
+.account-pro-info b{font-family:'Share Tech Mono',monospace;font-size:13px;color:#cfcfd2;font-weight:700}
+.account-upgrade-btn{margin-top:auto;padding:11px;background:linear-gradient(180deg,var(--orange) 0%,#a64500 100%);color:#0a0a0a;border:1px solid var(--orange-glow);border-radius:6px;font-family:'Orbitron',sans-serif;font-size:12px;font-weight:800;letter-spacing:2px;text-decoration:none;text-align:center;cursor:pointer;box-shadow:0 4px 14px rgba(255,122,0,.45),inset 0 1px 0 rgba(255,255,255,.3);transition:transform .12s,box-shadow .15s}
+.account-upgrade-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(255,122,0,.55)}
+
+.account-benefits{grid-column:1/-1}
+.account-benefits-list{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(2,1fr);gap:8px 18px}
+.account-benefits-list li{display:flex;align-items:center;gap:10px;font-size:13px;color:#cfcfd2;line-height:1.4}
+.account-benefits-list li i{flex:0 0 auto;width:6px;height:6px;border-radius:50%;background:var(--orange);box-shadow:0 0 8px rgba(255,122,0,.7)}
+
+.account-actions-row{display:flex;gap:8px;flex-wrap:wrap}
+.account-action-btn{flex:1;min-width:140px;padding:10px;background:linear-gradient(180deg,#2a2a2e 0%,#1a1a1c 100%);border:1px solid #333;color:var(--text);font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;border-radius:5px;cursor:pointer;transition:border-color .15s,color .15s}
+.account-action-btn:hover{border-color:var(--orange);color:var(--orange)}
+.account-action-btn.account-danger:hover{border-color:var(--red);color:var(--red)}
+
+@media (max-width:760px){
+  .account-hero{grid-template-columns:auto 1fr;text-align:left}
+  .account-since{grid-column:1/-1;text-align:left;flex-direction:row;justify-content:space-between;padding-top:8px;border-top:1px solid rgba(255,255,255,.05)}
+  .account-grid{grid-template-columns:1fr}
+  .account-benefits-list{grid-template-columns:1fr}
+}
 .ai-dj-panel{max-width:1200px;padding:20px;background:linear-gradient(135deg,rgba(200,0,255,.1) 0%,rgba(0,212,255,.1) 100%),linear-gradient(180deg,#2a2a2e 0%,#1a1a1c 100%);border-color:var(--purple);box-shadow:0 0 40px rgba(200,0,255,.2)}
 .analytics-panel{max-width:1400px;padding:20px}
 .midi-panel{max-width:900px;padding:20px}
@@ -10782,6 +10844,7 @@ body.tl-locked{overflow:hidden}
 <button class="tab-btn" data-tab="studio" data-t="tab_studio">🎚 SOUND</button>
 <button class="tab-btn" data-tab="studiopro" data-t="tab_studiopro">🎹 TITAN LAB</button>
 <button class="tab-btn admin-only" data-tab="admin" id="adminTabBtn" style="display:none">🛡 ADMIN</button>
+<button class="tab-btn customer-only" data-tab="account" id="accountTabBtn" style="display:none">👤 ACCOUNT</button>
 <button class="tab-btn" data-tab="settings" data-t="tab_settings">⚙ SETTINGS</button>
 <button class="tab-btn" data-tab="support" data-t="tab_support">📧 SUPPORT</button>
 <button class="tab-btn" data-tab="guide" data-t="tab_guide">❓ GUIDE</button>
@@ -12632,6 +12695,74 @@ No mappings yet. Pick a preset above or right-click any control → MIDI Learn.
 <tbody id="adminUsersBody"><tr><td colspan="6" style="text-align:center;color:var(--text-dim);padding:20px;">Sign in as admin to view users.</td></tr></tbody>
 </table>
 </div>
+</div>
+</div>
+
+<div class="tab-content" id="tab-account">
+<div class="account-page">
+  <div class="account-signed-out" id="accSignedOut">
+    <div class="account-so-icon">🔒</div>
+    <h2>Sign in to access your account</h2>
+    <p>Create a free TITAN account in seconds. Track your sessions, unlock PRO tools, and get a personal API key.</p>
+    <button class="account-cta" id="accSignedOutCta">👤 Sign In With Google</button>
+  </div>
+  <div class="account-signed-in" id="accSignedIn" style="display:none">
+    <header class="account-hero">
+      <div class="account-avatar"><img id="accAvatar" alt=""/><span id="accInitial">·</span></div>
+      <div class="account-id">
+        <h2 id="accName">—</h2>
+        <p id="accEmail">—</p>
+        <span class="account-tier-badge" id="accTier">BEGINNER</span>
+      </div>
+      <div class="account-since"><span class="acc-meta-label">MEMBER SINCE</span><b id="accSince">—</b></div>
+    </header>
+
+    <section class="account-grid">
+      <div class="account-card">
+        <h3>🔑 Personal API Key</h3>
+        <p class="account-card-desc">Use this key to activate premium features and external integrations. Treat it like a password.</p>
+        <div class="account-key-row">
+          <code class="account-key" id="accApiKey">•••••• •••••• •••••• ••••••</code>
+          <button class="account-key-toggle" id="accKeyToggle" title="Show / hide">👁</button>
+          <button class="account-copy-btn" id="accCopyKey">COPY</button>
+        </div>
+      </div>
+
+      <div class="account-card">
+        <h3>⭐ Subscription</h3>
+        <div class="account-tier-row">
+          <span class="account-tier-current" id="accTierLg">BEGINNER</span>
+          <span class="account-tier-meta" id="accTierMeta">Free plan — upgrade anytime to unlock all premium tools.</span>
+        </div>
+        <div class="account-pro-info" id="accProInfo" style="display:none">
+          <span><span class="acc-meta-label">PRO SINCE</span><b id="accProSince">—</b></span>
+          <span><span class="acc-meta-label">RENEWS</span><b id="accProUntil">—</b></span>
+        </div>
+        <a class="account-upgrade-btn" id="accUpgradeBtn" href="#" target="_blank" rel="noopener">⚡ Upgrade to PRO</a>
+      </div>
+
+      <div class="account-card account-benefits" id="accBenefitsCard">
+        <h3>⚡ What PRO Unlocks</h3>
+        <ul class="account-benefits-list">
+          <li><i></i>Unlimited cloud sessions &amp; sync across devices</li>
+          <li><i></i>Studio-grade recording without watermark</li>
+          <li><i></i>TITAN LAB premium tools (sampler 64-pad, drum-machine library, mastering compressor)</li>
+          <li><i></i>AI auto-mix priority queue + harmonic guidance</li>
+          <li><i></i>30+ pro sound presets &amp; theme packs</li>
+          <li><i></i>Priority support</li>
+        </ul>
+      </div>
+
+      <div class="account-card">
+        <h3>🚪 Account Actions</h3>
+        <p class="account-card-desc">Sign out keeps your local data. Deleting removes your cloud profile permanently.</p>
+        <div class="account-actions-row">
+          <button class="account-action-btn" id="accSignOutBtn">⎋ Sign Out</button>
+          <button class="account-action-btn account-danger" id="accDeleteBtn">🗑 Delete Account</button>
+        </div>
+      </div>
+    </section>
+  </div>
 </div>
 </div>
 
@@ -21648,9 +21779,12 @@ async function onSupaSession(session){
   document.getElementById('authModal')?.classList.remove('open');
   try{
     const{data:profile,error}=await _supa.from('profiles').select('*').eq('id',_supaUser.id).single();
-    _supaProfile=profile||{id:_supaUser.id,email:_supaUser.email,phone:_supaUser.phone,role:'user'};
+    _supaProfile=profile||{id:_supaUser.id,email:_supaUser.email,phone:_supaUser.phone,role:'user',tier:'beginner',api_key:''};
+    // Defensive defaults so renderAccountPage never sees undefined fields
+    if(!_supaProfile.tier)_supaProfile.tier='beginner';
+    if(!_supaProfile.api_key)_supaProfile.api_key='';
     try{await _supa.from('profiles').update({last_login:new Date().toISOString()}).eq('id',_supaUser.id);}catch(_){}
-  }catch(e){_supaProfile={id:_supaUser.id,email:_supaUser.email,role:'user'};}
+  }catch(e){_supaProfile={id:_supaUser.id,email:_supaUser.email,role:'user',tier:'beginner',api_key:''};}
   updateAuthUI();
   if(_supaProfile.banned){
     toast&&toast('Account suspended — contact support','error');
@@ -21671,17 +21805,119 @@ function updateAuthUI(){
   const chip=document.getElementById('authChip');
   const name=document.getElementById('authName');
   const admin=document.getElementById('adminTabBtn');
+  const account=document.getElementById('accountTabBtn');
   if(_supaUser){
     if(btn)btn.style.display='none';
     if(chip)chip.style.display='inline-flex';
     if(name)name.textContent=_supaProfile?.name||_supaUser.email||_supaUser.phone||'User';
     if(admin)admin.style.display=_supaProfile?.role==='admin'?'inline-flex':'none';
+    if(account)account.style.display='inline-flex';
   }else{
     if(btn)btn.style.display='inline-flex';
     if(chip)chip.style.display='none';
     if(admin)admin.style.display='none';
+    if(account)account.style.display='none';
+  }
+  renderAccountPage();
+}
+
+/* Personal account page — populated from _supaProfile every time the
+   auth state changes. The signed-out fallback shows a simple CTA so the
+   tab still has something to render if a curious visitor opens it. */
+function renderAccountPage(){
+  const out=document.getElementById('accSignedOut');
+  const inn=document.getElementById('accSignedIn');
+  if(!out||!inn)return;
+  if(!_supaUser||!_supaProfile){out.style.display='flex';inn.style.display='none';return;}
+  out.style.display='none';inn.style.display='block';
+
+  const p=_supaProfile;
+  const nm=p.name||_supaUser.email||_supaUser.phone||'TITAN user';
+  const em=p.email||_supaUser.email||p.phone||_supaUser.phone||'';
+  const init=(nm[0]||'·').toUpperCase();
+  const tier=(p.tier||'beginner').toLowerCase();
+  const isPro=tier==='pro';
+
+  const setText=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  const setHTML=(id,v)=>{const el=document.getElementById(id);if(el)el.innerHTML=v;};
+  setText('accName',nm);
+  setText('accEmail',em);
+  setText('accInitial',init);
+  const av=document.getElementById('accAvatar')?.querySelector('img');
+  if(av){if(p.avatar_url){av.src=p.avatar_url;av.style.display='block';}else{av.removeAttribute('src');av.style.display='none';}}
+
+  const tierEl=document.getElementById('accTier');
+  if(tierEl){tierEl.textContent=isPro?'PRO':'BEGINNER';tierEl.classList.toggle('is-pro',isPro);}
+  const tierLg=document.getElementById('accTierLg');
+  if(tierLg){tierLg.textContent=isPro?'PRO':'BEGINNER';tierLg.classList.toggle('is-pro',isPro);}
+  setText('accTierMeta',isPro?'You have full access to every premium tool, theme and AI feature.':'Free plan — upgrade anytime to unlock all premium tools.');
+
+  const since=p.created_at?new Date(p.created_at):null;
+  setText('accSince',since?since.toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'}):'—');
+
+  const proInfo=document.getElementById('accProInfo');
+  if(proInfo){
+    if(isPro){
+      proInfo.style.display='flex';
+      const ps=p.pro_since?new Date(p.pro_since).toLocaleDateString():'—';
+      const pu=p.pro_until?new Date(p.pro_until).toLocaleDateString():'—';
+      setText('accProSince',ps);setText('accProUntil',pu);
+    }else{proInfo.style.display='none';}
+  }
+  const upBtn=document.getElementById('accUpgradeBtn');
+  if(upBtn){
+    if(isPro){upBtn.textContent='✓ Manage Subscription';}
+    else{upBtn.textContent='⚡ Upgrade to PRO';}
+    if(typeof SP_STRIPE_CHECKOUT_URL==='string')upBtn.href=SP_STRIPE_CHECKOUT_URL;
+  }
+  const benefits=document.getElementById('accBenefitsCard');
+  if(benefits)benefits.style.display=isPro?'none':'flex';
+
+  // API key: hidden by default, click 👁 to reveal
+  const keyEl=document.getElementById('accApiKey');
+  if(keyEl){
+    keyEl.dataset.key=p.api_key||'';
+    keyEl.dataset.shown='0';
+    keyEl.textContent=p.api_key?_maskKey(p.api_key):'—';
   }
 }
+function _maskKey(k){if(!k)return'—';return k.replace(/[0-9a-f]/gi,'•').replace(/(.{6})/g,'$1 ').trim();}
+
+document.addEventListener('click',(e)=>{
+  const t=e.target;
+  if(!t)return;
+  if(t.id==='accSignedOutCta'){document.getElementById('authBtn')?.click();return;}
+  if(t.id==='accKeyToggle'){
+    const k=document.getElementById('accApiKey');if(!k)return;
+    const real=k.dataset.key||'';if(!real)return;
+    const shown=k.dataset.shown==='1';
+    k.dataset.shown=shown?'0':'1';
+    k.textContent=shown?_maskKey(real):real;
+    return;
+  }
+  if(t.id==='accCopyKey'){
+    const k=document.getElementById('accApiKey');const real=k?.dataset.key||'';if(!real){toast&&toast('No API key yet','error');return;}
+    try{navigator.clipboard.writeText(real);t.classList.add('is-copied');t.textContent='COPIED ✓';setTimeout(()=>{t.classList.remove('is-copied');t.textContent='COPY';},1400);}
+    catch(_){toast&&toast('Copy failed','error');}
+    return;
+  }
+  if(t.id==='accSignOutBtn'){document.getElementById('authLogoutBtn')?.click();return;}
+  if(t.id==='accDeleteBtn'){
+    if(!_supa||!_supaUser)return;
+    if(!confirm('Permanently delete your TITAN account? Your local data stays, but cloud profile, sessions, and PRO entitlement will be removed.'))return;
+    (async()=>{try{await _supa.from('profiles').delete().eq('id',_supaUser.id);await _supa.auth.signOut();toast&&toast('Account deleted','success');}
+    catch(err){toast&&toast('Delete failed: '+(err.message||err),'error');}})();
+    return;
+  }
+});
+
+// Clicking the auth chip in the header jumps to the ACCOUNT tab so the
+// signed-in user has a one-click path to their profile / API key.
+document.addEventListener('click',(e)=>{
+  if(e.target.closest&&e.target.closest('#authChip')&&!e.target.closest('#authLogoutBtn')){
+    document.querySelector('.tab-btn[data-tab="account"]')?.click();
+  }
+});
 function saveSupaCfg(){
   let u=document.getElementById('supabaseUrl')?.value?.trim()||'';
   const a=document.getElementById('supabaseAnon')?.value?.trim()||'';
